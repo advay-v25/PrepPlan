@@ -1,0 +1,113 @@
+{
+  "module": "fsa-income",
+  "target": 2,
+  "seed": 101,
+  "dryRun": false,
+  "quota": {
+    "pairs": [
+      {
+        "cognition": "recall",
+        "itemForm": "direct",
+        "count": 0
+      },
+      {
+        "cognition": "recall",
+        "itemForm": "exception",
+        "count": 0
+      },
+      {
+        "cognition": "interpret",
+        "itemForm": "scenario",
+        "count": 0
+      },
+      {
+        "cognition": "interpret",
+        "itemForm": "data_table",
+        "count": 0
+      },
+      {
+        "cognition": "apply",
+        "itemForm": "scenario",
+        "count": 1
+      },
+      {
+        "cognition": "apply",
+        "itemForm": "direct",
+        "count": 0
+      },
+      {
+        "cognition": "calculate",
+        "itemForm": "calculation",
+        "count": 1
+      },
+      {
+        "cognition": "calculate",
+        "itemForm": "data_table",
+        "count": 0
+      },
+      {
+        "cognition": "compare",
+        "itemForm": "scenario",
+        "count": 0
+      },
+      {
+        "cognition": "compare",
+        "itemForm": "exception",
+        "count": 0
+      },
+      {
+        "cognition": "diagnose",
+        "itemForm": "scenario",
+        "count": 0
+      },
+      {
+        "cognition": "integrate",
+        "itemForm": "integrated",
+        "count": 0
+      }
+    ],
+    "difficulties": [
+      {
+        "difficulty": "foundation",
+        "count": 1
+      },
+      {
+        "difficulty": "standard",
+        "count": 1
+      },
+      {
+        "difficulty": "difficult",
+        "count": 0
+      },
+      {
+        "difficulty": "stretch",
+        "count": 0
+      }
+    ],
+    "conceptCounts": {
+      "22222222-2222-2222-2222-222222222224": 1,
+      "22222222-2222-2222-2222-22222222222a": 1
+    },
+    "total": 2,
+    "seed": 101
+  },
+  "totalDrafted": 4,
+  "releasedCount": 0,
+  "yieldRate": 0,
+  "coverage": {
+    "satisfied": false,
+    "shortfalls": [
+      "calculate/calculation: wanted 1, released 0",
+      "difficulty foundation: wanted 1, released 0",
+      "concept 22222222-2222-2222-2222-222222222224: wanted 1, released 0"
+    ]
+  },
+  "keyPositions": [
+    1,
+    0,
+    0
+  ],
+  "positionBalanced": true,
+  "defectTally": {},
+  "records": []
+}

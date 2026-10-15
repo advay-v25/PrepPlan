@@ -1,0 +1,764 @@
+{
+ "volume": "Fixed Income, Derivatives (Schweser 2027 vol.)",
+ "subjects": [
+  {
+   "id": "fi",
+   "name": "Fixed Income",
+   "readings": [
+    {
+     "n": 51,
+     "title": "Fixed-Income Instrument Features",
+     "modules": [
+      [
+       "51.1",
+       "Fixed-Income Instrument Features",
+       1
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe the features of a fixed-income security",
+       1
+      ],
+      [
+       "b",
+       "Describe bond indenture contents and covenants",
+       4
+      ]
+     ]
+    },
+    {
+     "n": 52,
+     "title": "Fixed-Income Cash Flows and Types",
+     "modules": [
+      [
+       "52.1",
+       "Fixed-Income Cash Flows and Types",
+       9
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe cash flow structures and contingency provisions",
+       9
+      ],
+      [
+       "b",
+       "Describe legal, regulatory and tax effects on issuance and trading",
+       15
+      ]
+     ]
+    },
+    {
+     "n": 53,
+     "title": "Fixed-Income Issuance and Trading",
+     "modules": [
+      [
+       "53.1",
+       "Fixed-Income Issuance and Trading",
+       21
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe market segments and their participants",
+       21
+      ],
+      [
+       "b",
+       "Describe types of fixed-income indexes",
+       24
+      ],
+      [
+       "c",
+       "Compare primary and secondary markets with equity markets",
+       25
+      ]
+     ]
+    },
+    {
+     "n": 54,
+     "title": "Fixed-Income Markets for Corporate Issuers",
+     "modules": [
+      [
+       "54.1",
+       "Fixed-Income Markets for Corporate Issuers",
+       31
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Compare short-term funding alternatives for corporations",
+       31
+      ],
+      [
+       "b",
+       "Describe repurchase agreements, uses and risks",
+       33
+      ],
+      [
+       "c",
+       "Contrast long-term funding of investment-grade and high-yield issuers",
+       37
+      ]
+     ]
+    },
+    {
+     "n": 55,
+     "title": "Fixed-Income Markets for Government Issuers",
+     "modules": [
+      [
+       "55.1",
+       "Fixed-Income Markets for Government Issuers",
+       41
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe funding choices of sovereign, non-sovereign and supranational issuers",
+       41
+      ],
+      [
+       "b",
+       "Contrast issuance and trading of government and corporate instruments",
+       43
+      ]
+     ]
+    },
+    {
+     "n": 56,
+     "title": "Fixed-Income Bond Valuation: Prices and Yields",
+     "modules": [
+      [
+       "56.1",
+       "Fixed-Income Bond Valuation: Prices and Yields",
+       49
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Calculate a bond's price on or between coupon dates",
+       49
+      ],
+      [
+       "b",
+       "Identify relationships among price, coupon, maturity and yield",
+       53
+      ],
+      [
+       "c",
+       "Describe matrix pricing",
+       55
+      ]
+     ]
+    },
+    {
+     "n": 57,
+     "title": "Yield and Yield Spread Measures for Fixed-Rate Bonds",
+     "modules": [
+      [
+       "57.1",
+       "Yield and Yield Spread Measures for Fixed-Rate Bonds",
+       61
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Calculate annual yield for varying compounding periods",
+       61
+      ],
+      [
+       "b",
+       "Compare, calculate and interpret yield and spread measures",
+       66
+      ]
+     ]
+    },
+    {
+     "n": 58,
+     "title": "Yield and Yield Spread Measures for Floating-Rate Instruments",
+     "modules": [
+      [
+       "58.1",
+       "Yield and Yield Spread Measures for Floating-Rate Instruments",
+       73
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Calculate and interpret spread measures for floating-rate instruments",
+       73
+      ],
+      [
+       "b",
+       "Calculate and interpret yield measures for money market instruments",
+       74
+      ]
+     ]
+    },
+    {
+     "n": 59,
+     "title": "The Term Structure of Interest Rates: Spot, Par, and Forward Curves",
+     "modules": [
+      [
+       "59.1",
+       "The Term Structure of Interest Rates: Spot, Par, and Forward Curves",
+       79
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Define spot rates and price a bond using them",
+       79
+      ],
+      [
+       "b",
+       "Define par, spot and forward rates and their relationships",
+       80
+      ],
+      [
+       "c",
+       "Compare the spot, par and forward curves",
+       85
+      ]
+     ]
+    },
+    {
+     "n": 60,
+     "title": "Interest Rate Risk and Return",
+     "modules": [
+      [
+       "60.1",
+       "Interest Rate Risk and Return",
+       91
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Calculate and interpret return sources from a fixed-rate bond",
+       91
+      ],
+      [
+       "b",
+       "Describe holding period return, horizon and Macaulay duration",
+       96
+      ],
+      [
+       "c",
+       "Calculate and interpret Macaulay duration",
+       96
+      ]
+     ]
+    },
+    {
+     "n": 61,
+     "title": "Yield-Based Bond Duration Measures and Properties",
+     "modules": [
+      [
+       "61.1",
+       "Yield-Based Bond Duration Measures and Properties",
+       101
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Define and calculate modified duration, money duration and PVBP",
+       101
+      ],
+      [
+       "b",
+       "Explain how maturity, coupon and yield affect interest rate risk",
+       104
+      ]
+     ]
+    },
+    {
+     "n": 62,
+     "title": "Yield-Based Bond Convexity and Portfolio Properties",
+     "modules": [
+      [
+       "62.1",
+       "Yield-Based Bond Convexity and Portfolio Properties",
+       109
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Calculate and interpret convexity",
+       109
+      ],
+      [
+       "b",
+       "Calculate percentage price change from duration and convexity",
+       112
+      ],
+      [
+       "c",
+       "Calculate portfolio duration and convexity and their limitations",
+       114
+      ]
+     ]
+    },
+    {
+     "n": 63,
+     "title": "Curve-Based and Empirical Fixed-Income Risk Measures",
+     "modules": [
+      [
+       "63.1",
+       "Curve-Based and Empirical Fixed-Income Risk Measures",
+       121
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain effective duration and convexity for bonds with options",
+       121
+      ],
+      [
+       "b",
+       "Calculate price change using effective duration and convexity",
+       121
+      ],
+      [
+       "c",
+       "Define key rate duration and its use",
+       124
+      ],
+      [
+       "d",
+       "Describe empirical versus analytical duration",
+       125
+      ]
+     ]
+    },
+    {
+     "n": 64,
+     "title": "Credit Risk",
+     "modules": [
+      [
+       "64.1",
+       "Credit Risk",
+       129
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe credit risk and its components",
+       129
+      ],
+      [
+       "b",
+       "Describe uses and limits of credit ratings",
+       132
+      ],
+      [
+       "c",
+       "Describe factors that influence yield spreads",
+       134
+      ]
+     ]
+    },
+    {
+     "n": 65,
+     "title": "Credit Analysis for Government Issuers",
+     "modules": [
+      [
+       "65.1",
+       "Credit Analysis for Government Issuers",
+       141
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain considerations in evaluating sovereign and non-sovereign credit",
+       141
+      ]
+     ]
+    },
+    {
+     "n": 66,
+     "title": "Credit Analysis for Corporate Issuers",
+     "modules": [
+      [
+       "66.1",
+       "Credit Analysis for Corporate Issuers",
+       147
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe qualitative and quantitative factors in corporate credit analysis",
+       147
+      ],
+      [
+       "b",
+       "Calculate and interpret financial ratios for credit analysis",
+       149
+      ],
+      [
+       "c",
+       "Describe seniority rankings and priority of claims",
+       151
+      ]
+     ]
+    },
+    {
+     "n": 67,
+     "title": "Fixed-Income Securitization",
+     "modules": [
+      [
+       "67.1",
+       "Fixed-Income Securitization",
+       157
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain benefits of securitization for issuers, investors and markets",
+       157
+      ],
+      [
+       "b",
+       "Describe securitization parties and roles",
+       159
+      ]
+     ]
+    },
+    {
+     "n": 68,
+     "title": "Asset-Backed Security (ABS) Instrument and Market Features",
+     "modules": [
+      [
+       "68.1",
+       "Asset-Backed Security (ABS) Instrument and Market Features",
+       165
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe covered bonds versus other ABS",
+       165
+      ],
+      [
+       "b",
+       "Describe credit enhancement structures",
+       166
+      ],
+      [
+       "c",
+       "Describe non-mortgage ABS types, cash flows and risks",
+       167
+      ],
+      [
+       "d",
+       "Describe collateralized debt obligations",
+       169
+      ]
+     ]
+    },
+    {
+     "n": 69,
+     "title": "Mortgage-Backed Security (MBS) Instrument and Market Features",
+     "modules": [
+      [
+       "69.1",
+       "Mortgage-Backed Security (MBS) Instrument and Market Features",
+       173
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Define prepayment risk and tranching",
+       173
+      ],
+      [
+       "b",
+       "Describe residential mortgage loan features",
+       174
+      ],
+      [
+       "c",
+       "Describe residential MBS types, cash flows and risks",
+       176
+      ],
+      [
+       "d",
+       "Describe commercial MBS characteristics and risks",
+       179
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "deriv",
+   "name": "Derivatives",
+   "readings": [
+    {
+     "n": 70,
+     "title": "Derivative Instrument and Derivative Market Features",
+     "modules": [
+      [
+       "70.1",
+       "Derivative Instrument and Derivative Market Features",
+       187
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Define and describe a derivative instrument",
+       187
+      ],
+      [
+       "b",
+       "Describe derivative markets and contrast OTC with exchange-traded",
+       191
+      ]
+     ]
+    },
+    {
+     "n": 71,
+     "title": "Forward Commitment and Contingent Claim Features and Instruments",
+     "modules": [
+      [
+       "71.1",
+       "Forwards and Futures",
+       197
+      ],
+      [
+       "71.2",
+       "Swaps and Options",
+       199
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Define forwards, futures, swaps, options and credit derivatives",
+       197
+      ],
+      [
+       "b",
+       "Determine value and profit at expiration for options",
+       201
+      ],
+      [
+       "c",
+       "Contrast forward commitments with contingent claims",
+       204
+      ]
+     ]
+    },
+    {
+     "n": 72,
+     "title": "Derivative Benefits, Risks, and Issuer and Investor Uses",
+     "modules": [
+      [
+       "72.1",
+       "Derivative Benefits, Risks, and Issuer and Investor Uses",
+       209
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe benefits and risks of derivatives",
+       209
+      ],
+      [
+       "b",
+       "Compare derivative use among issuers and investors",
+       212
+      ]
+     ]
+    },
+    {
+     "n": 73,
+     "title": "Arbitrage, Replication, and the Cost of Carry in Pricing Derivatives",
+     "modules": [
+      [
+       "73.1",
+       "Arbitrage, Replication, and the Cost of Carry in Pricing Derivatives",
+       217
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain arbitrage and replication in derivative pricing",
+       217
+      ],
+      [
+       "b",
+       "Explain spot versus future price and cost of carry",
+       219
+      ]
+     ]
+    },
+    {
+     "n": 74,
+     "title": "Pricing and Valuation of Forward Contracts and for an Underlying with Varying Maturities",
+     "modules": [
+      [
+       "74.1",
+       "Pricing and Valuation of Forward Contracts and for an Underlying with Varying Maturities",
+       225
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain forward contract value and price through its life",
+       225
+      ],
+      [
+       "b",
+       "Explain how forward rates are determined and used",
+       226
+      ]
+     ]
+    },
+    {
+     "n": 75,
+     "title": "Pricing and Valuation of Futures Contracts",
+     "modules": [
+      [
+       "75.1",
+       "Pricing and Valuation of Futures Contracts",
+       233
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Compare value and price of forwards and futures",
+       233
+      ],
+      [
+       "b",
+       "Explain why forward and futures prices differ",
+       234
+      ]
+     ]
+    },
+    {
+     "n": 76,
+     "title": "Pricing and Valuation of Interest Rates and Other Swaps",
+     "modules": [
+      [
+       "76.1",
+       "Pricing and Valuation of Interest Rates and Other Swaps",
+       239
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe how swaps relate to and differ from forwards",
+       239
+      ],
+      [
+       "b",
+       "Contrast value and price of swaps",
+       240
+      ]
+     ]
+    },
+    {
+     "n": 77,
+     "title": "Pricing and Valuation of Options",
+     "modules": [
+      [
+       "77.1",
+       "Pricing and Valuation of Options",
+       245
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain exercise value, moneyness and time value",
+       245
+      ],
+      [
+       "b",
+       "Contrast arbitrage and replication in forwards and contingent claims",
+       247
+      ],
+      [
+       "c",
+       "Identify and describe factors that determine option value",
+       250
+      ]
+     ]
+    },
+    {
+     "n": 78,
+     "title": "Option Replication Using Put-Call Parity",
+     "modules": [
+      [
+       "78.1",
+       "Option Replication Using Put-Call Parity",
+       255
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain put-call parity for European options",
+       255
+      ],
+      [
+       "b",
+       "Explain put-call forward parity",
+       257
+      ]
+     ]
+    },
+    {
+     "n": 79,
+     "title": "Valuing a Derivative Using a One-Period Binomial Model",
+     "modules": [
+      [
+       "79.1",
+       "Valuing a Derivative Using a One-Period Binomial Model",
+       263
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Value a derivative using a one-period binomial model",
+       263
+      ],
+      [
+       "b",
+       "Describe risk neutrality in derivative pricing",
+       266
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

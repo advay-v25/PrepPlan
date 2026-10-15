@@ -1,0 +1,992 @@
+[
+ {
+  "id": "q-eth-r093-a-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r093-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r093-a-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r093-b-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r093-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r093-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r093-c-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r093-c-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r093-c-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r093-d-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r093-d-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r093-d-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r093-e-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r093-e-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r093-e-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r093-f-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r093-f-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r093-f-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r093-g-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r093-g-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r093-g-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r093-h-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r093-h-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r093-h-medium",
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 0 (Listing stakeholders, duties owed, and conflicts of interest corresponds to the 'Consider' stage of the CFA Institute's Ethical Decision‑Making Framework, where relevant facts and parties are examined.); item declares option 1",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r094-a-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r094-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r094-a-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r094-b-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r094-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r094-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r094-c-easy",
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 0 (Standard III(E) Preservation of Confidentiality was added in the 2023 revision of the CFA Institute Code and Standards.); item declares option 1",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r094-c-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r094-c-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r095-a-easy",
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 0 (Members must comply with applicable law, which overrides the CFA Institute Code when in conflict.); item declares option 1",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r095-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r095-a-medium",
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options lack parallel structure: options 0 and 1 use 'Follow X, because Y' while option 2 uses 'Follow X, but Y', and lengths and specificity vary, breaking parallelism.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r095-b-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r095-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r095-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r095-c-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r095-c-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r095-c-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r095-d-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r095-d-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r095-d-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r095-e-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r095-e-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r095-e-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r096-a-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r096-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r096-a-medium",
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 2 (The analyst’s conclusion that sales are weak is material; using nonpublic observations to form a material conclusion violates Standard II(A).); item declares option 0",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r096-b-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r096-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r096-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r097-a-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r097-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r097-a-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r097-b-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r097-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r097-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r097-c-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r097-c-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r097-c-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r097-d-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r097-d-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r097-d-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r097-e-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r097-e-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r097-e-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r098-a-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r098-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r098-a-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r098-b-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r098-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r098-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r098-c-easy",
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 0 (The correct requirement under Standard IV(C) is to take reasonable steps to detect and prevent violations by those supervised, which matches option 2.); item declares option 2",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r098-c-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r098-c-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r099-a-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r099-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r099-a-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r099-b-easy",
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 1 (The 2023 revision added a requirement that members disclose their own personal compensation to the general public.); item declares option 0",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r099-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r099-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r099-c-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r099-c-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r099-c-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r100-a-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r100-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r100-a-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r100-b-easy",
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: The options are not parallel in grammar or structure: option 1 is awkwardly phrased and differs in form from options 0 and 2, breaking parallelism and consistency in length and specificity.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r100-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r100-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r100-c-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r100-c-hard",
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Option 0 is longer and includes an explanatory clause ('so she can judge any partiality'), making it less parallel and potentially giving away the correct answer; options 1 and 2 are shorter and lack such detail.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r100-c-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r101-a-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r101-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r101-a-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r101-b-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r101-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r101-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r102-a-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r102-a-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r102-a-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-eth-r102-b-easy",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-eth-r102-b-hard",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-eth-r102-b-medium",
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ }
+]

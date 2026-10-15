@@ -1,0 +1,370 @@
+{
+ "1": [
+  "Defines what a return is and how it is measured on financial assets, instruments and indicators. Builds the language of required return: the risk-free rate, risk premia and inflation.",
+  "The vocabulary of returns underpins every valuation and portfolio reading that follows."
+ ],
+ "2": [
+  "Distinguishes the main types of returns across assets, instruments and indicators, and how each is calculated over short and long horizons.",
+  "Return conventions decide which formula an exam question expects."
+ ],
+ "3": [
+  "Compares how portfolio performance and market indexes are measured: money-weighted versus time-weighted returns, and how index construction choices shape what an index shows.",
+  "Performance measurement and index design recur in portfolio and equity questions."
+ ],
+ "4": [
+  "Applies discounted cash flow to value fixed-income and equity instruments, and derives implied returns and growth. Introduces cash flow additivity and no-arbitrage pricing.",
+  "Time value of money is the engine behind bond, equity and derivative pricing."
+ ],
+ "5": [
+  "Describes return data with measures of central tendency, dispersion, skewness, kurtosis, covariance and correlation.",
+  "Descriptive statistics feed risk measurement and hypothesis testing."
+ ],
+ "6": [
+  "Covers expected values, variances and the main probability distributions used for asset prices and returns, including conditional expectations and Bayesian updating.",
+  "Distribution choice and probability updates support risk and inference questions."
+ ],
+ "7": [
+  "Explains sampling, the central limit theorem, confidence intervals and hypothesis testing, and how to choose between parametric and non-parametric tests.",
+  "Inference underpins performance evaluation and model validation."
+ ],
+ "8": [
+  "Calculates portfolio return and risk, shows how correlation drives diversification, and builds the efficient frontier, capital allocation line and CAPM.",
+  "Portfolio theory links quantitative methods to portfolio management and equity valuation."
+ ],
+ "9": [
+  "Introduces simulation as a way to model uncertain outcomes: historical simulation, bootstrap resampling and Monte Carlo.",
+  "Simulation appears in risk and valuation applications."
+ ],
+ "10": [
+  "Uses simple linear regression to relate variables in finance: estimation, assumptions, goodness of fit, prediction intervals and CAPM estimation.",
+  "Regression interpretation is a frequent calculation and reasoning topic."
+ ],
+ "11": [
+  "Introduces big data, machine learning, artificial intelligence and fintech as they apply to investment management.",
+  "A newer topic that tests concepts and applications rather than calculation."
+ ],
+ "12": [
+  "Explains how firms decide output and pricing under different market structures, using breakeven, shutdown and scale ideas, and how structure and concentration are identified.",
+  "Market structure links firm behaviour to industry analysis in equity."
+ ],
+ "13": [
+  "Describes the business cycle and its phases, credit cycles, and how activity across sectors varies over the cycle and is measured.",
+  "Cycle awareness supports asset allocation and industry analysis."
+ ],
+ "14": [
+  "Compares fiscal with monetary policy, its objectives and tools, the debt debate, and whether a stance is expansionary or contractionary.",
+  "Policy stance questions test interpretation of economic conditions."
+ ],
+ "15": [
+  "Covers central bank objectives and tools, the monetary transmission mechanism, inflation targeting and the limits of monetary policy.",
+  "Monetary policy drives rates, currencies and asset prices."
+ ],
+ "16": [
+  "Introduces geopolitics: cooperation versus competition, globalization, international organizations, geopolitical risk and its effect on investments.",
+  "Geopolitical risk is a new theme linking economics to investment decisions."
+ ],
+ "17": [
+  "Explains the benefits and costs of international trade, trade restrictions and the trading blocs and unions that shape it.",
+  "Trade concepts support currency and country analysis."
+ ],
+ "18": [
+  "Describes the foreign exchange market, exchange rate regimes and their effects, and capital restrictions imposed by governments.",
+  "FX regime knowledge connects economics to international investing."
+ ],
+ "19": [
+  "Teaches exchange rate calculations: cross rates, no-arbitrage relationships, forward rates, points and premium or discount.",
+  "A calculation-heavy reading with predictable question formats."
+ ],
+ "20": [
+  "Compares organizational forms of business and the features of corporate issuers, including public versus private ownership.",
+  "Foundation for corporate governance and capital structure readings."
+ ],
+ "21": [
+  "Compares the claims and motivations of lenders and shareholders, other stakeholder groups, and the ESG factors investors consider.",
+  "Stakeholder and ESG framing appears in governance and valuation contexts."
+ ],
+ "22": [
+  "Explains principal-agent conflicts, governance mechanisms, and the risks of poor governance and benefits of effective governance.",
+  "Governance questions test identification of conflicts and mitigants."
+ ],
+ "23": [
+  "Covers the cash conversion cycle, liquidity levels and the management of working capital.",
+  "Working capital feeds ratio analysis and credit assessment."
+ ],
+ "24": [
+  "Covers types of capital investment, NPV, IRR and ROIC, capital allocation principles and pitfalls, and real options.",
+  "Capital budgeting calculations are a staple of corporate finance questions."
+ ],
+ "25": [
+  "Calculates and interprets the weighted-average cost of capital and explains capital structure theories including Modigliani-Miller.",
+  "Cost of capital links corporate finance to valuation."
+ ],
+ "26": [
+  "Describes the key features and types of business models.",
+  "A short conceptual reading that tests classification."
+ ],
+ "27": [
+  "Introduces the financial statement analysis framework, the roles of analysis, the information in filings, notes and audit reports, and how reporting standards develop.",
+  "The frame every later financial statement reading assumes."
+ ],
+ "28": [
+  "Analyzes income statements: revenue and expense recognition, non-recurring items, basic and diluted earnings per share, and common-size analysis.",
+  "Income statement analysis is high-yield for both calculation and judgement."
+ ],
+ "29": [
+  "Analyzes balance sheets: intangible assets, goodwill, financial instruments, non-current liabilities and common-size balance sheets.",
+  "Balance sheet quality affects ratios and valuation."
+ ],
+ "30": [
+  "Explains how the cash flow statement links to the other statements, direct versus indirect preparation, and IFRS versus US GAAP differences.",
+  "Cash flow presentation questions test conversion and classification."
+ ],
+ "31": [
+  "Analyzes cash flow statements: free cash flow to the firm and to equity, and cash flow ratios.",
+  "Free cash flow is central to valuation and credit analysis."
+ ],
+ "32": [
+  "Covers inventory measurement, the effect of FIFO and LIFO in inflation and deflation, and presentation and disclosure.",
+  "Inventory method effects are a classic comparison topic."
+ ],
+ "33": [
+  "Compares reporting of purchased, internally developed and acquired assets, impairment and derecognition, and long-term asset disclosures.",
+  "Asset accounting choices change reported profit and ratios."
+ ],
+ "34": [
+  "Covers lease reporting from both sides, defined contribution and benefit plans, share-based compensation and related disclosures.",
+  "Liability and equity items alter leverage and earnings quality."
+ ],
+ "35": [
+  "Explains differences between accounting profit and taxable income, deferred tax assets and liabilities, tax rates and disclosures.",
+  "Deferred tax treatment is a recurring analytical issue."
+ ],
+ "36": [
+  "Assesses financial reporting quality: the spectrum from conservative to aggressive, earnings management and warning signs of manipulation.",
+  "Reporting quality supports judgement questions across statements."
+ ],
+ "37": [
+  "Applies ratio analysis: activity, liquidity, solvency and profitability, DuPont decomposition, industry-specific ratios and forecasting.",
+  "One of the most heavily tested financial statement readings."
+ ],
+ "38": [
+  "Builds a sales-based pro forma model and considers behavioral factors, competitive position and forecast horizon.",
+  "Modeling links analysis to valuation."
+ ],
+ "39": [
+  "Describes basic features and types of equity instruments and contrasts public with private equity.",
+  "Foundation for equity markets and valuation readings."
+ ],
+ "40": [
+  "Explains economic and voting rights across jurisdictions and share classes, and the voting process and its participants.",
+  "Ownership rights matter for governance and valuation questions."
+ ],
+ "41": [
+  "Describes equity markets, exchanges and trading venues, liquidity measures and types of equity indexes.",
+  "Market structure knowledge supports execution and index questions."
+ ],
+ "42": [
+  "Explains dividends, share repurchases and splits, and calculates price and total return for equities.",
+  "Return calculations from corporate actions appear in many questions."
+ ],
+ "43": [
+  "Contrasts price with intrinsic value, book value with market capitalization and enterprise value, and outlines the main valuation models.",
+  "Frames every valuation approach that follows."
+ ],
+ "44": [
+  "Values equity using discounted cash flow: dividend, FCFF, FCFE and residual income models, constant and multistage growth, and preferred stock.",
+  "Discounted cash flow valuation is a core calculation topic."
+ ],
+ "45": [
+  "Values equity with multiples: price and enterprise value multiples, peer groups and comparable-based valuation.",
+  "Relative valuation is widely tested for method and interpretation."
+ ],
+ "46": [
+  "Explains how to construct and evaluate financial statement forecast models for equity valuation.",
+  "Bridges financial statement analysis and valuation."
+ ],
+ "47": [
+  "Describes industry analysis: classification, size, growth and profitability, and structure through Porter's Five Forces and PESTLE.",
+  "Industry analysis frameworks are common in equity questions."
+ ],
+ "48": [
+  "Evaluates a company's strategy and position, revenue drivers, profitability and pricing power, working capital and capital structure.",
+  "Company analysis ties strategy to financial performance."
+ ],
+ "49": [
+  "Describes the elements of an equity analyst research report and compares sell-side with buy-side views.",
+  "Tests reading and evaluating research rather than calculation."
+ ],
+ "50": [
+  "Estimates the cost of equity with the CAPM and market model, and introduces arbitrage pricing theory and multi-factor models.",
+  "Required return estimation is an input to many valuations."
+ ],
+ "51": [
+  "Describes the features of a fixed-income security and the contents of a bond indenture, including covenants.",
+  "The vocabulary of bonds for the rest of fixed income."
+ ],
+ "52": [
+  "Explains fixed-income cash flow structures, contingency provisions, and the legal, regulatory and tax factors that affect issuance and trading.",
+  "Cash flow structure decides valuation method."
+ ],
+ "53": [
+  "Describes fixed-income market segments and participants, index types, and primary versus secondary markets.",
+  "Market structure context for pricing."
+ ],
+ "54": [
+  "Compares short- and long-term funding for corporate issuers, including repurchase agreements, and investment-grade versus high-yield funding.",
+  "Links corporate funding choices to bond markets."
+ ],
+ "55": [
+  "Describes funding by sovereign, non-sovereign and supranational issuers and contrasts government with corporate issuance and trading.",
+  "Government issuance context for credit analysis."
+ ],
+ "56": [
+  "Values a bond from yield to maturity, explains price relationships and matrix pricing.",
+  "Bond pricing calculations are essential and frequently tested."
+ ],
+ "57": [
+  "Calculates yields and yield spreads for fixed-rate bonds and interprets them.",
+  "Yield measures decide relative value."
+ ],
+ "58": [
+  "Calculates spreads and yields for floating-rate instruments and money market instruments.",
+  "A distinct calculation set that differs from fixed-rate bonds."
+ ],
+ "59": [
+  "Explains spot, par and forward rates, prices bonds from spot rates, and compares the curves.",
+  "The term structure underpins bond and derivative valuation."
+ ],
+ "60": [
+  "Analyzes sources of return on a fixed-rate bond, holding period return and Macaulay duration.",
+  "Bridges pricing and interest rate risk."
+ ],
+ "61": [
+  "Defines and calculates modified duration, money duration and price value of a basis point, and what drives interest rate risk.",
+  "Duration is among the most tested fixed-income topics."
+ ],
+ "62": [
+  "Calculates convexity and combines duration and convexity to estimate price change, including at portfolio level.",
+  "Improves price-change estimates beyond duration."
+ ],
+ "63": [
+  "Uses effective duration and convexity for bonds with options, key rate duration, and empirical versus analytical duration.",
+  "Extends risk measures to callable and complex bonds."
+ ],
+ "64": [
+  "Describes credit risk and its components, uses and limits of ratings, and drivers of yield spreads.",
+  "Credit risk framing for corporate and government analysis."
+ ],
+ "65": [
+  "Explains special considerations in evaluating sovereign and non-sovereign government credit.",
+  "Distinct credit factors from corporate analysis."
+ ],
+ "66": [
+  "Describes qualitative and quantitative factors in corporate credit analysis, seniority rankings and claims priority.",
+  "Applies financial ratios to creditworthiness."
+ ],
+ "67": [
+  "Explains the benefits of securitization and the parties and roles involved.",
+  "Foundation for ABS and MBS readings."
+ ],
+ "68": [
+  "Describes covered bonds, credit enhancement, non-mortgage ABS and collateralized debt obligations.",
+  "Structure and risk of asset-backed products."
+ ],
+ "69": [
+  "Explains prepayment risk, tranching, residential mortgage loans and commercial and residential mortgage-backed securities.",
+  "Prepayment risk is the key MBS concept."
+ ],
+ "70": [
+  "Defines a derivative, describes derivative markets and contrasts over-the-counter with exchange-traded contracts.",
+  "Sets the vocabulary of derivatives."
+ ],
+ "71": [
+  "Defines forwards, futures, swaps, options and credit derivatives, determines option value at expiration, and contrasts forward commitments with contingent claims.",
+  "Payoff reasoning underpins pricing readings."
+ ],
+ "72": [
+  "Describes the benefits and risks of derivatives and how issuers and investors use them.",
+  "Applications and risk framing for derivatives."
+ ],
+ "73": [
+  "Explains arbitrage, replication and cost of carry as foundations of derivative pricing.",
+  "No-arbitrage logic is the basis of every pricing model."
+ ],
+ "74": [
+  "Values forward contracts at initiation, during their life and at expiration, and explains how forward rates are determined.",
+  "Forward valuation calculations are tested regularly."
+ ],
+ "75": [
+  "Compares the value and price of forward and futures contracts and explains why they differ.",
+  "Clarifies a common source of confusion."
+ ],
+ "76": [
+  "Explains how swaps resemble and differ from forward contracts and how swaps are priced and valued.",
+  "Swap valuation extends forward pricing."
+ ],
+ "77": [
+  "Explains exercise value, moneyness and time value, and the factors that determine an option's value.",
+  "Option value drivers are frequent testing points."
+ ],
+ "78": [
+  "Explains put-call parity and put-call forward parity for European options.",
+  "Parity relationships are a common calculation."
+ ],
+ "79": [
+  "Values a derivative with a one-period binomial model and explains risk neutrality.",
+  "A compact calculation topic."
+ ],
+ "80": [
+  "Describes features and categories of alternative investments, the ways to invest in them and their ownership and compensation structures.",
+  "Sets the frame for alternative asset classes."
+ ],
+ "81": [
+  "Describes performance appraisal of alternative investments and calculates returns before and after fees.",
+  "Fee-adjusted returns are the testable calculation."
+ ],
+ "82": [
+  "Explains private equity and private debt features and the diversification benefits of private capital.",
+  "Private markets characteristics and role in portfolios."
+ ],
+ "83": [
+  "Explains the features and investment characteristics of real estate and infrastructure.",
+  "Real assets and their return drivers."
+ ],
+ "84": [
+  "Explains raw land, timberland, farmland and commodities and analyzes their risk, return and diversification.",
+  "Natural resources as portfolio diversifiers."
+ ],
+ "85": [
+  "Explains hedge fund features, forms and vehicles, and analyzes risk, return and diversification.",
+  "Hedge fund characteristics versus other assets."
+ ],
+ "86": [
+  "Introduces distributed ledger technology and digital assets, their forms and vehicles, and their risk, return and diversification.",
+  "A newer topic emphasizing concepts."
+ ],
+ "87": [
+  "Covers asset-class characteristics, risk aversion and utility, mean, variance and covariance from historical data, portfolio standard deviation, and the efficient frontiers.",
+  "Core portfolio theory with calculation elements."
+ ],
+ "88": [
+  "Combines a risk-free asset with risky assets, explains systematic and nonsystematic risk, beta, the CAPM and SML, and performance ratios.",
+  "CAPM and performance measures are high-yield."
+ ],
+ "89": [
+  "Describes the portfolio approach, the portfolio management process, investor types, pension plans and pooled investments.",
+  "Frames the management process and client types."
+ ],
+ "90": [
+  "Explains the investment policy statement, risk and return objectives, constraints, asset allocation and ESG considerations.",
+  "IPS construction is a common case-style topic."
+ ],
+ "91": [
+  "Compares cognitive errors with emotional biases and their implications for financial decisions.",
+  "Bias identification is tested through scenarios."
+ ],
+ "92": [
+  "Defines risk management and its framework, governance, risk tolerance, budgeting, risk sources and methods of measuring and modifying risk.",
+  "Introduces enterprise and portfolio risk concepts."
+ ]
+}

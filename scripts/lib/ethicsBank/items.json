@@ -1,0 +1,2378 @@
+[
+ {
+  "id": "q-eth-r093-a-easy",
+  "o": "r093-a",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which description best fits \"ethics\" as the term is used in professional settings?",
+  "ok": "Principles for how to conduct oneself when one's actions affect other people",
+  "w": [
+   [
+    "Whatever course of action a person personally feels comfortable taking in a given moment",
+    "C",
+    "Treats ethics as private comfort rather than principles that account for the effect on others."
+   ],
+   [
+    "The body of statutes and regulations that authorities are able to enforce against individuals",
+    "M",
+    "Confuses ethics with law; ethics is a wider set of principles than what is legally enforced."
+   ]
+  ],
+  "sol": "Ethics is a body of principles for conduct where other people are affected. It is not private comfort, and it is not the same thing as enforceable law."
+ },
+ {
+  "id": "q-eth-r093-a-hard",
+  "o": "r093-a",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "An adviser says a questionable sales practice is fine because \"everyone in this market does it.\" Which criticism identifies the flaw most precisely?",
+  "ok": "Being common describes what people do, not whether the practice meets principles such as honesty",
+  "w": [
+   [
+    "Common practice can never be ethical, so anything that is widely done should be avoided",
+    "C",
+    "Overcorrects; a common practice can be ethical, but its being common does not establish that."
+   ],
+   [
+    "The practice must be unethical because it has not been written into the firm's formal policy",
+    "R",
+    "Uses the absence of a written policy as the test, which is not the question the statement raises."
+   ]
+  ],
+  "sol": "Prevalence is a factual claim about behavior. Whether the behavior meets ethical principles is a separate question, so \"everyone does it\" cannot settle it either way."
+ },
+ {
+  "id": "q-eth-r093-a-medium",
+  "o": "r093-a",
+  "t": "M",
+  "c": "interpret",
+  "f": "scenario",
+  "q": "A junior analyst tells a colleague, \"Right and wrong is a matter of taste, so nobody can say my choice was wrong.\" Which reply is most consistent with the idea of ethics as shared principles of conduct?",
+  "ok": "Conduct can be judged against principles such as honesty and fairness, so choices can be assessed",
+  "w": [
+   [
+    "Agreed: because people hold different views, no standard can properly be applied to anyone's choices",
+    "C",
+    "Treats disagreement as proof that no principle applies, which removes any basis for professional standards."
+   ],
+   [
+    "Disagree: the only valid test of any professional choice is whether it complies with the law",
+    "M",
+    "Replaces ethical assessment with a legality test; ethical conduct can require more than the law does."
+   ]
+  ],
+  "sol": "Ethics supplies principles such as honesty, fairness, diligence and care for others against which conduct can be assessed. Differences of opinion do not remove that basis, and legality is only one part of it."
+ },
+ {
+  "id": "q-eth-r093-b-easy",
+  "o": "r093-b",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "What does a profession's code of ethics primarily do?",
+  "ok": "Publicly communicates the shared principles and expected behavior of its members",
+  "w": [
+   [
+    "Guarantees that every member of the profession will act ethically in every situation",
+    "C",
+    "Overstates what a code can do; a code sets expectations but does not by itself ensure behavior."
+   ],
+   [
+    "Removes the need for members to apply their own judgment when a situation is unfamiliar",
+    "C",
+    "A code guides judgment; it does not replace it."
+   ]
+  ],
+  "sol": "A code of ethics states the principles and behavior a profession expects. It cannot guarantee conduct, which is why professions also set up disciplinary processes."
+ },
+ {
+  "id": "q-eth-r093-b-hard",
+  "o": "r093-b",
+  "t": "H",
+  "c": "compare",
+  "f": "exception",
+  "q": "Which function is a code of ethics with supporting standards LEAST suited to perform?",
+  "ok": "Making it unnecessary for members to exercise judgment in new situations",
+  "w": [
+   [
+    "Giving members a benchmark against which they can assess their own conduct",
+    "L",
+    "This is a genuine function; the question asks which is least likely."
+   ],
+   [
+    "Telling clients and the public what behavior they can expect from members",
+    "L",
+    "This is a genuine function; the question asks which is least likely."
+   ]
+  ],
+  "sol": "Codes and standards set expectations and give a benchmark, but they cannot foresee every situation. Members must still exercise judgment, so removing that need is not a function."
+ },
+ {
+  "id": "q-eth-r093-b-medium",
+  "o": "r093-b",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A new advisory firm prints a code of ethics and puts it on its website but never trains staff on it or discusses real cases. Which assessment is most reasonable?",
+  "ok": "It helps only if people understand and apply it; publishing it alone does not ensure conduct",
+  "w": [
+   [
+    "The firm is now an ethical firm because a written code exists and is publicly available",
+    "C",
+    "Treats the existence of a document as if it were the behavior it describes."
+   ],
+   [
+    "Codes never influence conduct, so the firm has lost nothing by leaving it unexplained",
+    "C",
+    "Too strong; a code that is understood and reinforced supports conduct, which is why the firm should do more."
+   ]
+  ],
+  "sol": "A code communicates expectations, but expectations only shape conduct when people know them and see them applied. Publication alone is not enough."
+ },
+ {
+  "id": "q-eth-r093-c-easy",
+  "o": "r093-c",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which feature is most characteristic of an occupation that qualifies as a profession?",
+  "ok": "Members commit to standards that put the interests of those they serve ahead of their own",
+  "w": [
+   [
+    "Anyone may practise the work without any training or any assessment of competence at all",
+    "C",
+    "Professions typically require specialized knowledge and demonstrated competence."
+   ],
+   [
+    "Each individual practitioner is free to decide for themselves which standards of conduct apply",
+    "C",
+    "A profession holds its members to shared standards rather than individually chosen ones."
+   ]
+  ],
+  "sol": "A profession combines specialized knowledge with a shared commitment to serve others, backed by common standards. Free entry and individually chosen standards work against that."
+ },
+ {
+  "id": "q-eth-r093-c-hard",
+  "o": "r093-c",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A new association of financial advisers wants public trust quickly. Which single step would do most to build it?",
+  "ok": "Adopting conduct standards together with a way to investigate breaches and sanction members",
+  "w": [
+   [
+    "Issuing a public statement that its members are ethical, trustworthy and committed to clients",
+    "C",
+    "An unsupported statement gives outsiders no reason to believe it."
+   ],
+   [
+    "Setting fees higher than competitors to signal that its members are of high quality",
+    "C",
+    "Price is not evidence of competence or ethical conduct."
+   ]
+  ],
+  "sol": "Standards that can be enforced show the public that conduct is checked and breaches have consequences. Assertions and high prices do not."
+ },
+ {
+  "id": "q-eth-r093-c-medium",
+  "o": "r093-c",
+  "t": "M",
+  "c": "interpret",
+  "f": "direct",
+  "q": "Which approach does the most to help a profession earn the public's trust?",
+  "ok": "Requiring demonstrated competence and enforcing ethical standards through accountability",
+  "w": [
+   [
+    "Advertising the strong past results achieved by its most successful individual members",
+    "C",
+    "Marketing results does not show that members are competent or held to standards."
+   ],
+   [
+    "Leaving the conduct of every member entirely to that member's own personal conscience",
+    "C",
+    "Trust depends on visible accountability, not on unverified self-regulation by conscience alone."
+   ]
+  ],
+  "sol": "Trust follows from evidence that members are competent and that misconduct has consequences. Advertising and unchecked conscience provide neither."
+ },
+ {
+  "id": "q-eth-r093-d-easy",
+  "o": "r093-d",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Why is trust especially important in investment management?",
+  "ok": "Clients often cannot judge advice themselves and must rely on the professional's honesty",
+  "w": [
+   [
+    "Ethical behavior guarantees that clients will earn a positive return on what they invest",
+    "C",
+    "Ethics affects trust and conduct; it does not guarantee investment outcomes."
+   ],
+   [
+    "Clients can usually check every recommendation they receive for themselves without help",
+    "C",
+    "The reverse is closer to the truth, which is what makes reliance on the adviser necessary."
+   ]
+  ],
+  "sol": "Clients frequently lack the expertise or information to check the advice they receive, so they depend on the professional's integrity and competence."
+ },
+ {
+  "id": "q-eth-r093-d-hard",
+  "o": "r093-d",
+  "t": "H",
+  "c": "interpret",
+  "f": "scenario",
+  "q": "Widespread scandals lead the public to distrust investment professionals. Which consequence is most directly linked to that loss of trust?",
+  "ok": "People become less willing to entrust capital to the industry, weakening how markets function",
+  "w": [
+   [
+    "Only the particular firms involved in the scandals are affected by the loss of trust",
+    "C",
+    "Loss of trust spreads across the profession, not just the firms named."
+   ],
+   [
+    "Investors who remain in the markets earn higher returns because there is less competition",
+    "C",
+    "No such link exists; less trust and participation tends to harm market functioning."
+   ]
+  ],
+  "sol": "Trust underpins participation. When it erodes across the profession, less capital is entrusted to it and the markets serve society less well."
+ },
+ {
+  "id": "q-eth-r093-d-medium",
+  "o": "r093-d",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A retiree hands discretion over her savings to a manager and can only see quarterly statements. Which feature of this relationship most raises the importance of the manager's ethical conduct?",
+  "ok": "The client depends on the manager and cannot easily observe daily decisions",
+  "w": [
+   [
+    "The manager's fee is charged as a percentage of the assets she manages",
+    "C",
+    "Fee structure can matter for conflicts, but it is not what makes the client's reliance so heavy."
+   ],
+   [
+    "The manager happens to work for a large and well-established firm",
+    "C",
+    "Firm size does not change how dependent the client is on the manager's honesty."
+   ]
+  ],
+  "sol": "When one party cannot observe or judge the other's actions, the relationship rests on trust. That dependence is what makes the manager's ethics important."
+ },
+ {
+  "id": "q-eth-r093-e-easy",
+  "o": "r093-e",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which best reflects professionalism in investment management?",
+  "ok": "Applying specialized skill with integrity while keeping clients' interests central",
+  "w": [
+   [
+    "Following an employer's instructions in every circumstance, whatever their effect on clients",
+    "C",
+    "Professionalism can require refusing an instruction that conflicts with duties to clients or the markets."
+   ],
+   [
+    "Maximizing one's own compensation while staying within the letter of the rules",
+    "C",
+    "A profession commits members to serve others, not to maximize their own gain."
+   ]
+  ],
+  "sol": "Professionalism means using expertise with integrity and putting those served first, which sometimes means declining an instruction or a personal gain."
+ },
+ {
+  "id": "q-eth-r093-e-hard",
+  "o": "r093-e",
+  "t": "H",
+  "c": "diagnose",
+  "f": "direct",
+  "q": "Which statement about professionalism is most accurate?",
+  "ok": "It shows in handling ordinary daily work, not only in rare dramatic dilemmas",
+  "w": [
+   [
+    "It is demonstrated simply by holding a recognized professional credential",
+    "C",
+    "A credential is not itself the conduct; professionalism is how a person behaves."
+   ],
+   [
+    "It is satisfied whenever a person complies with the applicable law and no more",
+    "C",
+    "Legal compliance is part of it but does not cover the wider ethical expectations of a profession."
+   ]
+  ],
+  "sol": "Most ethical tests are small and routine, such as how information is presented or how a limit is admitted. Professionalism is judged by that everyday conduct, not by a credential or bare legal compliance."
+ },
+ {
+  "id": "q-eth-r093-e-medium",
+  "o": "r093-e",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An analyst is asked to cover a sector she barely knows. Which response best reflects professionalism?",
+  "ok": "Tell her manager about her knowledge gaps and build the competence before advising",
+  "w": [
+   [
+    "Present her estimates with extra confidence so that no one begins to doubt her ability",
+    "C",
+    "Projecting certainty she lacks misleads readers about the quality of the work."
+   ],
+   [
+    "Rely on the firm's reputation in place of carrying out her own analysis of the sector",
+    "C",
+    "Professionalism requires her own diligence; reputation is not a substitute."
+   ]
+  ],
+  "sol": "Being honest about the limits of her knowledge and closing them is consistent with competence and integrity. Bluffing or borrowing credibility is not."
+ },
+ {
+  "id": "q-eth-r093-f-easy",
+  "o": "r093-f",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which of the following is a recognized challenge to ethical conduct?",
+  "ok": "Overconfidence about how ethically one's own behavior will turn out to be",
+  "w": [
+   [
+    "Being too well informed about the standards that apply to one's own professional work",
+    "C",
+    "Knowing the standards helps; it is not a challenge to ethical conduct."
+   ],
+   [
+    "Having a clear and trusted channel through which concerns can be reported",
+    "C",
+    "A reporting channel supports ethical conduct rather than challenging it."
+   ]
+  ],
+  "sol": "Overconfidence leads people to overestimate how ethically they will act, especially in unfamiliar situations. Knowledge of the standards and reporting channels help rather than hinder."
+ },
+ {
+  "id": "q-eth-r093-f-hard",
+  "o": "r093-f",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A team's bonus depends on hitting quarter-end targets, and a colleague who wants to fit in rounds an estimate upward \"like everyone else.\" Which challenge to ethical conduct does this most clearly illustrate?",
+  "ok": "Situational influence: incentives and peers push toward short-term self-interest",
+  "w": [
+   [
+    "A lack of the technical knowledge that was needed to prepare the estimate properly",
+    "C",
+    "Nothing suggests he lacks knowledge; the facts point to pressure and conformity."
+   ],
+   [
+    "Ambiguity in the law that made rounding the estimate upward acceptable",
+    "M",
+    "The scenario is about incentives and peers, not about a legal gray area."
+   ]
+  ],
+  "sol": "Incentives tied to short-term targets and the wish to conform are situational influences. They can lead people to act in short-term self-interest without weighing the longer-term consequences."
+ },
+ {
+  "id": "q-eth-r093-f-medium",
+  "o": "r093-f",
+  "t": "M",
+  "c": "interpret",
+  "f": "direct",
+  "q": "Research on ethical behavior suggests that whether a person acts ethically in a difficult moment is most influenced by which of the following?",
+  "ok": "External situational influences, such as what the people around them are doing",
+  "w": [
+   [
+    "The person's own internal character traits, considered on their own",
+    "C",
+    "Studies find internal traits are generally not the main determinant of behavior in a given situation."
+   ],
+   [
+    "Their belief that they are honest people who would never do such a thing",
+    "C",
+    "This self-image is itself the overconfidence that can mislead people."
+   ]
+  ],
+  "sol": "Even good people can be pushed toward unethical acts by circumstances such as peer behavior and pressure. Believing one's character will protect against this is the trap."
+ },
+ {
+  "id": "q-eth-r093-g-easy",
+  "o": "r093-g",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which statement about ethical and legal standards is most accurate?",
+  "ok": "Laws often codify ethical expectations, but ethics can require more than the law does",
+  "w": [
+   [
+    "Conduct that is legal is always ethical, so a lawful act needs no further ethical scrutiny",
+    "C",
+    "Something can be legal yet fail ethical principles such as fairness or honesty."
+   ],
+   [
+    "Ethical standards and legal requirements never overlap in any area of professional life",
+    "C",
+    "They often overlap, since many laws require honesty and disclosure."
+   ]
+  ],
+  "sol": "Many laws write down ethical expectations, so the two overlap. The law is a minimum, and ethical standards can call for more."
+ },
+ {
+  "id": "q-eth-r093-g-hard",
+  "o": "r093-g",
+  "t": "H",
+  "c": "compare",
+  "f": "exception",
+  "q": "Which of the following statements about ethical versus legal standards is INCORRECT?",
+  "ok": "Following a regulation removes the need to consider the ethical effect on stakeholders",
+  "w": [
+   [
+    "Complying with disclosure regulations often supports ethical conduct toward investors",
+    "L",
+    "This is a correct statement; the question asks for the incorrect one."
+   ],
+   [
+    "Different stakeholders can hold different ethical expectations of the very same conduct",
+    "L",
+    "This is a correct statement; the question asks for the incorrect one."
+   ]
+  ],
+  "sol": "Regulation and ethics overlap but are not identical. Meeting a rule does not remove the need to consider how an action affects stakeholders, so that statement is the incorrect one."
+ },
+ {
+  "id": "q-eth-r093-g-medium",
+  "o": "r093-g",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A manager knows an action is technically permitted by local law but would leave a client with a misleading impression. What does the ethical standard suggest?",
+  "ok": "Legal permission is not enough; she should avoid creating the misleading impression",
+  "w": [
+   [
+    "The action is acceptable because no law prohibits it, and that settles the question",
+    "C",
+    "Treats the legal test as the only test."
+   ],
+   [
+    "The action is acceptable so long as the client does not complain about it later",
+    "C",
+    "Whether the client notices does not decide whether the conduct meets ethical standards."
+   ]
+  ],
+  "sol": "Ethical standards ask whether conduct is honest and fair to those affected, not only whether it is prohibited. A misleading impression fails that test even where the law is silent."
+ },
+ {
+  "id": "q-eth-r093-h-easy",
+  "o": "r093-h",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which sequence correctly lists the stages of the ethical decision-making framework?",
+  "ok": "Identify, consider, decide and act, reflect",
+  "w": [
+   [
+    "Decide and act, identify, reflect, consider",
+    "I",
+    "Acts before gathering facts or weighing influences."
+   ],
+   [
+    "Consider, reflect, identify, decide and act",
+    "I",
+    "Mixes the order; reflection comes after acting, not before identifying facts."
+   ]
+  ],
+  "sol": "The framework starts by identifying the facts and duties, then considers influences and alternatives, then decides and acts, then reflects on the outcome."
+ },
+ {
+  "id": "q-eth-r093-h-hard",
+  "o": "r093-h",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "After acting, an analyst finds the outcome differed from what she anticipated. She reviews why. Which stage is this, and what is its purpose?",
+  "ok": "Reflect, to learn from the difference and improve future decisions",
+  "w": [
+   [
+    "Consider, in order to test alternative courses of action before a decision is made",
+    "M",
+    "Consider takes place before the decision, not after the outcome is known."
+   ],
+   [
+    "Identify, in order to establish the relevant facts behind the original decision",
+    "M",
+    "Identify is the first stage; here the decision has already been made."
+   ]
+  ],
+  "sol": "Reviewing whether the outcome matched expectations, and why, is the reflect stage. Its purpose is to improve later decisions."
+ },
+ {
+  "id": "q-eth-r093-h-medium",
+  "o": "r093-h",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "Using the framework, a portfolio manager lists the stakeholders, the duties she owes each and the conflicts of interest present. Which stage is she working through?",
+  "ok": "Identify",
+  "w": [
+   [
+    "Consider",
+    "M",
+    "Consider covers situational influences, additional guidance and alternative actions."
+   ],
+   [
+    "Reflect",
+    "M",
+    "Reflect happens after acting, asking whether the outcome was as expected."
+   ]
+  ],
+  "sol": "Listing relevant facts, stakeholders, duties owed, ethical principles and conflicts of interest is the identify stage."
+ },
+ {
+  "id": "q-eth-r094-a-easy",
+  "o": "r094-a",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which group investigates allegations of misconduct by CFA Institute members and candidates?",
+  "ok": "The Professional Conduct staff",
+  "w": [
+   [
+    "The Disciplinary Review Committee acting alone",
+    "M",
+    "The DRC serves on hearing panels and reviews allegations; the staff carries out the investigations."
+   ],
+   [
+    "The candidate's employer",
+    "M",
+    "Employers are not the body that enforces the Code and Standards."
+   ]
+  ],
+  "sol": "The Professional Conduct staff investigates allegations. The Disciplinary Review Committee, a volunteer body of charterholders, serves on hearing panels that decide contested matters and impose sanctions."
+ },
+ {
+  "id": "q-eth-r094-a-hard",
+  "o": "r094-a",
+  "t": "H",
+  "c": "diagnose",
+  "f": "exception",
+  "q": "Which of the following is NOT a way an investigation into a member's conduct can begin?",
+  "ok": "Only a formal complaint from a client can start an inquiry",
+  "w": [
+   [
+    "A matter the member disclosed on the annual Professional Conduct Statement",
+    "L",
+    "This is a real source; the question asks which is not."
+   ],
+   [
+    "Information about questionable conduct found in the media or regulatory notices",
+    "L",
+    "This is a real source; the question asks which is not."
+   ]
+  ],
+  "sol": "Investigations arise from several sources: self-disclosure on the annual Professional Conduct Statement, written complaints, public information such as media or regulatory notices, and monitoring of exams and social media. A client complaint is one route among several, not the only one."
+ },
+ {
+  "id": "q-eth-r094-a-medium",
+  "o": "r094-a",
+  "t": "M",
+  "c": "recall",
+  "f": "scenario",
+  "q": "After an investigation, the Professional Conduct staff believes a violation occurred and proposes a sanction. The member rejects the charges. What happens next?",
+  "ok": "It is referred to a panel of Disciplinary Review Committee members",
+  "w": [
+   [
+    "The proposed sanction takes effect regardless of how the member responds to the charges",
+    "C",
+    "The member has the opportunity to accept or reject the charges and proposed sanction."
+   ],
+   [
+    "The inquiry is closed at once, with no further action taken against the member",
+    "C",
+    "Rejecting the charges does not end the matter; contested cases go to a hearing panel."
+   ]
+  ],
+  "sol": "Where the member refuses the charges and the sanction proposed to him, the case goes to a panel of DRC members, who decide whether the Code and Standards were violated and what sanction applies."
+ },
+ {
+  "id": "q-eth-r094-b-easy",
+  "o": "r094-b",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "How many components does the CFA Institute Code of Ethics have, and how many Standards of Professional Conduct are there?",
+  "ok": "Six components and seven Standards",
+  "w": [
+   [
+    "Seven components and six Standards",
+    "C",
+    "Reverses the two numbers."
+   ],
+   [
+    "Six components and five Standards",
+    "C",
+    "There are seven Standards, from Professionalism through Responsibilities as a Member or Candidate."
+   ]
+  ],
+  "sol": "The Code has six components. The Standards number seven: Professionalism, Integrity of Capital Markets, Duties to Clients, Duties to Employers, Investment Analysis, Recommendations and Actions, Conflicts of Interest, and Responsibilities as a CFA Institute Member or Candidate."
+ },
+ {
+  "id": "q-eth-r094-b-hard",
+  "o": "r094-b",
+  "t": "H",
+  "c": "compare",
+  "f": "direct",
+  "q": "How does the Code of Ethics differ in character from the Standards of Professional Conduct?",
+  "ok": "The Code states aspirational principles; the Standards state practical conduct requirements",
+  "w": [
+   [
+    "The Code applies only to firms, while the Standards apply only to individual members",
+    "M",
+    "Both apply to individual members and candidates; firms are encouraged to adopt them."
+   ],
+   [
+    "The Code is optional guidance for members, while only the Standards are binding on them",
+    "C",
+    "Members and candidates are required to comply with both."
+   ]
+  ],
+  "sol": "The Code holds the high-level, aspirational principles and the Standards give practical conduct requirements. They are read together and both bind members and candidates."
+ },
+ {
+  "id": "q-eth-r094-b-medium",
+  "o": "r094-b",
+  "t": "M",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which Standard of Professional Conduct covers Diligence and Reasonable Basis?",
+  "ok": "Standard V: Investment Analysis, Recommendations, and Actions",
+  "w": [
+   [
+    "Standard I: Professionalism, which covers the law, independence and competence",
+    "M",
+    "Standard I covers knowledge of the law, independence, misrepresentation, misconduct and competence."
+   ],
+   [
+    "Standard III: Duties to Clients, which covers loyalty, fair dealing and suitability",
+    "M",
+    "Standard III covers loyalty, fair dealing, suitability, performance presentation and confidentiality."
+   ]
+  ],
+  "sol": "Diligence and Reasonable Basis is sub-section V(A), under Investment Analysis, Recommendations, and Actions."
+ },
+ {
+  "id": "q-eth-r094-c-easy",
+  "o": "r094-c",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which Standard is new to the 2023 revision of the Code and Standards?",
+  "ok": "Standard I(E): Competence",
+  "w": [
+   [
+    "Standard III(E): Preservation of Confidentiality",
+    "M",
+    "This Standard existed before the 2023 revision."
+   ],
+   [
+    "Standard IV(C): Responsibilities of Supervisors",
+    "M",
+    "This Standard existed before the 2023 revision."
+   ]
+  ],
+  "sol": "The 2023 revision added Standard I(E) Competence, and revised V(B) and VI(A). The other Standards named were already in place."
+ },
+ {
+  "id": "q-eth-r094-c-hard",
+  "o": "r094-c",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "Which statement about the 2023 revision to Standard V(B) is correct?",
+  "ok": "Members must now tell clients what services they offer and what these cost the client",
+  "w": [
+   [
+    "Members must now guarantee the investment performance of the services they provide to clients",
+    "C",
+    "No guarantee of performance is required by the Standard."
+   ],
+   [
+    "Members are now required to publish their own personal compensation for public inspection",
+    "C",
+    "The new requirement concerns the nature and cost of services to the client, not public disclosure of personal pay."
+   ]
+  ],
+  "sol": "The revised V(B) adds a requirement to tell clients and prospective clients about the nature of the services provided and the costs to the client, so they can make informed decisions."
+ },
+ {
+  "id": "q-eth-r094-c-medium",
+  "o": "r094-c",
+  "t": "M",
+  "c": "interpret",
+  "f": "direct",
+  "q": "What change did the 2023 revision make to Standard VI(A)?",
+  "ok": "It was renamed \"Avoid or Disclose Conflicts\" and now includes avoiding conflicts",
+  "w": [
+   [
+    "It was removed from the Standards and its content was moved into Standard IV instead",
+    "C",
+    "Standard VI(A) was retained and revised, not removed."
+   ],
+   [
+    "It now requires disclosure only, with no mention at all of avoiding conflicts of interest",
+    "C",
+    "Before the revision it did not mention avoidance; the change added it."
+   ]
+  ],
+  "sol": "Standard VI(A) now reads \"Avoid or Disclose Conflicts\". Members must either avoid conflicts of interest or disclose them, where before the standard had no mention of avoidance."
+ },
+ {
+  "id": "q-eth-r095-a-easy",
+  "o": "r095-a",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Where the applicable law and the CFA Institute Code and Standards conflict, which must a member or candidate follow?",
+  "ok": "Whichever of the two is stricter",
+  "w": [
+   [
+    "The applicable law, because it is binding on the member",
+    "C",
+    "Complying with the law alone is not enough where the Code and Standards are stricter."
+   ],
+   [
+    "The Code and Standards, because they are set by CFA Institute",
+    "C",
+    "Where the law is stricter, the law must be followed; the rule is the stricter one, not always the Code."
+   ]
+  ],
+  "sol": "Where the local rules and the Code and Standards differ, the member follows whichever requirement is tougher, and that can be either one."
+ },
+ {
+  "id": "q-eth-r095-a-hard",
+  "o": "r095-a",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A member learns her team is preparing a report she knows breaches securities regulations. Under Standard I(A), what is the minimum she must do?",
+  "ok": "Stop assisting, dissociate, and raise it with her supervisor or compliance",
+  "w": [
+   [
+    "Keep working on the report but leave her own name off it to avoid being identified",
+    "C",
+    "She would still be assisting the violation."
+   ],
+   [
+    "Report the firm to the regulator at once, since Standard I(A) makes this mandatory",
+    "C",
+    "The Standard requires dissociation; reporting to authorities is not itself a required step."
+   ]
+  ],
+  "sol": "Members must not knowingly participate or assist in a violation and must dissociate from it. Continuing to work on it, even anonymously, is still assisting, and the Standard does not itself make reporting to authorities mandatory."
+ },
+ {
+  "id": "q-eth-r095-a-medium",
+  "o": "r095-a",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "Nikhil works where local law lets advisers accept unlimited gifts from clients without telling employers. The Code and Standards require more disclosure than that. What should he do?",
+  "ok": "Follow the Code and Standards, because they are the stricter requirement",
+  "w": [
+   [
+    "Follow local law, because he works in that jurisdiction and it is binding on him",
+    "C",
+    "Ignores the requirement to follow the stricter rule."
+   ],
+   [
+    "Follow local law, but mention the gifts informally to a friend at the firm",
+    "I",
+    "An informal mention does not meet the stricter disclosure requirement."
+   ]
+  ],
+  "sol": "Where the Code and Standards are stricter than local law, I(A) requires him to follow the Code and Standards."
+ },
+ {
+  "id": "q-eth-r095-b-easy",
+  "o": "r095-b",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Standard I(B) is most concerned with which of the following?",
+  "ok": "Gifts or benefits that could reasonably compromise independence and objectivity",
+  "w": [
+   [
+    "Whether an adviser holds all of the licences that are required in the jurisdiction",
+    "M",
+    "Licensing is not the subject of I(B); that relates more to knowledge of the law."
+   ],
+   [
+    "Whether performance figures are calculated consistently across all of a firm's accounts",
+    "M",
+    "Performance calculation belongs under performance presentation, Standard III(D)."
+   ]
+  ],
+  "sol": "I(B) requires members to maintain independence and objectivity and not to offer, solicit or accept consideration that could reasonably be expected to compromise them."
+ },
+ {
+  "id": "q-eth-r095-b-hard",
+  "o": "r095-b",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An issuer pays an independent research firm to cover it. The issuer's finance chief reads a draft and asks that the rating be raised. What should the analyst do?",
+  "ok": "Fix factual errors, keep her own rating, and disclose the compensation arrangement",
+  "w": [
+   [
+    "Raise the rating as requested, since the issuer is the one paying for the report",
+    "C",
+    "Lets the payer shape the conclusion, which defeats independence."
+   ],
+   [
+    "Decline all issuer-paid work in every case, because such work is always prohibited",
+    "C",
+    "Issuer-paid research is not prohibited; independence and disclosure are what matter."
+   ]
+  ],
+  "sol": "She may fix factual errors but the conclusions must be her own. The fee arrangement should be disclosed so readers can judge it."
+ },
+ {
+  "id": "q-eth-r095-b-medium",
+  "o": "r095-b",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A company an analyst covers offers to fly her to its facility on a chartered jet, although commercial flights are available. Which response best meets Standard I(B)?",
+  "ok": "Decline the charter and travel commercially, at her own or her firm's expense",
+  "w": [
+   [
+    "Accept it, because a site visit will improve the quality of her research on the company",
+    "C",
+    "The research benefit does not remove the risk that the favour compromises her objectivity."
+   ],
+   [
+    "Accept it, but privately promise the company nothing in return for the favor",
+    "C",
+    "A private promise does not address how the benefit could reasonably be expected to affect her."
+   ]
+  ],
+  "sol": "Where commercial travel is available, accepting a lavish arrangement from a covered company can reasonably be expected to compromise objectivity, so she should decline it."
+ },
+ {
+  "id": "q-eth-r095-c-easy",
+  "o": "r095-c",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Standard I(C) prohibits which of the following?",
+  "ok": "Deliberately giving false or misleading information about analysis, advice, actions or other work",
+  "w": [
+   [
+    "Recommending any investment that later loses money for the clients who followed it",
+    "C",
+    "A loss does not by itself show misrepresentation."
+   ],
+   [
+    "Discussing past performance with prospective clients, even where it is presented accurately",
+    "C",
+    "Presenting performance is permitted when done accurately and fairly."
+   ]
+  ],
+  "sol": "I(C) covers knowingly false or misleading statements. A recommendation that turns out badly is not a misrepresentation, and discussing performance accurately is allowed."
+ },
+ {
+  "id": "q-eth-r095-c-hard",
+  "o": "r095-c",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "An analyst pastes a paragraph of another firm's published research into her own report without attribution. She has checked that the figures are accurate. Which statement is correct?",
+  "ok": "Plagiarism, a violation of I(C); checking the figures does not remove the duty to credit",
+  "w": [
+   [
+    "No violation, because she verified the figures herself before using the passage",
+    "C",
+    "Accuracy does not cure presenting someone else's work as her own."
+   ],
+   [
+    "A violation only if she profited personally from publishing the report",
+    "R",
+    "Profit is not the test; the issue is presenting others' work as her own."
+   ]
+  ],
+  "sol": "Using another party's work without attribution is plagiarism under I(C). Her having checked the figures does not change that she did not identify the source."
+ },
+ {
+  "id": "q-eth-r095-c-medium",
+  "o": "r095-c",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An adviser tells a prospect, \"Our balanced strategy is guaranteed to beat the index.\" Which best classifies this?",
+  "ok": "A misrepresentation, because no such outcome can be guaranteed",
+  "w": [
+   [
+    "Acceptable, provided that the strategy does go on to beat the index at some later point",
+    "C",
+    "Whether it later succeeds does not change that the guarantee was misleading when made."
+   ],
+   [
+    "A breach of the duty of loyalty that the adviser owes to his own employer",
+    "M",
+    "The problem is the false statement to the prospect, not disloyalty to the employer."
+   ]
+  ],
+  "sol": "Guaranteeing an investment outcome misleads the prospect about what can be promised. That is misrepresentation, regardless of what happens later."
+ },
+ {
+  "id": "q-eth-r095-d-easy",
+  "o": "r095-d",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Standard I(D) prohibits professional conduct involving which of the following?",
+  "ok": "Dishonesty, fraud or deceit",
+  "w": [
+   [
+    "Investment losses suffered by clients",
+    "C",
+    "Losses alone are not misconduct."
+   ],
+   [
+    "Disagreement with a supervisor",
+    "C",
+    "Disagreement is not misconduct."
+   ]
+  ],
+  "sol": "I(D) covers dishonesty, fraud or deceit, and any act that reflects adversely on professional reputation, integrity or competence."
+ },
+ {
+  "id": "q-eth-r095-d-hard",
+  "o": "r095-d",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A member files for personal bankruptcy after large medical bills and handles the process openly and honestly. Which conclusion is most appropriate?",
+  "ok": "The bankruptcy alone is not a violation, unless fraud or deceit was involved",
+  "w": [
+   [
+    "It is always a violation, because it reflects adversely on his professional competence",
+    "C",
+    "Bankruptcy alone does not necessarily reflect on integrity or trustworthiness."
+   ],
+   [
+    "I(D) cannot apply here, because it covers only conduct that takes place at work",
+    "C",
+    "Personal conduct that involves dishonesty or fraud can violate I(D)."
+   ]
+  ],
+  "sol": "Personal bankruptcy does not by itself reflect on integrity. It could violate I(D) only if it involved fraudulent or deceitful conduct, and the Standard is not limited to workplace acts."
+ },
+ {
+  "id": "q-eth-r095-d-medium",
+  "o": "r095-d",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A portfolio manager charges personal holiday costs to his employer as business expenses. Which Standard is most directly violated?",
+  "ok": "I(D) Misconduct, because the conduct involves dishonesty and deceit",
+  "w": [
+   [
+    "VI(B) Priority of Transactions, because the manager put himself first",
+    "M",
+    "That Standard concerns the order of client, employer and personal trades."
+   ],
+   [
+    "III(D) Performance Presentation, because the costs were reported inaccurately",
+    "M",
+    "That Standard concerns how investment performance is presented."
+   ]
+  ],
+  "sol": "Falsely claiming personal costs as business expenses is dishonest conduct, which is misconduct under I(D)."
+ },
+ {
+  "id": "q-eth-r095-e-easy",
+  "o": "r095-e",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "What does Standard I(E) require?",
+  "ok": "Acting with, and keeping up, the competence needed for the role",
+  "w": [
+   [
+    "Completing a set number of continuing-education hours in every calendar year",
+    "C",
+    "The Standard does not require any specific development program or hours."
+   ],
+   [
+    "Holding at least two separate professional credentials at any one time",
+    "C",
+    "No number of credentials is required by the Standard."
+   ]
+  ],
+  "sol": "I(E) requires competence appropriate to the role and its maintenance over time, without mandating a specific program of development."
+ },
+ {
+  "id": "q-eth-r095-e-hard",
+  "o": "r095-e",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "Asked to design retirement-income advice for clients, an equity analyst with no training in the area agrees, reasoning that Standard I(E) only requires him to maintain skills he already has. What is wrong with that reasoning?",
+  "ok": "The Standard requires competence for the responsibilities he takes on, not just current skills",
+  "w": [
+   [
+    "Nothing is wrong; the Standard only applies to skills that the member already holds",
+    "C",
+    "Competence must fit the responsibilities of the role, not only current skills."
+   ],
+   [
+    "The Standard forbids a member from ever taking on a new area of professional responsibility",
+    "C",
+    "New roles are permitted where competence is built or supported."
+   ]
+  ],
+  "sol": "I(E) is tied to the responsibilities being fulfilled. Taking on retirement advice without the necessary competence would not satisfy it, though he could build the skills or bring in qualified help."
+ },
+ {
+  "id": "q-eth-r095-e-medium",
+  "o": "r095-e",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A portfolio manager is moved to run a private credit fund, an area she has not worked in. What is the most appropriate response under I(E)?",
+  "ok": "Assess her skills and build the competence needed, or involve qualified people, before acting",
+  "w": [
+   [
+    "Continue as normal, because her CFA charter already satisfies the Standard for any role",
+    "C",
+    "A credential does not establish competence for every new role."
+   ],
+   [
+    "Take the role and learn on the job, with no other steps to establish competence",
+    "I",
+    "Acting before establishing competence does not meet the Standard."
+   ]
+  ],
+  "sol": "Competence is measured against the role. When the role expands, she needs to confirm or develop the skills required, or bring in help, rather than rely on a credential."
+ },
+ {
+  "id": "q-eth-r096-a-easy",
+  "o": "r096-a",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "For the purposes of Standard II(A), information is \"material\" when it:",
+  "ok": "It would probably affect a security's price, or a reasonable investor would want it",
+  "w": [
+   [
+    "It has already been reported in a company's regulatory filings and is available to all",
+    "M",
+    "Filed information is public; materiality is about its likely effect on price or decisions."
+   ],
+   [
+    "It comes from a source inside the company rather than from public documents",
+    "M",
+    "The source does not decide materiality; the likely effect on price and decisions does."
+   ]
+  ],
+  "sol": "Information is material if its disclosure would probably affect a security's price or if reasonable investors would want it before making a decision. Whether it is public is a separate question."
+ },
+ {
+  "id": "q-eth-r096-a-hard",
+  "o": "r096-a",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A portfolio manager hears from a friend at a company that a takeover offer will be announced next week. The friend did not say it was confidential. What is the most appropriate action?",
+  "ok": "Do not trade personally or for clients, and tell compliance",
+  "w": [
+   [
+    "Buy for client accounts only, because he gains nothing personally from the trade",
+    "C",
+    "The prohibition covers acting, or causing others to act, on the information, including for clients."
+   ],
+   [
+    "Trade if nothing has appeared on the newswire by the end of the day",
+    "C",
+    "Information is still nonpublic until it is disseminated; the absence of news is not permission."
+   ]
+  ],
+  "sol": "The information is material and nonpublic even though the friend did not label it confidential. He may neither trade on it nor prompt anyone else to, and compliance should be told."
+ },
+ {
+  "id": "q-eth-r096-a-medium",
+  "o": "r096-a",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An analyst counts cars in a retailer's parking lots, reads public filings and interviews suppliers about general demand, and concludes the retailer's sales are weak. Which statement is most accurate?",
+  "ok": "Permissible: combining public and non-material nonpublic observations is allowed",
+  "w": [
+   [
+    "A violation, because some of the inputs did not come directly from the company itself",
+    "C",
+    "Building a view from many pieces, none material and nonpublic, is not prohibited."
+   ],
+   [
+    "A violation, because the conclusion she reaches is itself material to the price",
+    "C",
+    "A conclusion drawn from public and non-material information is the analyst's own work product."
+   ]
+  ],
+  "sol": "Assembling public information and non-material nonpublic pieces into a conclusion is analysis, not use of material nonpublic information."
+ },
+ {
+  "id": "q-eth-r096-b-easy",
+  "o": "r096-b",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which conduct violates Standard II(B) Market Manipulation?",
+  "ok": "Spreading a false rumor about a company in order to move its share price",
+  "w": [
+   [
+    "Executing a large, legitimate order that happens to move the price of a security",
+    "C",
+    "A legitimate trade is not manipulation just because it moves the price."
+   ],
+   [
+    "Publishing a negative recommendation that is based on honest and careful analysis",
+    "C",
+    "An honest opinion is not manipulation even if it affects the price."
+   ]
+  ],
+  "sol": "Manipulation includes information-based practices such as spreading false rumors to distort prices. Honest analysis and legitimate trades that happen to move price are not manipulation."
+ },
+ {
+  "id": "q-eth-r096-b-hard",
+  "o": "r096-b",
+  "t": "H",
+  "c": "diagnose",
+  "f": "direct",
+  "q": "Which fact is most important in deciding whether a large purchase amounts to market manipulation?",
+  "ok": "Whether it was made with intent to mislead others by distorting price or volume",
+  "w": [
+   [
+    "Whether the purchase moved the price of the security in the market that day",
+    "C",
+    "Legitimate trades can move prices without being manipulation."
+   ],
+   [
+    "Whether the purchase was large compared with the security's normal daily trading volume",
+    "C",
+    "Size alone does not decide it; intent to mislead does."
+   ]
+  ],
+  "sol": "II(B) prohibits practices that distort prices or inflate volume with intent to mislead. A big, honest purchase that raises the price is not a violation by that fact alone."
+ },
+ {
+  "id": "q-eth-r096-b-medium",
+  "o": "r096-b",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "Near the end of each quarter, a fund manager makes small purchases of a thinly traded holding just before the close to lift its closing price and flatter the fund's valuation. Which is the best assessment?",
+  "ok": "A violation of II(B): the trades are meant to distort the price and mislead others",
+  "w": [
+   [
+    "Acceptable, because each individual trade was a genuine transaction in the market",
+    "C",
+    "Genuine trades can still be manipulative if made to distort the price with intent to mislead."
+   ],
+   [
+    "Acceptable, because the amounts involved in each of the trades were small",
+    "C",
+    "The size of the trades does not matter if the purpose is to distort the price."
+   ]
+  ],
+  "sol": "Trading intended to push up a closing price so as to mislead market participants is transaction-based manipulation."
+ },
+ {
+  "id": "q-eth-r097-a-easy",
+  "o": "r097-a",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "What is the core duty that Standard III(A) places on a member dealing with clients?",
+  "ok": "Serve the client first, ahead of the employer's interests and their own",
+  "w": [
+   [
+    "Place the employer's interests ahead of those of the clients they serve",
+    "C",
+    "Reverses the order the Standard sets."
+   ],
+   [
+    "Guarantee that every client portfolio will meet its stated return target",
+    "C",
+    "The Standard requires loyalty, prudence and care, not guaranteed results."
+   ]
+  ],
+  "sol": "III(A) sets a duty of loyalty, along with reasonable care and prudent judgment, and puts clients' interests ahead of the employer's and the member's own."
+ },
+ {
+  "id": "q-eth-r097-a-hard",
+  "o": "r097-a",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A manager holds foreign shares in client portfolios. After a reasonable analysis, she decides not to vote proxies on some holdings because the cost of voting would exceed the likely benefit to clients. Is this consistent with III(A)?",
+  "ok": "Yes, if a reasonable cost-benefit analysis in the clients' interests supports it",
+  "w": [
+   [
+    "No, proxies must be voted in every circumstance, whatever the cost of doing so",
+    "C",
+    "Voting is a client-benefiting duty; declining can be acceptable where the cost exceeds the benefit to clients."
+   ],
+   [
+    "Yes, because voting is a matter for the firm to decide and not for the clients",
+    "C",
+    "Proxies belong to the clients; the decision must reflect their interests."
+   ]
+  ],
+  "sol": "Proxy rights are client assets, and the duty is to act in the clients' interests. A reasoned cost-benefit conclusion that voting would not benefit clients can support not voting."
+ },
+ {
+  "id": "q-eth-r097-a-medium",
+  "o": "r097-a",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A manager directs client trades to brokers. Which use of the commissions generated is most consistent with Standard III(A)?",
+  "ok": "Obtaining research that helps the investment decisions of the clients who paid for it",
+  "w": [
+   [
+    "Paying the rent for the manager's own firm's offices out of the commissions",
+    "C",
+    "Client brokerage should benefit the clients, not cover the firm's overhead."
+   ],
+   [
+    "Covering the manager's personal travel costs out of the commissions generated",
+    "C",
+    "Personal benefit to the manager is not a use that benefits clients."
+   ]
+  ],
+  "sol": "Client brokerage is a client asset. It should be used to obtain goods or services that help the clients whose trades paid for it, such as research supporting their investment decisions."
+ },
+ {
+  "id": "q-eth-r097-b-easy",
+  "o": "r097-b",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "What does the fair dealing Standard, III(B), ask of a member who has several clients?",
+  "ok": "Deal fairly and objectively with all clients, though not necessarily identically",
+  "w": [
+   [
+    "Give every client exactly the same treatment in every respect, with no exceptions",
+    "C",
+    "Fairness does not demand identical treatment, for example clients with different mandates may receive different actions."
+   ],
+   [
+    "Serve the largest clients first in all circumstances, since they pay the most",
+    "C",
+    "Priority for the largest clients is not fair dealing."
+   ]
+  ],
+  "sol": "Fair dealing means fair and objective treatment of all clients. It does not mean identical outcomes because clients differ in objectives and service levels."
+ },
+ {
+  "id": "q-eth-r097-b-hard",
+  "o": "r097-b",
+  "t": "H",
+  "c": "compare",
+  "f": "scenario",
+  "q": "Which arrangement is most consistent with Standard III(B)?",
+  "ok": "Disclosed service tiers by fee level, if no client is disadvantaged in investment action",
+  "w": [
+   [
+    "Allocating a hot oversubscribed offering to whichever accounts pay the highest fees",
+    "C",
+    "Allocation should be fair among eligible clients, not based on fee size."
+   ],
+   [
+    "Refusing to allow any difference in service between any two clients under any terms",
+    "C",
+    "Differences in disclosed service levels are permitted; the Standard does not require identical treatment."
+   ]
+  ],
+  "sol": "Clients may receive different disclosed service levels provided no client is disadvantaged in the investment recommendations and actions they receive. Allocating scarce offerings by fee size is not fair."
+ },
+ {
+  "id": "q-eth-r097-b-medium",
+  "o": "r097-b",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An adviser downgrades a stock from buy to sell. He phones his largest clients immediately and emails everyone else the next morning. What is the best assessment?",
+  "ok": "A violation, because clients did not all get an equal chance to respond to the change",
+  "w": [
+   [
+    "No violation, because the largest clients pay more in fees and are entitled to priority",
+    "C",
+    "Fee size does not entitle some clients to earlier notice of a recommendation change."
+   ],
+   [
+    "No violation, because email is an acceptable channel for sending such changes",
+    "C",
+    "The channel is not the problem; the delay in giving other clients the opportunity to act is."
+   ]
+  ],
+  "sol": "Recommendation changes should be given to all affected clients in a way that gives each a fair chance to act. Favoring large clients with earlier access is not fair dealing."
+ },
+ {
+  "id": "q-eth-r097-c-easy",
+  "o": "r097-c",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Before making a recommendation in an advisory relationship, what must a member or candidate do under Standard III(C)?",
+  "ok": "Ask reasonable questions about experience, risk and return goals, and limitations",
+  "w": [
+   [
+    "Confirm that the investment has beaten its benchmark over the past several years",
+    "M",
+    "Past benchmark performance is not the suitability inquiry."
+   ],
+   [
+    "Obtain the client's signature on a disclaimer that limits the adviser's responsibility",
+    "M",
+    "A disclaimer does not replace the inquiry into the client's circumstances."
+   ]
+  ],
+  "sol": "III(C) requires a reasonable inquiry into the client's experience, objectives and constraints, kept up to date, so that recommendations fit the client."
+ },
+ {
+  "id": "q-eth-r097-c-hard",
+  "o": "r097-c",
+  "t": "H",
+  "c": "diagnose",
+  "f": "direct",
+  "q": "Which statement about judging suitability is correct?",
+  "ok": "Suitability is judged against the whole portfolio, so a riskier asset can fit if its role is appropriate",
+  "w": [
+   [
+    "Each security must be suitable on its own, regardless of the rest of the client's portfolio",
+    "C",
+    "The Standard looks at the portfolio as a whole."
+   ],
+   [
+    "Suitability is satisfied once the client has agreed to the adviser's recommendation",
+    "C",
+    "Client agreement does not remove the duty to consider whether it suits the client."
+   ]
+  ],
+  "sol": "The duty looks at how an investment fits the client's total portfolio and objectives. A risky holding can still be suitable if it has an appropriate role, but consent alone does not settle suitability."
+ },
+ {
+  "id": "q-eth-r097-c-medium",
+  "o": "r097-c",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A retired client has low risk tolerance and needs steady income. Her adviser recommends putting a large share of her portfolio into one speculative small-cap stock because of its return potential. Which is the best assessment?",
+  "ok": "A violation, because it fits neither her objectives nor her whole portfolio",
+  "w": [
+   [
+    "Acceptable, because the expected return on the speculative stock is high",
+    "C",
+    "Return potential alone does not make a risky concentrated holding suitable for this client."
+   ],
+   [
+    "Acceptable, because the stock looks attractive when judged on its own merits",
+    "C",
+    "Suitability is judged against the client and total portfolio, not the stock in isolation."
+   ]
+  ],
+  "sol": "Suitability compares an investment with the client's objectives, risk tolerance and total portfolio. A concentrated speculative position clashes with a low-risk, income-seeking retiree."
+ },
+ {
+  "id": "q-eth-r097-d-easy",
+  "o": "r097-d",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "In presenting results to clients and prospects, what must a member make reasonable efforts to ensure about the performance information?",
+  "ok": "That it is fair, accurate and complete",
+  "w": [
+   [
+    "That it is favorable to the firm",
+    "C",
+    "Performance presentation must not be shaped to flatter."
+   ],
+   [
+    "That it is shown only in annualized form",
+    "C",
+    "The Standard does not prescribe one format; it requires fair, accurate and complete presentation."
+   ]
+  ],
+  "sol": "III(D) asks for fair, accurate and complete performance information so that clients and prospects are not misled."
+ },
+ {
+  "id": "q-eth-r097-d-hard",
+  "o": "r097-d",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A firm does not follow the GIPS standards. Its manager wants to show prospects a performance history that still meets Standard III(D). Which approach is most appropriate?",
+  "ok": "Show a composite of comparable portfolios, not one hand-picked account, with full explanation",
+  "w": [
+   [
+    "Show only the single best-performing account, labeled as representative of the strategy",
+    "C",
+    "A single chosen account is not fair or complete and can mislead about typical results."
+   ],
+   [
+    "Show nothing at all, because only GIPS-compliant firms may present any performance",
+    "C",
+    "Firms that do not follow GIPS can still meet III(D) by other means."
+   ]
+  ],
+  "sol": "A firm outside the GIPS standards can still meet III(D) by, for example, presenting a composite of similar portfolios instead of one account and by fully explaining the results reported."
+ },
+ {
+  "id": "q-eth-r097-d-medium",
+  "o": "r097-d",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A firm's composite performance leaves out accounts that were closed after poor results. Which is the best assessment?",
+  "ok": "Misleading, because terminated accounts should be included in the composite history",
+  "w": [
+   [
+    "Acceptable, because accounts that have closed are no longer the firm's clients",
+    "C",
+    "Omitting them overstates results and is a form of survivorship bias."
+   ],
+   [
+    "Acceptable, as long as the accounts that are included have been calculated correctly",
+    "C",
+    "Correct calculation of the included accounts does not cure a biased selection."
+   ]
+  ],
+  "sol": "Excluding terminated accounts removes poor outcomes and overstates performance, so the presentation is not fair, accurate and complete."
+ },
+ {
+  "id": "q-eth-r097-e-easy",
+  "o": "r097-e",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Under Standard III(E), when may confidential client information be disclosed?",
+  "ok": "With client permission, when the law requires it, or for possible illegal activity",
+  "w": [
+   [
+    "Whenever a colleague at another firm asks the adviser for the information",
+    "C",
+    "Requests from outsiders do not justify disclosure."
+   ],
+   [
+    "Whenever sharing it would help the member to win some new business",
+    "C",
+    "Business advantage is not an exception to confidentiality."
+   ]
+  ],
+  "sol": "The Standard preserves confidentiality except where the client consents, the law requires disclosure, or the information concerns possible illegal activity."
+ },
+ {
+  "id": "q-eth-r097-e-hard",
+  "o": "r097-e",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An adviser sees transactions suggesting that a client may be laundering money. Which response is consistent with Standard III(E)?",
+  "ok": "Consult compliance and, if warranted, disclose to authorities only as far as needed",
+  "w": [
+   [
+    "Say nothing at all, because client confidentiality is absolute in every circumstance",
+    "C",
+    "The Standard has an exception for possible illegal activity."
+   ],
+   [
+    "Tell the firm's other clients about the suspicion so that they can protect themselves",
+    "C",
+    "Broad disclosure to other clients goes beyond what the exception allows."
+   ]
+  ],
+  "sol": "Confidentiality is not absolute. Possible illegal activity is an exception, and the adviser should involve compliance or legal counsel and limit any disclosure to what is appropriate."
+ },
+ {
+  "id": "q-eth-r097-e-medium",
+  "o": "r097-e",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A client's brother, who is not a client of the firm, asks the adviser for details of the client's account. What should the adviser do?",
+  "ok": "Decline, unless the client has given permission to share the information",
+  "w": [
+   [
+    "Share the details with the brother, because family members are entitled to know",
+    "C",
+    "A family relationship does not override the client's confidentiality."
+   ],
+   [
+    "Share only the total value of the account, since that figure is less sensitive",
+    "C",
+    "Any client information is covered, and partial disclosure is still disclosure."
+   ]
+  ],
+  "sol": "Client information belongs to the client. Without the client's permission, or a legal or illegal-activity exception, the adviser should not share it, even in part."
+ },
+ {
+  "id": "q-eth-r098-a-easy",
+  "o": "r098-a",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "In matters related to their employment, what does Standard IV(A) require of members and candidates?",
+  "ok": "Work for the employer's benefit and avoid harming it or leaking its confidences",
+  "w": [
+   [
+    "Follow every employer instruction, whatever the effect of doing so on clients",
+    "C",
+    "Employer policies are followed only to the extent they do not conflict with the law or the Code and Standards."
+   ],
+   [
+    "Put the employer's interests ahead of all personal and family obligations at all times",
+    "C",
+    "The Standard is not a blanket requirement to put employer interests ahead of personal ones in all matters."
+   ]
+  ],
+  "sol": "IV(A) is about not harming the employer in matters related to employment. It is not a duty to obey every instruction or to subordinate personal and family obligations."
+ },
+ {
+  "id": "q-eth-r098-a-hard",
+  "o": "r098-a",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A supervisor tells an adviser to follow a firm procedure that would breach the Code and Standards. Under Standard IV(A), what should the adviser do?",
+  "ok": "Comply with the Code and Standards; employer policy applies only where it does not conflict",
+  "w": [
+   [
+    "Follow the procedure, because loyalty to the employer must take priority over everything",
+    "C",
+    "Loyalty does not extend to conduct that breaches the Code and Standards."
+   ],
+   [
+    "Follow the procedure but make a private note that she disagrees with it",
+    "I",
+    "A private note does not stop her from taking part in a breach."
+   ]
+  ],
+  "sol": "Members must follow employer policies that govern the employment relationship only where doing so does not conflict with applicable law or the Code and Standards."
+ },
+ {
+  "id": "q-eth-r098-a-medium",
+  "o": "r098-a",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An analyst plans to start her own advisory firm. While still employed she calls the firm's current clients to say she will soon be offering the same service and asks them to move their accounts. Which is the best assessment?",
+  "ok": "A violation: she may prepare to leave but must not solicit clients while employed",
+  "w": [
+   [
+    "No violation, because she has not yet formally left the firm she works for",
+    "C",
+    "The duty to the employer applies while she is employed."
+   ],
+   [
+    "No violation, because clients are always free to choose whichever adviser they wish",
+    "C",
+    "Client choice does not excuse soliciting them while still employed."
+   ]
+  ],
+  "sol": "Preparing to enter independent business is allowed so long as the member does not solicit clients or otherwise harm the employer. Soliciting current clients while employed breaches IV(A)."
+ },
+ {
+  "id": "q-eth-r098-b-easy",
+  "o": "r098-b",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Before accepting compensation from a client, in addition to that from the employer, for services that could conflict with the employer's interests, a member must:",
+  "ok": "Obtain the employer's written consent after disclosing the arrangement",
+  "w": [
+   [
+    "Tell the employer verbally once the payment has been received",
+    "I",
+    "Consent must come first and be written."
+   ],
+   [
+    "Do nothing, because the payment comes from a client and not from the employer",
+    "C",
+    "The source being a client does not remove the disclosure and consent requirement."
+   ]
+  ],
+  "sol": "IV(B) requires written disclosure to the employer and the employer's written consent before accepting additional compensation for services that might create a conflict."
+ },
+ {
+  "id": "q-eth-r098-b-hard",
+  "o": "r098-b",
+  "t": "H",
+  "c": "compare",
+  "f": "exception",
+  "q": "Which of the following falls OUTSIDE the additional compensation requirement of Standard IV(B)?",
+  "ok": "A bonus that the member's own employer pays under the employment agreement",
+  "w": [
+   [
+    "A fee from a third party for advice that could compete with the employer's services",
+    "L",
+    "This is additional compensation that needs consent; the question asks for the one that does not."
+   ],
+   [
+    "A bonus from a client tied to that client's account outperforming",
+    "L",
+    "This is additional compensation that needs consent; the question asks for the one that does not."
+   ]
+  ],
+  "sol": "IV(B) concerns compensation or benefits from parties other than the employer. Pay from the employer under the agreed terms is not additional compensation."
+ },
+ {
+  "id": "q-eth-r098-b-medium",
+  "o": "r098-b",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A client offers a manager a personal bonus if the client's account beats its benchmark by 2% this year. The manager mentions it to her supervisor in the corridor. Is that enough?",
+  "ok": "No; she should disclose it in writing and obtain her employer's written consent first",
+  "w": [
+   [
+    "Yes, because the supervisor is now aware of the arrangement and has not objected",
+    "I",
+    "An informal mention is not written disclosure and consent."
+   ],
+   [
+    "Yes, because the payment comes from the client and not from her firm",
+    "C",
+    "Payments from clients that could conflict with the employer's interests still need consent."
+   ]
+  ],
+  "sol": "A performance bonus from one client may affect how she treats other clients or the employer's interests, so written disclosure and written consent are required."
+ },
+ {
+  "id": "q-eth-r098-c-easy",
+  "o": "r098-c",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "What is a supervisor required to do under Standard IV(C)?",
+  "ok": "Take reasonable steps to catch and stop breaches of law and the Code by people they oversee",
+  "w": [
+   [
+    "Personally review each and every trade and communication made by the people they supervise",
+    "C",
+    "The Standard requires reasonable efforts, not a personal review of everything."
+   ],
+   [
+    "Be responsible only for violations that they personally commit and never for others",
+    "C",
+    "A supervisor is also responsible for reasonable efforts regarding the people supervised."
+   ]
+  ],
+  "sol": "IV(C) asks supervisors to make reasonable efforts, including adequate compliance procedures, to detect and prevent violations by those they supervise."
+ },
+ {
+  "id": "q-eth-r098-c-hard",
+  "o": "r098-c",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A supervisor learns that a trader may have breached a regulation. She warns him not to do it again and takes no other step. What is missing?",
+  "ok": "Promptly investigate the extent and act, such as restricting the trader and reviewing controls",
+  "w": [
+   [
+    "Nothing further is needed; a clear warning to the trader is a sufficient response",
+    "C",
+    "A warning without investigating the extent of the problem does not meet the duty."
+   ],
+   [
+    "She should wait to see whether the regulator raises the matter before acting",
+    "I",
+    "She must act promptly rather than wait for external action."
+   ]
+  ],
+  "sol": "On learning of a possible violation, a supervisor must respond promptly by investigating its extent and taking action to stop it and prevent recurrence, not merely warning the person."
+ },
+ {
+  "id": "q-eth-r098-c-medium",
+  "o": "r098-c",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A firm gives a manager supervisory responsibility for a team but has no written compliance procedures. What should she do?",
+  "ok": "Raise the gap with senior management and, if unfixed, decline the role in writing",
+  "w": [
+   [
+    "Accept the role and rely on the team's good judgment to keep the work compliant",
+    "C",
+    "Without adequate procedures she cannot properly discharge the responsibility."
+   ],
+   [
+    "Accept the role and say nothing about the gap, to avoid friction with management",
+    "I",
+    "She must raise the inadequacy rather than ignore it."
+   ]
+  ],
+  "sol": "A supervisor who cannot carry out the duty because the compliance system is inadequate should bring this to senior management, and if it is not fixed decline the responsibility in writing until reasonable procedures exist."
+ },
+ {
+  "id": "q-eth-r099-a-easy",
+  "o": "r099-a",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "What does Standard V(A) require when a member makes an investment recommendation or takes an investment action?",
+  "ok": "A sound, adequate foundation backed by suitable research and investigation",
+  "w": [
+   [
+    "Independent verification of every single fact from primary sources before any recommendation",
+    "C",
+    "The Standard requires a reasonable and adequate basis, not verification of every fact from scratch."
+   ],
+   [
+    "A guarantee that the recommendation made will turn out to be profitable for clients",
+    "C",
+    "Diligence concerns the basis for the recommendation, not its outcome."
+   ]
+  ],
+  "sol": "The Standard calls for diligence, independence and thoroughness so that a recommendation rests on a sound and adequate foundation backed by suitable research and investigation."
+ },
+ {
+  "id": "q-eth-r099-a-hard",
+  "o": "r099-a",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A member disagrees with her team's consensus rating but believes the consensus is well founded, independent and objective. What is her obligation regarding the report?",
+  "ok": "She may leave her name on it even though it differs from her own view",
+  "w": [
+   [
+    "She must dissociate from the report whenever her own view differs from the team's",
+    "C",
+    "Disagreement alone does not require dissociation where the consensus is reasonable and independent."
+   ],
+   [
+    "She must publish a separate dissenting report setting out her own rating",
+    "C",
+    "The Standard does not require a separate dissent."
+   ]
+  ],
+  "sol": "Where she believes the group's conclusion is well founded, independent and objective, she need not step away from the report merely because her own opinion differs."
+ },
+ {
+  "id": "q-eth-r099-a-medium",
+  "o": "r099-a",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An analyst adopts the buy rating from a well-known outside research firm as her own, without reading the report's assumptions or methods. Which is the best assessment?",
+  "ok": "Not enough; she should inquire into the research's assumptions and methods first",
+  "w": [
+   [
+    "Enough, because the outside research firm has a good reputation in the market",
+    "C",
+    "A reputation does not replace her own reasonable inquiry into the basis."
+   ],
+   [
+    "Enough, as long as she names the outside firm as the source of the rating",
+    "I",
+    "Attribution is needed but does not supply the required basis for her own recommendation."
+   ]
+  ],
+  "sol": "Relying on outside research is permitted, but the member must make a reasonable judgment about the quality of the work, including its assumptions and methods, before relying on it."
+ },
+ {
+  "id": "q-eth-r099-b-easy",
+  "o": "r099-b",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which requirement was added to Standard V(B) by the 2023 revision?",
+  "ok": "Telling clients what the services are and what they will cost the client",
+  "w": [
+   [
+    "Disclosing the member's own personal compensation to the general public",
+    "C",
+    "The new requirement concerns the services and their cost to clients."
+   ],
+   [
+    "Guaranteeing the performance of the services described in the firm's marketing",
+    "C",
+    "No guarantee is required or permitted."
+   ]
+  ],
+  "sol": "V(B) now requires disclosure of the nature of services and the associated costs to the client, so that clients can make informed decisions."
+ },
+ {
+  "id": "q-eth-r099-b-hard",
+  "o": "r099-b",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A research note states \"Company X's shares will double next year because demand is surging.\" The analyst has no data showing the doubling. What is the main problem under V(B)?",
+  "ok": "An opinion is presented as fact, but facts and opinions must be kept distinct",
+  "w": [
+   [
+    "The note contains a forecast, and a forecast is never permitted in a research note",
+    "C",
+    "Forecasts are permitted when presented as opinion with a basis."
+   ],
+   [
+    "The problem exists only if the shares later fail to double as the note predicted",
+    "C",
+    "The problem lies in how the statement was communicated, not in the later result."
+   ]
+  ],
+  "sol": "V(B) requires members to distinguish fact from opinion. Stating a prediction as a certainty misleads the reader whatever happens next."
+ },
+ {
+  "id": "q-eth-r099-b-medium",
+  "o": "r099-b",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A manager moves clients' portfolios into a strategy that relies heavily on derivatives, a material change from the process described to clients. She plans to mention it in next year's annual letter. Which is the best assessment?",
+  "ok": "A violation, because material changes to the investment process must be disclosed promptly",
+  "w": [
+   [
+    "Acceptable, because the annual letter is the usual channel for telling clients things",
+    "C",
+    "Material changes must be disclosed promptly, not held for a routine report."
+   ],
+   [
+    "Acceptable, because clients can always ask if they want to know about changes",
+    "C",
+    "The duty to disclose is on the manager, not dependent on clients asking."
+   ]
+  ],
+  "sol": "V(B) requires prompt disclosure of material changes to the investment process, so that clients can decide what to do while it still matters."
+ },
+ {
+  "id": "q-eth-r099-c-easy",
+  "o": "r099-c",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "If neither regulation nor firm policy sets a period, how long does CFA Institute recommend keeping records that support investment analysis and communications?",
+  "ok": "At least seven years",
+  "w": [
+   [
+    "One year",
+    "C",
+    "Too short to be the recommended retention period."
+   ],
+   [
+    "Only until the recommendation has been made",
+    "C",
+    "Records must be kept after the recommendation to support it."
+   ]
+  ],
+  "sol": "Where no regulation or firm policy sets a period, CFA Institute recommends keeping records for at least seven years."
+ },
+ {
+  "id": "q-eth-r099-c-hard",
+  "o": "r099-c",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "At a new firm, an analyst wants to cite recommendations she made at her previous employer, but the supporting documents are not available to her. What should she do?",
+  "ok": "Not use them, because the documentation supporting them is unavailable",
+  "w": [
+   [
+    "Use them, because she clearly remembers the reasoning behind each of them",
+    "C",
+    "Memory is not the documentation Standard V(C) expects."
+   ],
+   [
+    "Use them, provided she labels them as recalled from memory rather than documented",
+    "I",
+    "A label does not provide the missing support."
+   ]
+  ],
+  "sol": "Historical recommendations or research from a previous firm should not be used if the supporting documentation is unavailable, since the basis cannot be shown."
+ },
+ {
+  "id": "q-eth-r099-c-medium",
+  "o": "r099-c",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An analyst leaving her firm wants to take copies of the files supporting her recommendations. What is the correct position?",
+  "ok": "The records generally belong to the firm, so she needs the firm's permission",
+  "w": [
+   [
+    "She may take them freely, because she is the person who wrote them",
+    "C",
+    "Responsibility for records generally rests with the firm, not the individual."
+   ],
+   [
+    "She may take them, provided that the copies are only for her personal use",
+    "C",
+    "Personal use does not change who is responsible for the records."
+   ]
+  ],
+  "sol": "Keeping the supporting records is mainly a firm responsibility, so the records generally belong to the firm unless the firm agrees otherwise."
+ },
+ {
+  "id": "q-eth-r100-a-easy",
+  "o": "r100-a",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "What does Standard VI(A) require regarding conflicts of interest?",
+  "ok": "Avoid conflicts of interest, or fully disclose those that cannot reasonably be avoided",
+  "w": [
+   [
+    "Disclose conflicts only in those cases where a client specifically asks about them",
+    "C",
+    "The duty to disclose does not depend on a client asking."
+   ],
+   [
+    "Disclose conflicts to the employer only, and not to clients or prospective clients",
+    "M",
+    "Disclosure must also reach clients and prospective clients where the conflict affects them."
+   ]
+  ],
+  "sol": "Since the 2023 revision, VI(A) requires members and candidates to avoid conflicts of interest or disclose them fully and fairly."
+ },
+ {
+  "id": "q-eth-r100-a-hard",
+  "o": "r100-a",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A member could easily avoid a conflict by reassigning coverage of a company to a colleague. Instead she keeps the coverage and discloses the conflict in small print. What is the best assessment?",
+  "ok": "Not adequate: she should avoid it where reasonable, and disclosure must be prominent",
+  "w": [
+   [
+    "Adequate, because disclosure is always an acceptable alternative to avoiding a conflict",
+    "C",
+    "Where avoidance is reasonable, the Standard points to avoiding, not merely disclosing."
+   ],
+   [
+    "Adequate, provided that the client signs the form containing the small-print disclosure",
+    "C",
+    "A signature on a poorly communicated disclosure does not make the disclosure effective."
+   ]
+  ],
+  "sol": "VI(A) is an avoid-or-disclose standard. Where the conflict can reasonably be avoided, she should avoid it, and disclosures must be prominent, plain and effective."
+ },
+ {
+  "id": "q-eth-r100-a-medium",
+  "o": "r100-a",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An adviser recommends a fund family to clients. The fund family pays his firm a fee for every client placed with it. He does not mention the payment because he believes the funds are good. Which is the best assessment?",
+  "ok": "A violation: the payment is a conflict and must be clearly disclosed to clients",
+  "w": [
+   [
+    "No violation, because the funds he recommended are objectively good funds",
+    "C",
+    "A good recommendation does not remove the duty to disclose the conflict."
+   ],
+   [
+    "No violation if the payment is mentioned somewhere in the contract's fine print",
+    "C",
+    "Disclosure must be prominent and communicated effectively, not hidden."
+   ]
+  ],
+  "sol": "A payment linked to the recommendation could reasonably impair objectivity, so it must be avoided or disclosed prominently and in plain language."
+ },
+ {
+  "id": "q-eth-r100-b-easy",
+  "o": "r100-b",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Under Standard VI(B), which transactions have priority?",
+  "ok": "Transactions for clients and the employer over the member's own beneficial holdings",
+  "w": [
+   [
+    "The member's own personal transactions over the transactions carried out for clients",
+    "C",
+    "Reverses the required order."
+   ],
+   [
+    "Whichever transaction happens to be placed first, whoever it is being placed for",
+    "C",
+    "Order of entry does not override the priority given to clients and the employer."
+   ]
+  ],
+  "sol": "VI(B) gives clients' and employer's transactions priority over personal transactions of the member."
+ },
+ {
+  "id": "q-eth-r100-b-hard",
+  "o": "r100-b",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An analyst wants to buy shares in a new issue for her personal account. Which practice is most consistent with Standard VI(B)?",
+  "ok": "Obtain preclearance from her firm's compliance function before participating",
+  "w": [
+   [
+    "Participate freely, because personal accounts fall outside the scope of the Standard",
+    "C",
+    "Personal transactions are exactly what VI(B) governs."
+   ],
+   [
+    "Participate first and tell her clients about it some time afterwards",
+    "T",
+    "Any check has to happen before the trade, not after."
+   ]
+  ],
+  "sol": "Preclearance procedures let the firm check that a personal transaction does not conflict with clients' interests before it is made."
+ },
+ {
+  "id": "q-eth-r100-b-medium",
+  "o": "r100-b",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A portfolio manager is about to place a large buy order for several clients in a small-cap stock. Before doing so she buys a small amount for her own account. Which is the best assessment?",
+  "ok": "A violation, because she has put her own transaction ahead of her clients'",
+  "w": [
+   [
+    "No violation, because the amount that she bought for herself was small",
+    "C",
+    "The size of her own trade does not change the required priority."
+   ],
+   [
+    "No violation, because she paid the same price that the clients later paid",
+    "C",
+    "Trading ahead of clients is the problem regardless of the price outcome."
+   ]
+  ],
+  "sol": "Buying for herself before her clients' large order breaches the priority requirement, since her personal trade came first."
+ },
+ {
+  "id": "q-eth-r100-c-easy",
+  "o": "r100-c",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Standard VI(C) requires members and candidates to disclose which of the following?",
+  "ok": "Any compensation or benefit received or paid for referring clients or business",
+  "w": [
+   [
+    "Only those referral payments that are above some minimum amount set by the firm",
+    "C",
+    "The Standard does not set a minimum size for disclosure."
+   ],
+   [
+    "Only the payments that are received directly from clients rather than third parties",
+    "C",
+    "It covers consideration paid or received for referrals from any party."
+   ]
+  ],
+  "sol": "VI(C) requires disclosure to the employer, clients and prospects, as appropriate, of any compensation or benefit paid or received for recommending products or services."
+ },
+ {
+  "id": "q-eth-r100-c-hard",
+  "o": "r100-c",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "When must referral arrangements be disclosed to a client?",
+  "ok": "Before the client commits to the referred service, so she can judge any partiality",
+  "w": [
+   [
+    "After the referral fee has actually been received by the adviser or the firm",
+    "T",
+    "Disclosure after the fact does not let the client weigh the referral."
+   ],
+   [
+    "Once a year, in the firm's general annual report to all clients",
+    "T",
+    "A later routine report does not help a client deciding now."
+   ]
+  ],
+  "sol": "Clients need the information before they commit to the service, so they can assess whether the recommendation is affected by the arrangement."
+ },
+ {
+  "id": "q-eth-r100-c-medium",
+  "o": "r100-c",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An adviser regularly sends clients to a mortgage broker, who gives him gift cards for each referral. He tells no one. Which is the best assessment?",
+  "ok": "A violation: benefits received for referrals must be disclosed to employer and clients",
+  "w": [
+   [
+    "No violation, because he received nothing at all from the clients themselves",
+    "C",
+    "The benefit comes from the broker, but it still relates to the referral and must be disclosed."
+   ],
+   [
+    "No violation, because gift cards are not cash and so are not compensation",
+    "C",
+    "Benefits of any kind are covered, not only cash."
+   ]
+  ],
+  "sol": "Benefits received for referrals could affect the objectivity of the advice, so they must be disclosed to the employer and clients."
+ },
+ {
+  "id": "q-eth-r101-a-easy",
+  "o": "r101-a",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Standard VII(A) prohibits conduct that compromises which of the following?",
+  "ok": "The standing of CFA Institute and the designation, or the security of its exams",
+  "w": [
+   [
+    "The share price of the member's employer, which could fall after an adverse ruling",
+    "M",
+    "VII(A) concerns CFA Institute programs and reputation, not the employer's finances."
+   ],
+   [
+    "The investment returns that the member's own clients earn in their portfolios",
+    "M",
+    "That concerns duties to clients, not participation in CFA Institute programs."
+   ]
+  ],
+  "sol": "VII(A) covers conduct that harms the standing of CFA Institute or the designation, or that undermines the security and validity of its programs."
+ },
+ {
+  "id": "q-eth-r101-a-hard",
+  "o": "r101-a",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A candidate takes handwritten notes into the exam room, against the testing rules, but says he did not look at them. Which is the best assessment?",
+  "ok": "A violation: unauthorized notes in the exam room breach the rules, used or not",
+  "w": [
+   [
+    "No violation, because he says that he did not look at or use the notes",
+    "C",
+    "Bringing the material in is itself the breach."
+   ],
+   [
+    "A violation only if his score turned out higher because of the notes he had",
+    "R",
+    "The test is whether the rules were breached, not whether the score changed."
+   ]
+  ],
+  "sol": "The testing rules bar unauthorized material in the exam room. Doing so compromises the security and integrity of the exam whether or not it is consulted."
+ },
+ {
+  "id": "q-eth-r101-a-medium",
+  "o": "r101-a",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "After sitting an exam, a candidate posts summaries of specific questions on an online forum. He says the exam is over and no names are used. Which is the best assessment?",
+  "ok": "A violation: exam content is confidential and sharing it compromises program security",
+  "w": [
+   [
+    "No violation, because the exam has already been sat and the questions are now old",
+    "C",
+    "Exam content stays confidential until CFA Institute releases it."
+   ],
+   [
+    "No violation, because no names were mentioned in any of the posts about the questions",
+    "C",
+    "Anonymity does not remove the breach of exam confidentiality."
+   ]
+  ],
+  "sol": "All aspects of an exam are confidential until CFA Institute chooses to release them, so sharing specific questions breaches VII(A)."
+ },
+ {
+  "id": "q-eth-r101-b-easy",
+  "o": "r101-b",
+  "t": "E",
+  "c": "recall",
+  "f": "direct",
+  "q": "Which statement about the CFA designation is appropriate under Standard VII(B)?",
+  "ok": "The exams are thorough and rigorous, and charterholders commit to ethical conduct",
+  "w": [
+   [
+    "Charterholders can be expected to deliver superior investment performance for clients",
+    "C",
+    "Implying superior performance is prohibited."
+   ],
+   [
+    "Holding the designation guarantees that a client will go on to earn better returns",
+    "C",
+    "Promising competence or performance tied to the designation is prohibited."
+   ]
+  ],
+  "sol": "Factual statements about the rigor of the exams and the commitment to ethics are appropriate. Statements that imply superior performance or promise results are not."
+ },
+ {
+  "id": "q-eth-r101-b-hard",
+  "o": "r101-b",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A charterholder fails to complete the annual membership requirements, and her membership lapses. Her website still says \"CFA charterholder.\" What must she do?",
+  "ok": "Remove them until membership is reinstated; she may say she was a charterholder before",
+  "w": [
+   [
+    "Nothing needs changing, because a designation, once earned, is held for life",
+    "C",
+    "The right to use the designation depends on meeting annual membership requirements."
+   ],
+   [
+    "Keep the references and add a note explaining that the annual dues are still owed",
+    "C",
+    "She must not present herself as a charterholder while membership is lapsed."
+   ]
+  ],
+  "sol": "The right to use the designation is kept only by satisfying annual membership requirements. After a lapse she must remove references until reinstated, though she can state past status."
+ },
+ {
+  "id": "q-eth-r101-b-medium",
+  "o": "r101-b",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A candidate's business card reads \"Candidate for the CFA designation, expected charter 2028.\" Which is the best assessment?",
+  "ok": "A violation: a candidate must not cite an expected date for earning the charter",
+  "w": [
+   [
+    "No violation, because the statement about 2028 may well turn out to be true",
+    "C",
+    "Whether it turns out true is not the test; the charter is not guaranteed."
+   ],
+   [
+    "No violation, because the card clearly states that he is only a candidate",
+    "C",
+    "Stating candidacy clearly is required but does not permit citing an expected charter date."
+   ]
+  ],
+  "sol": "A candidate may say he is a candidate but must not imply the designation is assured or cite when it will be earned, since the award depends on meeting requirements."
+ },
+ {
+  "id": "q-eth-r102-a-easy",
+  "o": "r102-a",
+  "t": "E",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A research analyst publishes buy recommendations on a small company while holding its shares personally, and does not mention the holding. Which Standard is most directly at issue?",
+  "ok": "VI(A) Avoid or Disclose Conflicts",
+  "w": [
+   [
+    "III(E) Preservation of Confidentiality",
+    "M",
+    "No client information is involved."
+   ],
+   [
+    "V(C) Record Retention",
+    "M",
+    "The issue is an undisclosed conflict, not the keeping of records."
+   ]
+  ],
+  "sol": "An undisclosed personal holding in a company she recommends is a conflict of interest that needed to be avoided or disclosed."
+ },
+ {
+  "id": "q-eth-r102-a-hard",
+  "o": "r102-a",
+  "t": "H",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A manager receives an allocation of 10,000 shares in an oversubscribed offering and assigns all of it to a few accounts that pay performance fees, leaving other eligible accounts with nothing. Which Standard is most directly implicated?",
+  "ok": "III(B) Fair Dealing",
+  "w": [
+   [
+    "III(C) Suitability",
+    "M",
+    "Suitability concerns fit with client objectives, not how the allocation was shared."
+   ],
+   [
+    "VI(B) Priority of Transactions",
+    "M",
+    "No personal transaction by the manager is described."
+   ]
+  ],
+  "sol": "Steering a scarce allocation to accounts that pay more, at the expense of other eligible clients, is unfair treatment among clients."
+ },
+ {
+  "id": "q-eth-r102-a-medium",
+  "o": "r102-a",
+  "t": "M",
+  "c": "diagnose",
+  "f": "scenario",
+  "q": "A firm's brochure says it has \"managed client money for 25 years,\" but the firm was founded eight years ago. Which Standard is most directly violated by the person who approved the brochure?",
+  "ok": "I(C) Misrepresentation",
+  "w": [
+   [
+    "III(D) Performance Presentation",
+    "M",
+    "The false claim is about the firm's history, not a performance figure."
+   ],
+   [
+    "IV(A) Loyalty",
+    "M",
+    "The false claim misleads prospects; it is not primarily a matter of disloyalty to the employer."
+   ]
+  ],
+  "sol": "Stating a track record that does not exist is a misrepresentation about the firm's professional activities."
+ },
+ {
+  "id": "q-eth-r102-b-easy",
+  "o": "r102-b",
+  "t": "E",
+  "c": "apply",
+  "f": "scenario",
+  "q": "A firm that underwrites a company's bonds asks its analyst to publish a positive report on that company. Which course best conforms to the Code and Standards?",
+  "ok": "Base the conclusions on her own independent analysis and disclose the firm's relationship",
+  "w": [
+   [
+    "Publish a positive report exactly as the firm has requested that she do",
+    "C",
+    "Lets the firm's interest dictate the conclusion, which undermines independence and objectivity."
+   ],
+   [
+    "Publish a positive report but leave out any mention of the underwriting relationship",
+    "I",
+    "Hides a relationship that could affect how the report is read."
+   ]
+  ],
+  "sol": "She must keep independence and objectivity, so her conclusions are her own, and the relationship should be disclosed."
+ },
+ {
+  "id": "q-eth-r102-b-hard",
+  "o": "r102-b",
+  "t": "H",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An adviser learns that his firm's marketing shows returns gross of fees without saying so, and it has already gone to prospects. Which response would best conform?",
+  "ok": "Label or restate the returns so fee effects are clear, and correct material already sent",
+  "w": [
+   [
+    "Leave it as it is, because prospects can always ask about fees if they want to know",
+    "C",
+    "The duty is to present performance fairly and not to rely on questions being asked."
+   ],
+   [
+    "Correct only the materials that are sent out from now on, and not the earlier ones",
+    "I",
+    "Stops one step short, leaving prospects already misled without correction."
+   ]
+  ],
+  "sol": "Performance must be fair, accurate and complete. Once an error is found, he should correct the presentation and inform those who received the misleading material."
+ },
+ {
+  "id": "q-eth-r102-b-medium",
+  "o": "r102-b",
+  "t": "M",
+  "c": "apply",
+  "f": "scenario",
+  "q": "An employee wants to buy a stock that her firm is about to buy for clients. Which conduct would conform?",
+  "ok": "Get preclearance, and wait until the firm's client trades are completed before trading",
+  "w": [
+   [
+    "Buy first, because the amount that she would buy is small compared with the clients'",
+    "C",
+    "A small personal trade ahead of clients still puts hers first."
+   ],
+   [
+    "Buy at the same moment as the clients, so that her order does not come first",
+    "C",
+    "Her order may compete with theirs and does not give them priority."
+   ]
+  ],
+  "sol": "Client and employer transactions come first, so she should preclear the trade and wait until the clients' orders are done."
+ }
+]

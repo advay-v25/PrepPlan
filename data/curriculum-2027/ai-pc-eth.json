@@ -1,0 +1,842 @@
+{
+ "volume": "AI, Portfolio Construction, Ethics (Schweser 2027 vol.)",
+ "subjects": [
+  {
+   "id": "alt",
+   "name": "Alternative Investments",
+   "readings": [
+    {
+     "n": 80,
+     "title": "Alternative Investment Features, Methods, and Structures",
+     "modules": [
+      [
+       "80.1",
+       "Alternative Investment Structures",
+       1
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe features and categories of alternative investments",
+       1
+      ],
+      [
+       "b",
+       "Compare direct, co-investment and fund investment methods",
+       3
+      ],
+      [
+       "c",
+       "Describe ownership and compensation structures",
+       4
+      ]
+     ]
+    },
+    {
+     "n": 81,
+     "title": "Alternative Investment Performance and Returns",
+     "modules": [
+      [
+       "81.1",
+       "Performance Appraisal and Return Calculations",
+       11
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe performance appraisal of alternative investments",
+       11
+      ],
+      [
+       "b",
+       "Calculate and interpret returns before and after fees",
+       14
+      ]
+     ]
+    },
+    {
+     "n": 82,
+     "title": "Investments in Private Capital: Equity and Debt",
+     "modules": [
+      [
+       "82.1",
+       "Private Capital",
+       23
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain private equity features and characteristics",
+       23
+      ],
+      [
+       "b",
+       "Explain private debt features and characteristics",
+       26
+      ],
+      [
+       "c",
+       "Describe the diversification benefits of private capital",
+       27
+      ]
+     ]
+    },
+    {
+     "n": 83,
+     "title": "Real Estate and Infrastructure",
+     "modules": [
+      [
+       "83.1",
+       "Real Estate",
+       31
+      ],
+      [
+       "83.2",
+       "Infrastructure",
+       34
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain features and characteristics of real estate",
+       31
+      ],
+      [
+       "b",
+       "Explain characteristics of real estate investments",
+       33
+      ],
+      [
+       "c",
+       "Explain features and characteristics of infrastructure",
+       34
+      ],
+      [
+       "d",
+       "Explain characteristics of infrastructure investments",
+       35
+      ]
+     ]
+    },
+    {
+     "n": 84,
+     "title": "Natural Resources",
+     "modules": [
+      [
+       "84.1",
+       "Farmland, Timberland, and Commodities",
+       39
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain features of raw land, timberland and farmland",
+       39
+      ],
+      [
+       "b",
+       "Describe features of commodities and their characteristics",
+       40
+      ],
+      [
+       "c",
+       "Analyze risk, return and diversification of natural resources",
+       41
+      ]
+     ]
+    },
+    {
+     "n": 85,
+     "title": "Hedge Funds",
+     "modules": [
+      [
+       "85.1",
+       "Hedge Funds",
+       45
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain hedge fund features and contrast them with other assets",
+       45
+      ],
+      [
+       "b",
+       "Describe hedge fund forms and vehicles",
+       48
+      ],
+      [
+       "c",
+       "Analyze risk, return and diversification among hedge funds",
+       49
+      ]
+     ]
+    },
+    {
+     "n": 86,
+     "title": "Introduction to Digital Assets",
+     "modules": [
+      [
+       "86.1",
+       "Distributed Ledger Technology",
+       53
+      ],
+      [
+       "86.2",
+       "Digital Asset Characteristics",
+       57
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe financial applications of distributed ledger technology",
+       53
+      ],
+      [
+       "b",
+       "Explain features of digital assets versus other asset classes",
+       57
+      ],
+      [
+       "c",
+       "Describe forms and vehicles for digital asset investment",
+       58
+      ],
+      [
+       "d",
+       "Analyze risk, return and diversification of digital assets",
+       60
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pm",
+   "name": "Portfolio Construction",
+   "readings": [
+    {
+     "n": 87,
+     "title": "Portfolio Risk and Return: Part I",
+     "modules": [
+      [
+       "87.1",
+       "Historical Risk and Return",
+       69
+      ],
+      [
+       "87.2",
+       "Risk Aversion",
+       70
+      ],
+      [
+       "87.3",
+       "Portfolio Standard Deviation",
+       75
+      ],
+      [
+       "87.4",
+       "The Efficient Frontier",
+       79
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe asset-class characteristics investors consider",
+       69
+      ],
+      [
+       "b",
+       "Explain risk aversion and its implications",
+       70
+      ],
+      [
+       "c",
+       "Explain optimal portfolio selection, utility and the CAL",
+       71
+      ],
+      [
+       "d",
+       "Calculate mean, variance and covariance from historical data",
+       75
+      ],
+      [
+       "e",
+       "Calculate and interpret portfolio standard deviation",
+       77
+      ],
+      [
+       "f",
+       "Describe the effect of imperfectly correlated assets",
+       79
+      ],
+      [
+       "g",
+       "Describe minimum-variance and efficient frontiers",
+       81
+      ]
+     ]
+    },
+    {
+     "n": 88,
+     "title": "Portfolio Risk and Return: Part II",
+     "modules": [
+      [
+       "88.1",
+       "Systematic Risk and Beta",
+       87
+      ],
+      [
+       "88.2",
+       "The CAPM and the SML",
+       97
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe combining a risk-free asset with a risky portfolio",
+       87
+      ],
+      [
+       "b",
+       "Explain the CAL and the CML",
+       88
+      ],
+      [
+       "c",
+       "Explain systematic and nonsystematic risk",
+       91
+      ],
+      [
+       "d",
+       "Explain return-generating models",
+       93
+      ],
+      [
+       "e",
+       "Calculate and interpret beta",
+       95
+      ],
+      [
+       "f",
+       "Explain the CAPM, its assumptions and the SML",
+       97
+      ],
+      [
+       "g",
+       "Calculate expected return using the CAPM and SML",
+       97
+      ],
+      [
+       "h",
+       "Apply the CAPM and SML",
+       101
+      ],
+      [
+       "i",
+       "Calculate and interpret Sharpe, Treynor, M-squared and Jensen's alpha",
+       103
+      ]
+     ]
+    },
+    {
+     "n": 89,
+     "title": "Portfolio Management: An Overview",
+     "modules": [
+      [
+       "89.1",
+       "Portfolio Management Process",
+       113
+      ],
+      [
+       "89.2",
+       "Asset Management and Pooled Investments",
+       118
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe the portfolio approach to investing",
+       113
+      ],
+      [
+       "b",
+       "Describe the steps in the portfolio management process",
+       114
+      ],
+      [
+       "c",
+       "Describe investor types and their needs",
+       115
+      ],
+      [
+       "d",
+       "Describe defined contribution and defined benefit plans",
+       116
+      ],
+      [
+       "e",
+       "Describe aspects of the asset management industry",
+       118
+      ],
+      [
+       "f",
+       "Describe mutual funds and compare pooled products",
+       119
+      ]
+     ]
+    },
+    {
+     "n": 90,
+     "title": "Basics of Portfolio Planning and Construction",
+     "modules": [
+      [
+       "90.1",
+       "Portfolio Planning and Construction",
+       127
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe reasons for an investment policy statement",
+       127
+      ],
+      [
+       "b",
+       "Describe IPS components",
+       127
+      ],
+      [
+       "c",
+       "Describe risk and return objectives",
+       128
+      ],
+      [
+       "d",
+       "Explain willingness versus ability to take risk",
+       129
+      ],
+      [
+       "e",
+       "Describe investment constraints",
+       129
+      ],
+      [
+       "f",
+       "Explain specifying asset classes",
+       131
+      ],
+      [
+       "g",
+       "Describe principles of portfolio construction and asset allocation",
+       132
+      ],
+      [
+       "h",
+       "Describe ESG considerations in planning",
+       134
+      ]
+     ]
+    },
+    {
+     "n": 91,
+     "title": "The Behavioral Biases of Individuals",
+     "modules": [
+      [
+       "91.1",
+       "Cognitive Errors vs. Emotional Biases",
+       141
+      ],
+      [
+       "91.2",
+       "Emotional Biases",
+       147
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Compare cognitive errors and emotional biases",
+       141
+      ],
+      [
+       "b",
+       "Discuss common behavioral biases and their implications",
+       142
+      ],
+      [
+       "c",
+       "Describe how biases can conflict with traditional finance",
+       150
+      ]
+     ]
+    },
+    {
+     "n": 92,
+     "title": "Introduction to Risk Management",
+     "modules": [
+      [
+       "92.1",
+       "Introduction to Risk Management",
+       157
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Define risk management",
+       157
+      ],
+      [
+       "b",
+       "Describe features of a risk management framework",
+       158
+      ],
+      [
+       "c",
+       "Define risk governance and its elements",
+       158
+      ],
+      [
+       "d",
+       "Explain how risk tolerance affects risk management",
+       158
+      ],
+      [
+       "e",
+       "Describe risk budgeting and its role in governance",
+       159
+      ],
+      [
+       "f",
+       "Identify financial and non-financial sources of risk",
+       159
+      ],
+      [
+       "g",
+       "Describe methods to measure and modify risk exposures",
+       160
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "eth",
+   "name": "Ethical and Professional Standards",
+   "readings": [
+    {
+     "n": 93,
+     "title": "Ethics and Trust in the Investment Profession",
+     "modules": [
+      [
+       "93.1",
+       "Ethics and Trust",
+       169
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain ethics",
+       169
+      ],
+      [
+       "b",
+       "Describe the role of a code of ethics",
+       169
+      ],
+      [
+       "c",
+       "Describe professions and how they establish trust",
+       170
+      ],
+      [
+       "d",
+       "Describe the need for high ethical standards",
+       170
+      ],
+      [
+       "e",
+       "Explain professionalism in investment management",
+       171
+      ],
+      [
+       "f",
+       "Identify challenges to ethical behavior",
+       171
+      ],
+      [
+       "g",
+       "Compare ethical and legal standards",
+       172
+      ],
+      [
+       "h",
+       "Describe a framework for ethical decision making",
+       172
+      ]
+     ]
+    },
+    {
+     "n": 94,
+     "title": "Code of Ethics and Standards of Professional Conduct",
+     "modules": [
+      [
+       "94.1",
+       "Code and Standards",
+       177
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe the structure of the Professional Conduct Program and the Code and Standards",
+       177
+      ],
+      [
+       "b",
+       "Identify the six Code components and the seven Standards",
+       178
+      ],
+      [
+       "c",
+       "Explain the responsibilities under each Standard",
+       179
+      ]
+     ]
+    },
+    {
+     "n": 95,
+     "title": "Guidance for Standard I: Professionalism",
+     "modules": [
+      [
+       "95.1",
+       "Guidance for Standards I(A) to I(E)",
+       185
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Apply the Code and Standards to situations involving Standard I (Professionalism)",
+       185
+      ],
+      [
+       "b",
+       "Recommend practices that prevent violations of Standard I (Professionalism)",
+       185
+      ],
+      [
+       "c",
+       "Identify conduct that conforms to or violates Standard I (Professionalism)",
+       185
+      ]
+     ]
+    },
+    {
+     "n": 96,
+     "title": "Guidance for Standard II: Integrity of Capital Markets",
+     "modules": [
+      [
+       "96.1",
+       "Guidance for Standards II(A) and II(B)",
+       193
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Apply the Code and Standards to situations involving Standard II (Integrity of Capital Markets)",
+       193
+      ],
+      [
+       "b",
+       "Recommend practices that prevent violations of Standard II (Integrity of Capital Markets)",
+       193
+      ],
+      [
+       "c",
+       "Identify conduct that conforms to or violates Standard II (Integrity of Capital Markets)",
+       193
+      ]
+     ]
+    },
+    {
+     "n": 97,
+     "title": "Guidance for Standard III: Duties to Clients",
+     "modules": [
+      [
+       "97.1",
+       "Guidance for Standards III(A) to III(E)",
+       197
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Apply the Code and Standards to situations involving Standard III (Duties to Clients)",
+       197
+      ],
+      [
+       "b",
+       "Recommend practices that prevent violations of Standard III (Duties to Clients)",
+       197
+      ],
+      [
+       "c",
+       "Identify conduct that conforms to or violates Standard III (Duties to Clients)",
+       197
+      ]
+     ]
+    },
+    {
+     "n": 98,
+     "title": "Guidance for Standard IV: Duties to Employers",
+     "modules": [
+      [
+       "98.1",
+       "Guidance for Standards IV(A) to IV(C)",
+       205
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Apply the Code and Standards to situations involving Standard IV (Duties to Employers)",
+       205
+      ],
+      [
+       "b",
+       "Recommend practices that prevent violations of Standard IV (Duties to Employers)",
+       205
+      ],
+      [
+       "c",
+       "Identify conduct that conforms to or violates Standard IV (Duties to Employers)",
+       205
+      ]
+     ]
+    },
+    {
+     "n": 99,
+     "title": "Guidance for Standard V: Investment Analysis, Recommendations, and Actions",
+     "modules": [
+      [
+       "99.1",
+       "Guidance for Standards V(A) to V(C)",
+       211
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Apply the Code and Standards to situations involving Standard V (Investment Analysis)",
+       211
+      ],
+      [
+       "b",
+       "Recommend practices that prevent violations of Standard V (Investment Analysis)",
+       211
+      ],
+      [
+       "c",
+       "Identify conduct that conforms to or violates Standard V (Investment Analysis)",
+       211
+      ]
+     ]
+    },
+    {
+     "n": 100,
+     "title": "Guidance for Standard VI: Conflicts of Interest",
+     "modules": [
+      [
+       "100.1",
+       "Guidance for Standards VI(A) to VI(C)",
+       217
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Apply the Code and Standards to situations involving Standard VI (Conflicts of Interest)",
+       217
+      ],
+      [
+       "b",
+       "Recommend practices that prevent violations of Standard VI (Conflicts of Interest)",
+       217
+      ],
+      [
+       "c",
+       "Identify conduct that conforms to or violates Standard VI (Conflicts of Interest)",
+       217
+      ]
+     ]
+    },
+    {
+     "n": 101,
+     "title": "Guidance for Standard VII: Responsibilities as a CFA Institute Member or CFA Candidate",
+     "modules": [
+      [
+       "101.1",
+       "Guidance for Standards VII(A) and VII(B)",
+       223
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Apply the Code and Standards to situations involving Standard VII (CFA Member or Candidate)",
+       223
+      ],
+      [
+       "b",
+       "Recommend practices that prevent violations of Standard VII (CFA Member or Candidate)",
+       223
+      ],
+      [
+       "c",
+       "Identify conduct that conforms to or violates Standard VII (CFA Member or Candidate)",
+       223
+      ]
+     ]
+    },
+    {
+     "n": 102,
+     "title": "Application of the Code and Standards: Level I",
+     "modules": [
+      [
+       "102.1",
+       "Ethics Application",
+       227
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Evaluate practices, policies and conduct against the Code and Standards",
+       227
+      ],
+      [
+       "b",
+       "Explain how practices and conduct do or do not violate the Code and Standards",
+       227
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

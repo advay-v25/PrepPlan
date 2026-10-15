@@ -1,0 +1,929 @@
+{
+ "volume": "FSA, Equity (Schweser 2027 vol.)",
+ "subjects": [
+  {
+   "id": "fsa",
+   "name": "Financial Statement Analysis",
+   "readings": [
+    {
+     "n": 27,
+     "title": "Introduction to Financial Statement Analysis",
+     "modules": [
+      [
+       "27.1",
+       "Introduction to Financial Statement Analysis",
+       1
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe the steps in the financial statement analysis framework",
+       1
+      ],
+      [
+       "b",
+       "Describe the roles of financial statement analysis",
+       2
+      ],
+      [
+       "c",
+       "Describe the importance of filings, notes, commentary and audit reports",
+       2
+      ],
+      [
+       "d",
+       "Describe alternative reporting systems and monitoring of standards developments",
+       7
+      ],
+      [
+       "e",
+       "Describe information sources beyond annual and interim reports",
+       8
+      ]
+     ]
+    },
+    {
+     "n": 28,
+     "title": "Analyzing Income Statements",
+     "modules": [
+      [
+       "28.1",
+       "Revenue Recognition",
+       13
+      ],
+      [
+       "28.2",
+       "Expense Recognition",
+       18
+      ],
+      [
+       "28.3",
+       "Nonrecurring Items",
+       29
+      ],
+      [
+       "28.4",
+       "Earnings Per Share",
+       32
+      ],
+      [
+       "28.5",
+       "Ratios and Common-Size Income Statements",
+       40
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe revenue recognition principles, choices and implications",
+       13
+      ],
+      [
+       "b",
+       "Describe expense recognition, capitalization choices and implications",
+       18
+      ],
+      [
+       "c",
+       "Describe treatment of non-recurring items and accounting changes",
+       29
+      ],
+      [
+       "d",
+       "Calculate and interpret basic and diluted EPS",
+       32
+      ],
+      [
+       "e",
+       "Evaluate performance using common-size statements and ratios",
+       40
+      ]
+     ]
+    },
+    {
+     "n": 29,
+     "title": "Analyzing Balance Sheets",
+     "modules": [
+      [
+       "29.1",
+       "Intangible Assets and Marketable Securities",
+       49
+      ],
+      [
+       "29.2",
+       "Common-Size Balance Sheets",
+       57
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain reporting and disclosures for intangible assets",
+       49
+      ],
+      [
+       "b",
+       "Explain reporting and disclosures for goodwill",
+       51
+      ],
+      [
+       "c",
+       "Explain reporting and disclosures for financial instruments",
+       52
+      ],
+      [
+       "d",
+       "Explain reporting for non-current liabilities",
+       55
+      ],
+      [
+       "e",
+       "Calculate common-size balance sheets and related ratios",
+       57
+      ]
+     ]
+    },
+    {
+     "n": 30,
+     "title": "Analyzing Statements of Cash Flows I",
+     "modules": [
+      [
+       "30.1",
+       "Cash Flow Introduction and Direct Method CFO",
+       65
+      ],
+      [
+       "30.2",
+       "Indirect Method CFO",
+       72
+      ],
+      [
+       "30.3",
+       "Investing and Financing Cash Flows and IFRS/US GAAP Differences",
+       78
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe how the cash flow statement links to the income statement and balance sheet",
+       65
+      ],
+      [
+       "b",
+       "Describe direct and indirect cash flow preparation and derivation from other statements",
+       68
+      ],
+      [
+       "c",
+       "Convert cash flows from the indirect to the direct method",
+       84
+      ],
+      [
+       "d",
+       "Contrast IFRS and US GAAP cash flow statements",
+       85
+      ]
+     ]
+    },
+    {
+     "n": 31,
+     "title": "Analyzing Statements of Cash Flows II",
+     "modules": [
+      [
+       "31.1",
+       "Analyzing Statements of Cash Flows II",
+       95
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Analyze reported and common-size cash flow statements",
+       95
+      ],
+      [
+       "b",
+       "Calculate and interpret free cash flow and cash flow ratios",
+       97
+      ]
+     ]
+    },
+    {
+     "n": 32,
+     "title": "Analysis of Inventories",
+     "modules": [
+      [
+       "32.1",
+       "Inventory Measurement",
+       105
+      ],
+      [
+       "32.2",
+       "Inflation Impact on FIFO and LIFO",
+       108
+      ],
+      [
+       "32.3",
+       "Presentation and Disclosure",
+       114
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe lower of cost and net realizable value measurement",
+       105
+      ],
+      [
+       "b",
+       "Calculate and explain how inventory methods affect statements and ratios",
+       108
+      ],
+      [
+       "c",
+       "Explain inventory presentation and disclosures",
+       114
+      ]
+     ]
+    },
+    {
+     "n": 33,
+     "title": "Analysis of Long-Term Assets",
+     "modules": [
+      [
+       "33.1",
+       "Intangible Long-Lived Assets",
+       125
+      ],
+      [
+       "33.2",
+       "Impairment and Derecognition",
+       128
+      ],
+      [
+       "33.3",
+       "Long-Term Asset Disclosures",
+       134
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Compare reporting of purchased, internally developed and acquired assets",
+       125
+      ],
+      [
+       "b",
+       "Explain impairment and derecognition and their effects",
+       128
+      ],
+      [
+       "c",
+       "Analyze disclosures on property, plant, equipment and intangibles",
+       134
+      ]
+     ]
+    },
+    {
+     "n": 34,
+     "title": "Topics in Long-Term Liabilities and Equity",
+     "modules": [
+      [
+       "34.1",
+       "Leases",
+       143
+      ],
+      [
+       "34.2",
+       "Deferred Compensation and Disclosures",
+       152
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain lease reporting from lessor and lessee perspectives",
+       143
+      ],
+      [
+       "b",
+       "Explain defined contribution, defined benefit and stock-based plans",
+       152
+      ],
+      [
+       "c",
+       "Describe presentation and disclosures for long-term liabilities and share-based compensation",
+       157
+      ]
+     ]
+    },
+    {
+     "n": 35,
+     "title": "Analysis of Income Taxes",
+     "modules": [
+      [
+       "35.1",
+       "Differences Between Accounting Profit and Taxable Income",
+       167
+      ],
+      [
+       "35.2",
+       "Deferred Tax Assets and Liabilities",
+       173
+      ],
+      [
+       "35.3",
+       "Tax Rates and Disclosures",
+       178
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Contrast accounting profit, taxable income and temporary versus permanent differences",
+       167
+      ],
+      [
+       "b",
+       "Explain how deferred tax liabilities and assets arise and are treated",
+       173
+      ],
+      [
+       "c",
+       "Calculate and contrast effective, statutory and cash tax rates",
+       178
+      ],
+      [
+       "d",
+       "Analyze deferred tax disclosures and the tax rate reconciliation",
+       180
+      ]
+     ]
+    },
+    {
+     "n": 36,
+     "title": "Financial Reporting Quality",
+     "modules": [
+      [
+       "36.1",
+       "Reporting Quality",
+       189
+      ],
+      [
+       "36.2",
+       "Accounting Choices and Estimates",
+       196
+      ],
+      [
+       "36.3",
+       "Warning Signs",
+       199
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Compare quality of reported results, earnings, cash flow and balance sheet items",
+       189
+      ],
+      [
+       "b",
+       "Describe a spectrum for assessing reporting quality",
+       190
+      ],
+      [
+       "c",
+       "Explain conservative versus aggressive accounting",
+       191
+      ],
+      [
+       "d",
+       "Describe motivations and conditions behind low-quality or fraudulent reporting",
+       192
+      ],
+      [
+       "e",
+       "Describe mechanisms that discipline reporting and their limits",
+       193
+      ],
+      [
+       "f",
+       "Describe presentation choices including non-GAAP measures",
+       194
+      ],
+      [
+       "g",
+       "Describe accounting choices and estimates used to manage earnings",
+       196
+      ],
+      [
+       "h",
+       "Describe warning signs and methods for detecting manipulation",
+       199
+      ]
+     ]
+    },
+    {
+     "n": 37,
+     "title": "Financial Analysis Techniques",
+     "modules": [
+      [
+       "37.1",
+       "Introduction to Financial Ratios",
+       207
+      ],
+      [
+       "37.2",
+       "Financial Ratios, Part 1",
+       213
+      ],
+      [
+       "37.3",
+       "Financial Ratios, Part 2",
+       217
+      ],
+      [
+       "37.4",
+       "DuPont Analysis",
+       225
+      ],
+      [
+       "37.5",
+       "Industry-Specific Financial Ratios",
+       229
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe tools and techniques in financial analysis and their limits",
+       207
+      ],
+      [
+       "b",
+       "Calculate and interpret activity, liquidity, solvency and profitability ratios",
+       213
+      ],
+      [
+       "c",
+       "Describe ratio relationships and evaluate a company with ratios",
+       222
+      ],
+      [
+       "d",
+       "Apply DuPont analysis of return on equity",
+       225
+      ],
+      [
+       "e",
+       "Describe industry-specific ratios",
+       229
+      ],
+      [
+       "f",
+       "Describe how ratios and other techniques forecast earnings",
+       231
+      ]
+     ]
+    },
+    {
+     "n": 38,
+     "title": "Introduction to Financial Statement Modeling",
+     "modules": [
+      [
+       "38.1",
+       "Introduction to Financial Statement Modeling",
+       237
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Demonstrate a sales-based pro forma company model",
+       237
+      ],
+      [
+       "b",
+       "Explain how behavioral factors affect analyst forecasts",
+       238
+      ],
+      [
+       "c",
+       "Explain how competitive position affects prices and costs",
+       239
+      ],
+      [
+       "d",
+       "Forecast industry and company sales and costs under inflation or deflation",
+       240
+      ],
+      [
+       "e",
+       "Explain forecast horizon choices",
+       243
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "eq",
+   "name": "Equity Investments",
+   "readings": [
+    {
+     "n": 39,
+     "title": "Equity Instrument Features",
+     "modules": [
+      [
+       "39.1",
+       "Equity Instrument Features",
+       249
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe basic features and types of equity instruments",
+       249
+      ],
+      [
+       "b",
+       "Contrast publicly listed with private equity securities",
+       251
+      ]
+     ]
+    },
+    {
+     "n": 40,
+     "title": "Equity Jurisdictions, Classes, and the Voting Process",
+     "modules": [
+      [
+       "40.1",
+       "Equity Jurisdictions, Classes, and the Voting Process",
+       255
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe differences in economic and voting rights across jurisdictions and classes",
+       255
+      ],
+      [
+       "b",
+       "Describe the voting process and the roles of managers, boards, proxy advisors and owners",
+       257
+      ]
+     ]
+    },
+    {
+     "n": 41,
+     "title": "Equity Issuance and Trading",
+     "modules": [
+      [
+       "41.1",
+       "Equity Markets and Exchanges",
+       261
+      ],
+      [
+       "41.2",
+       "Equity Indexes and Liquidity Measures",
+       266
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe primary and secondary equity markets and their functions",
+       261
+      ],
+      [
+       "b",
+       "Compare exchange, off-exchange and over-the-counter trading",
+       263
+      ],
+      [
+       "c",
+       "Describe liquidity measures and calculate float and average daily volume",
+       266
+      ],
+      [
+       "d",
+       "Describe types of equity indexes",
+       268
+      ]
+     ]
+    },
+    {
+     "n": 42,
+     "title": "Sources of Equity Returns",
+     "modules": [
+      [
+       "42.1",
+       "Dividends, Stock Splits, and Share Repurchases",
+       273
+      ],
+      [
+       "42.2",
+       "Return Calculations for Equities",
+       276
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe dividends, share repurchases, stock splits and reverse splits",
+       273
+      ],
+      [
+       "b",
+       "Describe dividend payment chronology",
+       275
+      ],
+      [
+       "c",
+       "Calculate price and total return for equities",
+       276
+      ]
+     ]
+    },
+    {
+     "n": 43,
+     "title": "Introduction to Equity Valuation",
+     "modules": [
+      [
+       "43.1",
+       "Introduction to Equity Valuation",
+       283
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Contrast price and value for an equity security",
+       283
+      ],
+      [
+       "b",
+       "Contrast book value, market capitalization and enterprise value",
+       284
+      ],
+      [
+       "c",
+       "Describe major valuation models and their advantages and disadvantages",
+       289
+      ]
+     ]
+    },
+    {
+     "n": 44,
+     "title": "Discounted Cash Flow (DCF) and Growth Models",
+     "modules": [
+      [
+       "44.1",
+       "Cash Flow Metrics",
+       295
+      ],
+      [
+       "44.2",
+       "Valuation Models",
+       299
+      ],
+      [
+       "44.3",
+       "Model Limitations and Preferred Stock Valuation",
+       305
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Contrast dividend, FCFF, FCFE and residual income inputs and value equity",
+       295
+      ],
+      [
+       "b",
+       "Value equity using constant and multistage growth models",
+       299
+      ],
+      [
+       "c",
+       "Explain shortcomings of constant and multistage assumptions",
+       305
+      ],
+      [
+       "d",
+       "Value non-callable, non-convertible preferred stock",
+       306
+      ]
+     ]
+    },
+    {
+     "n": 45,
+     "title": "Relative Value Equity Valuation Approaches",
+     "modules": [
+      [
+       "45.1",
+       "Price Multiples and Equity Valuation",
+       313
+      ],
+      [
+       "45.2",
+       "Price and Enterprise Value Multiples",
+       317
+      ],
+      [
+       "45.3",
+       "Peer Groups and Multiples-Based Valuation",
+       324
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain using multiples: comparables and forecasted fundamentals",
+       313
+      ],
+      [
+       "b",
+       "Calculate and interpret price and enterprise value multiples",
+       317
+      ],
+      [
+       "c",
+       "Determine a peer group for multiples-based valuation",
+       324
+      ],
+      [
+       "d",
+       "Describe using multiples on past, current and projected values",
+       325
+      ]
+     ]
+    },
+    {
+     "n": 46,
+     "title": "Financial Statement Forecasting in Equity Valuation",
+     "modules": [
+      [
+       "46.1",
+       "Financial Statement Forecast Models",
+       331
+      ],
+      [
+       "46.2",
+       "Models Based on Company Characteristics",
+       335
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain rationale, construction and uses of forecast models",
+       331
+      ],
+      [
+       "b",
+       "Evaluate a valuation model based on company characteristics",
+       335
+      ],
+      [
+       "c",
+       "Estimate and interpret value from a forecast model",
+       338
+      ]
+     ]
+    },
+    {
+     "n": 47,
+     "title": "Industry and Competitive Analysis",
+     "modules": [
+      [
+       "47.1",
+       "Industry Analysis Framework",
+       343
+      ],
+      [
+       "47.2",
+       "Porter's Five Forces and PESTLE Analysis",
+       349
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe the process of industry and competitive analysis",
+       343
+      ],
+      [
+       "b",
+       "Describe industry classification methods",
+       344
+      ],
+      [
+       "c",
+       "Determine industry size, growth, profitability and market share trends",
+       346
+      ],
+      [
+       "d",
+       "Analyze industry structure with Porter's Five Forces and PESTLE",
+       349
+      ]
+     ]
+    },
+    {
+     "n": 48,
+     "title": "Company Analysis: Past, Present, and Future",
+     "modules": [
+      [
+       "48.1",
+       "Corporate Strategy and Industry Position",
+       359
+      ],
+      [
+       "48.2",
+       "Revenue, Profitability, and Capital",
+       364
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain a company's competitive strategy and position",
+       359
+      ],
+      [
+       "b",
+       "Evaluate revenue drivers, profitability and pricing power",
+       364
+      ],
+      [
+       "c",
+       "Evaluate working capital, capital investment and capital structure",
+       367
+      ]
+     ]
+    },
+    {
+     "n": 49,
+     "title": "Equity Analyst Research Reports",
+     "modules": [
+      [
+       "49.1",
+       "Equity Analyst Research Reports",
+       375
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Describe the elements of a detailed company research report",
+       375
+      ],
+      [
+       "b",
+       "Compare sell-side and buy-side reports and their conclusions",
+       377
+      ],
+      [
+       "c",
+       "Explain why estimates differ across modeling approaches",
+       379
+      ]
+     ]
+    },
+    {
+     "n": 50,
+     "title": "The Capital Asset Pricing Model, Market Model, and Other Factor-Based Equity Models",
+     "modules": [
+      [
+       "50.1",
+       "Estimating the Cost of Equity With the Market Model and CAPM",
+       387
+      ],
+      [
+       "50.2",
+       "Arbitrage Pricing Theory",
+       393
+      ]
+     ],
+     "los": [
+      [
+       "a",
+       "Explain use of the CAPM and market model to estimate required return",
+       387
+      ],
+      [
+       "b",
+       "Describe arbitrage pricing theory and multi-factor models",
+       393
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

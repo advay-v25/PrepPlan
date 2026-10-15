@@ -1,0 +1,56 @@
+[
+ {
+  "id": "q-fsa-r027-e-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r028-d-hard",
+  "numeric": true,
+  "status": "REVISE",
+  "defects": [
+   "DISTRACTOR_NOT_REPRODUCED"
+  ],
+  "reason": "distractors: verifier could not derive distractor pathways",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r030-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r030-a-hard",
+  "numeric": true,
+  "status": "REVISE",
+  "defects": [
+   "DISTRACTOR_NOT_REPRODUCED"
+  ],
+  "reason": "distractors: option 1: formula failed to execute (Scope contains an illegal symbol, \"end\" is a reserved keyword); option 2: formula failed to execute (Scope contains an illegal symbol, \"end\" is a reserved keyword)",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r037-c-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ }
+]

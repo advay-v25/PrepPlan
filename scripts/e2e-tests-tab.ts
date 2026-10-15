@@ -1,0 +1,295 @@
+/**
+ * End-to-end check of the tests tab against a running dev server.
+ *
+ * Signs in with a Supabase admin-generated magic link, then drives the real
+ * HTTP endpoints the browser uses: assemble a form, answer every question,
+ * score it, read the result page, challenge an item, and probe the guard rails.
+ *
+ *   npm run dev                              # in another terminal
+ *   npx tsx scripts/e2e-tests-tab.ts --reset
+ *
+ * --reset clears the test account's own attempts, responses, evidence, and
+ * challenges first. Exposure control means a learner never sees an item twice,
+ * so without it the suite can only run once before the bank is used up. It
+ * touches only rows belonging to E2E_EMAIL.
+ */
+import { createClient } from '@supabase/supabase-js'
+import * as dotenv from 'dotenv'
+
+dotenv.config({ path: '.env.local', quiet: true } as any)
+
+import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
+
+const BASE = E2E_BASE_URL
+const EMAIL = getE2EEmail()
+const MANIFEST_ID = '11111111-1111-1111-1111-111111111111'
+
+let passed = 0
+let failed = 0
+function check(name: string, ok: boolean, detail = '') {
+  if (ok) { passed++; console.log(`  ✓ ${name}`) }
+  else { failed++; console.log(`  ✗ ${name}${detail ? ` — ${detail}` : ''}`) }
+}
+
+// A cookie jar, so the session survives across requests.
+const jar = new Map<string, string>()
+
+function storeCookies(res: Response) {
+  const raw = (res.headers as any).getSetCookie?.() ?? []
+  for (const line of raw as string[]) {
+    const [pair] = line.split(';')
+    const idx = pair.indexOf('=')
+    if (idx > 0) jar.set(pair.slice(0, idx).trim(), pair.slice(idx + 1).trim())
+  }
+}
+
+async function req(path: string, init: RequestInit = {}): Promise<Response> {
+  const cookie = [...jar.entries()].map(([k, v]) => `${k}=${v}`).join('; ')
+  const res = await fetch(`${BASE}${path}`, {
+    ...init,
+    redirect: 'manual',
+    headers: { ...(init.headers ?? {}), ...(cookie ? { cookie } : {}) },
+  })
+  storeCookies(res)
+  return res
+}
+
+async function json(path: string, init: RequestInit = {}): Promise<any> {
+  const res = await req(path, init)
+  const text = await res.text()
+  try { return { status: res.status, body: JSON.parse(text) } }
+  catch { return { status: res.status, body: { raw: text.slice(0, 200) } } }
+}
+
+const postJson = (path: string, body?: unknown) =>
+  json(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+
+async function signIn() {
+  const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: { persistSession: false },
+  })
+  const { data, error } = await admin.auth.admin.generateLink({ type: 'magiclink', email: EMAIL })
+  if (error) throw new Error(`Could not generate a login link: ${error.message}`)
+
+  const token = (data.properties as any).hashed_token
+  // Follow the redirect chain by hand so every Set-Cookie is captured.
+  let path = `/auth/confirm?token_hash=${token}&type=magiclink&next=/app/tests`
+  for (let hop = 0; hop < 5; hop++) {
+    const res = await req(path)
+    const location = res.headers.get('location')
+    if (!location) break
+    const next = new URL(location, BASE)
+    if (next.origin !== new URL(BASE).origin) throw new Error(`Login redirected off-origin: ${location}`)
+    path = next.pathname + next.search
+    if (path.startsWith('/app')) break
+  }
+  check('signed in', path.startsWith('/app'), `ended at ${path}`)
+}
+
+async function main() {
+  console.log(`\nEnd-to-end: tests tab against ${BASE}\n`)
+
+  console.log('Authentication')
+  await signIn()
+
+  if (process.argv.includes('--reset')) {
+    console.log('\nResetting this account\'s diagnostic history')
+    const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+      auth: { persistSession: false },
+    })
+    // listUsers()'s return type is a union the compiler cannot narrow here, so
+    // the shape we actually rely on is stated explicitly.
+    const { data: authUsers } = await admin.auth.admin.listUsers()
+    const users = (authUsers as { users?: { id: string; email?: string }[] } | null)?.users ?? []
+    const userId = users.find(u => u.email?.toLowerCase() === EMAIL.toLowerCase())?.id
+    if (!userId) throw new Error(`No account found for ${EMAIL}`)
+
+    // Order matters: evidence and challenges reference attempts.
+    await admin.from('evidence_events').delete().eq('user_id', userId)
+    await admin.from('item_challenges').delete().eq('user_id', userId)
+    await admin.from('assessment_responses').delete().eq('user_id', userId)
+    await admin.from('assessment_attempts').delete().eq('user_id', userId)
+    check('history cleared', true)
+  }
+
+  console.log('\nTests index')
+  const indexRes = await req('/app/tests')
+  const indexHtml = await indexRes.text()
+  check('page renders', indexRes.status === 200, `status ${indexRes.status}`)
+  check('is not the unauthorized fallback', !indexHtml.includes('>Unauthorized<'))
+  check('offers a way to start', indexHtml.includes('name="purpose"'))
+  check('shows the bank breakdown', indexHtml.includes('Verifier-passed'))
+
+  console.log('\nAssembling a diagnostic')
+  const start = await postJson('/api/diagnostic/attempt', {
+    manifestId: MANIFEST_ID,
+    purpose: 'module_diagnostic',
+    constraints: { maxQuestions: 6 },
+  })
+  check('attempt created', start.body?.ok === true, JSON.stringify(start.body))
+  const attemptId: string = start.body?.attemptId
+  if (!attemptId) { console.log('\nCannot continue without an attempt.'); return finish() }
+  check('form has questions', (start.body?.itemCount ?? 0) > 0, `itemCount ${start.body?.itemCount}`)
+
+  console.log('\nAnswering')
+  let answeredIds: string[] = []
+  let total = 0
+  for (let i = 0; i < 30; i++) {
+    const next = await json(`/api/diagnostic/attempt/${attemptId}`)
+    if (next.body?.ok !== true) { check('fetch next item', false, JSON.stringify(next.body)); break }
+    total = next.body.attempt.totalCount
+    const item = next.body.nextItem
+    if (!item) break
+
+    check(
+      `q${i + 1} withholds the answer key`,
+      !('keyIndex' in item) && !('perOptionFeedback' in item) && !('item_card' in item),
+      Object.keys(item).join(',')
+    )
+
+    const res = await postJson(`/api/diagnostic/attempt/${attemptId}/response`, {
+      itemId: item.id,
+      selectedOptionIndex: i % 3,
+      confidence: i % 2 === 0 ? 'high' : 'low',
+      elapsedSeconds: 20 + i,
+    })
+    if (res.body?.ok !== true) { check(`q${i + 1} saved`, false, JSON.stringify(res.body)); break }
+    check(`q${i + 1} saved without revealing correctness`, !('isCorrect' in res.body) && !('is_correct' in res.body))
+    answeredIds.push(item.id)
+  }
+  check('answered the whole form', answeredIds.length === total && total > 0, `${answeredIds.length} of ${total}`)
+
+  console.log('\nAnswer locking')
+  const relock = await postJson(`/api/diagnostic/attempt/${attemptId}/response`, {
+    itemId: answeredIds[0],
+    selectedOptionIndex: 2,
+  })
+  check('re-answering locks instead of overwriting', relock.body?.locked === true, JSON.stringify(relock.body))
+
+  console.log('\nScoring')
+  const submit = await postJson(`/api/diagnostic/attempt/${attemptId}/submit`)
+  check('scored', submit.body?.ok === true, JSON.stringify(submit.body))
+  check('score is a number, not null', typeof submit.body?.score === 'number', String(submit.body?.score))
+  check('evidence was written', (submit.body?.evidenceWritten ?? 0) > 0, JSON.stringify(submit.body))
+
+  const resubmit = await postJson(`/api/diagnostic/attempt/${attemptId}/submit`)
+  check('submitting twice is idempotent', resubmit.body?.alreadyScored === true, JSON.stringify(resubmit.body))
+
+  console.log('\nResult page')
+  const resultRes = await req(`/app/tests/${attemptId}/result`)
+  const resultHtml = await resultRes.text()
+  check('renders', resultRes.status === 200, `status ${resultRes.status}`)
+  check('shows per-question review', resultHtml.includes('review-item'))
+  check('marks the correct option', resultHtml.includes('Correct'))
+  check('labels the learner\'s own choice', resultHtml.includes('Your answer'))
+  check('shows concept evidence', resultHtml.includes('Concept evidence'))
+
+  console.log('\nChallenging an item')
+  const challenge = await postJson('/api/diagnostic/challenge', {
+    itemId: answeredIds[0],
+    attemptId,
+    reasonCode: 'unclear_wording',
+    comment: 'Raised by the automated end-to-end check.',
+  })
+  check('challenge recorded', challenge.body?.ok === true, JSON.stringify(challenge.body))
+  const dupChallenge = await postJson('/api/diagnostic/challenge', {
+    itemId: answeredIds[0], attemptId, reasonCode: 'unclear_wording', comment: 'Again.',
+  })
+  check('a second challenge is deduplicated', dupChallenge.body?.alreadyRaised === true, JSON.stringify(dupChallenge.body))
+
+  console.log('\nGuard rails')
+  const badOption = await postJson(`/api/diagnostic/attempt/${attemptId}/response`, {
+    itemId: answeredIds[0], selectedOptionIndex: 99,
+  })
+  check('an out-of-range option is refused', badOption.status === 409 || badOption.status === 400, `status ${badOption.status}`)
+
+  const badPurpose = await postJson('/api/diagnostic/attempt', { manifestId: MANIFEST_ID, purpose: 'nonsense' })
+  check('an unknown purpose is refused', badPurpose.status === 400, `status ${badPurpose.status}`)
+
+  const badManifest = await postJson('/api/diagnostic/attempt', {
+    manifestId: '00000000-0000-0000-0000-000000000000', purpose: 'module_diagnostic',
+  })
+  check('an unknown manifest is refused', badManifest.status === 400 && !badManifest.body.ok, JSON.stringify(badManifest.body))
+
+  const emptyChallenge = await postJson('/api/diagnostic/challenge', { itemId: answeredIds[0], comment: '' })
+  check('a challenge with no reason is refused', emptyChallenge.status === 400, `status ${emptyChallenge.status}`)
+
+  const foreignItem = await postJson(`/api/diagnostic/attempt/${attemptId}/response`, {
+    itemId: 'q-does-not-exist', selectedOptionIndex: 0,
+  })
+  check('an item not on the form is refused', foreignItem.status === 400 || foreignItem.status === 409, `status ${foreignItem.status}`)
+
+  console.log('\nManifest sign-off gate')
+  const admin2 = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: { persistSession: false },
+  })
+  const { data: pendingItem } = await admin2
+    .from('assessment_items')
+    .select('id, concept_id')
+    .eq('review_status', 'verified')
+    .limit(1)
+    .maybeSingle()
+
+  if (!pendingItem) {
+    console.log('  (no verifier-passed item awaiting review — skipping)')
+  } else {
+    // Force the concept back to drafted so the gate is tested from a known state.
+    await admin2.from('curriculum_concepts').update({ verification_status: 'drafted' }).eq('id', pendingItem.concept_id)
+
+    const blocked = await postJson(`/api/diagnostic/items/${encodeURIComponent(pendingItem.id)}/review`, { decision: 'approve' })
+    check('promoting on an unsigned concept is refused', blocked.status === 409 && blocked.body?.code === 'CONCEPT_UNVERIFIED',
+      `${blocked.status} ${JSON.stringify(blocked.body)}`)
+
+    const rejectNoReason = await postJson(`/api/diagnostic/items/${encodeURIComponent(pendingItem.id)}/review`, { decision: 'reject' })
+    check('rejecting without a reason is refused', rejectNoReason.status === 400, `status ${rejectNoReason.status}`)
+
+    const badDecision = await postJson(`/api/diagnostic/items/${encodeURIComponent(pendingItem.id)}/review`, { decision: 'maybe' })
+    check('an unknown decision is refused', badDecision.status === 400, `status ${badDecision.status}`)
+
+    const signOff = await postJson(`/api/curriculum/concepts/${pendingItem.concept_id}/verify`, { verified: true })
+    check('a concept with scope can be signed off', signOff.body?.ok === true, JSON.stringify(signOff.body))
+
+    // Leave the manifest exactly as it was found: promoting items to gold is a
+    // judgement call for a person, not something a test run should decide.
+    await admin2.from('curriculum_concepts').update({ verification_status: 'drafted' }).eq('id', pendingItem.concept_id)
+
+    const { data: noScope } = await admin2
+      .from('curriculum_concepts')
+      .select('id')
+      .is('scope_notes', null)
+      .limit(1)
+      .maybeSingle()
+    if (noScope) {
+      const bare = await postJson(`/api/curriculum/concepts/${noScope.id}/verify`, { verified: true })
+      check('a concept with no scope cannot be signed off', bare.status === 409, `status ${bare.status}`)
+    }
+  }
+
+  console.log('\nManifest page')
+  const manifestRes = await req('/app/tests/manifest')
+  const manifestHtml = await manifestRes.text()
+  check('manifest page renders', manifestRes.status === 200, `status ${manifestRes.status}`)
+  check('shows what is blocked from gold', manifestHtml.includes('blocked from gold'))
+
+  console.log('\nReview queue')
+  const reviewRes = await req('/app/tests/review')
+  const reviewHtml = await reviewRes.text()
+  check('review page renders', reviewRes.status === 200, `status ${reviewRes.status}`)
+  check('reports verifier–human agreement', reviewHtml.includes('verifier–human agreement'))
+
+  finish()
+}
+
+function finish() {
+  console.log(`\n${passed} passed, ${failed} failed\n`)
+  process.exit(failed === 0 ? 0 : 1)
+}
+
+main().catch(error => {
+  console.error('\nE2E run crashed:', error)
+  process.exit(1)
+})

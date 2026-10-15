@@ -1,0 +1,1656 @@
+[
+ {
+  "id": "q-fsa-r027-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r027-a-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r027-a-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r027-b-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r027-b-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r027-b-medium",
+  "numeric": false,
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 0 (For a lending decision, the bank's analyst should focus on the borrower's ability to generate cash flow to service debt and its leverage position, which is option 1.); item declares option 1",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r027-c-easy",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options lack parallel grammar: options 0 and 2 begin with 'Are', while option 1 begins with 'Show'. The options also differ in specificity and length, breaking parallelism.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r027-c-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r027-c-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r027-d-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r027-d-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r027-d-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r027-e-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r027-e-hard",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options are not parallel in length or specificity; option 2 is noticeably longer and more detailed, potentially cueing the correct answer.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r027-e-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r028-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r028-a-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r028-a-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r028-b-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r028-b-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r028-b-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r028-c-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r028-c-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r028-c-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r028-d-easy",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r028-d-hard",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "NUM_NO_OPTION_MATCHES"
+  ],
+  "reason": "numerical: independently computed 1.7230769230769232 via \"(netIncome + preferredDividends) / (weightedAvgShares + preferredSharesConverted)\", which matches no option ($1.76 | $1.54 | $1.35)",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r028-d-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r028-e-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r028-e-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r028-e-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r029-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r029-a-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r029-a-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r029-b-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r029-b-hard",
+  "numeric": false,
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 1 (Under IFRS goodwill impairment losses can be reversed if the recoverable amount increases; US GAAP does not allow reversal.); item declares option 0",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r029-b-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r029-c-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r029-c-hard",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options are not parallel in length and specificity; option 0 is longer and more precise, potentially giving away the correct answer.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r029-c-medium",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options lack parallel structure: option 0 includes an extra clause about EPS, option 1 is a full sentence, and option 2 is a brief phrase, which could affect fairness.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r029-d-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r029-d-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r029-d-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r029-e-easy",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r029-e-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r029-e-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r030-a-easy",
+  "numeric": false,
+  "status": "VOID",
+  "defects": [
+   "OUT_OF_SCOPE"
+  ],
+  "reason": "scope: The item asks what the cash flow statement explains, which is a basic definition, not how it links to the income statement and balance sheet as required by the concept.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r030-a-hard",
+  "numeric": true,
+  "status": "HUMAN_REVIEW",
+  "defects": [
+   "NUM_FORMULA_UNEXECUTABLE"
+  ],
+  "reason": "numerical: key formula failed to execute: Scope contains an illegal symbol, \"end\" is a reserved keyword",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r030-a-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r030-b-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r030-b-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r030-b-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r030-c-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r030-c-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r030-c-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r030-d-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r030-d-hard",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "NUM_NO_OPTION_MATCHES"
+  ],
+  "reason": "numerical: independently computed -40 via \"-interestPaid\", which matches no option ($70 | $40 | $30)",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r030-d-medium",
+  "numeric": false,
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 0 (Under US GAAP interest paid is an operating cash outflow, while under IFRS it can be classified as financing. Firm A (IFRS) treats interest as financing, so its operating cash flow excludes that outflow; Firm B (US GAAP) includes the interest outflow in operating cash flow, making its operating cash flow lower. Thus Firm A reports higher operating cash flow than Firm B.); item declares option 2",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r031-a-easy",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Option 0 is not parallel with the other options (it contains two items separated by a comma and an extra phrase), whereas options 1 and 2 are simple and consistent.",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r031-a-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r031-a-medium",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options are not parallel in length or specificity; option 2 is noticeably longer and more precise, potentially revealing the correct answer.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r031-b-easy",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r031-b-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r031-b-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r032-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r032-a-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r032-a-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r032-b-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r032-b-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r032-b-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r032-c-easy",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Option 2 is longer and more specific than the other options, potentially giving away the correct answer.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r032-c-hard",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 0 (Average FIFO inventory = 250 + 75 = 325; turnover = 1000 / 325 ≈ 3.08x.); item declares option 1",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r032-c-medium",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "OUT_OF_SCOPE"
+  ],
+  "reason": "scope: The item tests a calculation of days inventory on hand, which is an analytical ratio, not the presentation or disclosure requirements of inventory under financial reporting standards.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r033-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r033-a-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r033-a-medium",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 1 (The capitalized cost includes the invoice price plus all directly attributable costs: $200,000 + $8,000 + $12,000 + $6,000 = $226,000.); item declares option 0",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r033-b-easy",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r033-b-hard",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 1 (Impairment loss = carrying amount ($800) – recoverable amount ($780) = $20.); item declares option 0",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r033-b-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r033-c-easy",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r033-c-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r033-c-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r034-a-easy",
+  "numeric": false,
+  "status": "VOID",
+  "defects": [
+   "OUT_OF_SCOPE"
+  ],
+  "reason": "scope: The item tests IFRS lease accounting, which is a Level II concept, not Level I.",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r034-a-hard",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "OUT_OF_SCOPE"
+  ],
+  "reason": "scope: The item tests IFRS lease accounting, which is a Level II topic; it is not appropriate for a Level I exam.",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r034-a-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r034-b-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r034-b-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r034-b-medium",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "NUM_NO_OPTION_MATCHES"
+  ],
+  "reason": "numerical: independently computed -70 via \"assets - pbo\", which matches no option ($850.0 million | $1,630.0 million | $70.0 million)",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r034-c-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r034-c-hard",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "OUT_OF_SCOPE"
+  ],
+  "reason": "scope: The item tests a leverage ratio calculation, not presentation or disclosure requirements for long-term liabilities or share-based compensation.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r034-c-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r035-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r035-a-hard",
+  "numeric": true,
+  "status": "VOID",
+  "defects": [
+   "NUM_NO_OPTION_MATCHES"
+  ],
+  "reason": "numerical: independently computed 450 via \"preTaxProfit + taxExemptInterest - taxDepExcess\", which matches no option ($550 | $390 | $420)",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r035-a-medium",
+  "numeric": false,
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 0 (The difference between straight‑line book depreciation and accelerated tax depreciation creates a timing difference that will reverse over the asset’s life, so it is a temporary difference.); item declares option 2",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r035-b-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r035-b-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r035-b-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r035-c-easy",
+  "numeric": true,
+  "status": "REVISE",
+  "defects": [
+   "DISTRACTOR_NOT_REPRODUCED"
+  ],
+  "reason": "distractors: option 0: no plausible mistake produces it; option 1: no plausible mistake produces it",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r035-c-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r035-c-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r035-d-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r035-d-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r035-d-medium",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options 0 and 1 are parallel in structure, but option 2 is longer and includes a causal clause ('because the allowance is a balance sheet item'), breaking parallelism and potentially cueing the test‑taker.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r036-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r036-a-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r036-a-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r036-b-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r036-b-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r036-b-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r036-c-easy",
+  "numeric": false,
+  "status": "VOID",
+  "defects": [
+   "ANSWER_DISAGREEMENT"
+  ],
+  "reason": "answer: verifier answered option 0 (Conservative accounting follows the prudence principle: it recognizes expenses as soon as possible and delays revenue recognition, which reduces current earnings.); item declares option 1",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r036-c-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r036-c-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r036-d-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r036-d-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r036-d-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r036-e-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r036-e-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r036-e-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r036-f-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r036-f-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r036-f-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r036-g-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r036-g-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r036-g-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r036-h-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r036-h-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r036-h-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r037-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r037-a-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r037-a-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r037-b-easy",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r037-b-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r037-b-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r037-c-easy",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options are not parallel in grammar or length: option 0 is a short simple statement, option 1 is a medium-length claim about revenue, and option 2 is a longer compound statement with an 'or' clause, giving it a slight hint.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r037-c-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r037-c-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r037-d-easy",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r037-d-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r037-d-medium",
+  "numeric": true,
+  "status": "REVISE",
+  "defects": [
+   "DISTRACTOR_NOT_REPRODUCED"
+  ],
+  "reason": "distractors: option 1: no plausible mistake produces it; option 2: no plausible mistake produces it",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r037-e-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r037-e-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r037-e-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r037-f-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r037-f-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r037-f-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r038-a-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r038-a-hard",
+  "numeric": true,
+  "status": "REVISE",
+  "defects": [
+   "DISTRACTOR_NOT_REPRODUCED"
+  ],
+  "reason": "distractors: verifier could not derive distractor pathways",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r038-a-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r038-b-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r038-b-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r038-b-medium",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options are not parallel: options 0 and 1 are brief bias names, while option 2 includes an explanatory phrase, making it longer and more specific, potentially giving away the answer.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r038-c-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r038-c-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "openai/gpt-oss-20b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r038-c-medium",
+  "numeric": false,
+  "status": "REVISE",
+  "defects": [
+   "LANGUAGE"
+  ],
+  "reason": "language: Options are not parallel: option 1 is longer and includes a causal explanation, while options 0 and 2 are simple statements. This lack of parallelism and the extra detail in option 1 could serve as a clue, violating the language guideline.",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r038-d-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r038-d-hard",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r038-d-medium",
+  "numeric": true,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 8 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ },
+ {
+  "id": "q-fsa-r038-e-easy",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 0,
+  "declaredKey": 0
+ },
+ {
+  "id": "q-fsa-r038-e-hard",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 2,
+  "declaredKey": 2
+ },
+ {
+  "id": "q-fsa-r038-e-medium",
+  "numeric": false,
+  "status": "PASS",
+  "defects": [],
+  "reason": "all 7 gates passed",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "independentAnswerIndex": 1,
+  "declaredKey": 1
+ }
+]

@@ -1,0 +1,168 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { ArrowRight, CalendarDays, Check, ChevronRight, CircleAlert, GripVertical, Lightbulb, MessageCircle, Send } from 'lucide-react'
+import { subjects } from '../../data'
+import type { PlanBlock, SubjectId } from '../../types'
+import { ProgressBar } from '../../components/ProgressBar'
+import { useAppState } from '../../state/AppState'
+
+export default function ProductPage() {
+  const router = useRouter()
+  const { profile, examDays, preparedness, blocks, metrics, weakestLink, updateBlock, askCoach } = useAppState()
+  const [coachDraft, setCoachDraft] = useState('')
+  
+  const todayBlocks = blocks.filter((block) => ['tue-quant', 'thu-fi', 'mon-ethics'].includes(block.id)).slice(0, 3)
+  const weeklyProgress = Math.round(blocks.filter((block) => block.state === 'done').length / Math.max(1, blocks.length) * 100)
+  const weakSubject = subjects.find((subject) => subject.id === weakestLink.subjectId) ?? subjects[0]
+  
+  const sendCoach = (message = coachDraft) => { 
+    if (!message.trim()) return; 
+    askCoach(message.trim()); 
+    setCoachDraft(''); 
+    router.push('/app/coach') 
+  }
+  
+  const onStartDiagnostic = (subject: SubjectId) => {
+    // In real app, this would create an attempt and route to /app/tests/[attemptId]
+    // For now we just go to tests page
+    router.push('/app/tests')
+  }
+
+  return (
+    <div className="home-grid">
+      <main className="home-main">
+        <div className="greeting-row">
+          <h2>Good evening, {profile.name}</h2>
+          <span className="exam-date"><CalendarDays size={18} /> {examDays} days to exam</span>
+        </div>
+        
+        <h1>{weeklyProgress >= 70 ? 'You’re on pace. Protect the next sessions.' : 'One verified session at a time.'}</h1>
+        
+        <section className="section-block">
+          <div className="section-heading">
+            <h3>Today</h3>
+            <button className="text-button" onClick={() => router.push('/app/week')}>View full plan <ChevronRight size={16} /></button>
+          </div>
+          <div className="session-list">
+            {todayBlocks.map((block) => (
+              <SessionRow 
+                key={block.id} 
+                block={block} 
+                onComplete={() => updateBlock(block.id, 'done')} 
+                onDiagnostic={block.subjectId ? () => onStartDiagnostic(block.subjectId!) : undefined} 
+              />
+            ))}
+          </div>
+          <p className="tip"><Lightbulb size={17} /> Complete the block, then verify it. Time logged without evidence does not lift readiness.</p>
+        </section>
+        
+        <section className="section-block">
+          <div className="section-heading week-heading">
+            <h3>This week</h3>
+            <div className="legend">
+              <span><i className="dot dot--green" />Complete</span>
+              <span><i className="dot dot--blue" />Planned</span>
+              <span><i className="dot dot--amber" />At risk</span>
+            </div>
+          </div>
+          <div className="week-rail">
+            {blocks.map((block) => (
+              <button key={block.id} className={`day-block day-block--${block.state}`} onClick={() => router.push('/app/week')}>
+                <span className="day-label">{block.day}<small>{block.date}</small></span>
+                <span className="day-session">{block.title}<small>{block.duration}</small></span>
+                {block.state === 'done' ? <Check size={15} className="day-check" /> : null}
+              </button>
+            ))}
+          </div>
+          <div className="week-footer">
+            <span><GripVertical size={16} /> Roadmap selected {Math.floor(profile.recommendedWeeklyMinutes / 60)}h {profile.recommendedWeeklyMinutes % 60}m · max {profile.maxSessionMinutes} min per sitting</span>
+            <span>Weekly progress {weeklyProgress}%</span>
+            <ProgressBar value={weeklyProgress} tone="green" />
+          </div>
+        </section>
+        
+        <section className="coach-entry">
+          <h3>Coach</h3>
+          <div className="coach-input">
+            <MessageCircle size={19} />
+            <input value={coachDraft} onChange={(event) => setCoachDraft(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && sendCoach()} aria-label="Ask the coach" placeholder="Ask what to do next" />
+            <button onClick={() => sendCoach()} aria-label="Send question"><Send size={20} /></button>
+          </div>
+          <div className="coach-suggestions">
+            {['Should I review or test?', 'What topic next?', 'How do I recover this week?'].map((suggestion) => (
+              <button key={suggestion} onClick={() => sendCoach(suggestion)}>{suggestion}</button>
+            ))}
+          </div>
+        </section>
+      </main>
+      
+      <aside className="evidence-column">
+        <section className="index-panel">
+          <div className="index-title">
+            <h3>Preparedness index</h3>
+            <span className="status-line"><i />{preparedness >= 60 ? 'On pace' : 'Needs focus'}</span>
+          </div>
+          <div className="score"><strong>{preparedness}</strong><span>/100</span></div>
+          <div className="trajectory" aria-label="Preparedness trajectory">
+            <div className="chart-grid" />
+            <svg viewBox="0 0 300 100" role="img" aria-hidden="true">
+              <path d="M6 82 C42 74 50 66 82 62 S126 43 160 39 S202 27 236 22 S270 13 294 7" fill="none" stroke="currentColor" strokeWidth="2.5" />
+              <circle cx="82" cy="62" r="4" /><circle cx="160" cy="39" r="4" /><circle cx="236" cy="22" r="4" />
+            </svg>
+            <div className="chart-labels"><span>APR</span><span>MAY</span><span>JUN</span><span>SEP</span></div>
+          </div>
+          <p className="fine-print">Weighted from verified readiness, syllabus coverage, recency and consistency—not hours alone.</p>
+        </section>
+        
+        <section className="weak-link">
+          <div className="panel-icon-title">
+            <h3>Weakest link</h3>
+            <CircleAlert size={20} />
+          </div>
+          <strong>{weakSubject.name}: {weakestLink.module}</strong>
+          <p>Accuracy {weakestLink.accuracy}% · Impact high</p>
+          <button className="text-button" onClick={() => onStartDiagnostic(weakestLink.subjectId)}>Verify recommendation <ArrowRight size={16} /></button>
+        </section>
+        
+        <section className="syllabus-mini">
+          <div className="section-heading">
+            <h3>Syllabus progress</h3>
+            <button className="text-button" onClick={() => router.push('/app/syllabus')}>View all</button>
+          </div>
+          {subjects.map((subject) => (
+            <button className="subject-mini" key={subject.id} onClick={() => router.push('/app/syllabus')}>
+              <ChevronRight size={15} />
+              <span>{subject.name}</span>
+              <strong>{metrics[subject.id].readiness}%</strong>
+              <ProgressBar value={metrics[subject.id].readiness} tone={subject.color} />
+            </button>
+          ))}
+          <button className="secondary-button full-width" onClick={() => router.push('/app/tests')}>Choose a subject test</button>
+        </section>
+      </aside>
+    </div>
+  )
+}
+
+function SessionRow({ block, onComplete, onDiagnostic }: { block: PlanBlock; onComplete: () => void; onDiagnostic?: () => void }) {
+  return (
+    <div className="session-row">
+      <span className="session-time">{block.day}<small>{block.duration}</small></span>
+      <i className={`square-marker square-marker--${block.state === 'risk' ? 'amber' : 'green'}`} />
+      <span className="session-copy">
+        <strong>{block.title}</strong>
+        <small>{block.detail}</small>
+      </span>
+      <button className={block.subjectId ? 'primary-button' : 'secondary-button'} onClick={block.subjectId ? onDiagnostic : onComplete}>
+        {block.subjectId ? 'Verify' : 'Complete'}
+      </button>
+      {block.subjectId ? (
+        <button className="icon-button complete-quick" onClick={onComplete} aria-label={`Mark ${block.title} complete`}><Check size={17} /></button>
+      ) : (
+        <GripVertical size={18} className="row-grip" />
+      )}
+    </div>
+  )
+}

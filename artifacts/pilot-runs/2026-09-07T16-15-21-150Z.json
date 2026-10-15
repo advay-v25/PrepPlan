@@ -1,0 +1,154 @@
+{
+  "module": "fsa-income",
+  "target": 2,
+  "seed": 101,
+  "dryRun": true,
+  "quota": {
+    "pairs": [
+      {
+        "cognition": "recall",
+        "itemForm": "direct",
+        "count": 0
+      },
+      {
+        "cognition": "recall",
+        "itemForm": "exception",
+        "count": 0
+      },
+      {
+        "cognition": "interpret",
+        "itemForm": "scenario",
+        "count": 0
+      },
+      {
+        "cognition": "interpret",
+        "itemForm": "data_table",
+        "count": 0
+      },
+      {
+        "cognition": "apply",
+        "itemForm": "scenario",
+        "count": 1
+      },
+      {
+        "cognition": "apply",
+        "itemForm": "direct",
+        "count": 0
+      },
+      {
+        "cognition": "calculate",
+        "itemForm": "calculation",
+        "count": 1
+      },
+      {
+        "cognition": "calculate",
+        "itemForm": "data_table",
+        "count": 0
+      },
+      {
+        "cognition": "compare",
+        "itemForm": "scenario",
+        "count": 0
+      },
+      {
+        "cognition": "compare",
+        "itemForm": "exception",
+        "count": 0
+      },
+      {
+        "cognition": "diagnose",
+        "itemForm": "scenario",
+        "count": 0
+      },
+      {
+        "cognition": "integrate",
+        "itemForm": "integrated",
+        "count": 0
+      }
+    ],
+    "difficulties": [
+      {
+        "difficulty": "foundation",
+        "count": 1
+      },
+      {
+        "difficulty": "standard",
+        "count": 1
+      },
+      {
+        "difficulty": "difficult",
+        "count": 0
+      },
+      {
+        "difficulty": "stretch",
+        "count": 0
+      }
+    ],
+    "conceptCounts": {
+      "22222222-2222-2222-2222-222222222224": 1,
+      "22222222-2222-2222-2222-22222222222a": 1
+    },
+    "total": 2,
+    "seed": 101
+  },
+  "totalDrafted": 4,
+  "releasedCount": 2,
+  "yieldRate": 50,
+  "coverage": {
+    "satisfied": true,
+    "shortfalls": []
+  },
+  "keyPositions": [
+    1,
+    0,
+    1
+  ],
+  "positionBalanced": true,
+  "defectTally": {
+    "GEN_ERROR": 1,
+    "GEN_SHAPE": 1
+  },
+  "records": [
+    {
+      "cellIndex": 0,
+      "conceptId": "22222222-2222-2222-2222-222222222224",
+      "conceptName": "Diluted EPS and Anti-Dilutive Securities",
+      "cognition": "calculate",
+      "itemForm": "calculation",
+      "difficulty": "foundation",
+      "attempts": 1,
+      "outcome": "released",
+      "rejections": [],
+      "itemId": "q-fsa-income-2026-09-07T16-15-21-150Z-0",
+      "keyIndex": 2
+    },
+    {
+      "cellIndex": 1,
+      "conceptId": "22222222-2222-2222-2222-22222222222a",
+      "conceptName": "Non-Recurring Items and Discontinued Operations",
+      "cognition": "apply",
+      "itemForm": "scenario",
+      "difficulty": "standard",
+      "attempts": 3,
+      "outcome": "released",
+      "rejections": [
+        {
+          "status": "ERROR",
+          "defectCodes": [
+            "GEN_ERROR"
+          ],
+          "reason": "All models in tier \"reasoning\" failed. Last: openai/gpt-oss-20b returned no parseable JSON object (empty response)"
+        },
+        {
+          "status": "SHAPE",
+          "defectCodes": [
+            "GEN_SHAPE"
+          ],
+          "reason": "stem missing or too short"
+        }
+      ],
+      "itemId": "q-fsa-income-2026-09-07T16-15-21-150Z-1",
+      "keyIndex": 0
+    }
+  ]
+}
