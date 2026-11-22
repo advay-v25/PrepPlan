@@ -24,9 +24,13 @@ export function hasBearer(request: Request, secret: string | undefined) {
 
 function digest(purpose: string, value: string) {
   // The existing server credential keeps identifiers unlinkable without a new deployment dependency.
-  const rawKey = process.env.APP_SECURITY_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
-  const key = cleanEnv(rawKey)
-  if (!key || key.length < 32) throw new Error('Security key unavailable')
+  // The first configured value that is long enough: a too-short or stale APP_SECURITY_SECRET falls through to the next server credential instead of stopping every sign-in.
+  const candidates = [process.env.APP_SECURITY_SECRET, process.env.SUPABASE_SECRET_KEY, process.env.SUPABASE_SERVICE_ROLE_KEY]
+  const key = candidates.map(cleanEnv).find(val => val.length >= 32)
+  if (!key) {
+    const lens = candidates.map(c => c ? cleanEnv(c).length : 'undef').join(',')
+    throw new Error(`Security key unavailable (lengths: ${lens})`)
+  }
   return createHmac('sha256', key).update(purpose).update('\0').update(value).digest('hex')
 }
 
@@ -49,9 +53,8 @@ export async function rateLimit(scope: LimitScope, subject: string) {
     })
   } catch (err) {
     console.error('[auth] request quota unavailable', scope, err)
-    const reason = err instanceof Error ? err.message : String(err)
     const message = 'PrepPlan could not check this request. Try again shortly.'
-    return Response.json({ ok: false, code: 'SECURITY_UNAVAILABLE', error: message, message, detail: reason }, {
+    return Response.json({ ok: false, code: 'SECURITY_UNAVAILABLE', error: message, message }, {
       status: 503, headers: { 'Retry-After': '10', 'Cache-Control': AUTH_PRIVATE_CACHE },
     })
   }
