@@ -18,7 +18,7 @@ export function hasBearer(request: Request, secret: string | undefined) {
 
 function digest(purpose: string, value: string) {
   // The existing server credential keeps identifiers unlinkable without a new deployment dependency.
-  const key = process.env.APP_SECURITY_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY
+  const key = process.env.APP_SECURITY_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
   if (!key || key.length < 32) throw new Error('Security key unavailable')
   return createHmac('sha256', key).update(purpose).update('\0').update(value).digest('hex')
 }

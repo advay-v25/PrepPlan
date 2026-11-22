@@ -43,7 +43,8 @@ function providerFailure(error: AuthError) {
 }
 
 function mailClient() {
-  return createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+  return createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     global: { fetch: budgetFetch(fetch) },
   })
