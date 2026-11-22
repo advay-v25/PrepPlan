@@ -151,3 +151,22 @@
 .landing-cta h2 { color: #f5f7fb; }
 .landing-cta p { color: rgba(245, 247, 251, .78); }
 .landing-cta svg { color: var(--warning); }
+
+/* Settings: quiet-hours inputs on phone stack neatly below the label with full touch-friendly inputs */
+@media (max-width: 680px) {
+  .quiet-hours-wrap {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .quiet-hours-inputs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 320px;
+  }
+  .quiet-hours-inputs input[type="time"] {
+    flex: 1;
+    min-width: 0;
+  }
+}

@@ -108,7 +108,8 @@ test('3 recall linkage: a revision task in the Calendar opens ITS reading\'s car
     expect(res.body?.ok, JSON.stringify(res.body)).toBe(true)
   })
   const taskUrl = `/app/calendar?view=agenda&week=${today}&task=${taskId}`
-  await login(page, db, st.email, '/app/calendar'); await page.goto(taskUrl)   // (the login helper's next= is not URL-encoded, so a deep link is opened after sign-in)
+  await login(page, db, st.email, taskUrl)
+  if (!page.url().includes(taskId)) await page.goto(taskUrl)
   const before = { ev: await count('evidence_events', st.id), rp: await count('repair_threads', st.id) }
   await rec.browser('the task drawer offers "Practise your recall cards for this reading" and it opens THAT reading\'s Cards with Back = this exact task', async () => {
     const d = page.getByRole('dialog'); await expect(d).toBeVisible(); await d.getByRole('link', { name: 'Practise your recall cards for this reading' }).click()

@@ -60,14 +60,15 @@ export function StudyWalkthrough() {
         <button type="button" className="primary-button" onClick={() => go(4)}>Show the adjusted week</button>
       </>}
       {step === 4 && <>
+        <p><strong>Result summary</strong> · {correct ? '1 of 1 question answered correctly' : '0 of 1 question answered correctly'}.</p>
         <ul>
           <li><strong>Tuesday</strong> · {action}, 20 min after work</li>
           {move && <li><strong>Thursday</strong> · Continue the retrieval session, 20 min</li>}
           <li><strong>Sunday</strong> · Check the outcome again after spacing</li>
         </ul>
         <p className="fine-print" role="status">Walkthrough complete: 5 of 5 steps. Nothing here was saved.</p>
-        <Link className="primary-button" href="/signup">Create your plan</Link>{' '}
-        <Link className="secondary-button" href="/login">Sign in to Roadmap</Link>{' '}
+        <Link className="primary-button" href="/signup">Start your plan</Link>{' '}
+        <Link className="secondary-button" href="/login">Sign in</Link>{' '}
         <button type="button" className="secondary-button" onClick={() => { setAnswer(null); setConfidence(''); setMove(true); go(0) }}>Start again</button>
       </>}
       {step > 0 && step < 4 && <p><button type="button" className="text-button" onClick={() => go(step - 1)}>Back</button></p>}
