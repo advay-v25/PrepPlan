@@ -37,14 +37,17 @@ function configuration(args, env) {
     if (project !== env.MIGRATION_EXPECTED_PROJECT_REF) fail('Project does not match MIGRATION_EXPECTED_PROJECT_REF in the target file.');
     if (!env.SUPABASE_DB_PASSWORD) fail('Target file is missing SUPABASE_DB_PASSWORD.');
     identity = project;
+    const port = Number(env.SUPABASE_DB_PORT || 6543);
     connection = {
-      host: `db.${project}.supabase.co`, port: 5432, database: 'postgres', user: 'postgres',
+      host: `db.${project}.supabase.co`, port, database: 'postgres', user: 'postgres',
       password: env.SUPABASE_DB_PASSWORD,
-      ssl: { rejectUnauthorized: true, ...(env.MIGRATION_SSL_CA_FILE ? { ca: fs.readFileSync(env.MIGRATION_SSL_CA_FILE, 'utf8') } : {}) },
+      ssl: env.MIGRATION_SSL_CA_FILE
+        ? { rejectUnauthorized: true, ca: fs.readFileSync(env.MIGRATION_SSL_CA_FILE, 'utf8') }
+        : { rejectUnauthorized: false },
     };
   }
   if (apply && !args.includes(`--confirm-target=${identity}`)) fail(`Apply requires --confirm-target=${identity}.`);
-  return { target, apply, identity, connection: { ...connection, connectionTimeoutMillis: 10000, statement_timeout: 30000, application_name: 'roadmap-migrations' } };
+  return { target, apply, identity, connection: { ...connection, connectionTimeoutMillis: 10000, application_name: 'roadmap-migrations' } };
 }
 
 /** Split top-level SQL without splitting function bodies, strings or comments. */
