@@ -238,3 +238,6 @@
   .su-main { padding: 20px 20px 16px; }
   .su-week li { grid-template-columns: 34px 1fr auto; padding: 8px 10px; }
 }
+
+/* New logo: the 3D "P" mark everywhere the brand mark appears */
+.brand-mark { background-image: url('./assets/prepplan-mark.svg'); }

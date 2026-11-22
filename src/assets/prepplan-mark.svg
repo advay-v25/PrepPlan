@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="PrepPlan">
+  <defs>
+    <linearGradient id="d" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d56e0"/><stop offset="1" stop-color="#0838a8"/></linearGradient>
+    <linearGradient id="l" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a9d0f7"/><stop offset="1" stop-color="#7cafe8"/></linearGradient>
+  </defs>
+  <path fill="url(#d)" stroke="#3f86ff" stroke-width=".7" fill-rule="evenodd" d="M20 9H48V27H67V43.5H80V46H81.5C87.5 46 91 50 91 56V58C91 63 86 66 80 66H38V89C38 92 36.5 94 33.5 94H8.5C6 94 4.5 92.5 4.5 90V86C4.5 84.8 5.5 84 7 84H10.4V20C10.4 13.5 14 9 20 9ZM35 30.5V48H65.5V30.5Z"/>
+  <path fill="#06308f" opacity=".28" d="M10.4 84H35V94H8.5C6 94 4.5 92.5 4.5 90V86C4.5 84.8 5.5 84 7 84Z"/>
+  <path fill="url(#l)" stroke="#c5e0fb" stroke-width=".6" stroke-linejoin="round" d="M52 7H77C79.5 7 81 8.5 81 11V22H88C89.7 22 91 23.3 91 25V41.5C91 43 89.8 44 88.3 44H69C67.8 44 67 43.2 67 42V27H49.5C48.2 27 47.5 26.3 47.5 25V11.5C47.5 9 49 7 52 7Z"/>
+</svg>

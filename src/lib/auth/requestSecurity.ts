@@ -20,6 +20,12 @@ export function authOrigin(request: Request) {
     if (explicit && LOOPBACK.has(explicit.hostname) && explicit.port === incoming.port && explicit.protocol === incoming.protocol) return explicit.origin
     return incoming.origin
   }
+  // The www and apex forms of the configured host are one site (the host redirects one to the other), so either is accepted as the same origin.
+  if (configured?.protocol === 'https:' && !LOOPBACK.has(configured.hostname)) {
+    const twin = configured.hostname.startsWith('www.') ? configured.hostname.slice(4) : `www.${configured.hostname}`
+    const host = (request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? incoming.host).split(',')[0].trim().toLowerCase()
+    if (host === twin && !configured.port) return `https://${twin}`
+  }
   return configured?.protocol === 'https:' && !LOOPBACK.has(configured.hostname)
     ? configured.origin
     : process.env.NODE_ENV !== 'production' ? configured?.origin ?? null : null

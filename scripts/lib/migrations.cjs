@@ -39,11 +39,11 @@ function configuration(args, env) {
     identity = project;
     const port = Number(env.SUPABASE_DB_PORT || 6543);
     connection = {
-      host: `db.${project}.supabase.co`, port, database: 'postgres', user: 'postgres',
+      // New Supabase projects serve the direct host over IPv6 only, so the target file may name the Session pooler instead (host plus `postgres.<ref>` user).
+      host: env.SUPABASE_DB_HOST || `db.${project}.supabase.co`, port, database: 'postgres', user: env.SUPABASE_DB_USER || 'postgres',
       password: env.SUPABASE_DB_PASSWORD,
-      ssl: env.MIGRATION_SSL_CA_FILE
-        ? { rejectUnauthorized: true, ca: fs.readFileSync(env.MIGRATION_SSL_CA_FILE, 'utf8') }
-        : { rejectUnauthorized: false },
+      // The server certificate is always verified; MIGRATION_SSL_CA_FILE adds the Supabase CA when the system store lacks it.
+      ssl: { rejectUnauthorized: true, ...(env.MIGRATION_SSL_CA_FILE ? { ca: fs.readFileSync(env.MIGRATION_SSL_CA_FILE, 'utf8') } : {}) },
     };
   }
   if (apply && !args.includes(`--confirm-target=${identity}`)) fail(`Apply requires --confirm-target=${identity}.`);

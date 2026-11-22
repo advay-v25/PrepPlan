@@ -1,3 +1,4 @@
+import { refCache } from '../ops/refCache'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { getSubjects } from './spine'
 import { createAdminClient } from '../supabase/admin'
@@ -51,7 +52,7 @@ export async function getWorkspaceRows(userId: string, supabase: Pick<SupabaseCl
     readAll<{ scope_id: string; doc: unknown; updated_at: string }>((a, z) => supabase.from('curriculum_notes').select('scope_id, doc, updated_at').eq('scope_type', 'reading').order('scope_id').range(a, z) as any),
     // Every card of every reading, in deterministic pages (500, ordered by id); any failed page throws instead of truncating a total.
     readAll<{ id: string; scope_id: string; due_at: string; suspended: boolean }>((a, z) => supabase.from('flashcards').select('id, scope_id, due_at, suspended').eq('scope_type', 'reading').order('id').range(a, z) as any),
-    readAll<{ id: string; reading_no: number; title: string; topic_id: string; structure_pending: boolean }>((a, z) => createAdminClient().from('curriculum_readings').select('id, reading_no, title, topic_id, structure_pending').eq('is_active', true).order('sequence').order('id').range(a, z) as any),
+    refCache('index.readings', () => readAll<{ id: string; reading_no: number; title: string; topic_id: string; structure_pending: boolean }>((a, z) => createAdminClient().from('curriculum_readings').select('id, reading_no, title, topic_id, structure_pending').eq('is_active', true).order('sequence').order('id').range(a, z) as any)),
   ])
   if (!revision && !revisionUnavailable) { /* no active roadmap: nothing is queued, which is true, not a failure */ }
   const noteBy = new Map(notes.map(n => { const text = noteText(n.doc as NoteDoc).replace(/\s+/g, ' ').trim(); return [n.scope_id, { updatedAt: n.updated_at, preview: text.slice(0, 160), text }] as const }))

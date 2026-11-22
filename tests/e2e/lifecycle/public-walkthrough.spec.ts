@@ -24,7 +24,7 @@ test('the public walkthrough works without an account and sends no app writes', 
   await page.getByRole('button', { name: 'Show the adjusted week' }).click()
   await expect(page.getByText(/Rework the gain calculation/)).toBeVisible()
   await expect(page.getByText(/Continue the retrieval session/)).toHaveCount(0)
-  await page.getByRole('link', { name: 'Sign in to PrepPlan' }).click()
+  await page.getByRole('link', { name: 'Sign in', exact: true }).click()
   await expect(page).toHaveURL(/\/login/)
   expect(writes).toEqual([])
   expect(events.unexpected).toEqual([])

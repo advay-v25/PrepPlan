@@ -1,3 +1,4 @@
+import { refCache } from '../ops/refCache'
 import { calendarTaskHref } from '../routing/calendar'
 import { coachRepairHref } from '../coach/selection'
 import { perRequest, minuteOf } from '../ops/perRequest'
@@ -56,11 +57,11 @@ async function getLosTrackerUncached(userId: string, now = new Date()): Promise<
   const admin = createAdminClient()
 
   const [topicsRes, readingsRes, losRes, mapRes, conceptsRes, eventsRes, threadsRes, blocksRes, stateRes, itemsRes, marksRes, overridesRes, activity, cycleRes, profileRes] = await Promise.all([
-    admin.from('topics').select('id, name, default_sequence').order('default_sequence'),
-    admin.from('curriculum_readings').select('id, reading_no, topic_id, title, sequence, structure_pending, legacy_module_ids').eq('is_active', true).order('sequence'),
-    readAll<any>((a, z) => admin.from('reading_los').select('id, reading_id, code, title, sequence').order('sequence').order('id').range(a, z)).then(data => ({ data, error: null })),
+    refCache('los.topics', async () => await admin.from('topics').select('id, name, default_sequence').order('default_sequence')),
+    refCache('los.readings', async () => await admin.from('curriculum_readings').select('id, reading_no, topic_id, title, sequence, structure_pending, legacy_module_ids').eq('is_active', true).order('sequence')),
+    refCache('los.los', () => readAll<any>((a, z) => admin.from('reading_los').select('id, reading_id, code, title, sequence').order('sequence').order('id').range(a, z)).then(data => ({ data, error: null }))),
     conceptOutcomeMap().then(data => ({ data, error: null })),
-    readAll<any>((a, z) => admin.from('curriculum_concepts').select('id, name, manifest:curriculum_manifests!inner(is_active)').order('id').range(a, z)).then(data => ({ data, error: null })),
+    refCache('los.concepts', () => readAll<any>((a, z) => admin.from('curriculum_concepts').select('id, name, manifest:curriculum_manifests!inner(is_active)').order('id').range(a, z)).then(data => ({ data, error: null }))),
     readAll<any>((a, z) => admin.from('evidence_events').select('*').eq('user_id', userId).eq('evidence_mode', 'evidence')
       .order('created_at').order('id').range(a, z)).then(data => ({ data, error: null })),
     readAll<any>((a, z) => admin.from('repair_threads').select('id, concept_id, status, occurrence_count, next_recheck_due_at')

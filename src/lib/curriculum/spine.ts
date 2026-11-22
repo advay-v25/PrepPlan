@@ -1,3 +1,4 @@
+import { refCache } from '../ops/refCache'
 import { cache } from 'react'
 import { createAdminClient } from '../supabase/admin'
 
@@ -27,10 +28,10 @@ export type ReadingDetail = ReadingCard & {
 
 export async function getSubjects(): Promise<SubjectSummary[]> {
   const admin = createAdminClient()
-  const [{ data: topics }, { data: readings }] = await Promise.all([
+  const [{ data: topics }, { data: readings }] = await refCache('spine.subjects', () => Promise.all([
     admin.from('topics').select('id, name, summary, exam_weight_min, exam_weight_max, default_sequence').order('default_sequence').throwOnError(),
     admin.from('curriculum_readings').select('topic_id, page_count, structure_pending').eq('is_active', true).throwOnError(),
-  ])
+  ]))
   return (topics ?? []).map(t => {
     const rs = (readings ?? []).filter(r => r.topic_id === t.id)
     return {
