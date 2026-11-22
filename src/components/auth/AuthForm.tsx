@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, BarChart3, BookOpenCheck, Eye, EyeOff, ShieldCheck, Wrench } from 'lucide-react'
 import { authRequest } from '../../lib/auth/authRequest'
 import { GOOGLE_SIGN_IN_ENABLED, MIN_PASSWORD_LENGTH, passwordRule, TURNSTILE_SITE_KEY } from '../../lib/auth/authPolicy'
+import { GoogleMark } from './GoogleMark'
 import { TurnstileCheck } from './TurnstileCheck'
 import { Notice } from '../ui/Notice'
 
@@ -64,7 +65,7 @@ export function AuthForm({ mode, nextPath = '/app', reset }: { mode: 'login' | '
           <p className="auth-lede">{mode === 'login' ? 'Sign in to continue your CFA Level I roadmap.' : 'Set up your exam and your week, then organise your studies one week at a time.'}</p>
           {reset ? <Notice tone={reset === 'success' ? 'success' : 'warn'} role="status">{reset === 'success' ? 'Password updated. Sign in with your new password.' : 'Password updated. PrepPlan could not confirm that every previous session was revoked.'}</Notice> : null}
           {GOOGLE_SIGN_IN_ENABLED && mode === 'login' ? <>
-            <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading}><span className="google-g">G</span> Continue with Google</button>
+            <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading}><GoogleMark /> Continue with Google</button>
             <div className="auth-divider"><span>or</span></div>
           </> : null}
           <form className="auth-form" onSubmit={submit}>
@@ -84,7 +85,7 @@ export function AuthForm({ mode, nextPath = '/app', reset }: { mode: 'login' | '
             <TurnstileCheck onToken={setCaptcha} attempt={captchaAttempt} />
             {error ? <p className="auth-error" role="alert">{error}</p> : null}
             <button type="submit" className="auth-primary" disabled={loading || !!TURNSTILE_SITE_KEY && !captcha}>{loading ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'} <ArrowRight size={18} /></button>
-            {GOOGLE_SIGN_IN_ENABLED && mode === 'signup' ? <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading || !accepted}><span className="google-g">G</span> Continue with Google</button> : null}
+            {GOOGLE_SIGN_IN_ENABLED && mode === 'signup' ? <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading || !accepted}><GoogleMark /> Continue with Google</button> : null}
           </form>
           <p className="auth-switch">{mode === 'login' ? <>Don&apos;t have an account? <Link href="/signup">Create account</Link></> : <>Already have an account? <Link href="/login">Sign in</Link></>}</p>
         </div>

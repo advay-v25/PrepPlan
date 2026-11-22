@@ -10,6 +10,7 @@ import { authDestination } from '../../../lib/auth/redirect'
 import { AUTH_PRIVATE_CACHE, authOrigin, JsonInputError, readBoundedJson, sessionCookieOptions } from '../../../lib/auth/requestSecurity'
 import { authNetworkLimit, cleanEnv, makeRecoveryIntent, matchesRecoveryAddress, rateLimit, readRecoveryIntent, recoveryGrant } from '../../../lib/auth/securityServer'
 import { verifiedSession } from '../../../lib/auth/recoverySession'
+import { needsPassword } from '../../../lib/auth/passwordState'
 
 const email = z.string().trim().toLowerCase().max(254).email()
 const password = z.string().min(1).max(1024)
@@ -24,6 +25,7 @@ const input = z.discriminatedUnion('action', [
   z.strictObject({ action: z.literal('verify'), type: z.enum(VERIFICATION_TYPES), tokenHash: z.string().regex(/^[A-Za-z0-9_-]{20,256}$/), intent: z.string().max(512).optional(), next }),
   z.strictObject({ action: z.literal('update'), password }),
   z.strictObject({ action: z.literal('signout') }),
+  z.strictObject({ action: z.literal('setpassword'), password, next }),
   z.strictObject({ action: z.literal('google'), next }),
 ])
 
@@ -43,7 +45,7 @@ function providerFailure(error: AuthError) {
 }
 
 function mailClient() {
-  const anonKey = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+  const anonKey = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
   return createSupabaseClient(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
@@ -103,6 +105,22 @@ export async function POST(request: Request) {
       } finally { await clearSessionCookies() }
     }
 
+    if (data.action === 'setpassword') {
+      // Only an account that has no password yet (Google sign-up) may set one on its current session. Changing an existing password needs the reset email.
+      const rule = passwordRule(data.password)
+      if (rule) return reply({ error: rule }, 400)
+      const limited = await authNetworkLimit(request, 'signin')
+      if (limited) return limited
+      const supabase = await createClient()
+      const { data: { user } } = await boundedStage('read account', 10_000, () => supabase.auth.getUser())
+      if (!user?.email_confirmed_at) return reply({ error: 'Sign in again to continue.', code: 'SIGN_IN_REQUIRED' }, 401)
+      if (!needsPassword(user)) return reply({ error: 'This account already has a password. Use "Forgot password" to change it.', code: 'ALREADY_SET' }, 409)
+      const { error } = await boundedStage('set password', 12_000, () => supabase.auth.updateUser({ password: data.password, data: { password_set: true } }))
+      provider('password_set', error)
+      if (error) return providerFailure(error) ?? reply({ error: 'That password was refused. Choose a different one.' }, 400)
+      return reply({ ok: true, next: authDestination(data.next ?? null) })
+    }
+
     if (data.action === 'verify') {
       const limited = await authNetworkLimit(request, 'verify')
       if (limited) return limited
@@ -123,7 +141,7 @@ export async function POST(request: Request) {
         const { error: sessionError } = await boundedStage('install recovery session', 10_000, () => supabase.auth.setSession({
           access_token: result.session!.access_token, refresh_token: result.session!.refresh_token,
         }))
-        if (sessionError) throw new Error('Recovery session unavailable')
+        if (sessionError) throw new Error(`Recovery session unavailable (${sessionError.status ?? 'no status'}: ${sessionError.code ?? sessionError.name}: ${sessionError.message.slice(0, 120)})`)
         return reply({ ok: true, next: '/update-password' })
       }
       const { data: result, error } = await boundedStage('verify email', 12_000, () =>
@@ -200,7 +218,9 @@ export async function POST(request: Request) {
     if (error?.code === 'captcha_failed') return reply({ error: 'The security check expired. Try it again.' }, 400)
     // Duplicate, unknown, not admitted, provider mail limits and recipient-specific delivery errors have one outward result.
     return reply({ ok: true }, 202)
-  } catch {
+  } catch (error) {
+    // The reason is logged server-side (message only, never credentials or request bodies); the caller gets the neutral message below.
+    console.error('[auth] action failed:', data.action, error instanceof Error ? error.message : 'unknown')
     trace('auth', 'unavailable', { action: data.action })
     return reply({ error: 'PrepPlan could not confirm the request. Wait a moment and try again.' }, 503)
   }

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '../../lib/supabase/server'
 import { isAdmitted } from '../../lib/beta/admission'
 import { AppShell } from '../../components/AppShell'
+import { needsPassword } from '../../lib/auth/passwordState'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,6 +20,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!user.email_confirmed_at) redirect('/check-email')
   if (!(await isAdmitted(user.id))) redirect('/not-invited')
+  if (needsPassword(user)) redirect('/set-password?next=/app')
 
   const { data: profile } = await supabase
     .from('profiles')

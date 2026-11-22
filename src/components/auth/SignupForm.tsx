@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, CalendarCheck, Check, Eye, EyeOff, Target, Clock3 } from 'lucide-react'
 import { authRequest } from '../../lib/auth/authRequest'
 import { GOOGLE_SIGN_IN_ENABLED, MIN_PASSWORD_LENGTH, passwordRule, TURNSTILE_SITE_KEY } from '../../lib/auth/authPolicy'
+import { GoogleMark } from './GoogleMark'
 import { TurnstileCheck } from './TurnstileCheck'
 
 const DAYS = [
@@ -32,7 +33,7 @@ export function SignupForm() {
   const blocked = loading || (!!TURNSTILE_SITE_KEY && !captcha)
 
   const signInWithGoogle = async () => {
-    if (loading || !accepted) return
+    if (loading) return
     setLoading(true); setError('')
     try {
       const result = await authRequest('google', { next: '/onboarding' })
@@ -73,6 +74,12 @@ export function SignupForm() {
           <h1>Create your account</h1>
           <p className="su-lede">About a minute. Next, you set your exam date and your week.</p>
 
+          {GOOGLE_SIGN_IN_ENABLED ? <>
+            <button type="button" className="su-google" onClick={signInWithGoogle} disabled={loading}><GoogleMark /> Sign up with Google</button>
+            <p className="su-agree">By continuing you agree to the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link></p>
+            <div className="su-or"><span>or use your email</span></div>
+          </> : null}
+
           <form className="su-form" onSubmit={submit}>
             <label className="su-field"><span>Full name</span>
               <input value={name} onChange={e => setName(e.target.value)} autoComplete="name" maxLength={100} required placeholder="Your name" />
@@ -94,10 +101,6 @@ export function SignupForm() {
             {error ? <p className="auth-error" role="alert">{error}</p> : null}
             <button type="submit" className="su-submit" disabled={blocked}>{loading ? 'Please wait…' : 'Create account'} <ArrowRight size={18} aria-hidden /></button>
 
-            {GOOGLE_SIGN_IN_ENABLED ? <>
-              <div className="su-or"><span>or</span></div>
-              <button type="button" className="su-google" onClick={signInWithGoogle} disabled={loading || !accepted}><span className="google-g">G</span> Continue with Google</button>
-            </> : null}
           </form>
         </div>
         <p className="su-foot">Not affiliated with CFA Institute.</p>

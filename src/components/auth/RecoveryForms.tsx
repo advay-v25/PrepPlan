@@ -146,6 +146,42 @@ export function UpdatePasswordForm() {
   </AuthCard>
 }
 
+/** First Google sign-in: add a password so the same email also works with a password later. */
+export function SetPasswordForm({ email, next }: { email: string; next: string }) {
+  const [password, setPassword] = useState('')
+  const [confirmation, setConfirmation] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    if (loading) return
+    const rule = passwordRule(password)
+    if (rule) { setError(rule); return }
+    if (password !== confirmation) { setError('The passwords do not match.'); return }
+    setLoading(true)
+    setError('')
+    try {
+      const result = await authRequest('setpassword', { password, next })
+      if (result.ok && result.data?.next) { window.location.assign(result.data.next); return }
+      setError(result.data?.error ?? 'PrepPlan could not save the password. Try again.')
+    } catch { setError('PrepPlan could not be reached. Try again.') }
+    finally { setLoading(false) }
+  }
+
+  return <AuthCard>
+    <h1>Add a password</h1>
+    <p className="auth-lede">You signed in with Google. Add a password so you can also sign in with {email ? <strong>{email}</strong> : 'your email'} whenever you like.</p>
+    <form className="auth-form" onSubmit={submit}>
+      <label>Password<input type="password" autoComplete="new-password" minLength={MIN_PASSWORD_LENGTH} maxLength={72} value={password} onChange={event => setPassword(event.target.value)} required autoFocus /></label>
+      <label>Confirm password<input type="password" autoComplete="new-password" maxLength={72} value={confirmation} onChange={event => setConfirmation(event.target.value)} required /></label>
+      <p className="auth-fine">At least {MIN_PASSWORD_LENGTH} characters. A short phrase works well.</p>
+      {error ? <p className="auth-error" role="alert">{error}</p> : null}
+      <button type="submit" className="auth-primary" disabled={loading}>{loading ? 'Saving…' : 'Save and continue'} <ArrowRight size={18} /></button>
+    </form>
+  </AuthCard>
+}
+
 function AuthCard({ children }: { children: ReactNode }) {
   return <main className="auth-single"><Link href="/" className="auth-brand"><span className="brand-mark" aria-hidden="true" /> PrepPlan</Link><section>{children}</section></main>
 }

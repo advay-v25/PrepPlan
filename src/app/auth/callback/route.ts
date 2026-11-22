@@ -5,6 +5,7 @@ import { authDestination } from '../../../lib/auth/redirect'
 import { boundedStage } from '../../../lib/ops/requestBudget'
 import { GOOGLE_SIGN_IN_ENABLED } from '../../../lib/auth/authPolicy'
 import { sessionCookieOptions } from '../../../lib/auth/requestSecurity'
+import { needsPassword } from '../../../lib/auth/passwordState'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -24,6 +25,9 @@ export async function GET(request: Request) {
     if (error || !data.user?.email_confirmed_at || !data.session) {
       if (data.session) await clearSessionCookies()
       destination = '/auth/error?reason=expired'
+    } else if (needsPassword(data.user)) {
+      // A first Google sign-in has no password; ask for one now so email sign-in works later.
+      destination = '/set-password?next=' + encodeURIComponent(destination)
     }
   } catch {
     destination = '/auth/error?reason=unavailable'

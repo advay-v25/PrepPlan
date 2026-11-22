@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '../../lib/supabase/server'
 import { isAdmitted } from '../../lib/beta/admission'
+import { needsPassword } from '../../lib/auth/passwordState'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,6 +12,7 @@ export default async function OnboardingLayout({ children }: { children: ReactNo
   if (user) {
     if (!user.email_confirmed_at) redirect('/check-email')
     if (!(await isAdmitted(user.id))) redirect('/not-invited')
+    if (needsPassword(user)) redirect('/set-password?next=/onboarding')
   }
   return <div className="ob-root">{children}</div>
 }

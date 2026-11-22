@@ -241,3 +241,9 @@
 
 /* New logo: the 3D "P" mark everywhere the brand mark appears */
 .brand-mark { background-image: url('./assets/prepplan-mark.svg'); }
+
+.su-card > .su-google { margin-bottom: 0; }
+.su-agree { margin: 10px 0 18px; text-align: center; font-size: 12.5px; color: var(--muted); }
+.su-agree a { color: var(--accent); font-weight: 600; }
+.su-card > .su-or { margin-bottom: 18px; }
+.su-google .google-g { font-size: 18px; }
