@@ -5,20 +5,27 @@ import { createAdminClient } from '../supabase/admin'
 import { boundedStage } from '../ops/requestBudget'
 import { AUTH_PRIVATE_CACHE } from './requestSecurity'
 
+export function cleanEnv(val?: string | null): string {
+  if (!val) return ''
+  return val.replace(/^["']|["']$/g, '').trim()
+}
+
 export function equalSecret(left: string, right: string) {
-  const a = Buffer.from(left)
-  const b = Buffer.from(right)
+  const a = Buffer.from(cleanEnv(left))
+  const b = Buffer.from(cleanEnv(right))
   return a.length === b.length && timingSafeEqual(a, b)
 }
 
 export function hasBearer(request: Request, secret: string | undefined) {
   const auth = request.headers.get('authorization')
-  return !!secret && !!auth && auth.startsWith('Bearer ') && equalSecret(auth.slice(7), secret)
+  const cleanSecret = cleanEnv(secret)
+  return !!cleanSecret && !!auth && auth.startsWith('Bearer ') && equalSecret(auth.slice(7), cleanSecret)
 }
 
 function digest(purpose: string, value: string) {
   // The existing server credential keeps identifiers unlinkable without a new deployment dependency.
-  const key = process.env.APP_SECURITY_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+  const rawKey = process.env.APP_SECURITY_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+  const key = cleanEnv(rawKey)
   if (!key || key.length < 32) throw new Error('Security key unavailable')
   return createHmac('sha256', key).update(purpose).update('\0').update(value).digest('hex')
 }
@@ -33,14 +40,15 @@ export async function rateLimit(scope: LimitScope, subject: string) {
   try {
     const { data, error } = await boundedStage('security rate limit', 8000, async () =>
       await createAdminClient().rpc('security_take_rate_limit', { p_scope: scope, p_subject_hash: digest(scope, subject) }))
-    if (error || !Number.isInteger(data) || data < 0) throw new Error('Rate limit unavailable')
+    if (error) console.error('[auth] security_take_rate_limit rpc returned error:', error)
+    if (error || !Number.isInteger(data) || data < 0) throw new Error('Rate limit unavailable: ' + (error?.message ?? 'unknown'))
     if (data === 0) return null
     const message = 'Too many requests. Wait a little and try again.'
     return Response.json({ ok: false, code: 'RATE_LIMITED', error: message, message }, {
       status: 429, headers: { 'Retry-After': String(data), 'Cache-Control': AUTH_PRIVATE_CACHE },
     })
-  } catch {
-    console.error('[auth] request quota unavailable', scope)
+  } catch (err) {
+    console.error('[auth] request quota unavailable', scope, err)
     const message = 'PrepPlan could not check this request. Try again shortly.'
     return Response.json({ ok: false, code: 'SECURITY_UNAVAILABLE', error: message, message }, {
       status: 503, headers: { 'Retry-After': '10', 'Cache-Control': AUTH_PRIVATE_CACHE },

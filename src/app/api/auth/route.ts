@@ -8,7 +8,7 @@ import { trace } from '../../../lib/ops/trace'
 import { GOOGLE_SIGN_IN_ENABLED, passwordRule, TURNSTILE_SITE_KEY, VERIFICATION_TYPES } from '../../../lib/auth/authPolicy'
 import { authDestination } from '../../../lib/auth/redirect'
 import { AUTH_PRIVATE_CACHE, authOrigin, JsonInputError, readBoundedJson, sessionCookieOptions } from '../../../lib/auth/requestSecurity'
-import { authNetworkLimit, makeRecoveryIntent, matchesRecoveryAddress, rateLimit, readRecoveryIntent, recoveryGrant } from '../../../lib/auth/securityServer'
+import { authNetworkLimit, cleanEnv, makeRecoveryIntent, matchesRecoveryAddress, rateLimit, readRecoveryIntent, recoveryGrant } from '../../../lib/auth/securityServer'
 import { verifiedSession } from '../../../lib/auth/recoverySession'
 
 const email = z.string().trim().toLowerCase().max(254).email()
@@ -43,8 +43,9 @@ function providerFailure(error: AuthError) {
 }
 
 function mailClient() {
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
-  return createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, anonKey, {
+  const anonKey = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+  const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
+  return createSupabaseClient(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
     global: { fetch: budgetFetch(fetch) },
   })

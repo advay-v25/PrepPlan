@@ -3,9 +3,11 @@ import { cookies } from 'next/headers'
 import { tracedFetch } from '../ops/readTrace'
 import { sessionCookieOptions } from '../auth/requestSecurity'
 import { budgetFetch } from '../ops/requestBudget'
+import { cleanEnv } from '../auth/securityServer'
 
 export async function clearSessionCookies() {
-  const prefix = `sb-${new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname.split('.')[0]}-auth-token`
+  const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
+  const prefix = url ? `sb-${new URL(url).hostname.split('.')[0]}-auth-token` : 'sb-auth-token'
   const cookieStore = await cookies()
   for (const { name } of cookieStore.getAll()) {
     if (name === prefix || name.startsWith(`${prefix}.`) || name.startsWith(`${prefix}-code-verifier`)) {
@@ -16,10 +18,11 @@ export async function clearSessionCookies() {
 
 export async function createClient() {
   const cookieStore = await cookies()
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+  const anonKey = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+  const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    url,
     anonKey,
     {
       cookieOptions: sessionCookieOptions(),

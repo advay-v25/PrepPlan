@@ -1,6 +1,7 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { tracedFetch } from '../ops/readTrace'
 import { budgetFetch } from '../ops/requestBudget'
+import { cleanEnv } from '../auth/securityServer'
 
 /**
  * Service-role client, for system-owned rows.
@@ -10,8 +11,8 @@ import { budgetFetch } from '../ops/requestBudget'
  * student row to the verified owner.
  */
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+  const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
+  const key = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)
   if (!url || !key) {
     throw new Error('Supabase service role is not configured (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / SUPABASE_SECRET_KEY)')
   }
