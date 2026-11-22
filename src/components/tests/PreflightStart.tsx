@@ -51,7 +51,7 @@ export function PreflightStart({ body, reviewLabel = 'Review and start', startLa
                   <details><summary>Why this mix</summary>
                     <p className="muted">{d.difficulty.target.foundation} foundation · {d.difficulty.target.standard} standard · {d.difficulty.target.difficult} difficult planned{d.difficulty.actual ? `; ${d.difficulty.actual.foundation} · ${d.difficulty.actual.standard} · ${d.difficulty.actual.difficult} available as reviewed levels${d.difficulty.actual.unclassified ? `, ${d.difficulty.actual.unclassified} not yet level-reviewed` : ''}` : ''}.</p>
                     <ul>{d.difficulty.readings.map(r => <li key={r.readingId}><strong>{r.name}</strong>: {r.label}{r.basis === 'reading' ? ' (broader reading context)' : ''}. {r.reasons.join(' ')}</li>)}</ul>
-                    <p className="muted">A rules-based beta setting, not an exam-difficulty distribution or a measure of ability. Scores from papers with different mixes are not directly comparable.</p>
+                    <p className="muted">A rules-based setting, not an exam-difficulty distribution or a measure of ability. Scores from papers with different mixes are not directly comparable.</p>
                   </details>
                 </>
               )}

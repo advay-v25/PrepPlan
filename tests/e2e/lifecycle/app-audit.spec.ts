@@ -8,7 +8,7 @@ const BASE_TITLES = [
   ['/signup', 'Create account'],
   ['/forgot-password', 'Forgot password'],
   ['/check-email', 'Check your email'],
-  ['/not-invited', 'Private beta invitation'],
+  ['/not-invited', 'Invitation needed'],
   ['/demo', 'Planner walkthrough'],
   ['/privacy', 'Privacy'],
   ['/terms', 'Terms'],

@@ -3,14 +3,14 @@ import { SupportLink } from '../../components/legal/SupportLink'
 
 export const metadata = { title: 'Privacy' }
 
-/** DRAFT for the private beta. Written from how the product actually handles data; the owner must review it (release checklist) before the cohort opens. */
+/** DRAFT. Written from how the product actually handles data; the owner must review it (release checklist). */
 export default function PrivacyPage() {
   return (
     <main className="legal-page">
       <Link href="/signup" className="auth-brand"><span className="brand-mark" aria-hidden="true" /> PrepPlan</Link>
       <article>
-        <h1>Privacy — private beta</h1>
-        <p><strong>Draft for the private beta.</strong> It describes what PrepPlan does today and will change as the product does. Contact: <SupportLink subject="PrepPlan privacy" />.</p>
+        <h1>Privacy</h1>
+        <p><strong>Draft.</strong> It describes what PrepPlan does today and will change as the product does. Contact: <SupportLink subject="PrepPlan privacy" />.</p>
 
         <h2>What we keep</h2>
         <ul>
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
           <li><strong>Coach:</strong> your messages and the replies. Coach is not a tutor and gives no medical, legal or investment advice.</li>
           <li><strong>Reminders:</strong> only if you turn them on: your choices, quiet hours and the reminders sent.</li>
         </ul>
-        <p>We do not ask for payment details (payments are off in the beta) and we do not sell your data.</p>
+        <p>We do not ask for payment details (payments are off) and we do not sell your data.</p>
 
         <h2>Who processes it</h2>
         <ul>
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
         </ul>
 
         <h2>Retention</h2>
-        <p>Your data is kept while your account exists. When the beta ends we will tell you before anything is removed, and you can export or delete first.</p>
+        <p>Your data is kept while your account exists. If PrepPlan changes or closes we will tell you before anything is removed, and you can export or delete first.</p>
 
         <h2>Questions or requests</h2>
         <p>Write to <SupportLink subject="PrepPlan privacy" />. See also the <Link href="/terms">terms of use</Link>.</p>

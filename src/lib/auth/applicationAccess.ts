@@ -16,7 +16,7 @@ export async function requireSetupAccess(client: AccessClient, admitted: (userId
     if (error && (error.status ?? 0) >= 500) return denied(503, 'ACCESS_UNAVAILABLE', 'Your account could not be checked. Try again shortly.')
     if (error || !user) return denied(401, 'SIGN_IN_REQUIRED', 'Sign in to use your plan.', '/login')
     if (!user.email_confirmed_at) return denied(403, 'EMAIL_VERIFICATION_REQUIRED', 'Verify your email before using your plan.', '/check-email')
-    if (!(await admitted(user.id))) return denied(403, 'NOT_ADMITTED', 'PrepPlan is a private beta and this account has no valid invitation.', '/not-invited')
+    if (!(await admitted(user.id))) return denied(403, 'NOT_ADMITTED', 'PrepPlan needs an invitation and this account has none.', '/not-invited')
     return { ok: true as const, user }
   } catch {
     return denied(503, 'ACCESS_UNAVAILABLE', 'Your account could not be checked. Try again shortly.')

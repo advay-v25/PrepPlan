@@ -27,7 +27,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ step: s
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return errorResponse(401, 'unauthorized', 'Unauthorized')
-  if (!user.email_confirmed_at || !(await isAdmitted(user.id))) return errorResponse(403, 'not_admitted', 'PrepPlan is a private beta and this account has no valid invitation.')
+  if (!user.email_confirmed_at || !(await isAdmitted(user.id))) return errorResponse(403, 'not_admitted', 'PrepPlan needs an invitation and this account has none.')
 
   const { step } = await params
   if (!isStep(step)) return errorResponse(404, 'not_found', `Unknown step "${step}"`)

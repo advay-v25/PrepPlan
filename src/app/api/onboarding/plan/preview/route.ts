@@ -9,7 +9,7 @@ export async function POST() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
-  if (!user.email_confirmed_at || !(await isAdmitted(user.id))) return NextResponse.json({ ok: false, code: 'NOT_ADMITTED', error: 'PrepPlan is a private beta and this account has no valid invitation.' }, { status: 403 })
+  if (!user.email_confirmed_at || !(await isAdmitted(user.id))) return NextResponse.json({ ok: false, code: 'NOT_ADMITTED', error: 'PrepPlan needs an invitation and this account has none.' }, { status: 403 })
 
   try {
     // Idempotent: the same setup and week always resolve to the same draft.
