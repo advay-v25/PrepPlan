@@ -16,7 +16,7 @@ export async function proxy(request: NextRequest) {
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
     "img-src 'self' data: blob:",
-    "connect-src 'self' https://challenges.cloudflare.com" + (dev ? ' ws: wss:' : ''),
+    "connect-src 'self' data: blob: https://challenges.cloudflare.com" + (dev ? ' ws: wss:' : ''),
     "frame-src https://challenges.cloudflare.com",
     "frame-ancestors 'none'",
     "object-src 'none'",

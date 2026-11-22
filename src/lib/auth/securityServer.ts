@@ -49,8 +49,9 @@ export async function rateLimit(scope: LimitScope, subject: string) {
     })
   } catch (err) {
     console.error('[auth] request quota unavailable', scope, err)
+    const reason = err instanceof Error ? err.message : String(err)
     const message = 'PrepPlan could not check this request. Try again shortly.'
-    return Response.json({ ok: false, code: 'SECURITY_UNAVAILABLE', error: message, message }, {
+    return Response.json({ ok: false, code: 'SECURITY_UNAVAILABLE', error: message, message, detail: reason }, {
       status: 503, headers: { 'Retry-After': '10', 'Cache-Control': AUTH_PRIVATE_CACHE },
     })
   }
