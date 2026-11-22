@@ -247,3 +247,43 @@
 .su-agree a { color: var(--accent); font-weight: 600; }
 .su-card > .su-or { margin-bottom: 18px; }
 .su-google .google-g { font-size: 18px; }
+
+/* ── Authentication screens share one frame (.su): sign in, sign up, reset, verify, errors ── */
+.su-fieldrow { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.su-fieldrow a, .su-small a, .su .auth-state a:not(.auth-primary), .su .auth-back, .su .auth-fine a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.su-fieldrow a:hover, .su-small a:hover, .su .auth-state a:not(.auth-primary):hover, .su .auth-back:hover { text-decoration: underline; }
+.su-small { margin: 0; text-align: center; font-size: 13px; color: var(--muted); }
+.su-card > .ui-notice { margin: 0 0 18px; }
+.su-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+.su-card h1 { font-family: var(--font-geist), system-ui, sans-serif; }
+.su-card > ul { padding-left: 18px; color: var(--ink-soft); line-height: 1.6; font-size: 14.5px; }
+.su-card > p:not(.su-lede):not(.su-agree):not(.su-small) { color: var(--ink-soft); line-height: 1.55; }
+
+/* Reset, verify, update-password and error screens reuse the same field and button look */
+.su .auth-lede { margin: 12px 0 26px; color: var(--muted); font-size: 15px; line-height: 1.55; }
+.su .auth-form { display: grid; gap: 18px; }
+.su .auth-form label { display: grid; gap: 7px; font-size: 13.5px; font-weight: 650; color: var(--ink); }
+.su .auth-form input:not([type='checkbox']) { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); color: var(--ink); font: inherit; font-size: 15px; font-weight: 450; transition: border-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard); }
+.su .auth-form input:hover { border-color: color-mix(in srgb, var(--ink) 30%, var(--line)); }
+.su .auth-form input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.su .auth-primary { width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: var(--radius-md); border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: var(--shadow-sm); transition: transform var(--dur-fast) var(--ease-standard), background var(--dur-fast); }
+.su .auth-primary:hover:not(:disabled) { background: var(--accent-dark, var(--accent)); transform: translateY(-1px); }
+.su .auth-primary:disabled { opacity: .55; cursor: not-allowed; }
+.su .auth-back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 22px; font-size: 14px; }
+.su .auth-state { display: grid; gap: 14px; justify-items: start; text-align: left; }
+.su .auth-state h1 { margin: 0; }
+.su .auth-state p { color: var(--ink-soft); line-height: 1.55; margin: 0; }
+.su .auth-state svg, .su .auth-state-icon { color: var(--accent); }
+.su .auth-fine { font-size: 12.5px; color: var(--muted); margin: 0; }
+.su .text-button { color: var(--accent); }
+
+/* Without the dark panel the screen is one centred card on the page background */
+.su--solo { grid-template-columns: 1fr; background: var(--surface-page); }
+.su--solo .su-main { align-items: stretch; }
+.su--solo .su-card { background: var(--surface-raised); border: 1px solid var(--line); border-radius: 22px; padding: clamp(24px, 4vw, 40px); box-shadow: var(--shadow-xs); margin-block: auto; }
+.su-week li.is-done span { color: rgba(245, 247, 251, .6); text-decoration: line-through; }
+.su-week li.is-done b { color: #3dd68c; display: grid; place-items: center; }
+.su-card > .su-google + .su-or { margin: 16px 0 20px; }
+.su .auth-state-icon { display: block; margin: 0 0 14px; }
+.su .auth-back { display: flex; width: fit-content; margin-bottom: 18px; }
+.su--solo .su-card h1 { font-size: clamp(26px, 3vw, 32px); line-height: 1.12; }

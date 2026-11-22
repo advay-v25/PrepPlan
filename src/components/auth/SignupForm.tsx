@@ -6,17 +6,9 @@ import { ArrowRight, CalendarCheck, Check, Eye, EyeOff, Target, Clock3 } from 'l
 import { authRequest } from '../../lib/auth/authRequest'
 import { GOOGLE_SIGN_IN_ENABLED, MIN_PASSWORD_LENGTH, passwordRule, TURNSTILE_SITE_KEY } from '../../lib/auth/authPolicy'
 import { GoogleMark } from './GoogleMark'
+import { AuthShell } from './AuthShell'
+import { SignupAside } from './AuthAside'
 import { TurnstileCheck } from './TurnstileCheck'
-
-const DAYS = [
-  { d: 'Mon', t: 'Ethics', m: '45 min' }, { d: 'Tue', t: 'Quant methods', m: '60 min' }, { d: 'Wed', t: 'Rest', m: '' },
-  { d: 'Thu', t: 'Economics', m: '45 min' }, { d: 'Fri', t: 'Quant recap', m: '30 min' }, { d: 'Sat', t: 'Review', m: '60 min' }, { d: 'Sun', t: 'Paper', m: '90 min' },
-]
-const STEPS = [
-  { Icon: Target, title: 'Set your exam', text: 'Pick the sitting you are aiming for.' },
-  { Icon: Clock3, title: 'Share your week', text: 'Tell us when you can study.' },
-  { Icon: CalendarCheck, title: 'Get your plan', text: 'A week you can actually follow.' },
-]
 
 /** The /signup page. Same account call as the shared AuthForm; a layout of its own so the page can lead with what happens next. */
 export function SignupForm() {
@@ -63,14 +55,7 @@ export function SignupForm() {
   }
 
   return (
-    <main className="su">
-      <section className="su-main">
-        <header className="su-top">
-          <Link href="/" className="auth-brand"><span className="brand-mark"><span /></span> PrepPlan</Link>
-          <p>Have an account? <Link href="/login">Sign in</Link></p>
-        </header>
-
-        <div className="su-card">
+    <AuthShell top={<>Have an account? <Link href="/login">Sign in</Link></>} aside={<SignupAside />}>
           <h1>Create your account</h1>
           <p className="su-lede">About a minute. Next, you set your exam date and your week.</p>
 
@@ -102,31 +87,6 @@ export function SignupForm() {
             <button type="submit" className="su-submit" disabled={blocked}>{loading ? 'Please wait…' : 'Create account'} <ArrowRight size={18} aria-hidden /></button>
 
           </form>
-        </div>
-        <p className="su-foot">Not affiliated with CFA Institute.</p>
-      </section>
-
-      <aside className="su-aside" aria-label="What happens next">
-        <div className="su-aside__inner">
-          <h2>Your first week, planned.</h2>
-          <p>Study around your life, not the other way round.</p>
-          <div className="su-week" role="img" aria-label="Example week: study sessions most days, a rest day on Wednesday and a practice paper on Sunday">
-            <span className="su-week__tag">Example week</span>
-            <ul>
-              {DAYS.map(x => (
-                <li key={x.d} className={x.t === 'Rest' ? 'is-rest' : x.t === 'Paper' ? 'is-paper' : ''}>
-                  <b>{x.d}</b><span>{x.t}</span><em>{x.m}</em>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <ol className="su-steps">
-            {STEPS.map(({ Icon, title, text }, i) => (
-              <li key={title}><span><Icon size={18} aria-hidden /></span><div><strong>{i + 1}. {title}</strong><small>{text}</small></div></li>
-            ))}
-          </ol>
-        </div>
-      </aside>
-    </main>
+    </AuthShell>
   )
 }

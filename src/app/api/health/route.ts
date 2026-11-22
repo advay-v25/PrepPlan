@@ -9,28 +9,6 @@ export const dynamic = 'force-dynamic'
 /** The public probe performs no remote operations. Readiness is for the deployment monitor. */
 export async function GET(request: Request) {
   const url = new URL(request.url)
-  if (url.searchParams.get('diag') === '1') {
-    return NextResponse.json({
-      ok: true,
-      env: {
-        hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-        hasSupabaseAnonKey: !!(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY),
-        hasSupabaseSecretKey: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY),
-        hasAppSecuritySecret: !!process.env.APP_SECURITY_SECRET,
-        appSecuritySecretLen: (process.env.APP_SECURITY_SECRET ?? '').length,
-        supabaseSecretKeyLen: (process.env.SUPABASE_SECRET_KEY ?? '').length,
-        supabaseServiceRoleKeyLen: (process.env.SUPABASE_SERVICE_ROLE_KEY ?? '').length,
-        hasHealthcheckSecret: !!process.env.HEALTHCHECK_SECRET,
-        hasCronSecret: !!process.env.CRON_SECRET,
-        hasTurnstileSiteKey: !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
-        hasTurnstileSecretKey: !!process.env.TURNSTILE_SECRET_KEY,
-        hasResendApiKey: !!process.env.RESEND_API_KEY,
-        hasResendFromEmail: !!process.env.RESEND_FROM_EMAIL,
-        googleSignIn: process.env.NEXT_PUBLIC_GOOGLE_SIGN_IN === '1',
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? null,
-      }
-    }, { headers: { 'Cache-Control': 'no-store' } })
-  }
   if (url.searchParams.get('ready') !== '1') {
     return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
   }

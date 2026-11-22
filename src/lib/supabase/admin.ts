@@ -12,7 +12,7 @@ import { cleanEnv } from '../auth/securityServer'
  */
 export function createAdminClient() {
   const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
-  const key = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY)
+  const key = cleanEnv(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)
   if (!url || !key) {
     throw new Error('Supabase service role is not configured (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / SUPABASE_SECRET_KEY)')
   }

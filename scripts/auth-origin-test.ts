@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict'
 import { appRequestRefusal, authOrigin } from '../src/lib/auth/requestSecurity'
 import { needsPassword } from '../src/lib/auth/passwordState'
+import { makeRecoveryIntent, readRecoveryIntent } from '../src/lib/auth/securityServer'
 const req = (origin: string, host: string) => new Request(`https://${host}/api/auth`, { method: 'POST', headers: { origin, host, 'content-type': 'application/json' } })
 const env = process.env as Record<string, string | undefined>
 env.NODE_ENV = 'production'
@@ -25,5 +26,11 @@ ok('a Google-only account must add a password; email accounts and accounts that 
   assert.equal(needsPassword({ app_metadata: { providers: ['email', 'google'] }, user_metadata: {} }), false)
   assert.equal(needsPassword({ app_metadata: { providers: ['google'] }, user_metadata: { password_set: true } }), false)
   assert.equal(needsPassword({ app_metadata: {}, user_metadata: {} }), true)
+})
+ok('a too-short APP_SECURITY_SECRET falls back to the server key instead of stopping every sign-in', () => {
+  env.APP_SECURITY_SECRET = 'only-18-characters'; env.SUPABASE_SECRET_KEY = 'sb_secret_' + 'x'.repeat(31)
+  assert.ok(readRecoveryIntent(makeRecoveryIntent('a@b.co')))
+  delete env.SUPABASE_SECRET_KEY; delete env.SUPABASE_SERVICE_ROLE_KEY
+  assert.throws(() => makeRecoveryIntent('a@b.co'), /Security key unavailable/)
 })
 console.log(`${n} passed, 0 failed`)

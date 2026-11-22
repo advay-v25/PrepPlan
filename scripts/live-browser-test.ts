@@ -63,7 +63,7 @@ async function main() {
 
     await page.goto('/not-invited')
     await page.waitForLoadState('networkidle')
-    check('Auth', 'Private beta page shows standalone card', await page.locator('.standalone-page').isVisible())
+    check('Auth', 'Private beta page shows standalone card', await page.locator('.su').isVisible())
     await page.screenshot({ path: path.join(SNAP_DIR, '03-not-invited.png') })
 
     // ── 2. Authenticated Session & App Shell ───────────────────────────────────

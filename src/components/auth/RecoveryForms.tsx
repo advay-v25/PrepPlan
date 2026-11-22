@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Mail } from 'lucide-react'
 import { authRequest } from '../../lib/auth/authRequest'
 import { MIN_PASSWORD_LENGTH, passwordRule, TURNSTILE_SITE_KEY, VERIFICATION_TYPES, type VerificationType } from '../../lib/auth/authPolicy'
 import { TurnstileCheck } from './TurnstileCheck'
+import { AuthShell } from './AuthShell'
 
 function EmailRequest({ action }: { action: 'forgot' | 'resend' }) {
   const reset = action === 'forgot'
@@ -183,5 +184,5 @@ export function SetPasswordForm({ email, next }: { email: string; next: string }
 }
 
 function AuthCard({ children }: { children: ReactNode }) {
-  return <main className="auth-single"><Link href="/" className="auth-brand"><span className="brand-mark" aria-hidden="true" /> PrepPlan</Link><section>{children}</section></main>
+  return <AuthShell top={<>Remembered it? <Link href="/login">Sign in</Link></>}>{children}</AuthShell>
 }

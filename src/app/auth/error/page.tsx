@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { AuthShell } from '../../../components/auth/AuthShell'
 
 export const metadata = { title: 'Sign-in link unavailable' }
 
@@ -31,14 +32,13 @@ export default async function AuthErrorPage({ searchParams }: { searchParams: Pr
       }
 
   return (
-    <main className="auth-single">
-      <Link href="/" className="auth-brand"><span className="brand-mark" aria-hidden="true" /> PrepPlan</Link>
+    <AuthShell top={<>Need a hand? <Link href="/forgot-password">Reset password</Link></>}>
       <section className="auth-state">
         <h1>{copy.title}</h1>
         <p>{copy.body}</p>
         <Link className="auth-primary" href="/login">Try signing in</Link>
         <p className="auth-fine">Still stuck? <Link href="/forgot-password">Reset your password</Link> or <Link href="/signup">create a new account</Link>.</p>
       </section>
-    </main>
+    </AuthShell>
   )
 }

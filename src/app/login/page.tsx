@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '../../lib/supabase/server'
-import { AuthForm } from '../../components/auth/AuthForm'
+import { LoginForm } from '../../components/auth/LoginForm'
 import { authDestination } from '../../lib/auth/redirect'
 
 export const metadata = { title: 'Sign in' }
@@ -13,5 +13,5 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { next, reset } = await searchParams
   const destination = authDestination(typeof next === 'string' ? next : null)
   if (user) redirect(destination)
-  return <AuthForm mode="login" nextPath={destination} reset={reset === 'success' || reset === 'sessions' ? reset : undefined} />
+  return <LoginForm nextPath={destination} reset={reset === 'success' || reset === 'sessions' ? reset : undefined} />
 }
