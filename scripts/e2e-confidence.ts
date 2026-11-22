@@ -8,12 +8,11 @@
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local', quiet: true } as any)
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
+import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from './lib/e2eIdentity'
 import { createSession, completeOnboarding, makeCheck } from './lib/e2eSession'
 
 const { check, finish } = makeCheck()
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
-const MANIFEST_ID = '11111111-1111-1111-1111-111111111111'
 
 async function tracker(s: ReturnType<typeof createSession>) {
   const t = (await s.json('/api/curriculum/readiness')).body?.tracker
@@ -66,7 +65,7 @@ async function main() {
   // Scoped to r028: this suite's marks and assertions are all about that one reading's outcomes, and an
   // unscoped diagnostic now draws from the whole FSA bank (built later this session) rather than
   // concentrating on r028 the way it did when r028 was effectively the only reading with any items.
-  const start = await s.post('/api/diagnostic/attempt', { manifestId: MANIFEST_ID, purpose: 'module_diagnostic', constraints: { maxQuestions: 6 }, requestedScope: { modules: ['r028'] } })
+  const start = await s.post('/api/tests/start', { kind: 'reading', readingId: 'r028', baseline: true })
   check('a diagnostic starts', start.body?.ok === true)
   for (let i = 0; i < 30; i++) {
     const next = await s.json(`/api/diagnostic/attempt/${start.body.attemptId}`)

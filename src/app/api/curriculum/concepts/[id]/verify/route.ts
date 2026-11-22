@@ -1,52 +1,30 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '../../../../../../lib/supabase/server'
-import { createAdminClient } from '../../../../../../lib/supabase/admin'
-import { checkIsReviewer } from '../../../../../../lib/diagnostic/reviewAccess'
+import { commandResponse, reviewerRoute } from '../../../../../../lib/diagnostic/reviewApi'
 
 /**
- * Signs off one manifest concept (§5.1).
- *
- * The manifest is the verifier's ground truth: a scope error here is invisible
- * to every automated gate downstream, because the gates check against it. So a
- * concept must be read by a person before any item written against it can
- * become gold — and until that happens, item review is deliberately blocked.
+ * Signs a manifest concept's scope off, or withdraws that sign-off (§5.1). A scope error here is invisible to every automated gate
+ * downstream, so this is an explicit, attributable human decision:
+ *   { decision: 'verify' | 'withdraw', expectedScopeHash, rationale, confirmScope: true, requestKey? }
+ * Anything missing or malformed approves nothing. The database command (`decide_concept_signoff`) checks the reviewer role as the
+ * signed-in user, refuses a scope that changed since it was shown, and records who, when, which exact scope and why with the status change.
+ * A repeat with the same requestKey and the SAME request (decision, scope hash, reason, reviewer) replays the first result; the same key with anything different is a 409 and writes nothing.
  */
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
-  const isRev = await checkIsReviewer(user.id)
-  if (!isRev) {
-    return NextResponse.json({ ok: false, error: 'You are not a reviewer for this curriculum' }, { status: 403 })
-  }
-
+  const auth = await reviewerRoute()
+  if (!auth.ok) return auth.response
   const { id } = await params
-  const body = await req.json().catch(() => ({} as any))
-  const verified = body.verified !== false
-
-  const admin = createAdminClient()
-  const { data: concept } = await admin
-    .from('curriculum_concepts')
-    .select('id, name, scope_notes, verification_status')
-    .eq('id', id)
-    .maybeSingle()
-
-  if (!concept) return NextResponse.json({ ok: false, error: 'Unknown concept' }, { status: 404 })
-
-  // Verifying a concept with no written scope would sign off on nothing.
-  if (verified && !concept.scope_notes) {
-    return NextResponse.json(
-      { ok: false, error: 'This concept has no scope written for it yet. There is nothing to verify.' },
-      { status: 409 }
-    )
-  }
-
-  const { error } = await admin
-    .from('curriculum_concepts')
-    .update({ verification_status: verified ? 'verified' : 'drafted' })
-    .eq('id', id)
-
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
-
-  return NextResponse.json({ ok: true, id, verificationStatus: verified ? 'verified' : 'drafted' })
+  const body = await req.json().catch(() => null) as Record<string, unknown> | null
+  const decision = body?.decision
+  if (decision !== 'verify' && decision !== 'withdraw') return NextResponse.json({ ok: false, error: 'decision must be "verify" or "withdraw".' }, { status: 400 })
+  if (typeof body?.expectedScopeHash !== 'string' || !body.expectedScopeHash) return NextResponse.json({ ok: false, error: 'expectedScopeHash (the scope you were shown) is required.' }, { status: 400 })
+  if (decision === 'verify' && body?.confirmScope !== true) return NextResponse.json({ ok: false, error: 'Signing off needs your explicit confirmation that you read this exact scope.' }, { status: 400 })
+  // Never truncated: cutting a long key or reason could turn two different requests into one.
+  const key = body?.requestKey, why = typeof body?.rationale === 'string' ? body.rationale : ''
+  if (key !== undefined && key !== null && (typeof key !== 'string' || key.length < 8 || key.length > 100)) return NextResponse.json({ ok: false, code: 'BAD_KEY', error: 'requestKey must be 8 to 100 characters.' }, { status: 400 })
+  if (why.length > 1000) return NextResponse.json({ ok: false, code: 'RATIONALE_TOO_LONG', error: 'Keep the reason to 1000 characters; nothing was recorded.' }, { status: 400 })
+  const { data, error } = await auth.supabase.rpc('decide_concept_signoff', {
+    p_concept: id, p_decision: decision, p_expected_hash: body.expectedScopeHash,
+    p_rationale: why, p_request_key: typeof key === 'string' ? key : null,
+  })
+  return commandResponse(data, error)
 }

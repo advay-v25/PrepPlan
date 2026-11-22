@@ -1,4 +1,5 @@
 import { addDays, daysBetween } from '../planning/studyWeek'
+import { UNCERTAINTY_WEIGHT, type ModuleUncertainty, type MockKind } from './entryContext'
 
 /**
  * The long-term roadmap.
@@ -72,6 +73,8 @@ export type ModuleInput = {
   sequence: number
   /** What the student has already done. Completed work is not re-planned. */
   coverage: 'not_started' | 'taught' | 'studied' | 'verified' | 'decaying'
+  /** What the student reported feeling unsure of (planning context, not evidence). Absent when not answered. */
+  uncertainty?: ModuleUncertainty | null
 }
 
 export type TopicInput = {
@@ -87,6 +90,8 @@ export type RoadmapInput = {
   startDate: string
   /** The exam date. */
   targetDate: string
+  /** Whether targetDate is the student's booked date, or only the start of the sitting they aimed for. Absent on roadmaps saved earlier. */
+  targetKind?: 'booked' | 'sitting'
   topics: TopicInput[]
   modules: ModuleInput[]
   prerequisites: { from: string; to: string }[]
@@ -113,6 +118,11 @@ export type RoadmapInput = {
    * Absent on a first roadmap; C4 fits it from actual completions.
    */
   observedMinutesPerEffortUnit?: number | null
+  /**
+   * The student's reported starting position beyond coverage. Present for every onboarded student; absent in
+   * pure-planner fixtures, which then behave exactly as before.
+   */
+  entry?: { mockDate: string | null; mockKind: MockKind | null; mockLabel?: string | null; mockStartTime?: string | null; appointments?: { id: string; version: number; date: string; kind: MockKind; label: string | null; startTime: string | null }[]; token: string }
 }
 
 export type PhaseSpan = {
@@ -137,6 +147,8 @@ export type Milestone = {
   effortWeight: number
   /** Modules already done, excluded from the remaining work but still shown. */
   completedModuleIds: string[]
+  /** Why this topic is here, when that is not just its weight: the student reported it, or a mock is coming. */
+  basis?: 'reported_uncertainty' | 'mock_preparation'
 }
 
 export type Feasibility = {
@@ -161,6 +173,7 @@ export type Feasibility = {
 export type Roadmap = {
   startDate: string
   targetDate: string
+  targetKind?: 'booked' | 'sitting'
   totalWeeks: number
   phases: PhaseSpan[]
   milestones: Milestone[]
@@ -168,6 +181,12 @@ export type Roadmap = {
   /** True when the horizon is too short for a real first pass (§7.1). */
   compressed: boolean
   sequencedModuleIds: string[]
+  /** Dated checkpoints the plan works around. A mock never replaces the exam date. */
+  checkpoints: { kind: 'mock'; id?: string; date: string; week: number; mockKind: MockKind | null; label?: string | null; startTime?: string | null }[]
+  /** Things the plan assumed because the student's answer was broad. Shown, never hidden. */
+  assumptions: string[]
+  /** Calm notes about timing that do not block anything. */
+  warnings: string[]
 }
 
 const COMPLETED: ModuleInput['coverage'][] = ['verified']
@@ -243,8 +262,14 @@ export function sequenceModules(
  * roadmap to run (the class already was it), so every pre-final week goes to consolidation and revision —
  * the same split self-study's own first pass leads into, just starting from week 1 instead of after it.
  */
+/** Whole weeks leave 1–6 trailing days; the last phase owns them, so every day up to the target belongs to a phase. */
+function stretchToTarget(phases: PhaseSpan[], targetDate: string) {
+  const last = phases[phases.length - 1]
+  if (last && last.endDate < targetDate) last.endDate = targetDate
+}
+
 export function buildPhases(
-  startDate: string, targetDate: string, options: { skipFirstPass?: boolean } = {}
+  startDate: string, targetDate: string, options: { skipFirstPass?: boolean; firstPassShare?: number } = {}
 ): { phases: PhaseSpan[]; compressed: boolean } {
   const totalDays = daysBetween(startDate, targetDate)
   const totalWeeks = Math.max(1, Math.floor(totalDays / 7))
@@ -261,7 +286,9 @@ export function buildPhases(
   // Too short for a first pass: everything is final preparation, and the plan
   // says so instead of inventing a curriculum sweep that cannot happen.
   if (totalWeeks <= FINAL_PHASE_WEEKS) {
-    return { phases: [weekSpan(1, totalWeeks, 'final')], compressed: true }
+    const only = [weekSpan(1, totalWeeks, 'final')]
+    stretchToTarget(only, targetDate)
+    return { phases: only, compressed: true }
   }
 
   const finalWeeks = FINAL_PHASE_WEEKS
@@ -271,7 +298,9 @@ export function buildPhases(
   // enforces §7.1 for horizons where the target alone would still run long.
   const firstPassCap = Math.floor(totalWeeks * FIRST_PASS_MAX_SHARE)
   const firstPassTarget = Math.round(usable * FIRST_PASS_TARGET_SHARE)
-  const firstPassWeeks = options.skipFirstPass ? 0 : Math.max(1, Math.min(usable, firstPassTarget, firstPassCap))
+  const fullFirstPass = Math.max(1, Math.min(usable, firstPassTarget, firstPassCap))
+  // A partly finished first pass keeps the pace a fresh one would have: weeks scale with the work still to do.
+  const firstPassWeeks = options.skipFirstPass ? 0 : Math.min(fullFirstPass, Math.max(1, Math.ceil(fullFirstPass * (options.firstPassShare ?? 1))))
 
   const remainder = usable - firstPassWeeks
   // Revision takes the larger share: mixed practice is closer to the exam and
@@ -286,9 +315,20 @@ export function buildPhases(
   if (consolidationWeeks > 0) { phases.push(weekSpan(cursor, consolidationWeeks, 'consolidation')); cursor += consolidationWeeks }
   if (revisionWeeks > 0) { phases.push(weekSpan(cursor, revisionWeeks, 'revision')); cursor += revisionWeeks }
   phases.push(weekSpan(cursor, finalWeeks, 'final'))
-
+  stretchToTarget(phases, targetDate)
   return { phases, compressed: false }
 }
+
+/**
+ * What a module still needs as FIRST-PASS work. Distinct from remainingEffort (which also prices revisiting covered
+ * material): a module studied once needs no first pass, only revision. "Partly covered" with no exact scope is
+ * assumed to leave 60% of the module, and the plan says so.
+ */
+const FIRST_PASS_REMAINING: Record<ModuleInput['coverage'], number> = { not_started: 1, taught: 0.6, studied: 0, verified: 0, decaying: 0 }
+export function firstPassEffort(module: ModuleInput): number {
+  return module.effortBand * (1 + (module.difficulty - 3) * 0.08) * (FIRST_PASS_REMAINING[module.coverage] ?? 1)
+}
+export const isFirstPassPending = (m: ModuleInput) => FIRST_PASS_REMAINING[m.coverage] > 0
 
 /** The work a module still represents, after what the student has already done. */
 export function remainingEffort(module: ModuleInput): number {
@@ -308,12 +348,51 @@ export function buildRoadmap(input: RoadmapInput): Roadmap {
   // classes are confirmed done, first_pass collapses to zero weeks and the rest of this function treats it
   // exactly like self-study reaching the end of its own first pass: the whole pre-final span goes to
   // consolidation then revision, by the same proportional split.
-  const { phases, compressed } = buildPhases(input.startDate, input.targetDate, { skipFirstPass: classesDone })
+  const classesStillRunning = classLed && !classesDone
+
+  // First-pass work that is actually left. A student who has already covered a subject keeps the pace a fresh
+  // student would have, so the first pass shrinks with the work; if nothing is left it is not scheduled at all.
+  // Revising covered material is priced separately (remainingEffort) and happens in the later phases.
+  const freshEffort = input.modules.reduce((sum, m) => sum + firstPassEffort({ ...m, coverage: 'not_started' }), 0)
+  const remainingFirstPass = input.modules.reduce((sum, m) => sum + firstPassEffort(m), 0)
+  const nothingLeft = !classesStillRunning && input.modules.length > 0 && remainingFirstPass === 0
+  const { phases, compressed } = buildPhases(input.startDate, input.targetDate, {
+    skipFirstPass: classesDone || nothingLeft,
+    firstPassShare: !classesStillRunning && freshEffort > 0 ? remainingFirstPass / freshEffort : 1,
+  })
   const totalWeeks = Math.max(1, Math.floor(daysBetween(input.startDate, input.targetDate) / 7))
 
   const sequencedModuleIds = sequenceModules(input.modules, input.prerequisites, input.topics)
   const byId = new Map(input.modules.map(m => [m.id, m]))
   const topicById = new Map(input.topics.map(t => [t.id, t]))
+
+  // A mock is a checkpoint the plan works around, never a second exam date: one outside the horizon is ignored, with a note.
+  const checkpoints: Roadmap['checkpoints'] = []
+  const warnings: string[] = []
+  // Every planned appointment of the canonical schedule is a checkpoint; the profile's single "next mock" is only a projection of the first.
+  const mocks = input.entry?.appointments?.length ? input.entry.appointments
+    : input.entry?.mockDate ? [{ id: undefined, date: input.entry.mockDate, kind: input.entry.mockKind, label: input.entry.mockLabel ?? null, startTime: input.entry.mockStartTime ?? null }] : []
+  for (const m of mocks) {
+    if (m.date < input.startDate) warnings.push('A mock date has already passed, so the plan does not use it. Update or clear it in Calendar.')
+    else if (m.date >= input.targetDate) warnings.push('A mock is on or after your exam date, so the plan does not use it. Check both dates.')
+    else {
+      const week = Math.floor(daysBetween(input.startDate, m.date) / 7) + 1
+      checkpoints.push({ kind: 'mock', id: m.id, date: m.date, week, mockKind: m.kind ?? null, label: m.label ?? null, startTime: m.startTime ?? null })
+      if (checkpoints.length === 1 && week <= 2) warnings.push(`Your mock is about ${week === 1 ? 'a week' : 'two weeks'} away. The plan puts preparing for it first and keeps the rest light. It cannot recover time already gone, and nothing here promises a result.`)
+    }
+  }
+  const mockWeek = checkpoints[0]?.week ?? null
+
+  // How strongly a topic's revision priority is raised by what the student reported.
+  const uncertaintyFactor = (topicId: string) =>
+    input.modules.reduce((hi, m) => (m.topic === topicId && m.uncertainty ? Math.max(hi, UNCERTAINTY_WEIGHT[m.uncertainty.level]) : hi), 1)
+  const basisFor = (topicId: string, week: number): Milestone['basis'] =>
+    uncertaintyFactor(topicId) > 1 ? 'reported_uncertainty' : mockWeek !== null && week <= mockWeek ? 'mock_preparation' : undefined
+  const weightOf = (topicId: string) => { const t = topicById.get(topicId); return t ? (t.weightMin + t.weightMax) / 2 : 0 }
+  const avgDifficulty = (topicId: string) => {
+    const mods = input.modules.filter(m => m.topic === topicId)
+    return mods.length ? mods.reduce((sum, m) => sum + m.difficulty, 0) / mods.length : 3
+  }
 
   const firstPass = phases.find(p => p.phase === 'first_pass')
   const milestones: Milestone[] = []
@@ -330,21 +409,22 @@ export function buildRoadmap(input: RoadmapInput): Roadmap {
     else runs.push({ topicId: m.topic, moduleIds: [id] })
   }
 
-  const runEffort = (run: Run) => run.moduleIds.reduce((sum, id) => sum + remainingEffort(byId.get(id)!), 0)
+  const runEffort = (run: Run) => run.moduleIds.reduce((sum, id) => sum + firstPassEffort(byId.get(id)!), 0)
   const totalRemaining = runs.reduce((sum, r) => sum + runEffort(r), 0)
+  const isCovered = (m: ModuleInput) => m.coverage === 'verified' || m.coverage === 'studied'
 
   // While a class-led or hybrid route's classes are still running, first_pass content ordering belongs to
   // the class, not the planner (see the comment above classesDone) — so no first_pass milestones are
   // generated here. generateWeek.ts's pendingModules filter already only pulls modules whose milestone
   // belongs to the current phase, so simply not emitting first_pass milestones is enough to suppress
   // self-sequenced new content for that period; class_consolidation covers the actual work done.
-  const classesStillRunning = classLed && !classesDone
   if (firstPass && totalRemaining > 0 && !classesStillRunning) {
     // Allocate the first pass's weeks in proportion to remaining effort. Runs
     // are laid end to end on a continuous scale and then read off as weeks, so
-    // rounding cannot accumulate into a drift across sixty modules.
+    // rounding cannot accumulate into a drift across sixty modules. A run with nothing left to do (a covered
+    // subject) takes no weeks and has no milestone.
     let cursorEffort = 0
-    runs.forEach((run, index) => {
+    runs.filter(run => runEffort(run) > 0).forEach((run, index) => {
       const effort = runEffort(run)
       const startFraction = cursorEffort / totalRemaining
       cursorEffort += effort
@@ -359,7 +439,7 @@ export function buildRoadmap(input: RoadmapInput): Roadmap {
         topicId: run.topicId,
         topicName: topic?.name ?? run.topicId,
         moduleIds: run.moduleIds,
-        completedModuleIds: run.moduleIds.filter(id => COMPLETED.includes(byId.get(id)!.coverage)),
+        completedModuleIds: run.moduleIds.filter(id => isCovered(byId.get(id)!)),
         sequence: index + 1,
         startWeek,
         endWeek: Math.min(endWeek, firstPass.endWeek),
@@ -373,16 +453,16 @@ export function buildRoadmap(input: RoadmapInput): Roadmap {
   // Consolidation and revision get real content, not an empty band on a chart.
   //
   // Consolidation returns to the topics that carry the most exam weight and the
-  // most difficulty — where a shaky first pass costs the most marks. Revision is
-  // a cumulative sweep of everything, because by then the exam tests recall
-  // across topics rather than one at a time.
+  // most difficulty — where a shaky first pass costs the most marks — raised by anything the student reported
+  // as uncertain. Revision is a cumulative sweep of everything, because by then the exam tests recall
+  // across topics rather than one at a time; when something is reported or a mock is coming, the sweep
+  // starts with the topics that matter most instead of curriculum order.
   const consolidation = phases.find(p => p.phase === 'consolidation')
   if (consolidation) {
     const ranked = [...input.topics]
       .map(t => {
         const mods = input.modules.filter(m => m.topic === t.id)
-        const avgDifficulty = mods.length ? mods.reduce((s, m) => s + m.difficulty, 0) / mods.length : 3
-        return { topic: t, mods, priority: ((t.weightMin + t.weightMax) / 2) * avgDifficulty }
+        return { topic: t, mods, priority: ((t.weightMin + t.weightMax) / 2) * avgDifficulty(t.id) * uncertaintyFactor(t.id) }
       })
       .filter(r => r.mods.length > 0)
       .sort((a, b) => b.priority - a.priority)
@@ -396,24 +476,31 @@ export function buildRoadmap(input: RoadmapInput): Roadmap {
         topicId: r.topic.id,
         topicName: r.topic.name,
         moduleIds: r.mods.map(m => m.id),
-        completedModuleIds: r.mods.filter(m => COMPLETED.includes(m.coverage)).map(m => m.id),
+        completedModuleIds: r.mods.filter(isCovered).map(m => m.id),
         sequence: milestones.length + 1,
         startWeek: week,
         endWeek: week,
         startDate: addDays(input.startDate, (week - 1) * 7),
         endDate: addDays(input.startDate, week * 7 - 1),
         effortWeight: 0, // Revisiting is not new scope; it must not inflate the plan.
+        basis: basisFor(r.topic.id, week),
       })
     })
   }
+
+  const hasSignal = mockWeek !== null || input.topics.some(t => uncertaintyFactor(t.id) > 1)
+  const bySignal = (topics: TopicInput[]) => hasSignal
+    ? [...topics].sort((a, b) => weightOf(b.id) * uncertaintyFactor(b.id) - weightOf(a.id) * uncertaintyFactor(a.id) || a.sequence - b.sequence)
+    : topics
 
   const revision = phases.find(p => p.phase === 'revision')
   if (revision && input.topics.length > 0) {
     // A cumulative sweep: every topic, spread across the revision weeks, so no
     // topic goes untouched between the first pass and the mocks.
     const perWeek = Math.ceil(input.topics.length / revision.weeks)
+    const ordered = bySignal(input.topics)
     for (let w = 0; w < revision.weeks; w++) {
-      const slice = input.topics.slice(w * perWeek, (w + 1) * perWeek)
+      const slice = ordered.slice(w * perWeek, (w + 1) * perWeek)
       if (slice.length === 0) continue
       const week = revision.startWeek + w
       const mods = input.modules.filter(m => slice.some(t => t.id === m.topic))
@@ -422,25 +509,56 @@ export function buildRoadmap(input: RoadmapInput): Roadmap {
         topicId: slice[0].id,
         topicName: slice.length === 1 ? slice[0].name : `${slice.map(t => t.name).join(' and ')}`,
         moduleIds: mods.map(m => m.id),
-        completedModuleIds: mods.filter(m => COMPLETED.includes(m.coverage)).map(m => m.id),
+        completedModuleIds: mods.filter(isCovered).map(m => m.id),
         sequence: milestones.length + 1,
         startWeek: week,
         endWeek: week,
         startDate: addDays(input.startDate, (week - 1) * 7),
         endDate: addDays(input.startDate, week * 7 - 1),
         effortWeight: 0,
+        basis: slice.map(t => basisFor(t.id, week)).find(Boolean),
       })
     }
+  }
+
+  // Final preparation: one focus topic a week (the last week stays light), highest-priority first. Without this a
+  // student with no open repairs would reach the exam stretch to an empty Calendar. Only for students whose
+  // starting position is known, so it never changes a plan built without it.
+  const final = phases.find(p => p.phase === 'final')
+  if (final && input.entry && input.topics.length > 0) {
+    const ordered = bySignal(input.topics).filter(t => input.modules.some(m => m.topic === t.id))
+    const focusWeeks = Math.max(1, final.weeks - 1)
+    for (let w = 0; w < focusWeeks && ordered.length > 0; w++) {
+      const topic = ordered[w % ordered.length]
+      const week = final.startWeek + w
+      const mods = input.modules.filter(m => m.topic === topic.id)
+      milestones.push({
+        phase: 'final', topicId: topic.id, topicName: topic.name, moduleIds: mods.map(m => m.id),
+        completedModuleIds: mods.filter(isCovered).map(m => m.id), sequence: milestones.length + 1,
+        startWeek: week, endWeek: week, startDate: addDays(input.startDate, (week - 1) * 7), endDate: addDays(input.startDate, week * 7 - 1),
+        effortWeight: 0, basis: basisFor(topic.id, week),
+      })
+    }
+  }
+
+  // What the plan assumed because an answer was broad. Shown to the student, never silently absorbed.
+  const assumptions: string[] = []
+  for (const t of input.topics) {
+    const mods = input.modules.filter(m => m.topic === t.id)
+    if (mods.some(m => m.coverage === 'taught')) assumptions.push(`${t.name}: marked partly covered. Without the exact readings, the plan assumes about 60% of it still needs a first pass.`)
+    if (mods.some(m => m.uncertainty?.assumed)) assumptions.push(`${t.name}: you said some of it feels uncertain but not which readings, so revision starts with its first readings in order. Pick the readings in Settings to change that.`)
   }
 
   return {
     startDate: input.startDate,
     targetDate: input.targetDate,
+    targetKind: input.targetKind,
     totalWeeks,
     phases,
     milestones,
     compressed,
     sequencedModuleIds,
+    checkpoints, assumptions, warnings,
     feasibility: assessFeasibility(input, phases, totalRemaining, totalWeeks, compressed),
   }
 }
@@ -478,10 +596,28 @@ export function assessFeasibility(
   // would plan nine months around.
   const basis = rateIsObserved
     ? 'At the pace you have been working'
-    : 'At a typical pace for this syllabus'
+    : 'Using a planning assumption (a typical pace for this syllabus)'
   const caveat = rateIsObserved
     ? ''
-    : ' This uses a typical pace; after a few weeks it becomes yours.'
+    : ' This is a planning assumption, not your own pace. It becomes yours once enough finished modules have reported time.'
+
+  // Nothing left to learn for the first time: pressure is about revision and the checkpoint, not about finishing a
+  // syllabus. A short horizon alone is not a verdict on someone who has already covered the material.
+  if (remainingEffortTotal === 0 && input.modules.length > 0) {
+    return {
+      verdict: compressed ? 'tight' : 'comfortable',
+      totalWeeks, usableWeeks, remainingEffort: 0, effortPerWeek: 0,
+      weeklyCapacityMinutes: capacity, requiredMinutesPerWeek: null, rateIsObserved,
+      message: compressed
+        ? `Plan pressure is moderate: ${totalWeeks} week${totalWeeks === 1 ? '' : 's'} to the exam. You told us the first pass is done, so this plan is revision, practice and mock preparation. It is built from your own estimate, so tests matter: they show how secure the material is. Nothing here guarantees readiness.`
+        : 'No first-pass work is left, so this plan is revision, application and mock preparation. Your coverage is your own estimate, not a measurement: tests will show how secure it is.',
+      options: compressed ? [
+        'Start with the areas you flagged as uncertain',
+        'Keep the highest-weighted topics in regular rotation',
+        'Protect your study windows until the exam',
+      ] : [],
+    }
+  }
 
   if (compressed) {
     return {
@@ -562,5 +698,9 @@ export function currentMilestone(roadmap: Roadmap, today: string): Milestone | n
 
 export function currentPhase(roadmap: Roadmap, today: string): PhaseSpan | null {
   const weeksIn = Math.floor(daysBetween(roadmap.startDate, today) / 7) + 1
-  return roadmap.phases.find(p => weeksIn >= p.startWeek && weeksIn <= p.endWeek) ?? null
+  const found = roadmap.phases.find(p => weeksIn >= p.startWeek && weeksIn <= p.endWeek)
+  if (found) return found
+  // The trailing days after the last whole week still belong to the last phase, up to the target date.
+  const last = roadmap.phases[roadmap.phases.length - 1]
+  return last && today >= last.startDate && today <= last.endDate ? last : null
 }

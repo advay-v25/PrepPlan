@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
 import { createAdminClient } from '../../../../lib/supabase/admin'
 import { SELF_MARKS, type SelfMark } from '../../../../lib/curriculum/confidence'
+import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,8 +13,9 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(request: Request) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
   const body = await request.json().catch(() => null) as any
   if (!body || !['outcome', 'reading'].includes(body.scopeType) || typeof body.scopeId !== 'string'

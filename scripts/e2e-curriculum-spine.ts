@@ -7,7 +7,7 @@
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local', quiet: true } as any)
-import { getE2EEmail, verifyAndGetE2EUser } from '../src/lib/testing/e2eIdentity'
+import { getE2EEmail, verifyAndGetE2EUser } from './lib/e2eIdentity'
 import { createSession, makeCheck } from './lib/e2eSession'
 
 const { check, finish } = makeCheck()

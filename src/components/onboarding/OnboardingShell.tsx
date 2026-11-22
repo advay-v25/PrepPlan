@@ -34,7 +34,8 @@ export type { OnboardingState } from '../../lib/onboarding/state'
 import type { OnboardingState } from '../../lib/onboarding/state'
 
 export type TopicInfo = { id: string; name: string; weightMin: number; weightMax: number; summary: string }
-export type WindowInfo = { id: string; year: number; sitting: string; opens: string | null; confirmed: boolean }
+export type ReadingInfo = { id: string; topicId: string; name: string }
+export type WindowInfo = { id: string; year: number; sitting: string; opens: string | null; closes: string | null; confirmed: boolean }
 
 /**
  * The frame every onboarding screen sits in.
@@ -45,29 +46,37 @@ export type WindowInfo = { id: string; year: number; sitting: string; opens: str
  * flow impossible to link into.
  */
 export function OnboardingShell({
-  step, state, windows, topics, returnTo = null,
+  step, state, windows, topics, readings = [], returnTo = null,
 }: {
   step: Step
   returnTo?: string | null
   state: OnboardingState
   windows: WindowInfo[]
   topics: TopicInfo[]
+  readings?: ReadingInfo[]
 }) {
   const router = useRouter()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [payload, setPayload] = useState<Record<string, unknown> | null>(null)
-  const [canContinue, setCanContinue] = useState(true)
+  // Review is not acceptable until a ready draft reports itself (building, failed and invalidated all keep it off).
+  const [canContinue, setCanContinue] = useState(step !== 'plan')
+  const [previewKey, setPreviewKey] = useState(0)
+  const [invalid, setInvalid] = useState(false)
   const [continueReason, setContinueReason] = useState<string | null>(null)
   // Set only when an edit's impact is worth showing before returning to Settings; holds where to go once
   // the student has seen it, so the impact screen never gets in the way of a first-time setup.
   const [impact, setImpact] = useState<{ data: PlanImpact; goTo: string } | null>(null)
+  const [savedUnavailable, setSavedUnavailable] = useState<{ version: number | null; goTo: string } | null>(null)
 
   const handleStepChange = useCallback((newPayload: Record<string, unknown>, continueAllowed = true, reason: string | null = null) => {
     setPayload(newPayload)
     setCanContinue(continueAllowed)
     setContinueReason(reason)
+    if (continueAllowed) { setError(''); setInvalid(false) } // a new ready preview retires the error that belonged to the old one
   }, [])
+
+  const rebuild = useCallback(() => { setError(''); setInvalid(false); setPreviewKey(k => k + 1) }, [])
 
   const railRef = useRef<HTMLOListElement>(null)
   const meta = STEP_META[step]
@@ -78,19 +87,21 @@ export function OnboardingShell({
 
   // On a narrow screen the rail becomes a horizontal strip, and the current step
   // can sit entirely off the right edge — a progress indicator that cannot show
-  // where you are. Centre it whenever the strip actually overflows.
+  // where you are. Centre it inside the steps list whenever it overflows, keeping
+  // the brand logo pinned on the left without being scrolled or clipped.
   useEffect(() => {
-    const rail = railRef.current
-    const current = rail?.querySelector<HTMLElement>('.ob-step.is-current')
-    if (!rail || !current) return
-    const strip = rail.parentElement
-    if (!strip || strip.scrollWidth <= strip.clientWidth) return
+    const strip = railRef.current
+    const current = strip?.querySelector<HTMLElement>('.ob-step.is-current')
+    if (!strip || !current) return
+    if (strip.scrollWidth <= strip.clientWidth) return
     const stripBox = strip.getBoundingClientRect()
     const stepBox = current.getBoundingClientRect()
     strip.scrollLeft += (stepBox.left - stripBox.left) - (strip.clientWidth - stepBox.width) / 2
   }, [step])
 
   async function save(andGo: string | null) {
+    if (saving || savedUnavailable) return
+    if (step === 'plan' && (!payload?.draftId || typeof payload.expectedRevision !== 'number')) return
     setSaving(true)
     setError('')
     try {
@@ -98,18 +109,28 @@ export function OnboardingShell({
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload ?? {}),
+        // An edit by a completed student carries the setup version the editor read, so a stale overlapping edit is refused instead of silently overwriting.
+        body: JSON.stringify(editing && step !== 'plan' && typeof (state.profile as any)?.onboarding_context_version === 'number' ? { ...(payload ?? {}), expectedVersion: (state.profile as any).onboarding_context_version } : (payload ?? {})),
       })
       const data = await res.json()
-      if (!data.ok) { setError(data.message || data.error || 'Could not save that'); setSaving(false); return }
+      if (!data.ok) {
+        setError(data.code === 'setup_changed' ? 'Your setup was changed in another tab or device after you opened this. Nothing was saved and your edits are still here. Reload to see the latest, then save again.' : (data.message || data.error || 'Could not save that')); setSaving(false)
+        if (step === 'plan') { setInvalid(true); handleStepChange({}, false, 'Rebuild the preview to continue') }
+        return
+      }
       // In edit mode a save that measurably changes the days ahead is shown once, here, before returning to
       // Settings — never silently, and never by rewriting anything: the save already happened exactly as it
       // would have without this check.
+      if (data.impact?.unavailable || data.followUpUnavailable) {
+        setSavedUnavailable({ version: data.version ?? null, goTo: andGo ?? '/app/settings' })
+        setSaving(false)
+        return
+      }
       if (editing && andGo && isNotable(data.impact)) { setImpact({ data: data.impact, goTo: andGo }); setSaving(false); return }
       if (andGo) router.push(andGo)
       else router.refresh()
     } catch {
-      setError('Network error — nothing was saved')
+      setError('The connection dropped, so it is not confirmed whether this saved. Reload to check: if your change is there it saved; if not, your edits here are kept and saving again is safe.')
       setSaving(false)
     }
   }
@@ -117,9 +138,9 @@ export function OnboardingShell({
   const StepBody = {
     exam: <ExamStep state={state} windows={windows} onChange={handleStepChange} />,
     route: <RouteStep state={state} onChange={handleStepChange} />,
-    position: <PositionStep state={state} topics={topics} onChange={handleStepChange} />,
+    position: <PositionStep state={state} topics={topics} readings={readings} onChange={handleStepChange} />,
     week: <WeekStep state={state} onChange={handleStepChange} />,
-    plan: <PlanStep state={state} windows={windows} onChange={handleStepChange} />,
+    plan: <PlanStep state={state} windows={windows} onChange={handleStepChange} rebuildKey={previewKey} invalid={invalid} onRebuild={rebuild} />,
   }[step]
 
   return (
@@ -138,6 +159,7 @@ export function OnboardingShell({
               <li key={s}>
                 <Link
                   href={onboardingHref(s, returnTo ?? undefined)}
+                  prefetch={false}
                   className={`ob-step ${current ? 'is-current' : ''} ${done ? 'is-done' : ''}`}
                   aria-current={current ? 'step' : undefined}
                 >
@@ -162,11 +184,18 @@ export function OnboardingShell({
         <div className="ob-body">
           <header className="ob-head">
             <p className="eyebrow">{editing ? 'Editing your setup' : `Step ${meta.index} of ${STEPS.length}`}</p>
-            <h1>{impact ? 'How this changes the days ahead' : meta.title}</h1>
-            <p className="ob-blurb">{impact ? 'Nothing has been rescheduled yet. This is what your change means for the plan you already have.' : meta.blurb}</p>
+            <h1>{savedUnavailable ? 'Your changes are saved' : impact ? 'How this changes the days ahead' : meta.title}</h1>
+            <p className="ob-blurb">{savedUnavailable ? 'Your setup saved successfully. Nothing in your accepted week has been moved.' : impact ? 'Nothing has been rescheduled yet. This is what your change means for the plan you already have.' : meta.blurb}</p>
           </header>
 
-          {impact ? (
+          {savedUnavailable ? (
+            <section className="ob-section">
+              <Notice tone="warn" role="status">Saved{savedUnavailable.version !== null ? ` as setup version ${savedUnavailable.version}` : ''}. The plan impact could not be read just now. Open Calendar to review the current week; the earlier before-and-after comparison is unavailable.</Notice>
+              <Link href="/app/calendar" className="primary-button">Review my week</Link>
+              <Button variant="text" onClick={() => window.location.reload()}>Reload saved setup</Button>
+              <Button variant="text" onClick={() => router.push(savedUnavailable.goTo)}>Continue</Button>
+            </section>
+          ) : impact ? (
             <div className="ob-section">
               {impact.data.cycleChanged && (
                 <Card padding="tight" className="ob-impact-row">
@@ -201,16 +230,16 @@ export function OnboardingShell({
                 </Card>
               )}
               <Button className="ob-actions__next mt-6" onClick={() => router.push(impact.goTo)}>
-                Continue to Settings <ArrowRight size={16} aria-hidden />
+                Continue <ArrowRight size={16} aria-hidden />
               </Button>
             </div>
-          ) : StepBody}
+          ) : <fieldset disabled={saving} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>{StepBody}</fieldset>}
 
-          {error && <Notice tone="danger" role="alert">{error}</Notice>}
+          {error && !(step === 'plan' && invalid) && <Notice tone="danger" role="alert">{error}</Notice>}
 
-          {!impact && <div className="ob-actions">
+          {!impact && !savedUnavailable && <div className="ob-actions">
             {back
-              ? <Button variant="text" onClick={() => router.push(onboardingHref(back, returnTo ?? undefined))}>
+              ? <Button variant="text" disabled={saving} onClick={() => router.push(onboardingHref(back, returnTo ?? undefined))}>
                   <ArrowLeft size={15} aria-hidden /> Back
                 </Button>
               : <span />}
@@ -228,7 +257,7 @@ export function OnboardingShell({
                 disabled={!canContinue}
                 aria-disabled={!canContinue}
               >
-                {step === 'plan' ? 'Accept and open Calendar' : editing ? 'Save' : 'Continue'}
+                {step === 'plan' ? 'Accept and open Calendar' : editing ? (returnTo === ROUTES.onboarding.plan ? 'Save and return to review' : 'Save') : 'Continue'}
                 {step !== 'plan' && <ArrowRight size={16} aria-hidden />}
               </Button>
             </div>

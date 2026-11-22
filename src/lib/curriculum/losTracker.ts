@@ -16,6 +16,9 @@
  * exam result — it classifies what the student has demonstrated.
  */
 
+import { todayInZone } from '../planning/studyWeek'
+import { dueDateOf } from '../repairs/recheckDate'
+
 export type LosBand = 'repair' | 'verify' | 'maintain' | 'untested'
 export type EvidenceStateLike = 'insufficient' | 'needs_repair' | 'unstable' | 'supported' | 'disputed'
 export type LosProgress = 'not_started' | 'scheduled' | 'in_progress' | 'retest_due' | 'complete'
@@ -46,6 +49,8 @@ export function daysSince(iso: string | null, now: Date): number | null {
 }
 
 export function classifyLos(evidence: LosEvidenceInput | null, now: Date): BandResult {
+  // An unresolved repair is an obligation whatever its lifecycle state; with no recorded observation it still reads "Repair", but the sample stays 0.
+  if (evidence?.hasOpenRepair && evidence.validSampleSize === 0) return { band: 'repair', rationale: 'A repair is open for this outcome. No valid observation of it is recorded in this view yet.' }
   if (!evidence || evidence.validSampleSize === 0 || evidence.state === 'insufficient') {
     return { band: 'untested', rationale: 'No valid diagnostic evidence yet — not enough to classify.' }
   }
@@ -86,25 +91,30 @@ export function classifyLos(evidence: LosEvidenceInput | null, now: Date): BandR
 }
 
 /** What to do, and what proves it — the student's own method, per band. */
+/**
+ * What to do for a band, and what counts. Practice suggestions here are SUGGESTIONS: they never state a pass mark or a fixed question count, because what
+ * closes a repair is the assessment policy (a fresh, eligible check that comes out supported, at the time Roadmap schedules it) and how many fresh
+ * questions exist depends on the bank. Observed facts are shown separately from these suggestions.
+ */
 export const BAND_METHOD: Record<Exclude<LosBand, 'untested'>, {
   howToImprove: (concept: string) => string
   proof: string
   questionRange: string
 }> = {
   repair: {
-    howToImprove: c => `Relearn the rule, write a one-page error note, then work 12–15 fresh questions on: ${c}.`,
-    proof: '≥90% on 12 fresh questions with no guessed-correct answers, and ≥90% on a differently worded next-day retest.',
-    questionRange: '12–15 fresh questions + next-day retest',
+    howToImprove: c => `Relearn the rule, write the error in your own words, then practise it before the scheduled check. Focus: ${c}.`,
+    proof: 'A repair closes when a fresh, eligible check on this outcome comes out supported. Roadmap schedules that check; practising or writing a note does not close it.',
+    questionRange: 'A fresh check when one is due and questions are available',
   },
   verify: {
-    howToImprove: c => `Closed-book recall first, then 6–8 fresh questions; explain why every wrong option fails. Focus: ${c}.`,
-    proof: '≥85% on 6–8 fresh questions with correct reasoning and no formula or convention lookup.',
-    questionRange: '6–8 fresh questions',
+    howToImprove: c => `Try closed-book recall first, then check yourself with fresh questions when available. Focus: ${c}.`,
+    proof: 'Confirmed by repeated correct, confident answers on fresh questions over time. One right answer is not enough.',
+    questionRange: 'A short fresh set when available',
   },
   maintain: {
-    howToImprove: c => `3–5 mixed questions and a 60-second closed-book summary. Key recall: ${c}.`,
-    proof: '≥90% on maintenance questions with immediate recall; move to Verify if slow or guessed.',
-    questionRange: '3–5 mixed questions',
+    howToImprove: c => `Keep it warm with a few mixed questions and a short closed-book summary. Key recall: ${c}.`,
+    proof: 'Stays here while fresh answers remain correct and confident; it moves back to Verify if they are slow, unsure or wrong.',
+    questionRange: 'A few mixed questions',
   },
 }
 
@@ -119,13 +129,13 @@ export type ProgressInput = {
 }
 
 /** Progress of the *improvement*, never of understanding: work done is not evidence. */
-export function deriveProgress(i: ProgressInput, now: Date): LosProgress {
+export function deriveProgress(i: ProgressInput, now: Date, timezone = 'UTC'): LosProgress {
   if (i.band === 'maintain') return 'complete'
   // An untested outcome can still be scheduled or worked (e.g. class consolidation):
   // that is progress on the *work*, and the band stays Untested until a test moves it.
   if (i.band === 'untested') return i.workCompleted ? 'in_progress' : i.hasScheduledWork ? 'scheduled' : 'not_started'
   if (i.workCompleted) {
-    if (i.nextRecheckDueAt && new Date(i.nextRecheckDueAt).getTime() <= now.getTime()) return 'retest_due'
+    if (i.nextRecheckDueAt && dueDateOf(i.nextRecheckDueAt)! <= todayInZone(timezone, now)) return 'retest_due'   // a calendar date in the student's zone, the same rule the re-check start uses
     return 'in_progress'
   }
   if (i.hasScheduledWork) return 'scheduled'
@@ -141,6 +151,7 @@ export type TrackerRow = {
   outcomeId: string
   readingId: string
   classCoverage: ClassCoverage
+  classReports?: { sessionId: string; label: string; date: string; extent: ClassCoverage }[]
   /** How the evidence reads (concept miss, guess, ...) and the student's own mark checked against it. */
   verdict: import('./confidence').ObsVerdict | 'none'
   selfMark: import('./confidence').SelfMark | null

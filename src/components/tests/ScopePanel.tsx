@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { PaperPreview } from '../../lib/tests/paperPreview'
-import { ScopeConfirmForm, QuickStudyForm } from './ScopeForms'
+import { ScopeConfirmForm } from './ScopeForms'
+import { classLogHref } from '../../lib/routing/calendar'
 
 type Catalog = { id: string; name: string; readings: { id: string; no: number; title: string; outcomes: { id: string; code: string; title: string }[] }[] }[]
 
@@ -17,19 +18,18 @@ export function ScopePanel({ preview, catalog }: { preview: PaperPreview; catalo
   const { scope, blueprint, paperKind } = preview
   const readingName = new Map(catalog.flatMap(s => s.readings.map(r => [r.id, { no: r.no, title: r.title, subject: s.id, outcomes: r.outcomes }] as const)))
   const subjName = new Map(catalog.map(s => [s.id, s.name]))
+  const classSources = new Map(scope.targets.flatMap(target => target.sources.filter(source => source.type === 'class').map(source => [source.id, source] as const)))
 
   return (
     <section className="scope-panel" aria-labelledby="scope-h">
       <h2 id="scope-h">What this week&apos;s paper tests</h2>
-      <p className="muted">Only work you have <strong>completed</strong> is tested. Calendar plans it; your completion decides it.</p>
+      <p className="muted">Only completed work and outcomes you <strong>explicitly confirm</strong> are tested. Calendar plans it; your recorded progress decides it.</p>
 
-      {preview.noPaperReason ? (
-        <p role="status" className="note">{preview.noPaperReason}</p>
-      ) : (
+      {!preview.noPaperReason && (
         <>
           <p><strong>{PAPER_LABEL[paperKind]}</strong> — {blueprint.totalQuestions} questions, about {blueprint.estimatedMinutes} minutes
             {' '}(never more than {blueprint.policy.ceiling}). {scope.totals.newOutcomes} new and {scope.totals.revisionOutcomes} revisited outcomes from {scope.totals.readings} reading{scope.totals.readings === 1 ? '' : 's'}
-            in {scope.totals.subjects} subject{scope.totals.subjects === 1 ? '' : 's'}.</p>
+            {' '}in {scope.totals.subjects} subject{scope.totals.subjects === 1 ? '' : 's'}.</p>
           <ul className="scope-panel__readings">
             {blueprint.perReading.map(r => {
               const rd = readingName.get(r.readingId)
@@ -41,16 +41,34 @@ export function ScopePanel({ preview, catalog }: { preview: PaperPreview; catalo
         </>
       )}
 
+      {classSources.size > 0 && <details>
+        <summary>Class reports in this scope</summary>
+        <ul>{[...classSources.values()].map(source => <li key={source.id}>
+          <Link href={classLogHref({ sessionId: source.id })}>{source.label ?? 'Saved class'}{source.at ? ` on ${source.at}` : ''}</Link>
+        </li>)}</ul>
+      </details>}
+
       {scope.unresolved.length > 0 && (
         <div className="scope-panel__unresolved">
           <h3>Confirm what these covered</h3>
-          <p className="muted">These blocks name a reading but not which outcomes. Roadmap will not guess — tick what you actually covered and they join the paper.</p>
+          <p className="muted">Confirm the outcomes you actually covered. A finished sitting does not complete the shared learning scope while another sitting remains.</p>
           {scope.unresolved.map(u => (
             <div key={u.blockId} className="scope-panel__block">
-              <strong>{u.title}</strong> <small>{u.reason === 'partial' ? 'partly done' : 'reading-level'}</small>
-              <ScopeConfirmForm blockId={u.blockId} outcomes={readingName.get(u.readingId)?.outcomes ?? []} />
+              <strong>{u.title}</strong> <small>{u.reason === 'split' ? 'another sitting remains' : u.reason === 'partial' ? 'partly done' : u.reason === 'class_part' ? 'part of this was covered in class' : 'reading-level'}</small>
+              <ScopeConfirmForm blockId={u.blockId} expectedRevision={u.revision} outcomes={(readingName.get(u.readingId)?.outcomes ?? []).filter(o => !u.outcomeId || o.id === u.outcomeId)} />
             </div>
           ))}
+        </div>
+      )}
+
+      {scope.pendingPortions.length > 0 && (
+        <div className="scope-panel__pending" data-testid="pending-portions">
+          <h3>Part of a class, not yet testable</h3>
+          <ul>{scope.pendingPortions.map(p => {
+            const rd = readingName.get(p.readingId), o = rd?.outcomes.find(x => x.id === p.outcomeId)
+            return <li key={`${p.sessionId}-${p.outcomeId}`}>{rd ? `Reading ${rd.no}` : 'A reading'}{o ? `, ${o.code}. ${o.title}` : ''} · {p.extent === 'continued' ? 'Continued' : 'Partly covered'} in <Link href={classLogHref({ sessionId: p.sessionId })}>{p.classLabel ?? 'saved class'} on {p.classDate}</Link></li>
+          })}</ul>
+          <p className="muted">Roadmap cannot tell which questions test only that part, so it asks nothing about it yet. Continuing it is progress, not completion. Log it as “All of it” in a later class, or finish its continuation task and confirm that you covered the whole outcome, and it joins the paper.</p>
         </div>
       )}
 
@@ -62,7 +80,6 @@ export function ScopePanel({ preview, catalog }: { preview: PaperPreview; catalo
         </div>
       )}
 
-      <QuickStudyForm catalog={catalog} />
     </section>
   )
 }

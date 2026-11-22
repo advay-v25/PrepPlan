@@ -15,7 +15,7 @@ import * as dotenv from 'dotenv'
 
 dotenv.config({ path: '.env.local', quiet: true } as any)
 
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
+import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, E2E_BASE_URL } from './lib/e2eIdentity'
 
 const BASE = E2E_BASE_URL
 const EMAIL = getE2EEmail()
@@ -42,13 +42,11 @@ const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SU
 
 async function signIn() {
   const { data: link } = await admin.auth.admin.generateLink({ type: 'magiclink', email: EMAIL })
-  let path = `/auth/confirm?token_hash=${(link!.properties as any).hashed_token}&type=magiclink&next=/app`
-  for (let i = 0; i < 6; i++) {
-    const res = await req(path); const to = loc(res)
-    if (!to) break
-    const u = new URL(to, BASE); path = u.pathname + u.search
-    if (path.startsWith('/app') || path.startsWith('/onboarding')) break
-  }
+  const res = await req('/api/auth', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'verify', type: 'magiclink', tokenHash: link?.properties?.hashed_token, next: '/app' }),
+  })
+  if (!res.ok) throw new Error(`Test sign-in failed (HTTP ${res.status}).`)
 }
 
 async function main() {

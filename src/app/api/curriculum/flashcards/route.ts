@@ -1,102 +1,108 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
 import { createAdminClient } from '../../../../lib/supabase/admin'
-import { RATINGS, scheduleReview, type Rating } from '../../../../lib/curriculum/flashcards'
-import { isScopeType, scopeExists } from '../../../../lib/curriculum/scope'
+import { RATINGS, type Rating } from '../../../../lib/curriculum/flashcards'
+import { checkScope, isScopeType, scopeProblem } from '../../../../lib/curriculum/scope'
+import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
 
 export const dynamic = 'force-dynamic'
-const MAX_PER_SCOPE = 300, MAX_PER_USER = 3000
-const text = (v: unknown, max: number) => (typeof v === 'string' && v.trim().length >= 1 && v.length <= max ? v.trim() : null)
+const PAGE = 50, MAX_PAGE = 100
 
-const COLS = 'id, scope_type, scope_id, front, back, source, due_at, interval_days, ease, reps, lapses, last_reviewed_at, suspended'
-
-/** Own cards (RLS). ?scopeType&scopeId lists one scope; ?due=1 lists what is due now across scopes. */
-export async function GET(request: Request) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
-  const url = new URL(request.url)
-  if (url.searchParams.get('due') === '1') {
-    const { data } = await supabase.from('flashcards').select(COLS).eq('suspended', false)
-      .lte('due_at', new Date().toISOString()).order('due_at').limit(50)
-    return NextResponse.json({ ok: true, cards: data ?? [] })
-  }
-  const scopeType = url.searchParams.get('scopeType'), scopeId = url.searchParams.get('scopeId') ?? ''
-  if (!isScopeType(scopeType) || !(await scopeExists(scopeType, scopeId))) return NextResponse.json({ ok: false, error: 'Unknown subject or reading.' }, { status: 404 })
-  const { data } = await supabase.from('flashcards').select(COLS).eq('scope_type', scopeType).eq('scope_id', scopeId).order('created_at')
-  return NextResponse.json({ ok: true, cards: data ?? [] })
-}
+export const CARD_COLS = 'id, scope_type, scope_id, front, back, source, due_at, interval_days, ease, reps, lapses, last_reviewed_at, suspended, revision'
+const UNAVAILABLE = { ok: false, code: 'unavailable', error: 'Your cards could not be loaded just now. Nothing was changed; try again shortly.' }
+const escapeLike = (s: string) => s.replace(/[\\%_]/g, m => `\\${m}`)
+const intParam = (v: string | null, d: number, max: number) => { const n = Number(v); return v !== null && Number.isInteger(n) && n >= 0 ? Math.min(n, max) : d }
 
 /**
- * POST only. Body: { action: 'create' | 'update' | 'delete' | 'review' | 'draft', ... }
- *  - create: scopeType, scopeId, front, back
- *  - update: cardId, front, back
- *  - delete: cardId
- *  - review: cardId, rating (again | hard | good | easy) — a recall report, never evidence
- *  - draft:  scopeType, scopeId — suggested fronts from the outcome list; the student writes the answers. Writes nothing.
+ * Own cards (RLS). Every read is paginated with an EXACT count; a failed read or count is a 503, never an empty list or a zero.
+ *   ?scopeType&scopeId[&filter=all|due|later][&q=text][&limit][&offset]   one subject or reading
+ *   ?due=1[&limit][&offset]                                               what is due now across scopes (+ when the next card is due when nothing is)
+ */
+export async function GET(request: Request) {
+  const supabase = await createClient()
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const url = new URL(request.url), limit = Math.max(1, intParam(url.searchParams.get('limit'), PAGE, MAX_PAGE)), offset = intParam(url.searchParams.get('offset'), 0, 100_000)
+  const nowIso = new Date().toISOString()
+  if (url.searchParams.get('due') === '1') {
+    const [list, next, all] = await Promise.all([
+      supabase.from('flashcards').select(CARD_COLS, { count: 'exact' }).eq('suspended', false).lte('due_at', nowIso).order('due_at').order('id').range(offset, offset + limit - 1),
+      supabase.from('flashcards').select('due_at').eq('suspended', false).gt('due_at', nowIso).order('due_at').limit(1),
+      supabase.from('flashcards').select('id', { count: 'exact', head: true }),
+    ])
+    if (list.error || next.error || all.error || list.count === null || all.count === null) return NextResponse.json(UNAVAILABLE, { status: 503 })
+    return NextResponse.json({ ok: true, cards: list.data, total: list.count, totalCards: all.count, nextDueAt: (next.data?.[0]?.due_at as string | undefined) ?? null, now: nowIso, offset, limit })
+  }
+  const scopeType = url.searchParams.get('scopeType'), scopeId = url.searchParams.get('scopeId') ?? ''
+  if (!isScopeType(scopeType)) return NextResponse.json({ ok: false, error: 'Unknown subject or reading.' }, { status: 404 })
+  const sc = await checkScope(scopeType, scopeId); if (sc !== 'ok') { const p = scopeProblem(sc); return NextResponse.json(p.body, { status: p.status }) }
+  const filter = url.searchParams.get('filter'), q = (url.searchParams.get('q') ?? '').trim().slice(0, 100)
+  let query = supabase.from('flashcards').select(CARD_COLS, { count: 'exact' }).eq('scope_type', scopeType).eq('scope_id', scopeId)
+  if (filter === 'due') query = query.lte('due_at', nowIso); else if (filter === 'later') query = query.gt('due_at', nowIso)
+  if (q) query = query.or(`front.ilike.%${escapeLike(q)}%,back.ilike.%${escapeLike(q)}%`)
+  const [list, due, all] = await Promise.all([
+    query.order('created_at').order('id').range(offset, offset + limit - 1),
+    supabase.from('flashcards').select('id', { count: 'exact', head: true }).eq('scope_type', scopeType).eq('scope_id', scopeId).eq('suspended', false).lte('due_at', nowIso),
+    supabase.from('flashcards').select('id', { count: 'exact', head: true }).eq('scope_type', scopeType).eq('scope_id', scopeId),
+  ])
+  if (list.error || due.error || all.error || list.count === null || due.count === null || all.count === null) return NextResponse.json(UNAVAILABLE, { status: 503 })
+  return NextResponse.json({ ok: true, cards: list.data, matching: list.count, total: all.count, dueCount: due.count, now: nowIso, offset, limit })
+}
+
+const STATUS: Record<string, number> = { BAD_KEY: 400, BAD_ACTION: 400, BAD_SCOPE: 404, INVALID: 400, LIMIT: 409, NOT_FOUND: 404, STALE_CARD: 409, KEY_REUSED: 409 }
+const text = (v: unknown, max: number) => (typeof v === 'string' && v.trim().length >= 1 && v.length <= max ? v.trim() : null)
+
+/**
+ * POST only. Body: { action: 'create' | 'update' | 'delete' | 'review' | 'draft', requestKey, ... }. Every write is ONE database command (flashcard_apply):
+ *  - create: scopeType, scopeId, front, back [, source]
+ *  - update: cardId, expectedRevision, front, back
+ *  - delete: cardId, expectedRevision
+ *  - review: cardId, expectedRevision, rating (again | hard | good | easy) — a recall report, never evidence
+ *  - draft:  scopeType, scopeId — outcome PROMPTS (not cards, not generated). Writes nothing.
+ * `requestKey` (8–100 chars) names the request: an exact retry returns the original result and applies nothing twice; the same key for a different request is a 409.
+ * A stale expectedRevision is a 409 carrying the CURRENT card. Reviews write no evidence, coverage, repair state or paper credit.
  */
 export async function POST(request: Request) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
   const body = await request.json().catch(() => null) as any
   if (!body || typeof body.action !== 'string') return NextResponse.json({ ok: false, error: 'Invalid request.' }, { status: 400 })
   const requestId = crypto.randomUUID()
-  const fail = (error: string, status = 500, error_: unknown = null) => { if (error_) console.error(`[curriculum/flashcards ${requestId}]`, error_); return NextResponse.json({ ok: false, error, requestId }, { status }) }
+  const fail = (error: string, status = 500, detail: unknown = null, extra: object = {}) => { if (detail) console.error(`[curriculum/flashcards ${requestId}]`, detail); return NextResponse.json({ ok: false, error, requestId, ...extra }, { status }) }
 
+  if (body.action === 'draft') {
+    if (!isScopeType(body.scopeType)) return fail('Unknown subject or reading.', 404)
+    const sc = await checkScope(body.scopeType, body.scopeId); if (sc !== 'ok') { const p = scopeProblem(sc); return NextResponse.json(p.body, { status: p.status }) }
+    const admin = createAdminClient()
+    const readings = body.scopeType === 'reading' ? { data: [{ id: body.scopeId }], error: null }
+      : await admin.from('curriculum_readings').select('id').eq('topic_id', body.scopeId).eq('structure_pending', false)
+    if (readings.error) return fail('Prompts could not be loaded. Nothing was changed.', 503, readings.error.message)
+    const los = await admin.from('reading_los').select('id, title, reading_id').in('reading_id', (readings.data ?? []).map(r => r.id as string)).order('sequence').limit(60)
+    if (los.error) return fail('Prompts could not be loaded. Nothing was changed.', 503, los.error.message)
+    return NextResponse.json({ ok: true, kind: 'outcome_prompts', note: 'Prompts only: a question stem to answer in your own words. They are not cards and not generated content.', drafts: (los.data ?? []).map(l => ({ outcomeId: l.id, front: `In your own words: ${l.title}` })) })
+  }
+
+  const key = typeof body.requestKey === 'string' ? body.requestKey : null
+  if (!key || key.length < 8 || key.length > 100) return fail('A request key of 8 to 100 characters is required.', 400)
+  let p_card: string | null = null, p_expected: number | null = null, p_f: Record<string, unknown> = {}
   if (body.action === 'create') {
     const front = text(body.front, 1000), back = text(body.back, 2000)
     if (!isScopeType(body.scopeType) || !front || !back) return fail('Write both sides of the card.', 400)
-    if (!(await scopeExists(body.scopeType, body.scopeId))) return fail('Unknown subject or reading.', 404)
-    const { count: inScope } = await supabase.from('flashcards').select('*', { count: 'exact', head: true }).eq('scope_type', body.scopeType).eq('scope_id', body.scopeId)
-    const { count: total } = await supabase.from('flashcards').select('*', { count: 'exact', head: true })
-    if ((inScope ?? 0) >= MAX_PER_SCOPE || (total ?? 0) >= MAX_PER_USER) return fail('You have reached the card limit here.', 409)
-    const { data, error } = await supabase.from('flashcards').insert({
-      user_id: user.id, scope_type: body.scopeType, scope_id: body.scopeId, front, back,
-      source: body.source === 'outcome_prompt' ? 'outcome_prompt' : 'manual',
-    }).select(COLS).single()
-    if (error) return fail('Could not save the card.', 500, error.message)
-    return NextResponse.json({ ok: true, card: data })
-  }
+    p_f = { scopeType: body.scopeType, scopeId: body.scopeId, front, back, source: body.source === 'outcome_prompt' ? 'outcome_prompt' : body.source === 'note_draft' ? 'note_draft' : 'manual' }
+  } else if (body.action === 'update' || body.action === 'delete' || body.action === 'review') {
+    if (typeof body.cardId !== 'string' || !Number.isInteger(body.expectedRevision) || body.expectedRevision < 1) return fail('Invalid request.', 400)
+    p_card = body.cardId; p_expected = body.expectedRevision
+    if (body.action === 'update') { const front = text(body.front, 1000), back = text(body.back, 2000); if (!front || !back) return fail('Write both sides of the card.', 400); p_f = { front, back } }
+    if (body.action === 'review') {
+      if (!RATINGS.includes(body.rating as Rating)) return fail('Invalid request.', 400)
+      p_f = { rating: body.rating }   // the schedule is derived INSIDE the command from the locked card, the rating and the database clock; nothing else is accepted
+    }
+  } else return fail('Unknown action.', 400)
 
-  if (body.action === 'update') {
-    const front = text(body.front, 1000), back = text(body.back, 2000)
-    if (typeof body.cardId !== 'string' || !front || !back) return fail('Write both sides of the card.', 400)
-    const { data, error } = await supabase.from('flashcards').update({ front, back, updated_at: new Date().toISOString() }).eq('id', body.cardId).select(COLS)
-    if (error) return fail('Could not save the card.', 500, error.message)
-    if (!data?.length) return fail('Card not found.', 404)
-    return NextResponse.json({ ok: true, card: data[0] })
-  }
-
-  if (body.action === 'delete') {
-    if (typeof body.cardId !== 'string') return fail('Invalid request.', 400)
-    const { data, error } = await supabase.from('flashcards').delete().eq('id', body.cardId).select('id')
-    if (error) return fail('Could not delete the card.', 500, error.message)
-    if (!data?.length) return fail('Card not found.', 404)
-    return NextResponse.json({ ok: true })
-  }
-
-  if (body.action === 'review') {
-    if (typeof body.cardId !== 'string' || !RATINGS.includes(body.rating as Rating)) return fail('Invalid request.', 400)
-    const { data: card } = await supabase.from('flashcards').select('interval_days, ease, reps, lapses, last_reviewed_at').eq('id', body.cardId).maybeSingle()
-    if (!card) return fail('Card not found.', 404)
-    const next = scheduleReview({ intervalDays: Number(card.interval_days), ease: Number(card.ease), reps: card.reps as number, lapses: card.lapses as number }, body.rating, new Date())
-    const { error } = await supabase.from('flashcards').update({
-      interval_days: next.intervalDays, ease: next.ease, reps: next.reps, lapses: next.lapses, due_at: next.dueAt,
-      last_reviewed_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-    }).eq('id', body.cardId)
-    if (error) return fail('Could not record the review.', 500, error.message)
-    return NextResponse.json({ ok: true, dueAt: next.dueAt, intervalDays: next.intervalDays })
-  }
-
-  if (body.action === 'draft') {
-    if (!isScopeType(body.scopeType) || !(await scopeExists(body.scopeType, body.scopeId))) return fail('Unknown subject or reading.', 404)
-    const admin = createAdminClient()
-    const readingIds = body.scopeType === 'reading' ? [body.scopeId]
-      : ((await admin.from('curriculum_readings').select('id').eq('topic_id', body.scopeId).eq('structure_pending', false)).data ?? []).map(r => r.id as string)
-    const { data: los } = await admin.from('reading_los').select('id, title, reading_id').in('reading_id', readingIds).order('sequence').limit(60)
-    return NextResponse.json({ ok: true, drafts: (los ?? []).map(l => ({ outcomeId: l.id, front: `In your own words: ${l.title}` })) })
-  }
-
-  return fail('Unknown action.', 400)
+  const { data, error } = await supabase.rpc('flashcard_apply', { p_key: key, p_action: body.action, p_card, p_expected, p_f })
+  if (error) return fail('Could not save. Nothing was confirmed; try again with the same request.', 503, error.message)
+  const r = data as { ok: boolean; code?: string; error?: string } & Record<string, unknown>
+  if (!r?.ok) return NextResponse.json({ ...r, requestId }, { status: STATUS[r?.code ?? ''] ?? 500 })
+  return NextResponse.json({ ...r, requestId })
 }

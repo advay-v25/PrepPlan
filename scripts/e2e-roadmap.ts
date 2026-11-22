@@ -1,77 +1,52 @@
 /**
- * C3 end-to-end: the long-term roadmap through the real endpoints.
+ * C3 end-to-end: the long-term roadmap through the real endpoints, with an ORDINARY throwaway student (no role, deleted after).
  *
- *   npm run dev
- *   npx tsx scripts/e2e-roadmap.ts --reset
+ *   E2E_BASE_URL=http://localhost:3102 npx tsx scripts/e2e-roadmap.ts
+ *
+ * Independent of every other suite and of the shared +e2e account: the student is onboarded through the real API, then the
+ * "no exam target yet" state is built on that student's OWN records (the same state the roadmap's first-use path handles).
  */
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 import { FINAL_PHASE_WEEKS } from '../src/lib/curriculum/roadmap'
 import { daysBetween } from '../src/lib/planning/studyWeek'
+import { completeOnboarding, createSession } from './lib/e2eSession'
 
 dotenv.config({ path: '.env.local', quiet: true } as any)
-
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
-
-const BASE = E2E_BASE_URL
-const EMAIL = getE2EEmail()
 
 let passed = 0, failed = 0
 const check = (n: string, ok: boolean, d = '') => { ok ? (passed++, console.log(`  ✓ ${n}`)) : (failed++, console.log(`  ✗ ${n}${d ? ` — ${d}` : ''}`)) }
 
-const jar = new Map<string, string>()
-function store(res: Response) {
-  for (const line of ((res.headers as any).getSetCookie?.() ?? []) as string[]) {
-    const [pair] = line.split(';'); const i = pair.indexOf('=')
-    if (i > 0) jar.set(pair.slice(0, i).trim(), pair.slice(i + 1).trim())
-  }
-}
-async function req(path: string, init: RequestInit = {}) {
-  const cookie = [...jar.entries()].map(([k, v]) => `${k}=${v}`).join('; ')
-  const res = await fetch(`${BASE}${path}`, { ...init, redirect: 'manual', headers: { ...(init.headers ?? {}), ...(cookie ? { cookie } : {}) } })
-  store(res); return res
-}
-async function json(path: string, init: RequestInit = {}) {
-  const res = await req(path, init); const t = await res.text()
-  try { return { status: res.status, body: JSON.parse(t) } } catch { return { status: res.status, body: { raw: t.slice(0, 200) } } }
-}
-const post = (p: string, b?: unknown) => json(p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: b === undefined ? undefined : JSON.stringify(b) })
-
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+let session: ReturnType<typeof createSession>
+const req = (path: string, init: RequestInit = {}) => session.req(path, init)
+const json = (path: string, init: RequestInit = {}) => session.json(path, init)
+const post = (p: string, b?: unknown) => session.post(p, b)
+let studentId = ''
 
 async function main() {
-  console.log(`\nC3 end-to-end: the roadmap against ${BASE}\n`)
+  console.log(`\nC3 end-to-end: the roadmap against ${process.env.E2E_BASE_URL}\n`)
 
-  const { data: link } = await admin.auth.admin.generateLink({ type: 'magiclink', email: EMAIL })
-  let path = `/auth/confirm?token_hash=${(link!.properties as any).hashed_token}&type=magiclink&next=/app/curriculum`
-  for (let i = 0; i < 5; i++) {
-    const res = await req(path); const loc = res.headers.get('location')
-    if (!loc) break
-    const u = new URL(loc, BASE); path = u.pathname + u.search
-    if (path.startsWith('/app')) break
-  }
-  check('signed in', path.startsWith('/app'))
+  const email = `integ+rdmp${Date.now()}@example.com`
+  const created = await admin.auth.admin.createUser({ email, email_confirm: true })
+  studentId = created.data.user!.id
+  await admin.from('profiles').upsert({ id: studentId, onboarding_status: 'not_started' })
+  session = createSession(admin, email)
+  check('signed in', await session.signIn())
+  await completeOnboarding(session, admin)
+  const uid = studentId
 
-  const uid = await verifyAndGetE2EUser(admin)
-
-  // The calendar hero shows today's task instead of the milestone when any is planned,
-  // so this suite must not inherit another suite's planned week (dedicated +e2e account only).
+  // Build "no exam target yet, nothing covered, no availability" on this student's own records.
   await admin.from('plan_blocks').delete().eq('user_id', uid)
   await admin.from('planning_cycles').delete().eq('user_id', uid)
-
-  if (process.argv.includes('--reset')) {
-    await admin.from('roadmap_milestones').delete().eq('user_id', uid)
-    await admin.from('study_roadmaps').delete().eq('user_id', uid)
-    await admin.from('user_module_state').delete().eq('user_id', uid)
-    // Feasibility is only 'unknown' when there is no availability at all, so a
-    // suite asserting that must not inherit another suite's week.
-    await admin.from('availability_rules').delete().eq('user_id', uid)
-    // Onboarding now records real study windows and an exam date as well.
-    await admin.from('availability_windows').delete().eq('user_id', uid)
-    await admin.from('task_events').delete().eq('user_id', uid)
-    await admin.from('profiles').update({ registered: false, exam_date: null, exam_window_id: null, exam_year: null, exam_sitting: null }).eq('id', uid)
-    console.log('  (reset)')
-  }
+  await admin.from('roadmap_milestones').delete().eq('user_id', uid)
+  await admin.from('study_roadmaps').delete().eq('user_id', uid)
+  await admin.from('user_module_state').delete().eq('user_id', uid)
+  await admin.from('user_entry_uncertainty').delete().eq('user_id', uid)
+  await admin.from('availability_rules').delete().eq('user_id', uid)
+  await admin.from('availability_windows').delete().eq('user_id', uid)
+  await admin.from('task_events').delete().eq('user_id', uid)
+  await admin.from('profiles').update({ registered: false, exam_date: null, exam_window_id: null, exam_year: null, exam_sitting: null }).eq('id', uid)
 
   // --- The graph -----------------------------------------------------------
   console.log('\nCurriculum graph')
@@ -99,7 +74,7 @@ async function main() {
 
   const page = await req('/app/curriculum?view=roadmap')
   const html = await page.text()
-  check('Curriculum asks which exam first', page.status === 200 && html.includes('Which exam are you sitting'))
+  check('Curriculum asks which exam first', page.status === 200 && html.includes('Choose your exam') && html.includes('/onboarding/exam'))
 
   // --- Choose a target roughly nine months out -----------------------------
   console.log('\nChoosing a sitting')
@@ -116,7 +91,11 @@ async function main() {
   const horizonDays = daysBetween(today, nineMonths.window_opens as string)
   console.log(`  targeting ${nineMonths.sitting} ${nineMonths.year} — ${horizonDays} days out`)
 
-  const built = await post('/api/roadmap', { examWindowId: nineMonths.id, registered: false, activate: true })
+  const retired = await post('/api/roadmap', { examWindowId: nineMonths.id, registered: false, activate: true })
+  check('the roadmap route no longer writes the exam (setup editor owns it)', retired.status === 410 && retired.body?.code === 'USE_EXAM_EDITOR')
+  // The exam is set the way setup sets it; this fixture writes the same profile fields directly.
+  await admin.from('profiles').update({ exam_window_id: nineMonths.id, exam_year: nineMonths.year, exam_sitting: nineMonths.sitting, registered: false }).eq('id', studentId)
+  const built = await post('/api/roadmap', { activate: true })
   check('a roadmap is built', built.body?.ok === true, JSON.stringify(built.body).slice(0, 200))
   const roadmap = built.body?.roadmap
   if (!roadmap) return finish()
@@ -131,8 +110,9 @@ async function main() {
     const firstPassDays = daysBetween(roadmap.startDate, firstPass.endDate)
     check('the first pass finishes within seven months', firstPassDays <= 213, `${firstPassDays} days`)
   }
-  check('nothing is planned into the final phase',
-    roadmap.milestones.every((m: any) => m.endWeek < (final?.startWeek ?? 1e9)))
+  // Since Phase B the exam stretch has revision FOCUS weeks (phase 'final'); no other phase's work may run into it.
+  check('no first-pass, consolidation or revision work runs into the final phase',
+    roadmap.milestones.filter((m: any) => m.phase !== 'final').every((m: any) => m.endWeek < (final?.startWeek ?? 1e9)))
   check('every topic is in the plan', new Set(roadmap.milestones.map((m: any) => m.topicId)).size === 10,
     `${new Set(roadmap.milestones.map((m: any) => m.topicId)).size} topics`)
   check('milestones are week ranges, not exact dates',
@@ -187,7 +167,7 @@ async function main() {
   console.log('\nPages')
   const curriculum = await req('/app/curriculum?view=roadmap')
   const curriculumHtml = await curriculum.text()
-  check('Curriculum renders the roadmap', curriculum.status === 200 && curriculumHtml.includes('weeks to the exam'))
+  check('Curriculum renders the roadmap', curriculum.status === 200 && /weeks to (the exam|the target sitting)/.test(curriculumHtml.replace(/<!-- -->/g, '')))
   check('it shows the phases', curriculumHtml.includes('First pass') && curriculumHtml.includes('Final preparation'))
   check('it shows planned against actual', curriculumHtml.includes('Planned against actual'))
   check('it names the sequence', curriculumHtml.includes('The sequence'))
@@ -199,7 +179,7 @@ async function main() {
 
   const calendar = await req('/app/calendar')
   const calendarHtml = await calendar.text()
-  check('the calendar shows what the week draws from', calendar.status === 200 && calendarHtml.includes('This week draws from'))
+  check('the calendar shows the roadmap milestone for the week', calendar.status === 200 && calendarHtml.includes('Roadmap milestone'))
   check('and only the near-term milestone, not the whole plan',
     (calendarHtml.match(/wk \d/g) ?? []).length === 0)
 
@@ -214,9 +194,10 @@ async function main() {
   finish()
 }
 
-function finish() {
-  console.log(`\n${passed} passed, ${failed} failed\n`)
+async function finish() {
+  if (studentId) await admin.auth.admin.deleteUser(studentId).catch(() => {})
+  console.log(`\nDeleted the throwaway student.\n${passed} passed, ${failed} failed\n`)
   process.exit(failed === 0 ? 0 : 1)
 }
 
-main().catch(e => { console.error('\nCrashed:', e); process.exit(1) })
+main().catch(async e => { console.error('\nCrashed:', e); failed++; await finish() })

@@ -1,205 +1,130 @@
-/**
- * Authentication, end to end: signup + email confirmation, duplicate-signup
- * handling, login error branches, the open-redirect guard, and the account
- * deletion cascade fix — proved two ways: directly against the live
- * constraint definitions (precise, no fixture rows needed — this is what
- * caught that profiles.id, not just the five tables first suspected, was
- * the actual primary blocker) and once more against a real disposable user
- * with a real row in one of those tables, deleted through the real API route.
- *
- * Does not drive the password-reset or Google OAuth flows: both complete
- * through client-side supabase-js calls (updateUser, signInWithOAuth) with
- * no server route of their own to hit over plain HTTP, and were verified
- * instead by direct code read plus one manual browser pass (see the
- * conversation this script shipped in). Never touches the shared E2E_EMAIL
- * fixture — every user this script creates is its own disposable throwaway,
- * deleted by the end of the run (the deletion tests delete them as their own
- * assertion; the rest are cleaned up in a finally block).
- *
- *   npm run dev
- *   npx tsx scripts/e2e-auth.ts
- */
+/** Disposable-project proof of the app's actual auth commands. Admin-generated links never send an email. */
+import assert from 'node:assert/strict'
 import { createClient } from '@supabase/supabase-js'
-import { Client as PgClient } from 'pg'
-import * as dotenv from 'dotenv'
+import { config } from 'dotenv'
+import { createSession } from './lib/e2eSession'
+import { E2E_BASE_URL } from './lib/e2eIdentity'
+import { makeRecoveryIntent } from '../src/lib/auth/securityServer'
 
-dotenv.config({ path: '.env.local', quiet: true } as any)
-
-import { E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
-
-const BASE = E2E_BASE_URL
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-let passed = 0, failed = 0
-const check = (n: string, ok: boolean, d = '') => { ok ? (passed++, console.log(`  ✓ ${n}`)) : (failed++, console.log(`  ✗ ${n}${d ? ` — ${d}` : ''}`)) }
-
-const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } })
-
-if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production' || process.env.NEXT_PUBLIC_IS_PRODUCTION === 'true') {
-  throw new Error('Refusing to run auth e2e (creates/deletes real auth users) against a production environment.')
+config({ path: '.env.local', quiet: true })
+const project = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!)
+const app = new URL(E2E_BASE_URL)
+if (project.hostname !== 'asylsxszdhlnzewhwtga.supabase.co' || !['localhost', '127.0.0.1'].includes(app.hostname)
+  || process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+  throw new Error('Use the confirmed disposable project and a local Roadmap server.')
 }
 
-// --- tiny cookie-jar HTTP client, matching scripts/e2e-routes.ts -----------
-const jar = new Map<string, string>()
-function store(res: Response) {
-  for (const line of ((res.headers as any).getSetCookie?.() ?? []) as string[]) {
-    const [pair] = line.split(';'); const i = pair.indexOf('=')
-    if (i > 0) jar.set(pair.slice(0, i).trim(), pair.slice(i + 1).trim())
-  }
-}
-async function req(path: string, init: RequestInit = {}) {
-  const cookie = [...jar.entries()].map(([k, v]) => `${k}=${v}`).join('; ')
-  const res = await fetch(`${BASE}${path}`, { ...init, redirect: 'manual', headers: { ...(init.headers ?? {}), ...(cookie ? { cookie } : {}) } })
-  store(res); return res
-}
-function loc(res: Response) { return res.headers.get('location') ?? '' }
-function clearJar() { jar.clear() }
-
-/** Follows /auth/confirm's redirect chain, same pattern as e2e-routes.ts's signIn(). */
-async function followConfirm(tokenHash: string, type: string, next: string) {
-  let path = `/auth/confirm?token_hash=${tokenHash}&type=${type}&next=${encodeURIComponent(next)}`
-  let last = ''
-  for (let i = 0; i < 6; i++) {
-    const res = await req(path); last = loc(res)
-    if (!last) return path
-    const u = new URL(last, BASE); path = u.pathname + u.search
-  }
-  return path
+const admin = createClient(project.origin, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+const owned = new Set<string>()
+const stamp = crypto.randomUUID().slice(0, 12)
+const initial = 'Original fixture passphrase 101'
+const replacement = 'Reset fixture passphrase 342'
+const json = { 'Content-Type': 'application/json' }
+let passes = 0
+function check(name: string, value: unknown) {
+  assert.ok(value, name)
+  console.log('  pass ' + name)
+  passes++
 }
 
-const disposableUserIds: string[] = []
-function uniqueEmail(tag: string) { return `e2e-auth-${tag}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com` }
+async function fixture(tag: string, confirmed: boolean) {
+  const email = 'security+' + tag + '-' + stamp + '@example.com'
+  const { data, error } = await admin.auth.admin.createUser({ email, password: initial, email_confirm: confirmed })
+  if (error || !data.user) throw new Error('Could not create an owned auth fixture.')
+  owned.add(data.user.id)
+  return { id: data.user.id, email, session: createSession(admin, email) }
+}
+
+async function generated(type: 'signup' | 'recovery' | 'magiclink', email: string) {
+  const { data, error } = await admin.auth.admin.generateLink(type === 'signup' ? { type, email, password: initial } : { type, email })
+  if (error || !data.properties?.hashed_token) throw new Error('Could not generate an owned email-link fixture.')
+  return data.properties.hashed_token
+}
 
 async function main() {
-  console.log(`\nAuth, end to end, against ${BASE}\n`)
+  const student = await fixture('signup', false)
+  const anonymous = createSession(admin, 'nobody@example.com')
+  const locked = await anonymous.req('/app/calendar?week=2027-01-04')
+  check('signed-out Calendar preserves its in-app return path', locked.status === 307
+    && new URL(locked.headers.get('location')!, app).searchParams.get('next') === '/app/calendar?week=2027-01-04')
 
-  // --- Signup + email confirmation -----------------------------------------
-  // The actual public signUp() call (what AuthForm.tsx uses) dispatches a real
-  // email through Supabase's mailer, which on this project's default rate limit
-  // was already exhausted by a one-off probe during this test's development —
-  // see the written report's Supabase manual-action list. Rather than a flaky
-  // test that passes or fails depending on how recently *anyone* signed up,
-  // the "just signed up, unconfirmed" state is constructed directly (admin
-  // createUser bypasses the mailer and the public endpoint's rate limit,
-  // since it's a different, service-role code path) and only the confirmation
-  // *link*'s handling — the part with actual logic worth testing — is driven
-  // through the real route. signUp() itself is simple SDK boilerplate,
-  // verified correct by direct code read.
-  console.log('Signup + email confirmation')
-  const visitor = createClient(SUPABASE_URL, ANON_KEY)
-  const email1 = uniqueEmail('signup')
-  const { data: newUser, error: createErr } = await admin.auth.admin.createUser({ email: email1, password: 'correct horse battery', email_confirm: false })
-  check('fixture: a freshly-signed-up, unconfirmed account exists', !createErr && !!newUser.user, createErr?.message)
-  if (newUser.user) disposableUserIds.push(newUser.user.id)
-  check('the new user is unconfirmed until the link is followed', newUser.user?.email_confirmed_at == null)
+  const wrong = await anonymous.post('/api/auth', { action: 'login', email: student.email, password: 'A wrong passphrase' })
+  const unverified = await anonymous.post('/api/auth', { action: 'login', email: student.email, password: initial })
+  check('wrong credentials and unverified email have the same outward response', wrong.status === 401 && unverified.status === 401
+    && JSON.stringify(wrong.body) === JSON.stringify(unverified.body))
 
-  const { data: confirmLink } = await admin.auth.admin.generateLink({ type: 'signup', email: email1, password: 'correct horse battery' })
-  const confirmPath = await followConfirm((confirmLink!.properties as any).hashed_token, 'signup', '/onboarding')
-  check('following the confirmation link lands in onboarding', confirmPath.startsWith('/onboarding'), confirmPath)
-  const { data: afterConfirm } = await admin.auth.admin.getUserById(newUser.user!.id)
-  check('the account is confirmed server-side after the link is followed', afterConfirm.user?.email_confirmed_at != null)
-  clearJar()
+  const signup = await generated('signup', student.email)
+  const showedLink = await student.session.req('/auth/confirm?' + new URLSearchParams({ token_hash: signup, type: 'signup' }))
+  check('reading an older link only opens the confirmation screen', showedLink.status === 307
+    && new URL(showedLink.headers.get('location')!, app).pathname === '/auth/verify' && !showedLink.headers.has('set-cookie'))
+  check('link preview did not confirm the account', !(await admin.auth.admin.getUserById(student.id)).data.user?.email_confirmed_at)
+  const confirmation = await student.session.post('/api/auth', { action: 'verify', type: 'signup', tokenHash: signup })
+  check('explicit confirmation creates a session and sends signup to setup', confirmation.status === 200 && confirmation.body?.next === '/onboarding'
+    && !!(await admin.auth.admin.getUserById(student.id)).data.user?.email_confirmed_at)
+  check('a confirmation link is single-use', (await anonymous.post('/api/auth', { action: 'verify', type: 'signup', tokenHash: signup })).status === 400)
+  const noRecovery = await student.session.req('/update-password')
+  check('ordinary session reaches the recovery request screen', noRecovery.status === 307 && noRecovery.headers.get('location') === '/forgot-password')
+  check('ordinary session cannot update via recovery', (await student.session.post('/api/auth', { action: 'update', password: replacement })).status === 403)
+  check('the account page is available before completing setup', (await student.session.req('/account')).status === 200)
+  check('the retired reservation makes no attempt', (await student.session.post('/api/diagnostic/attempt')).status === 410)
+  check('Tests start still requires completed setup', (await student.session.post('/api/tests/start', { kind: 'weekly' })).status === 403)
 
-  // --- Duplicate signup -----------------------------------------------------
-  console.log('\nDuplicate signup')
-  const { data: dupData, error: dupErr } = await visitor.auth.signUp({ email: email1, password: 'a different password 1' })
-  check('re-signing up with an already-confirmed email returns no error (anti-enumeration)', !dupErr, dupErr?.message)
-  check('…but the returned user carries no identities, which is how AuthForm detects it', dupData.user != null && dupData.user.identities?.length === 0,
-    JSON.stringify(dupData.user?.identities))
-
-  // --- Login error branches --------------------------------------------------
-  console.log('\nLogin error branches')
-  const { error: wrongPwErr } = await visitor.auth.signInWithPassword({ email: email1, password: 'not the right password' })
-  check('wrong password is reported as invalid_credentials', wrongPwErr?.code === 'invalid_credentials', wrongPwErr?.code)
-
-  const email2 = uniqueEmail('unconfirmed')
-  const { data: unconfirmedUser } = await admin.auth.admin.createUser({ email: email2, password: 'correct horse battery', email_confirm: false })
-  if (unconfirmedUser.user) disposableUserIds.push(unconfirmedUser.user.id)
-  const { error: unconfirmedErr } = await visitor.auth.signInWithPassword({ email: email2, password: 'correct horse battery' })
-  check('an unconfirmed account reports email_not_confirmed, not invalid_credentials', unconfirmedErr?.code === 'email_not_confirmed', unconfirmedErr?.code)
-
-  // resend() always dispatches a real email, so a strict pass/fail here would
-  // depend on the project mailer's rate limit window at the moment the suite
-  // happens to run — environment state, not a code defect. What's worth
-  // proving is that the call is reachable and well-formed at all (a wiring
-  // bug throws before the API ever responds; this reaches it either way).
-  let resendReached = true
-  try { await visitor.auth.resend({ type: 'signup', email: email2 }) } catch { resendReached = false }
-  check('resend is wired and reachable (the Resend button AuthForm now shows)', resendReached)
-
-  // --- Open-redirect guard (safeNextPath, exercised through /auth/confirm) --
-  console.log('\nOpen-redirect guard')
-  const email3 = uniqueEmail('redirect')
-  const { data: redirectUser } = await admin.auth.admin.createUser({ email: email3, password: 'correct horse battery', email_confirm: true })
-  if (redirectUser.user) disposableUserIds.push(redirectUser.user.id)
-  const { data: magicLink } = await admin.auth.admin.generateLink({ type: 'magiclink', email: email3 })
-  for (const evil of ['//evil.com', 'https://evil.com', '/\\evil.com']) {
-    clearJar()
-    const landedAt = await followConfirm((magicLink!.properties as any).hashed_token, 'magiclink', evil)
-    check(`next=${JSON.stringify(evil)} never leaves the app`, landedAt.startsWith('/') && !landedAt.startsWith('//') && !/^\/\\?\/?evil\.com/i.test(landedAt) && !landedAt.includes('evil.com'),
-      landedAt)
-    // A magic link's OTP is single-use; each loop iteration after the first will
-    // correctly fail to re-verify, which is fine — the redirect target is decided
-    // by safeNextPath() before verifyOtp ever runs, so even the failed attempts
-    // prove the guard (they land on /auth/error, not on evil.com).
-  }
-
-  // --- Account deletion: the cascade fix, two ways ---------------------------
-  // (20261013_auth_cascade_fixes.sql + 20261014_profiles_cascade_and_trigger.sql)
-  console.log('\nAccount deletion cascade')
-  const projectId = new URL(SUPABASE_URL).hostname.split('.')[0]
-  const pg = new PgClient({
-    connectionString: `postgresql://postgres:${process.env.SUPABASE_DB_PASSWORD}@db.${projectId}.supabase.co:5432/postgres`,
-    ssl: { rejectUnauthorized: false },
+  const login = await student.session.post('/api/auth', { action: 'login', email: student.email, password: initial, next: '/account' })
+  check('the existing password still works and returns to the account page', login.status === 200 && login.body?.next === '/account')
+  const originDenied = await student.session.req('/api/auth', {
+    method: 'POST', headers: { ...json, Origin: 'https://unrelated.example', 'Sec-Fetch-Site': 'cross-site' },
+    body: JSON.stringify({ action: 'signout' }),
   })
-  await pg.connect()
-  const { rows: constraintRows } = await pg.query(
-    `select conrelid::regclass::text as tbl, conname, confdeltype
-     from pg_constraint where contype = 'f' and confrelid = 'auth.users'::regclass`
-  )
-  await pg.end()
-  const byName = new Map(constraintRows.map((r: any) => [r.conname, r.confdeltype]))
-  check('profiles.id cascades — the one that actually blocked every deletion, not tracked in any prior migration', byName.get('profiles_id_fkey') === 'c')
-  check('repair_threads.user_id cascades', byName.get('repair_threads_user_id_fkey') === 'c')
-  check('user_roles.user_id cascades', byName.get('user_roles_user_id_fkey') === 'c')
-  check('user_roles.granted_by sets null (not cascade — it records provenance, not ownership)', byName.get('user_roles_granted_by_fkey') === 'n')
-  check('weekly_reviews.user_id cascades', byName.get('weekly_reviews_user_id_fkey') === 'c')
-  check('class_sessions.user_id cascades', byName.get('class_sessions_user_id_fkey') === 'c')
+  check('an off-site browser request is rejected and does not sign out the student', originDenied.status === 403 && (await student.session.req('/account')).status === 200)
 
-  // Real end-to-end proof: a disposable user with a real row in one of the five
-  // previously-broken tables, deleted through the actual DELETE /api/account/delete
-  // route (not direct admin calls), the exact path a real user's "Delete Account"
-  // button takes.
-  const email4 = uniqueEmail('delete')
-  const { data: deleteUser } = await admin.auth.admin.createUser({ email: email4, password: 'correct horse battery', email_confirm: true })
-  const deleteUserId = deleteUser.user!.id
-  disposableUserIds.push(deleteUserId) // safety net: a no-op if the delete test below already removed them
-  const { error: classLogErr } = await admin.from('class_sessions').insert({
-    user_id: deleteUserId, class_date: '2026-01-01', kind: 'covered', idempotency_key: 'e2e-delete-test',
+  const reset = await generated('recovery', student.email)
+  check('an email link without a Roadmap recovery intent cannot use the reset form', (await anonymous.post('/api/auth', {
+    action: 'verify', type: 'recovery', tokenHash: reset,
+  })).status === 400)
+  const recovery = createSession(admin, student.email)
+  const opened = await recovery.post('/api/auth', {
+    action: 'verify', type: 'recovery', tokenHash: reset, intent: makeRecoveryIntent(student.email),
   })
-  check('fixture: a class_sessions row was created for the disposable user', !classLogErr, classLogErr?.message)
+  check('a provider-verified link with the matching intent opens recovery', opened.status === 200 && opened.body?.next === '/update-password')
+  check('the recovery form can render and refresh', (await recovery.req('/update-password')).status === 200 && (await recovery.req('/update-password')).status === 200)
+  check('a second session on the same account does not inherit the recovery proof', (await student.session.post('/api/auth', { action: 'update', password: replacement })).status === 403)
+  const two = await Promise.all([1, 2].map(() => recovery.post('/api/auth', { action: 'update', password: replacement })))
+  check('two simultaneous submissions use the proof exactly once', two.filter(response => response.status === 200).length === 1 && two.filter(response => response.status === 403).length === 1)
+  check('the old password stops working', (await recovery.post('/api/auth', { action: 'login', email: student.email, password: initial })).status === 401)
+  check('the new password works and cannot reuse recovery', (await recovery.post('/api/auth', { action: 'login', email: student.email, password: replacement })).status === 200
+    && (await recovery.post('/api/auth', { action: 'update', password: initial })).status === 403)
 
-  const { data: loginLink } = await admin.auth.admin.generateLink({ type: 'magiclink', email: email4 })
-  clearJar()
-  await followConfirm((loginLink!.properties as any).hashed_token, 'magiclink', '/app')
-  const deleteRes = await req('/api/account/delete', { method: 'DELETE' })
-  check('DELETE /api/account/delete now succeeds for a user with real rows in the once-broken tables',
-    deleteRes.status === 200, `status ${deleteRes.status}: ${await deleteRes.text().catch(() => '')}`)
+  const addressBound = await fixture('address', true)
+  const mismatch = await generated('recovery', addressBound.email)
+  const mismatched = await addressBound.session.post('/api/auth', { action: 'verify', type: 'recovery', tokenHash: mismatch, intent: makeRecoveryIntent(student.email) })
+  check('a recovery intent is bound to the email it was sent for', mismatched.status === 400 && (await addressBound.session.req('/account')).status === 307)
 
-  const { data: afterDelete } = await admin.auth.admin.getUserById(deleteUserId)
-  check('the auth user is actually gone', afterDelete.user == null)
-  const { count: survivingRows } = await admin.from('class_sessions').select('*', { count: 'exact', head: true }).eq('user_id', deleteUserId)
-  check('…and their class_sessions row went with them', (survivingRows ?? 0) === 0, `${survivingRows} rows remain`)
+  const second = createSession(admin, student.email)
+  check('a separate device can sign in', (await second.post('/api/auth', { action: 'login', email: student.email, password: replacement })).status === 200)
+  check('normal sign-out clears just this browser', (await second.post('/api/auth', { action: 'signout' })).status === 200
+    && (await second.req('/account')).status === 307 && (await recovery.req('/account')).status === 200)
+  const deletion = await recovery.post('/api/account/delete', { confirmEmail: student.email })
+  check('recent sign-in still allows deliberate deletion before setup', deletion.status === 200
+    && !(await admin.auth.admin.getUserById(student.id)).data.user && (await recovery.req('/account')).status === 307)
+
+  const health = await anonymous.json('/api/health')
+  check('public liveness reveals only whether Roadmap is running', health.status === 200 && JSON.stringify(health.body) === '{"ok":true}')
+  check('readiness requires its dedicated credential', (await anonymous.json('/api/health?ready=1')).status === 401)
+  check('reminder worker requires its own credential', (await anonymous.post('/api/reminders/run')).status === 401)
+  const oversized = await anonymous.req('/api/auth', { method: 'POST', headers: json, body: JSON.stringify({ action: 'signout', extra: 'a'.repeat(13_000) }) })
+  check('oversized auth bodies are refused before signing in', oversized.status === 413)
+  check('signup consent is validated without contacting the email provider', (await anonymous.post('/api/auth', {
+    action: 'signup', name: 'Fixture', email: addressBound.email, password: initial, accepted: false,
+  })).status === 400)
 }
 
-main()
-  .catch(e => { console.error('\nCrashed:', e); failed++ })
-  .finally(async () => {
-    for (const id of disposableUserIds) {
-      await admin.auth.admin.deleteUser(id).catch(() => {})
-    }
-    console.log(`\n${passed} passed, ${failed} failed\n`)
-    process.exit(failed > 0 ? 1 : 0)
-  })
+main().catch(error => {
+  console.error('Auth suite stopped:', error instanceof Error ? error.message : 'unexpected failure')
+  process.exitCode = 1
+}).finally(async () => {
+  for (const id of owned) {
+    const { error } = await admin.auth.admin.deleteUser(id)
+    if (error && error.status !== 404) { console.error('Could not remove an owned authentication fixture.'); process.exitCode = 1 }
+  }
+  console.log(passes + ' auth checks passed')
+})

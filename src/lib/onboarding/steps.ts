@@ -87,12 +87,16 @@ export const TOPIC_STATUS_OPTIONS: { value: 'current' | 'recent'; label: string 
   { value: 'recent', label: 'Covered before' },
 ]
 
-export const STARTING_STAGES: { value: Stage; label: string; needsTopics: boolean }[] = [
-  { value: 'starting_fresh', label: 'Starting fresh', needsTopics: false },
-  { value: 'first_pass_underway', label: 'First pass underway', needsTopics: false },
-  { value: 'most_of_first_pass', label: 'Most of first pass complete', needsTopics: false },
-  { value: 'revising_or_mocks', label: 'Revising or taking mocks', needsTopics: true },
-  { value: 'retaking', label: 'Retaking', needsTopics: true },
+/**
+ * The fast route. `tile` is what the student sees; `most_of_first_pass` is a saved answer from before and
+ * still displays and saves, but is no longer offered (it reads as "some subjects covered").
+ */
+export const STARTING_STAGES: { value: Stage; label: string; needsTopics: boolean; tile: boolean }[] = [
+  { value: 'starting_fresh', label: 'Starting fresh', needsTopics: false, tile: true },
+  { value: 'first_pass_underway', label: 'Some subjects covered', needsTopics: false, tile: true },
+  { value: 'revising_or_mocks', label: 'First pass complete', needsTopics: true, tile: true },
+  { value: 'retaking', label: 'Retaking or back after a break', needsTopics: true, tile: true },
+  { value: 'most_of_first_pass', label: 'Most of first pass complete', needsTopics: false, tile: false },
 ]
 
 /** Where a saved link to a retired step should land. */

@@ -2,7 +2,7 @@ import { forwardRef } from 'react'
 
 /**
  * One card, replacing six independent declarations whose padding varied
- * 16/18/20/22/24/28px (`.log-card`, `.dashboard-hero-card`, `.source-card`,
+ * 16/18/20/22/24/28px (`.log-card`, `.attempt-row`,
  * `.review-queue__card`, `.purpose-card`, `.verdict`).
  *
  * `accent` covers the 3px left-border pattern that recurs across the calendar,

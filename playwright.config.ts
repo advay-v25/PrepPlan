@@ -10,6 +10,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env.local') });
 
 export default defineConfig({
   testDir: './tests/e2e',
+  testIgnore: '**/lifecycle/**',   // the lifecycle browser proof has its own config (playwright.lifecycle.config.ts)
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

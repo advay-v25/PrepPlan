@@ -1,5 +1,6 @@
 import { observationVerdict, type Level, type ObsVerdict } from '../curriculum/confidence'
 import { timingClass, readAnswer, type TimingClass, type Reading } from './attemptTiming'
+import { studyGuidance, type Guidance } from '../study/guidance'
 
 /**
  * Result analysis (pure). Turns one scored attempt into an honest account of what it showed:
@@ -137,13 +138,14 @@ export function analyseAttempt(rows: RespRow[], meta: Map<string, ItemMeta>): An
 // ---------------------------------------------------------------------------------------------
 
 export type OutcomeStatus = { outcomeId: string; readingId: string; subjectId: string; title: string; verdict: ObsVerdict | 'none'; band: string; correctHere: number; askedHere: number }
-export type ReadingEdge = { from: string; to: string; kind: 'prerequisite' | 'reinforces' | 'applied_in'; basis: 'concept_link' | 'sequence' }
+/** `concept_link` = a curated, verified relationship (it carries a written rationale). `sequence` = reading order only: navigation, never a prerequisite or a prediction. */
+export type ReadingEdge = { from: string; to: string; kind: 'prerequisite' | 'reinforces' | 'applied_in'; basis: 'concept_link' | 'sequence'; rationale?: string | null }
 
 export type SwotItem = { text: string; outcomeId?: string; readingId?: string; basis: 'evidence' | 'inferred'; support: string }
-export type Swot = { strengths: SwotItem[]; weaknesses: SwotItem[]; opportunities: SwotItem[]; threats: SwotItem[]; observedSuccesses: SwotItem[]; toVerify: SwotItem[] }
+export type Swot = { strengths: SwotItem[]; weaknesses: SwotItem[]; opportunities: SwotItem[]; threats: SwotItem[]; observedSuccesses: SwotItem[]; toVerify: SwotItem[]; navigation: SwotItem[] }
 
 export function buildSwot(input: { outcomes: OutcomeStatus[]; edges: ReadingEdge[]; readingName: (id: string) => string }): Swot {
-  const swot: Swot = { strengths: [], weaknesses: [], opportunities: [], threats: [], observedSuccesses: [], toVerify: [] }
+  const swot: Swot = { strengths: [], weaknesses: [], opportunities: [], threats: [], observedSuccesses: [], toVerify: [], navigation: [] }
   const tested = input.outcomes.filter(o => o.askedHere > 0)
 
   for (const o of tested) {
@@ -159,23 +161,29 @@ export function buildSwot(input: { outcomes: OutcomeStatus[]; edges: ReadingEdge
   const weakReadings = new Set(swot.weaknesses.map(w => w.readingId!).filter(Boolean))
   const strongReadings = new Set(swot.strengths.map(s => s.readingId!).filter(Boolean))
   const seen = new Set<string>()
-  // Threats: readings that build on a demonstrated weakness (inferred; not new wrong answers).
+  const why = (e: ReadingEdge) => (e.rationale ? ` ${e.rationale}` : '')
   for (const e of input.edges) {
-    if (weakReadings.has(e.from) && !weakReadings.has(e.to)) {
+    if (e.basis === 'sequence') {
+      // Reading order helps navigation only. It cannot establish a prerequisite or predict a weakness.
+      if (strongReadings.has(e.from) && !strongReadings.has(e.to) && !weakReadings.has(e.to)) {
+        const key = `n:${e.from}>${e.to}`; if (seen.has(key)) continue; seen.add(key)
+        swot.navigation.push({ text: input.readingName(e.to), readingId: e.to, basis: 'inferred', support: `Comes after ${input.readingName(e.from)} in the curriculum order. This only helps you find it; it does not mean it depends on it.` })
+      }
+      continue
+    }
+    // Threats: readings that depend on a demonstrated weakness through a verified curriculum link (not new wrong answers).
+    if (weakReadings.has(e.from) && !weakReadings.has(e.to) && e.kind !== 'reinforces') {
       const key = `t:${e.from}>${e.to}`; if (seen.has(key)) continue; seen.add(key)
       swot.threats.push({ text: input.readingName(e.to), readingId: e.to, basis: 'inferred',
-        support: `${e.basis === 'concept_link' ? 'It builds on' : 'It follows'} ${input.readingName(e.from)}, where a weakness showed. Inferred from the curriculum's own ${e.basis === 'concept_link' ? 'dependency link' : 'reading order'}; you have not been tested on it here.` })
+        support: `It ${e.kind === 'applied_in' ? 'applies' : 'builds on'} ${input.readingName(e.from)}, where a weakness showed.${why(e)} Worth watching; you have not been tested on it here.` })
     }
-    // Opportunities: readings that build on something demonstrated (inferred; competence is not assumed).
+    // Opportunities: related applications of something demonstrated, to check next (competence is not assumed).
     if (strongReadings.has(e.from) && !strongReadings.has(e.to) && !weakReadings.has(e.to)) {
       const key = `o:${e.from}>${e.to}`; if (seen.has(key)) continue; seen.add(key)
       swot.opportunities.push({ text: input.readingName(e.to), readingId: e.to, basis: 'inferred',
-        support: `${input.readingName(e.from)} held up, and ${input.readingName(e.to)} ${e.basis === 'concept_link' ? 'builds on it' : 'comes next'}. This is a place to try next, not evidence that you already know it.` })
+        support: `${input.readingName(e.from)} held up, and ${input.readingName(e.to)} ${e.kind === 'reinforces' ? 'reinforces it' : e.kind === 'applied_in' ? 'applies it' : 'builds on it'}.${why(e)} A place to check next, not evidence that you already know it.` })
     }
   }
-  // Concept links first: they are stronger evidence of dependency than reading order.
-  const rank = (i: SwotItem) => (i.support.includes('dependency link') || i.support.includes('builds on it') ? 0 : 1)
-  swot.threats.sort((a, b) => rank(a) - rank(b)); swot.opportunities.sort((a, b) => rank(a) - rank(b))
   return swot
 }
 
@@ -207,4 +215,107 @@ export function prioritiseRepairs(cands: RepairCandidate[]): RepairItem[] {
       },
     }
   })
+}
+
+// ---------------------------------------------------------------------------------------------
+// Findings and the next action
+// ---------------------------------------------------------------------------------------------
+
+export type FindingKind = 'misconception' | 'provisional' | 'timing' | 'omitted' | 'interrupted'
+export type FindingAction = 'repair' | 'fresh_check' | 'timed_practice' | 'pending' | 'none'
+export type Finding = {
+  kind: FindingKind
+  title: string
+  /** What the pattern does and does not show. */
+  interpretation: string
+  /** How many questions this finding rests on. One observation is stated as one observation. */
+  observations: number
+  outcomeIds: string[]
+  action: FindingAction
+  /** What to do about it, in plain words. */
+  response: string
+  /** Practical study method for the student's own materials; observed, possible and self-reported kept apart. */
+  guidance?: Guidance
+  /** Timing finding only: an explicit reading scope for timed practice, and whether the shared decision allows it now. */
+  practice?: { readingId: string; outcomeIds: string[]; state: string; deliverable: number; minutes: number; message: string | null } | null
+}
+
+const support = (n: number) => `Based on ${n} question${n === 1 ? '' : 's'}${n === 1 ? ' — a second would confirm or clear it' : ''}.`
+
+/**
+ * The four patterns, each with its own meaning and response (pure):
+ *  - correct but uncertain  → provisional evidence; a fresh check;
+ *  - incorrect and confident → possible misconception, grounded in the chosen distractor's recorded diagnosis;
+ *  - repeatedly correct but slow → a possible timing issue, separate from concept repair;
+ *  - unanswered / interrupted → recorded as omissions or interruptions; the conceptual cause stays unknown.
+ */
+export function buildFindings(input: {
+  tagged: Tagged[]
+  /** Distractor evidence per item (the diagnosis of the option the student chose), when the item has one. */
+  distractor: (itemId: string) => { label: string | null; description: string | null } | null
+  outcomeTitle: (id: string) => string
+  omitted: { itemId: string; outcomeId: string | null }[]
+}): Finding[] {
+  const out: Finding[] = []
+  const group = (rows: Tagged[]) => { const m = new Map<string, Tagged[]>(); for (const r of rows) { const k = r.outcomeId ?? '(unmapped)'; m.set(k, [...(m.get(k) ?? []), r]) } return m }
+
+  for (const [oid, rows] of group(input.tagged.filter(t => t.tags.includes('confident_mistake')))) {
+    const ev = rows.map(r => input.distractor(r.itemId)).find(d => d && (d.description || d.label))
+    out.push({
+      kind: 'misconception', title: oid === '(unmapped)' ? 'A confident mistake on an unmapped question' : input.outcomeTitle(oid), outcomeIds: oid === '(unmapped)' ? [] : [oid], observations: rows.length,
+      interpretation: `Possible misconception: you were sure and wrong. ${ev ? `The option you chose points to ${ev.label ?? 'a specific error'}${ev.description ? ` — ${ev.description}` : ''}. ` : ''}${support(rows.length)}`,
+      action: 'repair', response: 'Preview targeted repair work, then re-check with different questions.',
+      guidance: studyGuidance({ signal: 'misconception', scope: oid === '(unmapped)' ? 'this question’s topic' : input.outcomeTitle(oid), observed: 'sure, and wrong', possibleCause: ev?.description ?? null, observations: rows.length }),
+    })
+  }
+  for (const [oid, rows] of group(input.tagged.filter(t => t.tags.includes('correct_guess')))) {
+    out.push({
+      kind: 'provisional', title: oid === '(unmapped)' ? 'Correct but unsure' : input.outcomeTitle(oid), outcomeIds: oid === '(unmapped)' ? [] : [oid], observations: rows.length,
+      interpretation: `Correct but uncertain: provisional evidence, not counted as mastery. ${support(rows.length)}`,
+      action: 'fresh_check', response: 'Check it again with fresh questions you have not seen.',
+      guidance: studyGuidance({ signal: 'fragile_correct', scope: oid === '(unmapped)' ? 'this question’s topic' : input.outcomeTitle(oid), observations: rows.length }),
+    })
+  }
+  const slow = input.tagged.filter(t => t.tags.includes('slow_correct'))
+  const slowByOutcome = [...group(slow)].filter(([, r]) => r.length >= 2)
+  if (slow.length >= 3 || slowByOutcome.length > 0) {
+    out.push({
+      kind: 'timing', title: 'Correct, but slow', outcomeIds: [...new Set(slow.flatMap(t => t.outcomeId ? [t.outcomeId] : []))], observations: slow.length,
+      interpretation: `Repeatedly correct but slow: a possible timing issue, not a concept gap. Slow time is judged against each question's own type. ${support(slow.length)}`,
+      action: 'timed_practice', response: 'Practise these under a time limit, separately from concept repair.',
+      guidance: studyGuidance({ signal: 'slow_correct', scope: 'the questions you answered correctly but slowly', observations: slow.length }),
+    })
+  }
+  if (input.omitted.length > 0) {
+    out.push({
+      kind: 'omitted', title: 'Not answered', outcomeIds: [...new Set(input.omitted.flatMap(o => o.outcomeId ? [o.outcomeId] : []))], observations: input.omitted.length,
+      interpretation: `${input.omitted.length} question${input.omitted.length === 1 ? ' was' : 's were'} left unanswered, so there is no confidence for ${input.omitted.length === 1 ? 'it' : 'them'}. The omission is recorded; why it happened is unknown, and it is not counted as a wrong answer.`,
+      action: 'pending', response: 'These outcomes stay untested until a later paper.',
+    })
+  }
+  const interrupted = input.tagged.filter(t => t.tags.includes('interrupted'))
+  if (interrupted.length > 0) {
+    out.push({
+      kind: 'interrupted', title: 'Interrupted time', outcomeIds: [], observations: interrupted.length,
+      interpretation: `Time was interrupted on ${interrupted.length} question${interrupted.length === 1 ? '' : 's'}. Interrupted time is not held against you and does not change what the answer shows.`,
+      action: 'none', response: 'No action needed.',
+    })
+  }
+  return out
+}
+
+export type NextAction = { kind: 'repair' | 'fresh_check' | 'timed_practice' | 'further_paper' | 'continue'; title: string; why: string; cta: string; href: string }
+
+/** The single most useful next step, in order of value. Detailed analysis sits behind it. */
+export function chooseNextAction(input: { findings: Finding[]; repairCount: number; furtherPaper: boolean; hasRepairOpen: boolean }): NextAction {
+  const f = (k: FindingKind) => input.findings.find(x => x.kind === k)
+  const mis = input.findings.filter(x => x.kind === 'misconception')
+  if (input.repairCount > 0 || mis.length > 0) {
+    const n = Math.max(input.repairCount, mis.length)
+    return { kind: 'repair', title: `Plan repair work for ${n} area${n === 1 ? '' : 's'}`, why: 'These are genuine gaps or confident mistakes. Preview the work, the days it would take and what it would displace, then confirm only if it fits.', cta: 'Preview repair work', href: '#proposal-h' }
+  }
+  if (f('provisional')) return { kind: 'fresh_check', title: 'Check the uncertain answers again', why: 'You were right but unsure, which is provisional evidence. A fresh check turns it into evidence or shows a gap.', cta: 'See what to re-check', href: '#findings-h' }
+  if (f('timing')) return { kind: 'timed_practice', title: 'Add some timed practice', why: 'You were correct but slow on several questions. That is a speed question, separate from understanding.', cta: 'See the timing finding', href: '#findings-h' }
+  if (input.furtherPaper) return { kind: 'further_paper', title: 'Cover the rest of this week’s scope', why: 'Some confirmed outcomes were not asked in this paper. A further paper uses different questions.', cta: 'See what is untested', href: '#scope-h2' }
+  return { kind: 'continue', title: 'Nothing urgent — continue your plan', why: 'No gap or confident mistake showed in this paper. Keep to your Calendar and widen the scope of the next paper rather than re-testing what held.', cta: 'Open Calendar', href: '/app/calendar' }
 }

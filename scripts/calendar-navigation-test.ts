@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { calendarTaskHref, calendarSelectionHref, findCalendarTask } from '../src/lib/routing/calendar'
+import { calendarTaskHref, calendarSelectionHref, calendarOccupantHref, findCalendarTask } from '../src/lib/routing/calendar'
 
 const href = new URL(calendarTaskHref('task/with ? punctuation', '2026-10-13'), 'https://roadmap.test')
 assert.equal(href.pathname, '/app/calendar')
@@ -14,6 +14,13 @@ assert.equal(opened.searchParams.get('task'), 'repair-1')
 assert.equal(calendarSelectionHref(opened.search.slice(1), null), '/app/calendar?week=2026-10-12&view=week')
 assert.equal(calendarSelectionHref('task=old', null), '/app/calendar')
 assert.equal(new URL(calendarSelectionHref('task=old', 'new'), 'https://roadmap.test').searchParams.get('task'), 'new')
+assert.equal(new URL(calendarSelectionHref('entry=old', 'new'), 'https://roadmap.test').searchParams.has('entry'), false)
+for (const [id,kind,param,value] of [['mock:abc','mock','appointment','abc'],['series@2026-10-13','class','entry','series@2026-10-13'],['task/1','task','task','task/1']]) {
+  const destination = new URL(calendarOccupantHref(id,kind,'2026-10-13'),'https://roadmap.test')
+  assert.equal(destination.searchParams.get(param),value)
+  assert.equal(destination.searchParams.get('week'),'2026-10-13')
+  assert.equal(destination.searchParams.get('view'),'agenda')
+}
 
 const entries = [
   { id: 'task-1', isTask: true, revision: 1 },

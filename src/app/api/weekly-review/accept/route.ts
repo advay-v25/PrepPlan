@@ -1,37 +1,31 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
-import { acceptWeeklyReview, RESOLUTIONS, type Resolution } from '../../../../lib/planning/weeklyReview/service'
+import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
+import { acceptWeeklyTransition } from '../../../../lib/planning/weeklyReview/service'
 
 export const dynamic = 'force-dynamic'
 
+const STATUS = { stale: 409, unavailable: 409, already_closed: 409, access: 403, not_found: 404, invalid: 400, failed: 503 } as const
+
 /**
- * Explicit confirmation. POST only — no render or prefetch can close a week.
- * Body: { cycleId, resolutions: {taskId: 'completed'|'skipped'|'deferred'|'unknown'},
- *         previewFingerprint, acknowledgeNoPaper? }
+ * Explicit confirmation. POST only: no render or prefetch can close a week.
+ * Body: { draftId }. The request names a saved review and never carries task rows.
  */
 export async function POST(request: Request) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
 
   const body = await request.json().catch(() => null) as any
-  const resolutions = body?.resolutions
-  const valid = body && typeof body.cycleId === 'string' && typeof body.previewFingerprint === 'string'
-    && resolutions && typeof resolutions === 'object' && !Array.isArray(resolutions)
-    && Object.values(resolutions).every(v => RESOLUTIONS.includes(v as Resolution))
-  if (!valid) return NextResponse.json({ ok: false, error: 'Invalid request.' }, { status: 400 })
+  if (!body || typeof body.draftId !== 'string') return NextResponse.json({ ok: false, error: 'Invalid request.' }, { status: 400 })
 
   const requestId = crypto.randomUUID()
   try {
-    const result = await acceptWeeklyReview(supabase, user.id, {
-      cycleId: body.cycleId, resolutions, previewFingerprint: body.previewFingerprint,
-      acknowledgeNoPaper: body.acknowledgeNoPaper === true,
-    })
-    if (result.ok) return NextResponse.json({ ...result, requestId, nextUrl: '/app/calendar' })
-    const status = result.code === 'failed' ? 500 : result.code === 'invalid' ? 400 : 409
-    return NextResponse.json({ ...result, requestId }, { status })
+    const result = await acceptWeeklyTransition(supabase, body.draftId)
+    if (result.ok) return NextResponse.json({ ...result, requestId, nextUrl: '/app/calendar?reviewed=1' })
+    return NextResponse.json({ ...result, requestId }, { status: STATUS[result.code] })
   } catch (error) {
     console.error(`[weekly-review/accept ${requestId}]`, error)
-    return NextResponse.json({ ok: false, code: 'failed', message: 'Could not close the week. Nothing was changed.', requestId }, { status: 500 })
+    return NextResponse.json({ ok: false, code: 'failed', message: 'Save not confirmed. Check your current week before trying again.', requestId }, { status: 503 })
   }
 }

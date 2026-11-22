@@ -3,6 +3,8 @@ import { OperatingStateRepository } from './operatingStateRepository'
 import { computeWeekExecution } from './weekExecutionReducer'
 import { computeEvidencePulse } from './evidencePulseReducer'
 import { computeAttentionQueue } from './attentionReducer'
+import { countRecoveryOverlaps, latestClassChangeKey } from '../planning/classRecovery'
+import { listOwedClassWork } from '../planning/classlog/carry'
 import { selectNextAction } from './nextActionSelector'
 import { deriveActivation } from './derive'
 import { getStudyWeekContext } from '../planning/schedule'
@@ -10,6 +12,11 @@ import { OperatingState, PlanBlock } from './types'
 import { getTestsBridge, mergeTestsBridge } from '../signals/operatingBridge'
 import { getActiveRoadmap } from '../curriculum/roadmapService'
 import { calendarTaskHref } from '../routing/calendar'
+import { buildWork } from './homeModel'
+import { coachProposalHref, coachRepairHref } from '../coach/selection'
+import { controlForPaperTask, controlForRecheck } from './assessmentControl'
+import { planRepairCheck } from '../tests/repairCheck'
+import { getCurrentWeekPlanState } from '../planning/currentWeek/service'
 
 export async function getCurrentOperatingState(userId: string): Promise<OperatingState> {
   const supabase = await createClient()
@@ -23,7 +30,6 @@ export async function getCurrentOperatingState(userId: string): Promise<Operatin
     roadmapResult,
     activeCycle,
     latestDraft,
-    todayBlocksData,
     protectedCommitmentsData,
     recentEvidenceData,
     openRepairsData,
@@ -40,7 +46,6 @@ export async function getCurrentOperatingState(userId: string): Promise<Operatin
     getActiveRoadmap(userId),
     repo.getActiveCycle(),
     repo.getLatestPlanDraft(),
-    repo.getTodayBlocks(studyWeek.today),
     repo.getProtectedCommitments(studyWeek.today),
     repo.getRecentEvidence(),
     repo.getOpenRepairs(),
@@ -80,14 +85,22 @@ export async function getCurrentOperatingState(userId: string): Promise<Operatin
     durationMinutes: b.duration_minutes || 0,
     placement: b.placement || 'day_preferred',
     startsAt: b.starts_at || null,
-    execution: b.execution || 'not_started'
+    execution: b.execution || 'not_started',
+    rationale: b.rationale ?? null,
+    localDate: b.local_date ?? null,
+    repairThreadId: b.repair_thread_id ?? null,
+    follows: Array.isArray(b.dependencies) ? b.dependencies.filter((x: unknown): x is string => typeof x === 'string') : [],
+    sittingOrdinal: typeof b.sitting_ordinal === 'number' ? b.sitting_ordinal : null,
   })
 
-  const todayBlocks: PlanBlock[] = (todayBlocksData ?? []).map(normalizeBlock)
+  // One read of the cycle's blocks feeds everything: today's list, overdue work and undated work. (Today's list used to be a
+  // separate date-only query, which could never see overdue or undated tasks.)
   const cycleBlocks: (PlanBlock & { localDate: string })[] = (cycleBlocksData ?? []).map((b: any) => ({
     ...normalizeBlock(b),
     localDate: b.local_date
   }))
+  const todayBlocks: PlanBlock[] = cycleBlocks.filter(b => b.localDate === studyWeek.today)
+  const work = buildWork(cycleBlocks, cycleTaskEvents ?? [], studyWeek.today, Date.now(), studyWeek.timezone)
 
   const protectedCommitments = (protectedCommitmentsData ?? []).map((c: any) => ({
     id: c.id,
@@ -119,7 +132,7 @@ export async function getCurrentOperatingState(userId: string): Promise<Operatin
       id: r.id,
       revision: 0,
       availability: 'available' as const,
-      destination: '/app/coach',
+      destination: coachRepairHref(r.id),
       permittedCommands: [],
       conceptName: r.concept_id || 'Unknown', // Ideally fetched via join
       createdAt: r.created_at
@@ -128,7 +141,7 @@ export async function getCurrentOperatingState(userId: string): Promise<Operatin
       id: p.id,
       revision: 0,
       availability: 'available' as const,
-      destination: '/app/coach',
+      destination: coachProposalHref(p.id),
       permittedCommands: ['accept_proposal', 'reject_proposal'],
       title: p.title,
       summary: p.summary
@@ -204,7 +217,8 @@ export async function getCurrentOperatingState(userId: string): Promise<Operatin
     },
     
     execution,
-    
+    work,
+
     papers: {
       availablePapers: [],
       activeReservation: null
@@ -246,6 +260,35 @@ export async function getCurrentOperatingState(userId: string): Promise<Operatin
   if (state.cycle) {
     state.cycle = { ...state.cycle, closureState: state.capabilities.canCloseWeek ? 'closure_ready' : 'active' }
   }
+
+  // System assessment tasks get their own control (start, resume, result, waiting, unavailable) from the sources Tests uses.
+  if (state.work) {
+    state.work = { ...state.work, open: await Promise.all(state.work.open.map(async t => {
+      if (t.taskType === 'diagnostic') return { ...t, assessmentControl: controlForPaperTask(state.assessment) }
+      if (t.taskType === 'recheck') return { ...t, assessmentControl: controlForRecheck(await planRepairCheck(userId, t.id).catch(() => null), t.destination) }
+      return t
+    })) }
+  }
+
+  // The canonical state of an empty accepted week, for Home and Calendar. Only read when the cycle holds no planned work.
+  if (activeCycle && cycleBlocks.length === 0) {
+    try { state.weekPlan = await getCurrentWeekPlanState(userId) } catch { state.integrity.partialServiceFailure = [...state.integrity.partialServiceFailure, 'week plan'] }
+  }
+
+  // Work still overlapping a class or booking after a saved class change stays an open decision until the student reviews it.
+  if (activeCycle) {
+    try {
+      const overlaps = await countRecoveryOverlaps(userId)
+      const changeKey = overlaps > 0 ? await latestClassChangeKey(userId) : null
+      if (changeKey) state.classRecovery = { overlaps, changeKey }
+    } catch { state.integrity.partialServiceFailure = [...state.integrity.partialServiceFailure, 'class changes'] }
+  }
+
+  // Class follow-up minutes that never received a task stay an open obligation across cycles until they are placed and done.
+  try {
+    const owed = await listOwedClassWork(userId)
+    if (owed.length) state.classFollowUp = { minutes: owed.reduce((n, o) => n + o.remainingMinutes, 0), items: owed.map(o => ({ title: o.title, remainingMinutes: o.remainingMinutes })) }
+  } catch { state.integrity.partialServiceFailure = [...state.integrity.partialServiceFailure, 'class follow-up'] }
 
   // 6. Compute derived queues via selectors/reducers
   state.attention = computeAttentionQueue(state)

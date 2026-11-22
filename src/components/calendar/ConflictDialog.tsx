@@ -1,17 +1,11 @@
 'use client'
 
+import { clockTime as timeLabel } from '../../lib/format/date'
 import { useRef } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Dialog } from '../ui/Dialog'
 import type { ConflictInfo } from './useTaskMutation'
 
-function timeLabel(minutes: number) {
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  const suffix = h < 12 ? 'am' : 'pm'
-  const hour12 = h % 12 === 0 ? 12 : h % 12
-  return m === 0 ? `${hour12}${suffix}` : `${hour12}:${String(m).padStart(2, '0')}${suffix}`
-}
 
 /**
  * Refusing a drop without saying where it could go leaves the student to hunt
@@ -45,11 +39,11 @@ export function ConflictDialog({
       initialFocusRef={firstRef}
       footer={
         <>
-          <button ref={!info.suggestions.length || !onPick ? firstRef : undefined} className="secondary-button" onClick={onClose}>
+          <button type="button" ref={!info.suggestions.length || !onPick ? firstRef : undefined} className="secondary-button" onClick={onClose}>
             {onConfirm ? 'Cancel' : 'Leave it where it was'}
           </button>
           {onConfirm && (
-            <button className="primary-button" onClick={() => onConfirm()}>{confirmLabel ?? 'Continue'}</button>
+            <button type="button" className="primary-button" onClick={() => onConfirm()}>{confirmLabel ?? 'Continue'}</button>
           )}
         </>
       }
@@ -59,18 +53,20 @@ export function ConflictDialog({
           {info.conflicts.map((c, i) => (
             <li key={i}>
               <strong>{c.title}</strong>
-              <small>{c.overlapMinutes} minutes of overlap</small>
+              {c.overlapMinutes > 0 && <small>{c.overlapMinutes} minutes of overlap</small>}
+              {c.href && <a className="prose-link" href={c.href}>Open {c.title}</a>}
             </li>
           ))}
         </ul>
       )}
+      {onConfirm && <p className="fine-print">This applies only to this placement. Your saved study windows and usual sitting limit stay the same.</p>}
 
       {info.suggestions.length > 0 && onPick && (
         <>
           <h3 className="conflict-dialog__subhead">Nearest free slots</h3>
           <div className="conflict-slots">
             {info.suggestions.map((s, i) => (
-              <button
+              <button type="button"
                 key={i}
                 ref={i === 0 ? firstRef : undefined}
                 className="conflict-slot"

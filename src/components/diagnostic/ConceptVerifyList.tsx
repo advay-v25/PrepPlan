@@ -14,6 +14,7 @@ export type ConceptRow = {
   scopeNotes: string | null
   exclusions: string | null
   verified: boolean
+  scopeHash: string
   itemsAwaitingReview: number
 }
 
@@ -34,18 +35,30 @@ export function ConceptVerifyList({ rows }: { rows: ConceptRow[] }) {
 
   const modules = [...new Set(rows.map(r => r.module))]
 
-  async function setVerified(id: string, verified: boolean) {
+  const [why, setWhy] = useState<Record<string, string>>({})
+  const [read, setRead] = useState<Record<string, boolean>>({})
+  // One key per open decision, so a lost response retried here replays instead of recording a second sign-off.
+  const [keys] = useState<Record<string, string>>({})
+
+  async function setVerified(row: ConceptRow, verified: boolean) {
+    const id = row.id
     setBusy(id)
     setError('')
+    // The key names this exact request; a changed reason or scope is a new request and gets a new key.
+    const kk = `${id}:${verified}:${row.scopeHash}:${why[id] ?? ''}`
+    keys[kk] ??= crypto.randomUUID()
     try {
       const res = await fetch(`/api/curriculum/concepts/${encodeURIComponent(id)}/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ verified }),
+        body: JSON.stringify({ decision: verified ? 'verify' : 'withdraw', expectedScopeHash: row.scopeHash, rationale: why[id] ?? '', confirmScope: verified ? read[id] === true : undefined, requestKey: keys[kk] }),
       })
       const data = await res.json()
-      if (data.ok) { setState(prev => ({ ...prev, [id]: verified })); router.refresh() }
-      else setError(data.error || 'Could not update that concept')
+      if (data.ok) {
+        delete keys[kk]
+        setState(prev => ({ ...prev, [id]: verified })); router.refresh()
+        if (!verified && data.approvedItemsStillLive > 0) setError(`Sign-off withdrawn. ${data.approvedItemsStillLive} approved question${data.approvedItemsStillLive === 1 ? '' : 's'} for this concept remain published until a reviewer retires them in the question queue.`)
+      } else setError(data.error || 'Could not update that concept')
     } catch {
       setError('Network error')
     }
@@ -81,7 +94,7 @@ export function ConceptVerifyList({ rows }: { rows: ConceptRow[] }) {
               const isOpen = open.has(row.id)
               return (
                 <article key={row.id} className={`review-item ${isVerified ? 'is-correct' : ''}`}>
-                  <button className="review-item__head" onClick={() => toggle(row.id)} aria-expanded={isOpen}>
+                  <button type="button" className="review-item__head" onClick={() => toggle(row.id)} aria-expanded={isOpen}>
                     <span className={`review-mark ${isVerified ? 'is-correct' : 'is-pending'}`} aria-hidden>
                       {isVerified ? <Check size={14} /> : null}
                     </span>
@@ -94,7 +107,7 @@ export function ConceptVerifyList({ rows }: { rows: ConceptRow[] }) {
                         {row.itemsAwaitingReview > 0 && (
                           <span className={isVerified ? '' : 'review-item__error'}>
                             {row.itemsAwaitingReview} item{row.itemsAwaitingReview === 1 ? '' : 's'}
-                            {isVerified ? ' awaiting review' : ' blocked from gold'}
+                            {isVerified ? ' awaiting review' : ' blocked from publication'}
                           </span>
                         )}
                       </span>
@@ -122,21 +135,29 @@ export function ConceptVerifyList({ rows }: { rows: ConceptRow[] }) {
                         </div>
                       )}
 
-                      <div className="review-item__foot">
+                      <div className="review-item__foot" style={{ flexWrap: 'wrap', gap: 8 }}>
+                        <label className="fine-print" style={{ flexBasis: '100%' }}>Why (recorded with your name and the exact scope above)
+                          <input className="field" style={{ width: '100%' }} value={why[row.id] ?? ''} onChange={e => setWhy(p => ({ ...p, [row.id]: e.target.value }))} maxLength={1000} />
+                        </label>
+                        {!isVerified && row.scopeNotes && (
+                          <label className="fine-print" style={{ flexBasis: '100%' }}>
+                            <input type="checkbox" checked={read[row.id] === true} onChange={e => setRead(p => ({ ...p, [row.id]: e.target.checked }))} /> I have read this exact scope and the exclusions, and it is correct.
+                          </label>
+                        )}
                         {isVerified ? (
-                          <button
+                          <button type="button"
                             className="text-button"
-                            onClick={() => setVerified(row.id, false)}
-                            disabled={busy === row.id}
+                            onClick={() => setVerified(row, false)}
+                            disabled={busy === row.id || (why[row.id] ?? '').trim().length < 8}
                           >
                             {busy === row.id ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <RotateCcw size={14} aria-hidden />}
                             Withdraw sign-off
                           </button>
                         ) : (
-                          <button
+                          <button type="button"
                             className="primary-button"
-                            onClick={() => setVerified(row.id, true)}
-                            disabled={busy === row.id || !row.scopeNotes}
+                            onClick={() => setVerified(row, true)}
+                            disabled={busy === row.id || !row.scopeNotes || !read[row.id] || (why[row.id] ?? '').trim().length < 8}
                           >
                             {busy === row.id ? <Loader2 size={16} className="animate-spin" aria-hidden /> : <Check size={16} aria-hidden />}
                             This scope is correct

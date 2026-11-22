@@ -3,12 +3,13 @@
  * 
  * Version 1.0 of the evidence policy.
  */
+import { isEvidenceGrade } from './itemState'
 
 export const EVIDENCE_POLICY_VERSION = '1.0'
 
 export type EvidenceMode = 'evidence' | 'practice'
 export type AssessmentPurpose = 'weekly' | 'module' | 'repair' | 'practice'
-export type ItemTrustTier = 'verified' | 'reviewed' | 'gold' | 'draft' | 'deprecated'
+export type ItemTrustTier = import('./itemState').ItemState
 export type ConceptEvidenceState = 'insufficient' | 'needs_repair' | 'unstable' | 'supported' | 'disputed' | 'voided'
 
 export interface EvidenceEvent {
@@ -30,10 +31,8 @@ export interface EvidenceEvent {
 export function determineEvidenceMode(purpose: AssessmentPurpose, items: { review_status: string }[]): EvidenceMode {
   if (purpose === 'practice') return 'practice'
   
-  // For evidence-grade, all items must be expert-reviewed.
-  const hasUnreviewedItems = items.some(
-    i => i.review_status !== 'reviewed' && i.review_status !== 'gold' && i.review_status !== 'verified'
-  )
+  // Evidence needs every item human reviewed; the scoring function in the database applies the same rule.
+  const hasUnreviewedItems = items.some(i => !isEvidenceGrade(i.review_status))
   
   return hasUnreviewedItems ? 'practice' : 'evidence'
 }

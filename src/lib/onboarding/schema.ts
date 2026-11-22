@@ -1,4 +1,6 @@
+import { isCalendarDate } from '../format/date'
 import { z } from 'zod'
+import { MOCK_KINDS, READING_STATES, UNCERTAINTY_LEVELS } from '../curriculum/entryContext'
 
 // ---------------------------------------------------------------------------
 // Shared time rules. Pure, so they are testable without a database, and used by
@@ -120,9 +122,29 @@ export type Stage = z.infer<typeof StageSchema>
 export const TopicStatusSchema = z.enum(['current', 'recent'])   // working on now / covered before
 export const TopicExposureSchema = z.record(z.string().min(1), TopicStatusSchema)
 
+// Optional refinements. Each is "unchanged" when omitted, so a client that does not send it cannot erase it:
+//   readingStates  single readings that differ from their topic's answer (not started / partly / covered)
+//   uncertainty    areas to revisit, independent of coverage; a topic missing here is "not answered", level 'none' is "nothing shaky"
+//   mock           an optional upcoming mock or checkpoint; null clears it
+export const UncertaintySchema = z.record(z.string().min(1), z.object({
+  level: z.enum(UNCERTAINTY_LEVELS),
+  lmIds: z.array(z.string().min(1)).max(80).default([]),
+}))
+export const MockSchema = z.object({
+  date: z.string().regex(DATE, 'Must be YYYY-MM-DD').refine(isCalendarDate, 'That is not a real date.'),
+  kind: z.enum(MOCK_KINDS),
+  // Optional timing, each "unchanged" when omitted and cleared by null. A date alone is a complete checkpoint.
+  label: z.string().trim().max(80).nullable().optional(),
+  startTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Use a time like 14:30').nullable().optional(),
+  durationMinutes: z.number().int().min(15).max(480).nullable().optional(),
+}).nullable()
+
 export const PositionSetupSchema = z.object({
   stage: StageSchema,
   topicExposure: TopicExposureSchema.default({}),
+  readingStates: z.record(z.string().min(1), z.enum(READING_STATES)).optional(),
+  uncertainty: UncertaintySchema.optional(),
+  mock: MockSchema.optional(),
 }).superRefine((d, ctx) => {
   const needsTopics = d.stage === 'revising_or_mocks' || d.stage === 'retaking'
   if (needsTopics && Object.keys(d.topicExposure).length === 0) {

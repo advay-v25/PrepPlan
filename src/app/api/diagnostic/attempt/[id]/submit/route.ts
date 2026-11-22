@@ -1,14 +1,17 @@
+import { routeFailure } from '../../../../../../lib/ops/routeFailure'
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../../../lib/supabase/server'
 import { EVIDENCE_POLICY_VERSION } from '../../../../../../lib/diagnostic/evidencePolicy'
+import { requireApplicationAccess } from '../../../../../../lib/auth/applicationAccess'
 
 /**
  * Scores an attempt and turns its responses into concept evidence atomically via RPC.
  */
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
   const { id: attemptId } = await params
 
@@ -29,7 +32,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     if (rpcErr.message.includes('No responses found')) {
       return NextResponse.json({ ok: false, error: 'Nothing has been answered yet' }, { status: 400 })
     }
-    return NextResponse.json({ ok: false, error: rpcErr.message }, { status: 500 })
+    return routeFailure('diagnostic.submit', 'Could not confirm submission. Try again to open the result or submit your saved answers.', rpcErr)
   }
 
   return NextResponse.json(result)

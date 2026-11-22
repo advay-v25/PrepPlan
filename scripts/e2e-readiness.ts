@@ -7,14 +7,15 @@
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local', quiet: true } as any)
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
+import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from './lib/e2eIdentity'
 import { createSession, completeOnboarding, makeCheck } from './lib/e2eSession'
 
 const { check, finish } = makeCheck()
+import { declareBank } from './lib/bankMode'
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
-const MANIFEST_ID = '11111111-1111-1111-1111-111111111111'
 
 async function main() {
+  await declareBank(admin, 'e2e-readiness', ['r028'])
   const s = createSession(admin, getE2EEmail())
   check('signed in', await s.signIn())
   const uid = await verifyAndGetE2EUser(admin)
@@ -38,10 +39,7 @@ async function main() {
   check('it never shows a readiness percentage or pass probability', !/pass probability|readiness score|\d+%\s*ready/i.test(htmlBefore))
 
   console.log('\nAfter a diagnostic answered wrong with high confidence')
-  const start = await s.post('/api/diagnostic/attempt', { manifestId: MANIFEST_ID, purpose: 'module_diagnostic', constraints: { maxQuestions: 6 },
-    // The assertions below are about FSA readings 27-29 and 33, so the diagnostic is scoped to them. Unscoped,
-    // it draws from whichever subjects the bank covers, which is no longer only FSA.
-    requestedScope: { modules: ['r027', 'r028', 'r029', 'r033'] } })
+  const start = await s.post('/api/tests/start', { kind: 'reading', readingId: 'r028', baseline: true })
   check('an attempt starts', start.body?.ok === true, JSON.stringify(start.body))
   const attemptId = start.body.attemptId
   for (let i = 0; i < 30; i++) {

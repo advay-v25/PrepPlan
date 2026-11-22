@@ -31,8 +31,12 @@ export function validateNoteDoc(input: unknown): { ok: true; doc: NoteDoc } | { 
       if (![1, 2, 3].includes(lvl)) return 'Unsupported heading level.'
     }
     if (node.type === 'text' && typeof node.text !== 'string') return 'Malformed text.'
+    if (node.attrs !== undefined && (node.attrs === null || typeof node.attrs !== 'object' || Array.isArray(node.attrs))) return 'Malformed content.'
+    if (node.marks !== undefined && !Array.isArray(node.marks)) return 'Malformed formatting.'
+    if (node.text !== undefined && node.type !== 'text') return 'Malformed content.'
     for (const m of node.marks ?? []) {
-      if (!m || !MARKS.has(m.type)) return `Unsupported formatting (${String(m?.type)}).`
+      if (!m || typeof m !== 'object' || typeof m.type !== 'string' || !MARKS.has(m.type)) return `Unsupported formatting (${String(m?.type)}).`
+      if (m.attrs !== undefined && (m.attrs === null || typeof m.attrs !== 'object' || Array.isArray(m.attrs))) return 'Malformed formatting.'
       if (m.type === 'link') {
         const href = m.attrs?.href
         if (typeof href !== 'string' || !SAFE_HREF.test(href.trim())) return 'Links must start with http://, https:// or mailto:.'
@@ -67,4 +71,11 @@ export function noteText(doc: NoteDoc): string {
   const walk = (n: NoteNode) => { if (n.text) out.push(n.text); n.content?.forEach(walk) }
   walk(doc as NoteNode)
   return out.join(' ')
+}
+
+/** Key-order-independent JSON (jsonb does not preserve key order), for comparing a stored note with a submitted one. */
+export function canonicalJson(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(canonicalJson).join(',')}]`
+  if (v && typeof v === 'object') return `{${Object.keys(v as object).sort().map(k => `${JSON.stringify(k)}:${canonicalJson((v as any)[k])}`).join(',')}}`
+  return JSON.stringify(v)
 }

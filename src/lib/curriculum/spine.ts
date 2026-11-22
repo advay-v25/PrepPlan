@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createAdminClient } from '../supabase/admin'
 
 /**
@@ -27,8 +28,8 @@ export type ReadingDetail = ReadingCard & {
 export async function getSubjects(): Promise<SubjectSummary[]> {
   const admin = createAdminClient()
   const [{ data: topics }, { data: readings }] = await Promise.all([
-    admin.from('topics').select('id, name, summary, exam_weight_min, exam_weight_max, default_sequence').order('default_sequence'),
-    admin.from('curriculum_readings').select('topic_id, page_count, structure_pending').eq('is_active', true),
+    admin.from('topics').select('id, name, summary, exam_weight_min, exam_weight_max, default_sequence').order('default_sequence').throwOnError(),
+    admin.from('curriculum_readings').select('topic_id, page_count, structure_pending').eq('is_active', true).throwOnError(),
   ])
   return (topics ?? []).map(t => {
     const rs = (readings ?? []).filter(r => r.topic_id === t.id)
@@ -41,14 +42,16 @@ export async function getSubjects(): Promise<SubjectSummary[]> {
   })
 }
 
-export async function getSubjectReadings(subjectId: string): Promise<{ subject: SubjectSummary; readings: ReadingCard[] } | null> {
+export const getSubjectReadings = cache(async (subjectId: string): Promise<{ subject: SubjectSummary; readings: ReadingCard[] } | null> => {
   const admin = createAdminClient()
   const subject = (await getSubjects()).find(s => s.id === subjectId)
   if (!subject) return null
-  const [{ data: readings }, { data: los }, { data: mods }] = await Promise.all([
-    admin.from('curriculum_readings').select('*').eq('topic_id', subjectId).eq('is_active', true).order('sequence'),
-    admin.from('reading_los').select('reading_id'),
-    admin.from('reading_modules').select('reading_id'),
+  const { data: readings } = await admin.from('curriculum_readings').select('*').eq('topic_id', subjectId).eq('is_active', true).order('sequence').throwOnError()
+  const ids = (readings ?? []).map(r => r.id)
+  if (!ids.length) return { subject, readings: [] }
+  const [{ data: los }, { data: mods }] = await Promise.all([
+    admin.from('reading_los').select('reading_id').in('reading_id', ids).throwOnError(),
+    admin.from('reading_modules').select('reading_id').in('reading_id', ids).throwOnError(),
   ])
   const count = (rows: { reading_id: unknown }[] | null, id: string) => (rows ?? []).filter(r => r.reading_id === id).length
   return {
@@ -60,17 +63,18 @@ export async function getSubjectReadings(subjectId: string): Promise<{ subject: 
       structurePending: Boolean(r.structure_pending), outcomeCount: count(los, r.id as string), moduleCount: count(mods, r.id as string),
     })),
   }
-}
+})
 
-export async function getReading(subjectId: string, readingId: string): Promise<ReadingDetail | null> {
+export const getReading = cache(async (subjectId: string, readingId: string): Promise<ReadingDetail | null> => {
   const admin = createAdminClient()
-  const { data: r } = await admin.from('curriculum_readings').select('*').eq('id', readingId).eq('topic_id', subjectId).maybeSingle()
+  const { data: r, error: readError } = await admin.from('curriculum_readings').select('*').eq('id', readingId).eq('topic_id', subjectId).eq('is_active', true).maybeSingle()
+  if (readError) throw new Error('The reading could not be read.')   // a failed read is not an unknown reading
   if (!r) return null
   const [{ data: subject }, { data: modules }, { data: los }, { data: siblings }] = await Promise.all([
-    admin.from('topics').select('id, name').eq('id', subjectId).single(),
-    admin.from('reading_modules').select('id, module_no, title, start_page, sequence').eq('reading_id', readingId).order('sequence'),
-    admin.from('reading_los').select('id, module_id, code, title, page, sequence').eq('reading_id', readingId).order('sequence'),
-    admin.from('curriculum_readings').select('id, title, sequence').eq('topic_id', subjectId).order('sequence'),
+    admin.from('topics').select('id, name').eq('id', subjectId).single().throwOnError(),
+    admin.from('reading_modules').select('id, module_no, title, start_page, sequence').eq('reading_id', readingId).order('sequence').throwOnError(),
+    admin.from('reading_los').select('id, module_id, code, title, page, sequence').eq('reading_id', readingId).order('sequence').throwOnError(),
+    admin.from('curriculum_readings').select('id, title, sequence').eq('topic_id', subjectId).eq('is_active', true).order('sequence').throwOnError(),
   ])
   const sibs = siblings ?? []
   const i = sibs.findIndex(s => s.id === readingId)
@@ -87,4 +91,4 @@ export async function getReading(subjectId: string, readingId: string): Promise<
     prev: i > 0 ? { id: sibs[i - 1].id as string, title: sibs[i - 1].title as string } : null,
     next: i >= 0 && i < sibs.length - 1 ? { id: sibs[i + 1].id as string, title: sibs[i + 1].title as string } : null,
   }
-}
+})

@@ -1,3 +1,4 @@
+import { routeFailure } from '../../../../../../lib/ops/routeFailure'
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../../../lib/supabase/server'
 import { createAdminClient } from '../../../../../../lib/supabase/admin'
@@ -34,7 +35,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     if (rpcErr.message.includes('Challenge already resolved')) {
        return NextResponse.json({ ok: false, error: 'Challenge already resolved' }, { status: 409 })
     }
-    return NextResponse.json({ ok: false, error: rpcErr.message }, { status: 500 })
+    return routeFailure('challenge.resolve', 'Could not confirm the review decision. Reload the challenge and try again.', rpcErr)
   }
 
   return NextResponse.json(result)

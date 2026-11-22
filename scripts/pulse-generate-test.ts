@@ -1,7 +1,8 @@
 /**
  * Day-by-day generation: priority order and the new-content absorption cap.
  */
-import { allocateDay } from '../src/lib/planning/pulse/generateWeek'
+import { allocateDay, selectUnstableConcepts, siblingLink, type GeneratedPortion } from '../src/lib/planning/pulse/generateWeek'
+import { splitIntoSittings } from '../src/lib/planning/pulse/sittings'
 
 let passed = 0, failed = 0
 const check = (n: string, ok: boolean, d = '') => { ok ? (passed++, console.log(`  ✓ ${n}`)) : (failed++, console.log(`  ✗ ${n}${d ? ` — ${d}` : ''}`)) }
@@ -59,9 +60,32 @@ const result5 = allocateDay({
 })
 check('no portion ever exceeds the DB duration cap', result5.portions.every(p => p.durationMinutes <= 180), `durations: ${JSON.stringify(result5.portions.map(p => p.durationMinutes))}`)
 
+{
+  const ev = (conceptId: string, state: string) => ({ conceptId, state, name: conceptId })
+  const none = new Set<string>()
+  check('unstable, no repair thread: planned once (a generic re-verify is legitimate)', selectUnstableConcepts([ev('c1', 'unstable'), ev('c1', 'unstable')], none).map(c => c.conceptId).join() === 'c1')
+  for (const [why, owned] of [['an open or proposed repair', 'c1'], ['an accepted (scheduled/in-progress) repair', 'c1'], ['a repair awaiting its spacing', 'c1'], ['a scheduled re-check', 'c1']]) check(`${why} owns verification: no second generic obligation`, selectUnstableConcepts([ev('c1', 'unstable')], new Set([owned])).length === 0)
+  check('newer supported evidence retires an older unstable event', selectUnstableConcepts([ev('c1', 'supported'), ev('c1', 'unstable')], none).length === 0)
+  check('a different concept is independent of another concept\'s repair', selectUnstableConcepts([ev('c2', 'unstable'), ev('c1', 'unstable')], new Set(['c1'])).map(c => c.conceptId).join() === 'c2')
+  check('repeated calls are stable (retry and rollover add nothing)', JSON.stringify(selectUnstableConcepts([ev('c2', 'unstable')], new Set(['c1']))) === JSON.stringify(selectUnstableConcepts([ev('c2', 'unstable')], new Set(['c1']))))
+}
 // (Requires a real active roadmap + profile to test buildWeekPlan end-to-end,
 // which allocateDay's pure tests above deliberately avoid. Cover this in
 // scripts/e2e-calendar.ts instead, against the real E2E account — see Task 14.)
+
+console.log('\nWeekly splits carry explicit sibling identity and declared order\n')
+{
+  const portion = { title: 'Study X', detail: '', taskType: 'study', effortUnits: 3, durationMinutes: 130, lmId: 'r1', repairThreadId: null, priorityLane: 'content' } as GeneratedPortion
+  const parts = splitIntoSittings(portion, 45), other = splitIntoSittings({ ...portion, title: 'Study Y' }, 45)
+  const all = [...parts, ...other].map((p, i) => ({ p, id: `id${i}` }))
+  const link = (i: number) => siblingLink(all[i].p, all)
+  check('every sitting of one portion shares one key, 1-based index and count', new Set(parts.map(p => p.split!.key)).size === 1 && parts.every((p, i) => p.split!.index === i + 1 && p.split!.count === parts.length) && parts.length === 3)
+  check('two different portions never share a key (no inference from a shared reading or title)', parts[0].split!.key !== other[0].split!.key)
+  check('the first sitting follows nothing; each later one declares exactly the sitting before it', link(0).after.length === 0 && link(1).after[0] === 'id0' && link(2).after[0] === 'id1')
+  check('a sibling of ANOTHER portion on the same day is never a predecessor', link(3).after.length === 0 && link(4).after[0] === 'id3')
+  check('an unsplit portion carries no group and no order', siblingLink({ ...portion, durationMinutes: 30 }, []).group_key === '' && siblingLink({ ...portion, durationMinutes: 30 }, []).after.length === 0)
+  check('the minutes of the split add back up exactly', parts.reduce((n, p) => n + p.durationMinutes, 0) === 130)
+}
 
 console.log(`\n${passed} passed, ${failed} failed\n`)
 if (failed > 0) process.exit(1)

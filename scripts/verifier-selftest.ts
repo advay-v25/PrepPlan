@@ -15,7 +15,7 @@
 import * as dotenv from 'dotenv'
 
 import { extractJson } from '../src/lib/llm'
-import { allowedScales, matchComputedToOption, parseOptionNumber, safeEvaluate, verifyItem } from '../src/lib/diagnostic/verifier'
+import { allowedScales, matchComputedToOption, optionDecimals, parseOptionNumber, safeEvaluate, verifyItem } from '../src/lib/diagnostic/verifier'
 import { semanticFingerprint } from '../src/lib/diagnostic/generator'
 import { buildBlueprint, checkCoverage } from '../src/lib/diagnostic/blueprintPlan'
 import type { BlueprintCell, GeneratedItemDraft } from '../src/lib/diagnostic/types'
@@ -70,6 +70,10 @@ rejects('createUnit is refused', 'createUnit("zzz")')
 rejects('nested evaluate is refused', 'evaluate("1+1")')
 rejects('unknown symbol is refused', 'revenue - mystery', { revenue: 10 })
 rejects('non-finite result is refused', '1 / 0')
+rejects('an expensive function is not on the allow-list', 'factorial(170)')
+rejects('a range / matrix expression is refused', 'sum(1:1000000)')
+rejects('an oversized formula is refused', Array.from({ length: 200 }, () => '1').join('+'))
+rejects('an accessor is refused', 'a[1]', { a: 1 })
 
 // ---------------------------------------------------------------------------
 console.log('\nJSON extraction from model output')
@@ -107,7 +111,15 @@ check('a value matching nothing stays unmatched',
 check('no rescaling is invented for plain options',
   matchComputedToOption(14.7, cashOptions.map(parseOptionNumber), allowedScales(cashOptions)).index === null)
 check('an ambiguous match is reported, not guessed',
-  matchComputedToOption(100, [100, 100.1, 500], [1]).multiple === true)
+  matchComputedToOption(100, [100, 100, 500], [1], [0, 0, 0]).multiple === true)
+check('a close wrong value is NOT absorbed by a tolerance (1,003 is not 1,000)', matchComputedToOption(1003, [1000, 2000, 3000], [1], [0, 0, 0]).index === null)
+check('a close distractor is not confused with the key (12.5 vs 12.6 at one decimal)', matchComputedToOption(12.5, [12.5, 12.6, 13.0], [1], [1, 1, 1]).index === 0)
+check('mixed option precision around a boundary is not silently resolved (12.5 vs "13" at 0 dp)', matchComputedToOption(12.5, [12.5, 12.6, 13], [1], [1, 1, 0]).index === null)
+check('rounding to the displayed precision matches (12.4999 is "12.5")', matchComputedToOption(12.4999, [12.0, 12.5, 13.0], [1], [1, 1, 1]).index === 1)
+check('a rounding tie is flagged, not guessed (2.25 at one decimal)', matchComputedToOption(2.25, [2.2, 2.3, 2.4], [1], [1, 1, 1]).tie === true || matchComputedToOption(2.25, [2.2, 2.3, 2.4], [1], [1, 1, 1]).index === null)
+check('basis-point options license ×10,000', allowedScales(['125 bps', '150 bps', '175 bps']).includes(1e4) && matchComputedToOption(0.0125, [125, 150, 175], allowedScales(['125 bps', '150 bps', '175 bps']), [0, 0, 0]).index === 0)
+check('a negative option matches a negative value', matchComputedToOption(-1250.5, [-1250.5, 1250.5, 0], [1], [1, 1, 0]).index === 0)
+check('thousands/millions options: 1,470,000 is "1.47 million"', optionDecimals('$1.47 million') === 2 && matchComputedToOption(1470000, [1.47, 2.73], [1e-6], [2, 2]).index === 0)
 
 // ---------------------------------------------------------------------------
 console.log('\nSemantic fingerprinting')

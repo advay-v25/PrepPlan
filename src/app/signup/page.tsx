@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '../../lib/supabase/server'
 import { AuthForm } from '../../components/auth/AuthForm'
 
+export const metadata = { title: 'Create account' }
+
 export const dynamic = 'force-dynamic'
 
 export default async function SignupPage() {

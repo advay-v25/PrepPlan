@@ -7,21 +7,27 @@ function verbFor(action: ActionableDecision): string {
   switch (action.code) {
     case 'recover_activation': return action.permittedCommands.includes('start_activation') ? 'Review my week' : 'Retry'
     case 'resolve_conflict': return 'Refresh'
-    case 'resume_task': return 'Resume'
+    // Opening a task shows it in Calendar; it does not start or complete anything, so the verb says so.
+    case 'resume_task': return 'Open session'
     case 'complete_logs': return 'Log activities'
     case 'take_paper': return action.permittedCommands.includes('resume_paper') ? 'Resume paper' : 'Start paper'
-    case 'review_scored_paper': return 'Review result'
+    case 'review_scored_paper': return 'See result'
     case 'review_repair': return 'Review proposal'
     case 'start_timed_task':
-    case 'start_preferred_task': return 'Start session'
+    case 'start_preferred_task': return 'Open session'
+    case 'confirm_coverage': return 'Confirm coverage'
+    case 'repair_check': return action.permittedCommands.includes('resume_paper') ? 'Resume check' : 'Start check'
     case 'review_draft': return 'Review this week'
-    case 'place_task': return 'Schedule it'
+    case 'place_task': return 'Place tasks'
     case 'complete_closure': return 'Review this week'
+    case 'add_availability': return 'Add availability'
+    case 'class_followup_owed': return 'See what is waiting'
     default: return 'See the week'
   }
 }
 
 const KIND: Record<string, string> = {
+  Coverage: 'Coverage', Planning: 'Planning', Setup: 'Setup',
   study: 'Study', class_consolidation: 'Class follow-up', repair: 'Weak area', recheck: 'Check again',
   review: 'Review', verification: 'Check understanding', diagnostic: 'Paper', mock: 'Mock',
 }
@@ -36,13 +42,14 @@ export function NextActionCard({ action }: { action: ActionableDecision }) {
         <p className="next-up__eyebrow">{empty ? 'Today' : 'Up next'}{kind ? <span className="next-up__kind">{kind}</span> : null}</p>
         <h2 id="next-up-h">{action.title}</h2>
         <p className="next-up__why">{action.rationale}</p>
+        {action.timing && action.timing !== 'Future' && <p className="next-up__when">{action.timing}{minutes ? ` · ${minutes} min` : ''}</p>}
       </div>
       <div className="next-up__side">
         {minutes && (
           <p className="next-up__duration"><strong>{minutes}</strong><span>min</span></p>
         )}
         <Link href={action.destination} className="next-up__cta">
-          {empty ? 'See the week' : verbFor(action)} <ArrowRight size={16} aria-hidden />
+          {action.actionLabel ?? (empty ? 'See the week' : verbFor(action))} <ArrowRight size={16} aria-hidden />
         </Link>
       </div>
     </section>

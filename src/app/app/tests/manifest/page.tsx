@@ -1,9 +1,11 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import { createClient } from '../../../../lib/supabase/server'
 import { createAdminClient } from '../../../../lib/supabase/admin'
-import { checkIsReviewer } from '../../../../lib/diagnostic/reviewAccess'
+import { requireReviewerPage } from '../../../../lib/diagnostic/reviewAccess'
+import { ReviewNav } from '../../../../components/reviewer/ReviewNav'
+import { conceptScopeHash } from '../../../../lib/diagnostic/conceptScope'
 import { ConceptVerifyList, ConceptRow } from '../../../../components/diagnostic/ConceptVerifyList'
+
+export const metadata = { title: 'Curriculum sign-off' }
 
 export const dynamic = 'force-dynamic'
 
@@ -13,19 +15,16 @@ export const dynamic = 'force-dynamic'
  * Everything downstream inherits a manifest error, and no automated gate can
  * catch it, because the manifest is what the gates check against. This page is
  * where a person reads the scope the generator was given and says whether it is
- * right. Nothing becomes gold until they have.
+ * right. Nothing is published until they have.
  */
 export default async function ManifestPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login?next=/app/tests/manifest')
-  if (!(await checkIsReviewer(user.id))) redirect('/app/tests')
+  await requireReviewerPage('/app/tests/manifest')
 
   const admin = createAdminClient()
 
   const { data: concepts } = await admin
     .from('curriculum_concepts')
-    .select('id, name, topic, module, lm_id, los, importance, scope_notes, excluded_or_superseded, verification_status')
+    .select('id, name, topic, module, lm_id, los, importance, scope_notes, excluded_or_superseded, verification_status, manifest_id')
     .order('lm_id')
     .order('los')
 
@@ -50,6 +49,7 @@ export default async function ManifestPage() {
     scopeNotes: (c.scope_notes ?? null) as string | null,
     exclusions: (c.excluded_or_superseded ?? null) as string | null,
     verified: c.verification_status === 'verified',
+    scopeHash: conceptScopeHash(c as any),
     itemsAwaitingReview: pendingByConcept.get(c.id as string) ?? 0,
   }))
 
@@ -70,7 +70,7 @@ export default async function ManifestPage() {
             it, then sign it off.
           </p>
         </div>
-        <Link href="/app/tests/review" className="text-button">Item review &rarr;</Link>
+        <ReviewNav current="manifest" />
       </header>
 
       <div className="review-stats">
@@ -88,7 +88,7 @@ export default async function ManifestPage() {
         </div>
         <div className={`review-stat ${blocked > 0 ? 'review-stat--headline' : ''}`}>
           <strong>{blocked}</strong>
-          <span>items blocked from gold</span>
+          <span>items blocked from publication</span>
         </div>
       </div>
 

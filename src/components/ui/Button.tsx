@@ -47,11 +47,12 @@ export type ButtonProps = CommonProps &
   Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'>
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant, tone, size, loading, fullWidth, className, children, disabled, ...rest }, ref
+  { variant, tone, size, loading, fullWidth, className, children, disabled, type = 'button', ...rest }, ref
 ) {
   return (
     <button
       ref={ref}
+      type={type}
       className={classesFor({ variant, tone, size, fullWidth, className })}
       // Disabled while loading so a double submit is impossible, and announced
       // so a screen reader knows the control is working rather than broken.
@@ -94,7 +95,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
   { label, className, children, ...rest }, ref
 ) {
   return (
-    <button ref={ref} className={`icon-button ${className ?? ''}`.trim()} aria-label={label} {...rest}>
+    <button type="button" ref={ref} className={`icon-button ${className ?? ''}`.trim()} aria-label={label} {...rest}>
       {children}
     </button>
   )

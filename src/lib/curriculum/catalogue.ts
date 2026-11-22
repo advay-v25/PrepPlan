@@ -60,7 +60,7 @@ export const TOPICS: TopicSeed[] = [
   { id: 'pm', name: 'Portfolio Management', weightMin: 8, weightMax: 12, sequence: 10,
     summary: 'Combining assets: risk and return, the efficient frontier, and planning for an investor.' },
   { id: 'eth', name: 'Ethical and Professional Standards', weightMin: 15, weightMax: 20, sequence: 1,
-    summary: 'The Code and Standards, applied to situations rather than recited. The heaviest single topic on the exam, and the one that decides borderline results — which is why it comes first and is revisited, rather than being left to the end.' },
+    summary: 'The Code and Standards, applied to situations rather than recited. One of the most heavily weighted topics on the exam, and the one that decides borderline results — which is why it comes first and is revisited, rather than being left to the end.' },
 ]
 
 export const MODULES: ModuleSeed[] = [

@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation'
 
 export type ConflictInfo = {
   message: string
-  conflicts: { title: string; overlapMinutes: number }[]
+  conflicts: { title: string; overlapMinutes: number; href?: string }[]
   suggestions: { date: string; start: number; label: string }[]
 }
 
@@ -25,16 +25,20 @@ export type PendingWarning = {
 export type UndoState = {
   message: string
   taskId: string
+  /** What the server says actually happened (e.g. whether deferred work moved), when it has more to say than the label. */
+  detail?: string
 }
 
 export function useTaskMutation() {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [errorLink, setErrorLink] = useState<string | null>(null)
   const [conflict, setConflict] = useState<ConflictInfo | null>(null)
   const [warning, setWarning] = useState<PendingWarning | null>(null)
   const [undo, setUndo] = useState<UndoState | null>(null)
   const [staleNotice, setStaleNotice] = useState('')
+  const [receipt, setReceipt] = useState('')
 
   // What the last call tried to do. A conflict dialog needs it to retry against
   // a suggested slot: the task being dragged is not necessarily the one open in
@@ -42,7 +46,7 @@ export function useTaskMutation() {
   const lastAttempt = useRef<{ taskId: string; body: Record<string, unknown>; options: any } | null>(null)
 
   const clear = useCallback(() => {
-    setError(''); setConflict(null); setWarning(null); setStaleNotice('')
+    setError(''); setErrorLink(null); setConflict(null); setWarning(null); setStaleNotice(''); setReceipt('')
   }, [])
 
   const call = useCallback(async (
@@ -62,7 +66,8 @@ export function useTaskMutation() {
       const data = await res.json()
 
       if (data.ok) {
-        if (options.undoMessage) setUndo({ message: options.undoMessage, taskId })
+        if (options.undoMessage) setUndo({ message: options.undoMessage, taskId, detail: data.outcome?.message })
+        else if (data.outcome?.message) setReceipt(data.outcome.message)
         router.refresh()
         setBusy(false)
         return true
@@ -81,11 +86,12 @@ export function useTaskMutation() {
         router.refresh()
       } else {
         setError(data.error || 'That change could not be saved')
+        setErrorLink(data.nextUrl ?? null)
       }
       setBusy(false)
       return false
     } catch {
-      setError('Network error — nothing was changed')
+      setError('Connection lost. Refresh to check whether the change was saved before trying again.')
       setBusy(false)
       return false
     }
@@ -102,7 +108,7 @@ export function useTaskMutation() {
       })
       const data = await res.json()
       if (!data.ok) setError(data.error || 'That could not be undone')
-      else router.refresh()
+      else { setReceipt(data.outcome?.message ?? ''); router.refresh() }
     } catch {
       setError('Network error')
     }
@@ -128,5 +134,5 @@ export function useTaskMutation() {
     )
   }, [call])
 
-  return { busy, error, conflict, warning, undo, staleNotice, call, retryAt, runUndo, dismissUndo, clear, setError }
+  return { busy, error, errorLink, conflict, warning, undo, staleNotice, receipt, call, retryAt, runUndo, dismissUndo, clear, setError }
 }

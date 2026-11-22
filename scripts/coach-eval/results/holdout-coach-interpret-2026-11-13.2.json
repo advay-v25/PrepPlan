@@ -1,0 +1,43 @@
+{
+ "version": "coach-interpret-2026-11-13.2",
+ "cases": 48,
+ "metrics": {
+  "resolved": {
+   "hit": 43,
+   "of": 48
+  },
+  "routing": {
+   "hit": 43,
+   "of": 46
+  },
+  "wrongRoute": {
+   "hit": 46,
+   "of": 46
+  },
+  "forbidden": {
+   "hit": 7,
+   "of": 7
+  },
+  "boundary": {
+   "hit": 48,
+   "of": 48
+  },
+  "dates": {
+   "hit": 5,
+   "of": 5
+  },
+  "grounded": {
+   "hit": 48,
+   "of": 48
+  },
+  "planningKept": {
+   "hit": 2,
+   "of": 2
+  }
+ },
+ "misses": [
+  "routing: \"what's on my plate for today\" → free, wanted today",
+  "routing: \"what am I doing today?\" → free, wanted today",
+  "routing: \"what should I tackle next\" → free, wanted next"
+ ]
+}

@@ -1,0 +1,36 @@
+# Roadmap agent handoff — finish and verify scored journeys
+
+Read §9.21 of [the master status](MASTER-STATUS-AND-COMPLETION-PLAN.md) and the open checks in [the Calendar journey handoff](CALENDAR-JOURNEY-CLOSEOUT-NEXT-AGENT-PROMPT.md). Follow AGENTS.md and Ponytail. Preserve the shared worktree, booking guards, historical Calendar and regenerated baseline. Begin with the test harness and the observed reliability failures. Keep class-aware rollover and forecast implementation for the next slice.
+
+## 1. Make the question bank used by each test explicit
+
+- Give the scored suites explicit actual-bank and fixture-bank modes, reusing `scripts/fixture-bank.cjs` and the existing session helper. A supplied `--bank=<record>` must be validated and used or rejected up front. This includes Calendar, paper, taking, results and Readiness. The paper journey already creates a routine fixture internally. Preserve its standalone path if useful and define who owns cleanup when it is given an external record.
+- Build a routine fixture for confirmed readings, follow-up repair and fresh checks. Build a separate held-out fixture with enough independent families in every topic for both 90-question sessions. The current fixture builder's rehearsal mode bypasses routine generation. Rehearsal fixture coverage does not establish routine coverage.
+- Print target, track, eligibility by scope and fixture counts. Use disposable accounts and a guarded test target. Assert that reserved forms actually use the intended fixture items or families. A flag on a script does not scope the server's selection. Prefer isolated inventory for exact-count assertions. Keep the normal eligibility rules and never add a student-request override for the held-out pool. Clean up only records created by the run.
+- In actual-bank mode, check that genuine insufficient coverage leaves nothing started and still offers a useful Calendar or review path. In fixture mode a missing bank, wrong pool or a success scenario that fails to start is a failed test. A suite must report why each case did not run.
+
+## 2. Fix and prove rehearsal start and Home links
+
+- Reproduce the three concurrent `POST /api/rehearsal/start` requests, keeping response status, code and request ID. The likely sequence is in `src/lib/rehearsal/service.ts`: a request sees no open rehearsal, another request reserves it, then the first request loads the pool after the forms were pinned. The held-out pool excludes pinned items, so the first request can return `insufficient` without reaching `start_rehearsal`, whose SQL already resumes an existing open reservation.
+- Force that interleaving with a controlled barrier. Ensure the losing request resolves the open rehearsal for the exact owned appointment before returning a shortfall. Reuse the existing atomic reservation and resume rules. Prove all concurrent starts return the same rehearsal ID, there are exactly two forms and two attempts, and their clocks remain unset until the corresponding session starts. Also prove a genuine shortfall, another appointment's reservation, a foreign or cancelled appointment, and a bank edit during reservation remain handled honestly.
+- The Home assertion still expects multiple `data-appointment` list rows from `UpcomingCheckpoint`. The current page renders a next checkpoint in `ProgressSummary`. Verify that the actual next appointment link carries its ID and opens the right appointment. Verify the other appointments through the Calendar schedule. Update the assertion to match that contract after browser proof. Fix any wrong or missing destination without restoring a redundant Home list just for the test.
+
+## 3. Make answer-save outcomes recoverable
+
+- Trace `/api/tests/attempt/[id]/answer` and `AttemptRunner`. A successful `save_attempt_response` commits before the separate progress write. The route does not inspect an ordinary Supabase error returned from that progress upsert. A lost response also cannot tell the client whether the answer committed. The runner currently awaits the request and JSON without a catch, so a transport or parse failure can leave “Saving…” on screen. Treat the prior two timeouts as unexplained until a failure is captured.
+- Inject one failure before the answer write, one after commit before the response reaches the browser, and one on the progress write. Verify persisted answer, confidence and progress separately. Keep the student's selected answer and confidence visible on failure. Show a usable retry or reconcile against the owned attempt. After a successful retry, the next action should unlock. Preserve newer answers when delayed responses arrive, and preserve the existing clock and finalisation policy.
+- Run the attempt race suite and a bounded HTTP contention test. Prove no duplicate evidence, no silent omissions after a confirmed save, and a final result derived from committed answers. Report whether each timeout was database, upstream, browser transport or still unclassified. Capture stage, request ID and duration without logging student answers or secrets.
+
+## 4. Click through the joined journeys
+
+Use Browser at desktop and 390 px. Cover fresh self-study with a scored paper, partly covered and uncertain, first pass complete with a mock in a month, class moved after weekly preview, and final week through exam follow-up. Check actual and historical Calendar after the latest edits. Retain Monday–Saturday self-study with Sunday assessment and class-driven cycles for coached students. Verify exact Home, Curriculum, Calendar, Tests and review links, **Keep for later → Review follow-up** without reload, a lost accept response followed by one receipt, and stale paper scope in a second tab.
+
+Close a week using a designated external mock and separately using a rehearsal after both in-app sessions. Confirm which assessment counts, that external results remain self-reported, and that all completed work and assessment results stay in the correct historical week. Record blockers by exact step and separate browser, HTTP and database proof.
+
+## 5. Finish measurement and verification
+
+- Extend the existing Tests measurement with routine eligible, held-out eligible, student-fresh counts, representative history, query counts and timeout stage. Compare matching histories and inventory. Report actual bank, routine fixtures and contention separately. The previous 303 was total inventory and the 89-second load remains unexplained.
+- Compare identical planning inputs with Coach enabled, disabled, slow and malformed. Schedule, scope and receipts must agree. If the configured provider can be tested, run a bounded synthetic live smoke check and record validated output and fallback separately.
+- Fix stale roadmap wording assertions and editing fixtures against the verified current contract. Run the scope suite with its guarded flags. Run `npm run verify`, TypeScript and the focused HTTP suites. Use the regenerated baseline. Refresh it and run install and upgrade checks only if new schema work requires it.
+
+Report actual fixes, counts, unresolved cases and the next proposed slice. Keep product defects, stale assertions and missing inventory in separate categories. A green contract suite cannot substitute for the fixture-bank or browser checks.

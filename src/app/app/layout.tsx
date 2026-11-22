@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '../../lib/supabase/server'
+import { isAdmitted } from '../../lib/beta/admission'
 import { AppShell } from '../../components/AppShell'
 
 export const dynamic = 'force-dynamic'
@@ -16,15 +17,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/app')
 
+  if (!user.email_confirmed_at) redirect('/check-email')
+  if (!(await isAdmitted(user.id))) redirect('/not-invited')
+
   const { data: profile } = await supabase
     .from('profiles')
-    .select('onboarding_status')
+    .select('onboarding_status,display_name')
     .eq('id', user.id)
-    .maybeSingle()
+    .maybeSingle().throwOnError()
 
   if (profile?.onboarding_status !== 'complete') redirect('/onboarding')
 
   return (
-    <AppShell>{children}</AppShell>
+    <AppShell displayName={profile.display_name || user.user_metadata?.full_name || user.user_metadata?.name || null}>{children}</AppShell>
   )
 }

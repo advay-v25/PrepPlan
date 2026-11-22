@@ -81,3 +81,8 @@ export function resolvePulseWeek(options: {
     classLed: hasRecurringPattern || anchor !== null,
   }
 }
+
+/** Only self-study has a fixed Sunday paper boundary. */
+export function permitsStudyPortions(route: 'self_study' | 'coaching' | 'hybrid', weekday: Weekday): boolean {
+  return route !== 'self_study' || weekday !== 0
+}

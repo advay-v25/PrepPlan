@@ -1,3 +1,12 @@
+import { createHash } from 'node:crypto'
+import { perRequest, minuteOf } from '../ops/perRequest'
+import { observedPaceFrom } from './observedPace'
+import { getActivityCoverage } from './activityCoverageService'
+import { getStudyActivity } from './studyActivityService'
+import type { MockKind } from './entryContext'
+import { loadEntryContext } from './entryContextService'
+import { entryToken, uncertaintyForModule } from './entryContext'
+import { readAll } from '../supabase/readAll'
 import { createAdminClient } from '../supabase/admin'
 import { getStudyWeekContext } from '../planning/schedule'
 import { addDays, daysBetween, todayInZone, utcToZonedParts } from '../planning/studyWeek'
@@ -51,53 +60,47 @@ export async function weeklyCapacityMinutes(userId: string): Promise<number | nu
   // the last four weeks, which is a better guide than any self-estimate.
   const { data: events } = await admin
     .from('task_events')
-    .select('actual_duration_minutes, created_at')
+    .select('actual_duration_minutes, created_at,task:plan_blocks!inner(cancelled_at,learning_activity_id,activity:learning_activities!plan_blocks_learning_activity_id_fkey(activity_type))')
     .eq('user_id', userId)
     .not('actual_duration_minutes', 'is', null)
+    .is('task.cancelled_at',null)
     .gte('created_at', new Date(Date.now() - 28 * 86_400_000).toISOString())
 
-  if (!events || events.length < 3) return null
-  const total = events.reduce((s, e) => s + (e.actual_duration_minutes ?? 0), 0)
+  const studyEvents=events?.filter(e=>(e.task as any)?.activity?.activity_type!=='class')
+  if (!studyEvents || studyEvents.length < 3) return null
+  const total = studyEvents.reduce((s, e) => s + (e.actual_duration_minutes ?? 0), 0)
   return Math.round(total / 4)
 }
 
 /**
- * Minutes actually spent per unit of effort, from completed work.
- *
- * This is the number that turns a relative effort band into a real duration.
- * It is measured, never assumed, and absent until there is enough completed
- * work to mean anything.
+ * Minutes actually spent per unit of effort, from time the student reported on finished modules.
+ * The rule lives in observedPace.ts; this only loads the rows. Absent until there is enough to mean anything.
  */
-export async function observedMinutesPerEffortUnit(userId: string): Promise<number | null> {
+export async function observedPace(userId: string): Promise<{ minutesPerEffortUnit: number | null; modules: number }> {
   const admin = createAdminClient()
-
-  const { data: done } = await admin
-    .from('plan_blocks')
-    .select('lm_id, duration_minutes, execution')
-    .eq('user_id', userId)
-    .eq('execution', 'completed')
-    .not('lm_id', 'is', null)
-
-  if (!done || done.length < 4) return null
-
-  const lmIds = [...new Set(done.map(d => d.lm_id as string))]
-  const { data: mods } = await admin
-    .from('learning_modules').select('id, effort_band').in('id', lmIds)
-  const effortById = new Map((mods ?? []).map(m => [m.id as string, (m.effort_band ?? 3) as number]))
-
-  let minutes = 0
-  let effort = 0
-  for (const d of done) {
-    const band = effortById.get(d.lm_id as string)
-    if (!band) continue
-    minutes += (d.duration_minutes ?? 0) as number
-    effort += band
-  }
-  if (effort <= 0) return null
-  return Math.round(minutes / effort)
+  const [{ data: blocks }, { data: events }, { data: state }, { data: mods },coverage,activity] = await Promise.all([
+    readAll<any>((a,z)=>admin.from('plan_blocks').select('id, lm_id, execution, cancelled_at, continued_from_task_id, learning_activity_id').eq('user_id', userId).eq('task_type', 'study').not('lm_id', 'is', null).order('id').range(a,z)).then(data=>({data})),
+    // Filtered in code rather than with a long .in() list, which would outgrow a request URL on a long-lived account.
+    readAll<any>((a,z)=>admin.from('task_events').select('task_id, actual_duration_minutes').eq('user_id', userId).not('actual_duration_minutes', 'is', null).order('id').range(a,z)).then(data=>({data})),
+    admin.from('user_module_state').select('lm_id').eq('user_id', userId).in('coverage_state', ['studied', 'verified', 'decaying']).throwOnError(),
+    admin.from('learning_modules').select('id, effort_band').throwOnError(),
+    getActivityCoverage(userId),getStudyActivity(userId),
+  ])
+  const classLogs=new Set(activity.blocks.filter(b=>b.activityKind==='class').map(b=>b.id))
+  return observedPaceFrom(
+    (blocks ?? []).filter(b=>!classLogs.has(b.id) && !(b.learning_activity_id && b.cancelled_at)).map(b => ({ id: b.id as string, lmId: b.lm_id as string, execution: b.execution as string, cancelled: Boolean(b.cancelled_at), continuedFromId: (b.continued_from_task_id ?? null) as string | null })),
+    (events ?? []).map(e => ({ taskId: e.task_id as string, actualMinutes: e.actual_duration_minutes as number })),
+    new Map((mods ?? []).map(m => [m.id as string, Number(m.effort_band ?? 3)])),
+    new Set([...(state ?? []).map(s => s.lm_id as string),...[...coverage].filter(([,s])=>s==='studied').map(([id])=>id)]),
+  )
 }
 
+export const observedMinutesPerEffortUnit = async (userId: string) => (await observedPace(userId)).minutesPerEffortUnit
+
 export async function loadRoadmapInputs(userId: string, options: { targetDate?: string } = {}): Promise<RoadmapInput | null> {
+  // The canonical mock schedule: every planned appointment, not only the profile's "next" projection.
+  const { data: apptRows } = await createAdminClient().from('mock_appointments').select('id, version, planned_date, kind, label, start_time').eq('user_id', userId).eq('status', 'planned').order('planned_date').throwOnError()
+  const appts = (apptRows ?? []).map(a => ({ id: a.id as string, version: a.version as number, date: a.planned_date as string, kind: a.kind as MockKind, label: (a.label ?? null) as string | null, startTime: a.start_time ? String(a.start_time).slice(0, 5) : null }))
   const admin = createAdminClient()
   const ctx = await getStudyWeekContext(userId)
 
@@ -108,6 +111,7 @@ export async function loadRoadmapInputs(userId: string, options: { targetDate?: 
     .maybeSingle()
 
   let targetDate = options.targetDate ?? null
+  const targetKind: 'booked' | 'sitting' = profile?.exam_date && (!options.targetDate || options.targetDate === profile.exam_date) ? 'booked' : 'sitting'
   if (!targetDate && profile?.exam_date) {
     // Exact booked date takes precedence and is already YYYY-MM-DD
     targetDate = profile.exam_date as string
@@ -125,14 +129,18 @@ export async function loadRoadmapInputs(userId: string, options: { targetDate?: 
     { data: edgeRows },
     { data: coverageRows },
     capMinutes,
-    obsMinutes
+    obsMinutes,
+    activityState,
+    entry,
   ] = await Promise.all([
     admin.from('topics').select('id, name, exam_weight_min, exam_weight_max, default_sequence').order('default_sequence'),
     admin.from('learning_modules').select('id, topic_ref, name, effort_band, effort_units, difficulty_weight, sequence_hint, is_active').eq('is_active', true),
     admin.from('lm_edges').select('from_lm, to_lm, kind').eq('kind', 'prerequisite'),
     admin.from('user_module_state').select('lm_id, coverage_state').eq('user_id', userId),
     weeklyCapacityMinutes(userId),
-    observedMinutesPerEffortUnit(userId)
+    observedMinutesPerEffortUnit(userId),
+    getActivityCoverage(userId),
+    loadEntryContext(userId),
   ])
 
   // A weekly class series' own ends_on is the strongest signal classes have finished — it's what the
@@ -159,6 +167,8 @@ export async function loadRoadmapInputs(userId: string, options: { targetDate?: 
 
   const activeIds = new Set((moduleRows ?? []).map(m => m.id as string))
   const coverage = new Map((coverageRows ?? []).map(r => [r.lm_id as string, r.coverage_state as ModuleInput['coverage']]))
+  const rank={not_started:0,decaying:1,taught:2,studied:3,verified:4}
+  for(const [id,state] of activityState)if(rank[state]>rank[coverage.get(id)??'not_started'])coverage.set(id,state)
 
   // Four preparation modes map onto three planner routes. The distinction that
   // matters is whether someone else decides what is covered when: a recorded
@@ -174,6 +184,7 @@ export async function loadRoadmapInputs(userId: string, options: { targetDate?: 
     // week numbers line up with the calendar the student already sees.
     startDate: ctx.week.startDate,
     targetDate,
+    targetKind,
     route,
     classesCompletedDate,
     topics: (topicRows ?? []).map(t => ({
@@ -192,6 +203,7 @@ export async function loadRoadmapInputs(userId: string, options: { targetDate?: 
         difficulty: Number(m.difficulty_weight ?? 3),
         sequence: (m.sequence_hint ?? 1) as number,
         coverage: coverage.get(m.id as string) ?? 'not_started',
+        uncertainty: uncertaintyForModule(entry, { id: m.id as string, topic: m.topic_ref as string }),
       })),
     // Edges to retired modules (the pre-2027 list) are ignored.
     prerequisites: (edgeRows ?? [])
@@ -199,6 +211,8 @@ export async function loadRoadmapInputs(userId: string, options: { targetDate?: 
       .map(e => ({ from: e.from_lm as string, to: e.to_lm as string })),
     weeklyCapacityMinutes: capMinutes,
     observedMinutesPerEffortUnit: obsMinutes,
+    entry: { mockDate: entry.mock?.date ?? null, mockKind: entry.mock?.kind ?? null, mockLabel: entry.mock?.label ?? null, mockStartTime: entry.mock?.startTime ?? null,
+      appointments: appts, token: `${entryToken(entry)}|${appts.map(a => `${a.id}:${a.version}`).join(',')}` },
   }
 }
 
@@ -221,56 +235,31 @@ export async function generateRoadmap(userId: string, options: { targetDate?: st
   const roadmap = buildRoadmap(input)
   const admin = createAdminClient()
 
-  await admin.from('study_roadmaps')
-    .update({ status: 'superseded' })
-    .eq('user_id', userId)
-    .in('status', options.activate ? ['draft', 'active'] : ['draft'])
-
   const { data: profile } = await admin
     .from('profiles').select('exam_window_id').eq('id', userId).maybeSingle()
 
-  const { data: stored, error } = await admin.from('study_roadmaps').insert({
-    user_id: userId,
-    exam_window_id: (profile?.exam_window_id ?? null) as string | null,
-    target_date: roadmap.targetDate,
-    route: input.route,
-    status: options.activate ? 'active' : 'draft',
-    phases: roadmap.phases,
-    inputs: {
-      startDate: roadmap.startDate,
-      weeklyCapacityMinutes: input.weeklyCapacityMinutes,
-      observedMinutesPerEffortUnit: input.observedMinutesPerEffortUnit,
-      moduleCount: input.modules.length,
+  // One transaction (see replace_roadmap): the replacement and every milestone commit together, or the previous roadmap is untouched.
+  const hash = createHash('sha256').update(JSON.stringify({ t: roadmap.targetDate, r: input.route, p: roadmap.phases, m: roadmap.milestones, a: !!options.activate, w: profile?.exam_window_id ?? null })).digest('hex')
+  const { data: res, error } = await admin.rpc('replace_roadmap', {
+    p_user: userId, p_activate: options.activate === true, p_hash: hash,
+    p_roadmap: {
+      exam_window_id: (profile?.exam_window_id ?? null) as string | null, target_date: roadmap.targetDate, route: input.route, phases: roadmap.phases,
+      inputs: { startDate: roadmap.startDate, weeklyCapacityMinutes: input.weeklyCapacityMinutes, observedMinutesPerEffortUnit: input.observedMinutesPerEffortUnit, moduleCount: input.modules.length },
+      feasibility: roadmap.feasibility,
     },
-    feasibility: roadmap.feasibility,
-    accepted_at: options.activate ? new Date().toISOString() : null,
-  }).select('id, revision, generated_at').single()
-
-  if (error) throw new Error(`Could not save the roadmap: ${error.message}`)
-
-  if (roadmap.milestones.length > 0) {
-    const { error: msErr } = await admin.from('roadmap_milestones').insert(
-      roadmap.milestones.map(m => ({
-        roadmap_id: stored.id,
-        user_id: userId,
-        phase: m.phase,
-        topic_ref: m.topicId,
-        sequence: m.sequence,
-        planned_start_week: m.startWeek,
-        planned_end_week: m.endWeek,
-        planned_start_date: m.startDate,
-        planned_end_date: m.endDate,
-        effort_weight: m.effortWeight,
-      }))
-    )
-    if (msErr) throw new Error(`Could not save milestones: ${msErr.message}`)
-  }
+    p_milestones: roadmap.milestones.map(m => ({
+      phase: m.phase, topic_ref: m.topicId, sequence: m.sequence, planned_start_week: m.startWeek, planned_end_week: m.endWeek,
+      planned_start_date: m.startDate, planned_end_date: m.endDate, effort_weight: m.effortWeight,
+    })),
+  })
+  if (error || !(res as { ok?: boolean } | null)?.ok) throw new Error(`Could not save the roadmap. Nothing was changed: ${error?.message ?? 'no result'}`)
+  const stored = { id: (res as { id: string }).id }
 
   return { id: stored.id as string, roadmap, input }
 }
 
 /** The roadmap currently in force, rebuilt from its stored inputs. */
-export async function getActiveRoadmap(userId: string): Promise<{ id: string; status: string; roadmap: Roadmap; input: RoadmapInput } | null> {
+async function getActiveRoadmapUncached(userId: string): Promise<{ id: string; status: string; roadmap: Roadmap; input: RoadmapInput } | null> {
   const admin = createAdminClient()
   const { data: row } = await admin
     .from('study_roadmaps')
@@ -286,7 +275,7 @@ export async function getActiveRoadmap(userId: string): Promise<{ id: string; st
 
   // Rebuild from current inputs rather than replaying a stale snapshot: coverage
   // and capacity move, and a roadmap that cannot see that is decoration.
-  const input = await loadRoadmapInputs(userId, { targetDate: row.target_date as string })
+  const input = await loadRoadmapInputs(userId) ?? await loadRoadmapInputs(userId, { targetDate: row.target_date as string })
   if (!input) return null
   const stored = (row.inputs ?? {}) as any
   if (stored.startDate) input.startDate = stored.startDate
@@ -374,7 +363,8 @@ export async function computeProgress(userId: string, roadmap: Roadmap, preloade
   let verdict: Progress['verdict']
   let message: string
   // Nothing meaningful to compare in the first week of a nine-month plan.
-  if (actualEffortDone === 0 && elapsedWeeks < 1) {
+  // Within the first week, "done" can only be what the student said they had covered, which is not progress against the plan.
+  if (elapsedWeeks < 1) {
     verdict = 'not_started'
     message = 'The plan has not started yet. Nothing to compare.'
   } else if (weeksAhead >= 1) {
@@ -408,3 +398,6 @@ export async function computeProgress(userId: string, roadmap: Roadmap, preloade
 }
 
 export { addDays }
+
+/** Shared within one request (see perRequest): Home, the operating state and the bridge all ask for this. */
+export const getActiveRoadmap = perRequest(getActiveRoadmapUncached, (u: string) => u)

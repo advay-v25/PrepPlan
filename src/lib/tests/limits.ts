@@ -15,3 +15,10 @@ export const WEEKLY_PAPER_SOFT_MAX_QUESTIONS = 60
 
 export const clampQuestions = (n: number) => Math.max(0, Math.min(MAX_ASSESSMENT_QUESTIONS, Math.floor(n)))
 export const estimatedMinutes = (questions: number) => Math.round(clampQuestions(questions) * REFERENCE_MINUTES_PER_QUESTION)
+/** The fewest questions an ordinary paper or check may have. One rule for preview, buttons and start. */
+export const MIN_PAPER_QUESTIONS = 5
+
+/** Timed practice: a short, strictly timed set on one explicit reading. Practice, never evidence. */
+export const PRACTICE_QUESTIONS = 10
+export const PRACTICE_SECONDS_PER_QUESTION = 75
+export const practiceMinutes = (questions: number) => Math.max(1, Math.ceil((clampQuestions(questions) * PRACTICE_SECONDS_PER_QUESTION) / 60))

@@ -1,7 +1,7 @@
 /**
  * Defines conditions for diagnostic deliverability.
  * 
- * Determines whether the item bank has sufficient unreviewed or gold items
+ * Determines whether the item bank has sufficient human-reviewed items
  * to fulfill a requested diagnostic. If not, the diagnostic must not be delivered.
  */
 import { AssessmentPurpose, allowedTiers, countAvailableItems, PURPOSE_LENGTHS } from './blueprint'
@@ -45,9 +45,7 @@ export async function checkDiagnosticSufficiency(
   const counts = await countAvailableItems(userId, manifestId, { modules })
   const tiers = allowedTiers(purpose)
   
-  const availableCount = tiers.includes('verified') 
-    ? counts.verified + counts.reviewed 
-    : counts.reviewed
+  const availableCount = counts.reviewed
 
   const requiredCount = Math.min(5, PURPOSE_LENGTHS[purpose]) // MVP: 5 items minimum if bank is low, but ideally the exact length. Wait, if it's weekly cumulative, it needs exact length, but for MVP it's just min 5? No, the plan says PURPOSE_LENGTHS[purpose]. But TestsPage says Math.min(5, PURPOSE_LENGTHS). Let's stick to PURPOSE_LENGTHS[purpose] or min 5.
   
@@ -59,9 +57,7 @@ export async function checkDiagnosticSufficiency(
       isSufficient: false,
       availableCount,
       requiredCount: needed,
-      reason: tiers.includes('verified') 
-        ? 'Not enough unseen practice items available in the bank.' 
-        : 'Not enough unseen reviewed (gold) items available in the bank.'
+      reason: 'Not enough unseen human-reviewed items available in the bank.'
     }
   }
 

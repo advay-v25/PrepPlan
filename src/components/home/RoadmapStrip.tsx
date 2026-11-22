@@ -13,7 +13,7 @@ function short(date: string) {
  * roadmap and progress model Curriculum shows (getActiveRoadmap + computeProgress). It states
  * positions and percentages only; it makes no promise about whether the plan is recoverable.
  */
-export function RoadmapStrip({ status, roadmap, progress }: { status: string; roadmap: Roadmap; progress: Progress }) {
+export function RoadmapStrip({ status, roadmap, progress, weekNote }: { status: string; roadmap: Roadmap; progress: Progress; /** Why this week's accepted work differs from the milestone (recorded provenance), or null. */ weekNote?: string | null }) {
   const total = Math.max(1, roadmap.totalWeeks)
   const marker = Math.min(100, Math.max(0, (progress.weeksElapsed / total) * 100))
   const now = progress.currentMilestone
@@ -39,7 +39,7 @@ export function RoadmapStrip({ status, roadmap, progress }: { status: string; ro
         ))}
         <span className={`road__marker ${marker < 6 ? 'is-start' : marker > 94 ? 'is-end' : ''}`} style={{ left: `${marker}%` }} aria-hidden><span>Now</span></span>
       </div>
-      <div className="road__ends"><span>{short(roadmap.startDate)}</span><span>Exam · {short(roadmap.targetDate)}</span></div>
+      <div className="road__ends"><span>{short(roadmap.startDate)}</span><span>{roadmap.targetKind === 'sitting' ? 'Target sitting opens' : 'Exam'} · {short(roadmap.targetDate)}</span></div>
 
       <div className="road__facts">
         <div className="road__fact">
@@ -57,6 +57,7 @@ export function RoadmapStrip({ status, roadmap, progress }: { status: string; ro
           <span className="road__bar is-done"><span>Done</span><i><b style={{ width: `${progress.actualPercent}%` }} /></i><em>{progress.actualPercent}%</em></span>
         </div>
       </div>
+      {weekNote && <p className="road__note road__note--clamp" data-testid="road-week-note" title={weekNote}>{weekNote}</p>}
       {draft && <p className="road__note">This is a proposed plan, not yet your accepted one — review it in Curriculum.</p>}
     </section>
   )

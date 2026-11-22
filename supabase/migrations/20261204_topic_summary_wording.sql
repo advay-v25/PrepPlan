@@ -1,0 +1,2 @@
+-- Editorial correction: Ethics is not "the heaviest single topic": its published 2027 range (10-15%) is shared with other topics. Wording only; ids, names and weights unchanged.
+update public.topics set summary = replace(summary, 'The heaviest single topic on the exam', 'One of the most heavily weighted topics on the exam') where id = 'eth' and summary like '%The heaviest single topic on the exam%';

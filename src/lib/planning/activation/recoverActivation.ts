@@ -31,6 +31,11 @@ export async function recoverActivation(userId: string): Promise<RecoveryResult>
       .gte('local_date', ctx.week.startDate).lte('local_date', ctx.week.endDate)
       .neq('execution', 'cancelled')
     if ((count ?? 0) > 0) return { status: 'already_active', cycleId: cycle.id as string, plannedTasks: count ?? 0 }
+    // A week the student accepted in their weekly review is theirs, even when it holds only unplaced work
+    // or nothing at all. It is not a failed activation, so no first-week draft may be built over it.
+    const { count: reviewed } = await admin.from('weekly_reviews').select('*', { count: 'exact', head: true })
+      .eq('user_id', userId).eq('next_cycle_id', cycle.id)
+    if ((reviewed ?? 0) > 0) return { status: 'already_active', cycleId: cycle.id as string, plannedTasks: count ?? 0 }
   }
 
   const draft = await getOrCreateReadyDraft(userId)

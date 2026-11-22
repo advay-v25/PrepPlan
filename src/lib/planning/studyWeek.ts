@@ -1,3 +1,5 @@
+import { isCalendarDate } from '../format/date'
+
 /**
  * The study week.
  *
@@ -114,6 +116,14 @@ export function todayInZone(timeZone: string, reference: Date = new Date()): str
 // Calendar-date arithmetic (no timezone involved — these are plain dates)
 // ---------------------------------------------------------------------------
 
+/** A real calendar date inside a navigable range (2020–2100): "2026-02-30", "not-a-date" and "9999-12-31" are all refused. */
+export function parseLocalDate(value: unknown): string | null {
+  if (!isCalendarDate(value)) return null
+  const y = Number(value.slice(0, 4))
+  if (y < 2020 || y > 2100) return null
+  return value
+}
+
 export function addDays(dateStr: string, days: number): string {
   const [y, m, d] = dateStr.split('-').map(Number)
   const t = new Date(Date.UTC(y, m - 1, d))
@@ -182,6 +192,12 @@ export function shiftStudyWeek(week: StudyWeek, n: number): StudyWeek {
     endDate: addDays(startDate, cycleLength - 1),
     days: Array.from({ length: cycleLength }, (_, i) => addDays(startDate, i)),
   }
+}
+
+/** The seven-day period (of the same length and boundary as `week`) that holds `date`, counted outwards from `week` so periods never overlap or skip. */
+export function adjacentWeek(week: StudyWeek, date: string): StudyWeek {
+  const days = (a: string, b: string) => Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000)
+  return shiftStudyWeek(week, date > week.endDate ? Math.ceil(days(week.endDate, date) / 7) : date < week.startDate ? -Math.ceil(days(date, week.startDate) / 7) : 0)
 }
 
 export function studyWeekContaining(dateStr: string, anchorDay: Weekday, timezone: string): StudyWeek {

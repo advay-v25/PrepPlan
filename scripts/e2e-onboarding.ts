@@ -1,18 +1,18 @@
 /**
- * Onboarding, end to end.
+ * Onboarding, end to end, with an ORDINARY throwaway student (no role, deleted after); independent of every other suite.
  *
- *   npm run dev
- *   npx tsx scripts/e2e-onboarding.ts --reset
+ *   E2E_BASE_URL=http://localhost:3102 npx tsx scripts/e2e-onboarding.ts
  */
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 
 dotenv.config({ path: '.env.local' })
 
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
+import { assertBlankOnboarding, E2E_BASE_URL } from './lib/e2eIdentity'
 
 const BASE = E2E_BASE_URL
-const EMAIL = getE2EEmail()
+const EMAIL = `integ+onb${Date.now()}@example.com`
+let createdId = ''
 
 let passed = 0, failed = 0
 const check = (n: string, ok: boolean, d = '') => { ok ? (passed++, console.log(`  ✓ ${n}`)) : (failed++, console.log(`  ✗ ${n}${d ? ` — ${d}` : ''}`)) }
@@ -41,16 +41,16 @@ const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SU
 async function main() {
   console.log(`\nOnboarding end to end against ${BASE}\n`)
 
+  const created = await admin.auth.admin.createUser({ email: EMAIL, email_confirm: true })
+  createdId = created.data.user!.id
   const { data: link } = await admin.auth.admin.generateLink({ type: 'magiclink', email: EMAIL })
-  let path = `/auth/confirm?token_hash=${(link!.properties as any).hashed_token}&type=magiclink&next=/onboarding`
-
-  const loginRes = await req(path)
-  check('magic link signs us in and sets cookies', loginRes.status === 302 || loginRes.status === 307)
+  if (!link.properties) throw new Error('Could not generate an owned sign-in link.')
+  const login = await post('/api/auth', { action: 'verify', type: 'magiclink', tokenHash: link.properties.hashed_token, next: '/onboarding' })
+  check('magic link signs us in and sets cookies', login.status === 200 && login.body?.next === '/onboarding')
   const entry = await req('/onboarding')
   check('a fresh user hits the gateway /onboarding and redirects', entry.status === 302 || entry.status === 307 || entry.status === 308)
 
-  const uid = await verifyAndGetE2EUser(admin)
-  if (process.argv.includes('--reset')) await resetE2EUser(admin, uid)
+  const uid = createdId
   await assertBlankOnboarding(admin, uid)
   check('the account starts from a blank onboarding slate', true)
 
@@ -144,24 +144,41 @@ async function main() {
   // date like 2027-01-12 above is deliberately left unanchored; this checks the near-term case does anchor.
   const addDays = (d: string, n: number) => new Date(new Date(`${d}T12:00:00Z`).getTime() + n * 86_400_000).toISOString().slice(0, 10)
   const todayIso = new Date().toISOString().slice(0, 10)
-  const nearDate = addDays(todayIso, 6)
   await admin.from('calendar_commitments').delete().eq('user_id', uid).eq('kind', 'class')
+  const { getStudyWeekContext } = await import('../src/lib/planning/schedule')
+  // With no class defining the cycle, this is the week the student has. The near class below must differ from it, so pick a date
+  // (3 to 10 days out) whose "day before" is NOT already this week's natural last day; otherwise "anchors" and "does not move"
+  // cannot be told apart. (Fixed to the real local date; nothing else is assumed about the weekday the suite runs on.)
+  const baseline = await getStudyWeekContext(uid)
+  const nearDate = [3, 4, 5, 6, 7, 8, 9, 10].map(n => addDays(todayIso, n)).find(d => addDays(d, -1) !== baseline.week.endDate)!
   const varNear = await post('/api/onboarding/route', { prepMode: 'instructor_led', classPattern: 'variable', recurringClasses: [], nextClass: { label: '', date: nearDate, startTime: '18:00', endTime: '20:00' } })
   check('a near-term next class saves', varNear.body?.ok === true, JSON.stringify(varNear.body))
   const { data: nearRow } = await admin.from('calendar_commitments').select('defines_cycle').eq('user_id', uid).eq('status', 'active').eq('recurrence', 'none').single()
   check('it is marked as defining the cycle', nearRow?.defines_cycle === true, JSON.stringify(nearRow))
-  const { getStudyWeekContext } = await import('../src/lib/planning/schedule')
   const ctxNear = await getStudyWeekContext(uid)
-  check('the week actually anchors to the day before that class', ctxNear.week.endDate === addDays(nearDate, -1), `${ctxNear.week.endDate} vs expected ${addDays(nearDate, -1)}`)
+  // Two separate facts. The class ANCHOR is a pure rule of the class date; first-cycle ADVANCEMENT is a separate decision about
+  // a student with no cycle yet (it moves them one cycle on when this one has no study time left, e.g. late on a Sunday).
+  const { resolvePulseWeek } = await import('../src/lib/planning/pulse/weekBoundary')
+  const anchored = resolvePulseWeek({ classWeekdays: [], nextClassDate: nearDate, timezone: ctxNear.timezone, reference: todayIso })
+  check('anchor: the rule puts the cycle end on the day before that class', anchored.endDate === addDays(nearDate, -1) && anchored.classLed, `${anchored.endDate} vs expected ${addDays(nearDate, -1)}`)
+  const advanced = ctxNear.initialCycle?.advanced === true
+  check('first cycle: the saved class produced that anchor, or exactly one cycle after it when the first cycle advanced',
+    ctxNear.week.endDate === (advanced ? addDays(anchored.endDate, 7) : anchored.endDate), `${ctxNear.week.endDate}; advanced=${advanced}`)
   check('getStudyWeekContext reports this as class-led', ctxNear.classLed === true)
 
   // An ad-hoc class — the ordinary Calendar "Add commitment" path — must never anchor the week by accident.
   await admin.from('calendar_commitments').delete().eq('user_id', uid).eq('kind', 'class').eq('recurrence', 'none')
+  // The Calendar route is an app API: it needs a completed setup, as it would for a real student.
+  await admin.from('profiles').update({ onboarding_status: 'complete' }).eq('id', uid)
   const adhoc = await post('/api/commitments', { label: 'Doubt session', kind: 'class', recurrence: 'none', date: nearDate, startTime: '18:00', endTime: '20:00' })
+  await admin.from('profiles').update({ onboarding_status: 'in_progress' }).eq('id', uid) // back to the journey's own state
   check('an ad-hoc one-off class can be added the ordinary way', adhoc.body?.ok === true, JSON.stringify(adhoc.body))
   check('…and is not marked as defining the cycle', adhoc.body?.commitment?.defines_cycle === false, JSON.stringify(adhoc.body?.commitment))
   const ctxAdhoc = await getStudyWeekContext(uid)
-  check('…so it does not move the week boundary', ctxAdhoc.classLed === false && ctxAdhoc.week.endDate !== addDays(nearDate, -1), JSON.stringify(ctxAdhoc.week))
+  check('…so it does not move the week boundary: the week is exactly the one the student had before adding it',
+    ctxAdhoc.classLed === baseline.classLed && ctxAdhoc.week.startDate === baseline.week.startDate && ctxAdhoc.week.endDate === baseline.week.endDate,
+    `${JSON.stringify(ctxAdhoc.week)} vs ${JSON.stringify(baseline.week)}`)
+  check('…and that unchanged week really differs from the one an anchoring class would give', ctxAdhoc.week.endDate !== addDays(nearDate, -1))
   await admin.from('calendar_commitments').delete().eq('user_id', uid).eq('kind', 'class')
 
   const routeRes = await post('/api/onboarding/route', { prepMode: 'self_study', classPattern: 'none', recurringClasses: [] })
@@ -286,12 +303,13 @@ async function main() {
   // Editing setup afterwards must never rewrite accepted history.
   console.log('\nEditing after activation')
   const snap = async () => ({
-    blocks: JSON.stringify(((await admin.from('plan_blocks').select('id, revision, local_date, starts_at').eq('user_id', uid).order('id')).data ?? [])),
-    cycles: JSON.stringify(((await admin.from('planning_cycles').select('id, status, start_date, end_date').eq('user_id', uid).order('id')).data ?? [])),
-    roadmap: JSON.stringify(((await admin.from('study_roadmaps').select('id, status').eq('user_id', uid).order('id')).data ?? [])),
+    blocks: JSON.stringify(((await admin.from('plan_blocks').select('id, revision, local_date, starts_at').eq('user_id', uid).order('id').throwOnError()).data ?? [])),
+    cycles: JSON.stringify(((await admin.from('planning_cycles').select('id, status, starts_at_local, ends_at_local, timezone').eq('user_id', uid).order('id').throwOnError()).data ?? [])),
+    roadmap: JSON.stringify(((await admin.from('study_roadmaps').select('id, status').eq('user_id', uid).order('id').throwOnError()).data ?? [])),
   })
   const beforeEdit = await snap()
-  const edit = await post('/api/onboarding/week', { availabilityMode: 'windows', windows: [{ weekday: 3, startTime: '19:00', endTime: '21:00' }], maxSessionMinutes: 60 })
+  const setupVersion = async () => Number((await admin.from('profiles').select('onboarding_context_version').eq('id', uid).single().throwOnError()).data!.onboarding_context_version)
+  const edit = await post('/api/onboarding/week', { availabilityMode: 'windows', windows: [{ weekday: 3, startTime: '19:00', endTime: '21:00' }], maxSessionMinutes: 60, expectedVersion: await setupVersion() })
   check('a completed student can edit the week', edit.body?.ok === true, JSON.stringify(edit.body))
   const afterEdit = await snap()
   check('…and the accepted blocks, cycle and roadmap are unchanged', beforeEdit.blocks === afterEdit.blocks && beforeEdit.cycles === afterEdit.cycles && beforeEdit.roadmap === afterEdit.roadmap)
@@ -302,17 +320,32 @@ async function main() {
   console.log('\nFuture-plan impact proposal')
   check('a shrunk week reports how much study time it costs', edit.body?.impact && typeof edit.body.impact.capacityDeltaMinutes === 'number' && edit.body.impact.capacityDeltaMinutes < 0, JSON.stringify(edit.body?.impact))
   check('…and no cycle change for a same-route edit', edit.body?.impact?.cycleChanged === false)
-  const noop = await post('/api/onboarding/week', { availabilityMode: 'windows', windows: [{ weekday: 3, startTime: '19:00', endTime: '21:00' }], maxSessionMinutes: 60 })
+  const noop = await post('/api/onboarding/week', { availabilityMode: 'windows', windows: [{ weekday: 3, startTime: '19:00', endTime: '21:00' }], maxSessionMinutes: 60, expectedVersion: await setupVersion() })
   // Zero net change in capacity — overflowDays can still be non-empty if a day was already tight (that is
   // real and pre-existing, not caused by this edit); the invariant a true no-op guarantees is zero delta.
   check('an edit that changes nothing reports zero capacity delta', noop.body?.impact?.capacityDeltaMinutes === 0, JSON.stringify(noop.body?.impact))
 
+  console.log('\nProfile edits stay explicit and preserve omitted context')
+  const beforeProfile = (await admin.from('profiles').select('prep_mode,class_pattern,classes_completed_at').eq('id', uid).single().throwOnError()).data!
+  const invalidClassResponses: Awaited<ReturnType<typeof post>>[] = []
+  for (const body of [null, {}, { done: 'false' }]) invalidClassResponses.push(await post('/api/profile/classes-completed', body))
+  check('invalid class-completion bodies are refused rather than interpreted as completed', invalidClassResponses.every(r => r.status === 400))
+  const afterInvalid = (await admin.from('profiles').select('classes_completed_at').eq('id', uid).single().throwOnError()).data!
+  check('invalid bodies leave class completion untouched', afterInvalid.classes_completed_at === beforeProfile.classes_completed_at)
+  const savedProfile = await json('/api/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'Onboarding fixture' }) })
+  check('the guarded profile route persists its name through the planning command', savedProfile.status === 200 && savedProfile.body.ok)
+  const retiredTry = await json('/api/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'x', maxSessionMinutes: 20 }) })
+  check('planning fields are explicitly refused here (retired), changing nothing', retiredTry.status === 400 && retiredTry.body.code === 'RETIRED_FIELD' && (await admin.from('profiles').select('display_name,max_session_minutes').eq('id', uid).single().throwOnError()).data!.display_name === 'Onboarding fixture')
+  const afterProfile = (await admin.from('profiles').select('display_name,max_session_minutes,prep_mode,class_pattern').eq('id', uid).single().throwOnError()).data!
+  check('profile edits keep omitted preparation context', afterProfile.display_name === 'Onboarding fixture' && afterProfile.prep_mode === beforeProfile.prep_mode && afterProfile.class_pattern === beforeProfile.class_pattern)
+
   finish()
 }
 
-function finish() {
-  console.log(`\n${passed} passed, ${failed} failed\n`)
+async function finish() {
+  if (createdId) await admin.auth.admin.deleteUser(createdId).catch(() => {})
+  console.log(`\nDeleted the throwaway student.\n${passed} passed, ${failed} failed\n`)
   process.exit(failed === 0 ? 0 : 1)
 }
 
-main().catch(e => { console.error('\nCrashed:', e); process.exit(1) })
+main().catch(async e => { console.error('\nCrashed:', e); failed++; await finish() })

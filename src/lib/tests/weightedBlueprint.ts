@@ -57,8 +57,11 @@ export type WeightedBlueprint = {
 const CARRIED_SHARE = 0.15
 
 const mid = (w: SubjectWeight) => (w.min + w.max) / 2
-/** Reading rank: pages, moderated by how many outcomes are eligible (1..5+). */
-const readingScore = (pages: number, outcomes: number) => Math.max(1, pages) * (0.5 + 0.5 * Math.min(1, outcomes / 5))
+/**
+ * Reading rank inside a subject: the reading's size in eligible outcomes. Page count is only a tie-breaker, and only when the
+ * edition's page metadata is complete (`pagesKnown`); otherwise it is ignored rather than guessed.
+ */
+const readingScore = (pages: number, outcomes: number, pagesKnown: boolean) => Math.max(1, outcomes) + (pagesKnown ? Math.max(0, pages) * 1e-4 : 0)
 
 /** Largest-remainder apportionment; deterministic (ties by key). */
 export function apportion(total: number, shares: { key: string; weight: number }[]): Map<string, number> {
@@ -99,7 +102,7 @@ export function allocateWeighted(input: WeightedInput): WeightedBlueprint {
 
   const readingInfo = new Map(readingsInScope.map(r => {
     const els = eligible.filter(t => t.readingId === r.readingId)
-    return [r.readingId, { r, outcomes: els, score: readingScore(r.pageCount, els.length), pages: r.pageCount }]
+    return [r.readingId, { r, outcomes: els, score: readingScore(r.pageCount, els.length, pagesKnown), pages: r.pageCount }]
   }))
   const subjectIds = [...new Set(readingsInScope.map(r => r.subjectId))]
   const subjectPages = new Map(subjectIds.map(s => [s, readingsInScope.filter(r => r.subjectId === s).reduce((n, r) => n + r.pageCount, 0)]))
@@ -108,9 +111,11 @@ export function allocateWeighted(input: WeightedInput): WeightedBlueprint {
   const ranked = [...readingInfo.values()].sort((a, b) =>
     mid(weightOf.get(b.r.subjectId) ?? { id: '', min: 0, max: 0 }) - mid(weightOf.get(a.r.subjectId) ?? { id: '', min: 0, max: 0 })
     || b.pages - a.pages || a.r.readingId.localeCompare(b.r.readingId))
-  const floorReadings = ranked.slice(0, Math.min(scopeQ, ranked.length))
-  const floorMap = new Map(floorReadings.map(x => [x.r.readingId, 1]))
-  const remaining = scopeQ - floorReadings.length
+  // Breadth before depth: when the paper can afford it, EVERY eligible outcome gets one question before any reading gets a second.
+  const coversAllOutcomes = scopeQ >= eligible.length
+  const floorReadings = coversAllOutcomes ? ranked : ranked.slice(0, Math.min(scopeQ, ranked.length))
+  const floorMap = new Map(floorReadings.map(x => [x.r.readingId, coversAllOutcomes ? x.outcomes.length : 1]))
+  const remaining = scopeQ - [...floorMap.values()].reduce((n, q) => n + q, 0)
 
   // --- subject shares by exam-weight midpoint over subjects in scope; equal weights tie-break on pages
   const subjShares = subjectIds.map(id => {
@@ -133,6 +138,7 @@ export function allocateWeighted(input: WeightedInput): WeightedBlueprint {
   for (const [rid, q] of readingQ) {
     const info = readingInfo.get(rid)!
     const spread = apportion(q, info.outcomes.map(t => ({ key: t.outcomeId, weight: t.weight })))
+    if (coversAllOutcomes) { const extra = apportion(q - info.outcomes.length, info.outcomes.map(t => ({ key: t.outcomeId, weight: t.weight }))); for (const t of info.outcomes) spread.set(t.outcomeId, 1 + (extra.get(t.outcomeId) ?? 0)) }
     for (const t of info.outcomes) {
       const n = spread.get(t.outcomeId) ?? 0
       if (n > 0) perOutcome.push({ outcomeId: t.outcomeId, readingId: rid, subjectId: t.subjectId, questions: n, kind: t.kind })

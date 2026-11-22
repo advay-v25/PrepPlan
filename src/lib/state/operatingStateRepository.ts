@@ -62,9 +62,10 @@ export class OperatingStateRepository {
   async getTodayBlocks(dateLocal: string) {
     const { data, error } = await this.supabase
       .from('plan_blocks')
-      .select('id, title, detail, task_type, origin, duration_minutes, placement, starts_at, execution, revision')
+      .select('id, title, detail, task_type, origin, duration_minutes, placement, starts_at, execution, revision, rationale')
       .eq('user_id', this.userId)
       .eq('local_date', dateLocal)
+      .is('learning_activity_id',null).is('cancelled_at',null).neq('execution','cancelled')
     if (error) throw error
     return data
   }
@@ -103,9 +104,10 @@ export class OperatingStateRepository {
   async getCycleBlocks(cycleId: string) {
     const { data, error } = await this.supabase
       .from('plan_blocks')
-      .select('id, title, detail, task_type, origin, duration_minutes, placement, starts_at, execution, revision, local_date')
+      .select('id, title, detail, task_type, origin, duration_minutes, placement, starts_at, execution, revision, local_date, rationale, repair_thread_id, dependencies, sitting_ordinal')
       .eq('user_id', this.userId)
       .eq('cycle_id', cycleId)
+      .is('learning_activity_id',null).is('cancelled_at',null).neq('execution','cancelled')
     if (error) throw error
     return data
   }

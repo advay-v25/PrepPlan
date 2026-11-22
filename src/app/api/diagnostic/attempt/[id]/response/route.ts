@@ -1,5 +1,7 @@
+import { routeFailure } from '../../../../../../lib/ops/routeFailure'
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../../../lib/supabase/server'
+import { requireApplicationAccess } from '../../../../../../lib/auth/applicationAccess'
 
 /**
  * Records one answer via atomic RPC.
@@ -14,8 +16,9 @@ const CONFIDENCE_SCALE: Record<string, number> = { low: 1, medium: 3, high: 5 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
   const { id: attemptId } = await params
   const body = await req.json().catch(() => ({} as any))
@@ -63,12 +66,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   if (respErr) {
     // Graceful lock or conflict errors
     if (respErr.message.includes('Attempt not found') || respErr.message.includes('Attempt is')) {
-       return NextResponse.json({ ok: false, error: respErr.message }, { status: 409 })
+       return NextResponse.json({ ok: false, error: 'This paper is no longer accepting answers.' }, { status: 409 })
     }
     if (respErr.message.includes('Item not in form') || respErr.message.includes('Item not found')) {
-       return NextResponse.json({ ok: false, error: respErr.message }, { status: 400 })
+       return NextResponse.json({ ok: false, error: 'That question is unavailable in this paper.' }, { status: 400 })
     }
-    return NextResponse.json({ ok: false, error: respErr.message }, { status: 500 })
+    return routeFailure('diagnostic.answer', 'Could not confirm your answer. Try saving again.', respErr)
   }
 
   // Deliberately no correctness in the response body.

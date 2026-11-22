@@ -1,12 +1,17 @@
 import { notFound, permanentRedirect, redirect } from 'next/navigation'
 import { createClient } from '../../../lib/supabase/server'
 import { createAdminClient } from '../../../lib/supabase/admin'
-import { isStep, STEPS, RETIRED_STEPS } from '../../../lib/onboarding/steps'
-import { safeReturnTo } from '../../../lib/routing/registry'
+import { isStep, STEPS, STEP_META, RETIRED_STEPS } from '../../../lib/onboarding/steps'
+import { ROUTES, safeReturnTo } from '../../../lib/routing/registry'
 import { readCanonicalState } from '../../../lib/onboarding/service'
 import { OnboardingShell } from '../../../components/onboarding/OnboardingShell'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({ params }: { params: Promise<{ step: string }> }) {
+  const { step } = await params
+  return { title: isStep(step) ? STEP_META[step].nav : 'Set up Roadmap' }
+}
 
 export default async function OnboardingStepPage({
   params, searchParams,
@@ -15,7 +20,7 @@ export default async function OnboardingStepPage({
   // A saved link to a retired screen keeps working.
   if (step in RETIRED_STEPS) permanentRedirect(`/onboarding/${RETIRED_STEPS[step]}`)
   if (!isStep(step)) notFound()
-  const returnTo = safeReturnTo((await searchParams).returnTo)
+  const requestedReturn = safeReturnTo((await searchParams).returnTo)
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -34,32 +39,37 @@ export default async function OnboardingStepPage({
     redirect(`/onboarding/${state.firstIncompleteStep}`)
   }
 
+  // Back to Review is honoured for a student who has reached it (every step answered); everything else needs a finished setup.
+  const returnTo = requestedReturn && (isComplete || (requestedReturn === ROUTES.onboarding.plan && state.firstIncompleteStep === 'plan')) ? requestedReturn : null
+
   const admin = createAdminClient()
-  const today = new Date().toISOString().slice(0, 10)
 
   // Only sittings the active curriculum supports (currently 2027) are offered.
   const { data: manifest } = await admin.from('curriculum_manifests').select('year').eq('is_active', true).limit(1).maybeSingle()
 
-  const [{ data: windows }, { data: topics }] = await Promise.all([
+  const [{ data: windows }, { data: topics }, { data: modules }] = await Promise.all([
     admin.from('exam_windows')
-      .select('id, year, sitting, window_opens, is_confirmed')
+      .select('id, year, sitting, window_opens, window_closes, is_confirmed')
       .eq('year', manifest?.year ?? 2027)
-      .gt('window_opens', today)
+      .gt('window_closes', new Date().toISOString())
       .order('year').order('window_opens'),
     admin.from('topics')
       .select('id, name, exam_weight_min, exam_weight_max, summary')
       .order('default_sequence'),
+    // Reading names for the optional per-reading refinement; the list is only shown when a topic is opened.
+    admin.from('learning_modules').select('id, topic_id, name, sequence_hint').eq('is_active', true).order('sequence_hint'),
   ])
 
   return (
     <OnboardingShell
       step={step}
       state={state}
-      returnTo={isComplete ? returnTo : null}
+      returnTo={returnTo}
       windows={(windows ?? []).map(w => ({
         id: w.id as string, year: w.year as number, sitting: w.sitting as string,
-        opens: (w.window_opens ?? null) as string | null, confirmed: Boolean(w.is_confirmed),
+        opens: (w.window_opens ?? null) as string | null, closes: (w.window_closes ?? null) as string | null, confirmed: Boolean(w.is_confirmed),
       }))}
+      readings={(modules ?? []).map(m => ({ id: m.id as string, topicId: m.topic_id as string, name: m.name as string }))}
       topics={(topics ?? []).map(t => ({
         id: t.id as string, name: t.name as string,
         weightMin: Number(t.exam_weight_min), weightMax: Number(t.exam_weight_max),

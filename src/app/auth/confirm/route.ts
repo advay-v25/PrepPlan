@@ -1,11 +1,15 @@
-import { NextResponse } from 'next/server'
-import type { EmailOtpType } from '@supabase/supabase-js'
-import { createClient } from '../../../lib/supabase/server'
-import { safeNextPath } from '../../../lib/auth/redirect'
+import { redirect } from 'next/navigation'
+import { authDestination } from '../../../lib/auth/redirect'
 
-export async function GET(request: Request) {
-  const url = new URL(request.url); const tokenHash = url.searchParams.get('token_hash'); const type = url.searchParams.get('type') as EmailOtpType | null; const next = safeNextPath(url.searchParams.get('next'), '/onboarding')
-  if (!tokenHash || !type) return NextResponse.redirect(new URL('/auth/error?reason=invalid', url.origin))
-  const supabase = await createClient(); const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
-  return NextResponse.redirect(new URL(error ? '/auth/error?reason=expired' : next, url.origin))
+/** Older signup and sign-in links now open a confirmation screen without using the token. */
+export function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const tokenHash = searchParams.get('token_hash')
+  const type = searchParams.get('type')
+  if (type === 'recovery') redirect('/forgot-password')
+  if (!tokenHash || !/^[A-Za-z0-9_-]{20,256}$/.test(tokenHash) || (type !== 'signup' && type !== 'magiclink')) {
+    redirect('/auth/error?reason=invalid')
+  }
+  const fragment = new URLSearchParams({ token_hash: tokenHash, type, next: authDestination(searchParams.get('next')) })
+  redirect('/auth/verify#' + fragment.toString())
 }

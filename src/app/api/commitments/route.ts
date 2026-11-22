@@ -1,7 +1,11 @@
+import { routeFailure } from '../../../lib/ops/routeFailure'
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../lib/supabase/server'
 import { getStudyWeekContext } from '../../../lib/planning/schedule'
 import { zonedTimeToUtc } from '../../../lib/planning/studyWeek'
+import { requireApplicationAccess } from '../../../lib/auth/applicationAccess'
+import { commitmentConflict, isBookingConflict } from '../../../lib/planning/bookingConflict'
+import { createAdminClient } from '../../../lib/supabase/admin'
 
 /**
  * Recurring and one-off commitments — classes, work, life.
@@ -14,8 +18,9 @@ const KINDS = ['class', 'work', 'personal', 'travel', 'other']
 
 export async function GET() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
   const { data, error } = await supabase
     .from('calendar_commitments')
@@ -24,14 +29,16 @@ export async function GET() {
     .eq('status', 'active')
     .order('created_at', { ascending: true })
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error && isBookingConflict(error)) return NextResponse.json(commitmentConflict(error), { status: 409 })
+  if (error) return routeFailure('commitments', 'Your commitments could not be loaded. Try again.', error)
   return NextResponse.json({ ok: true, commitments: data ?? [] })
 }
 
 export async function POST(req: Request) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
   const body = await req.json().catch(() => ({} as any))
   const kind = KINDS.includes(body.kind) ? body.kind : 'other'
@@ -66,22 +73,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: 'It has to end after it starts' }, { status: 400 })
     }
 
-    const startsOn = typeof body.startsOn === 'string' ? body.startsOn : ctx.week.startDate
+    const isDate = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)
+    const startsOn = isDate(body.startsOn) ? body.startsOn : ctx.week.startDate
     // starts_at/ends_at remain NOT NULL; a series anchors them to its first occurrence.
     const anchorStart = zonedTimeToUtc(startsOn, body.startTime, ctx.timezone)
     const anchorEnd = zonedTimeToUtc(startsOn, body.endTime, ctx.timezone)
 
-    const { data, error } = await supabase.from('calendar_commitments').insert({
+    const { data, error } = await createAdminClient().from('calendar_commitments').insert({
       user_id: user.id, label: effectiveLabel, kind, recurrence: 'weekly', weekdays,
       start_time: body.startTime, end_time: body.endTime,
-      starts_on: startsOn, ends_on: typeof body.endsOn === 'string' ? body.endsOn : null,
+      starts_on: startsOn, ends_on: isDate(body.endsOn) ? body.endsOn : null,
       timezone: ctx.timezone,
       starts_at: anchorStart.toISOString(), ends_at: anchorEnd.toISOString(),
       is_protected: body.isProtected !== false,
       source: 'student', status: 'active',
     }).select('*').single()
 
-    if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+    if (error && isBookingConflict(error)) return NextResponse.json(commitmentConflict(error), { status: 409 })
+    if (error && isBookingConflict(error)) return NextResponse.json(commitmentConflict(error), { status: 409 })
+  if (error) return routeFailure('commitments', 'Could not confirm the new commitment. Check Calendar before trying again.', error)
     return NextResponse.json({ ok: true, commitment: data })
   }
 
@@ -92,7 +102,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'It has to end after it starts' }, { status: 400 })
   }
 
-  const { data, error } = await supabase.from('calendar_commitments').insert({
+  const { data, error } = await createAdminClient().from('calendar_commitments').insert({
     user_id: user.id, label: effectiveLabel, kind, recurrence: 'none',
     starts_at: zonedTimeToUtc(body.date, body.startTime, ctx.timezone).toISOString(),
     ends_at: zonedTimeToUtc(body.date, body.endTime, ctx.timezone).toISOString(),
@@ -102,6 +112,7 @@ export async function POST(req: Request) {
     source: 'student', status: 'active',
   }).select('*').single()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error && isBookingConflict(error)) return NextResponse.json(commitmentConflict(error), { status: 409 })
+  if (error) return routeFailure('commitments', 'Could not confirm the change. Check Calendar before trying again.', error)
   return NextResponse.json({ ok: true, commitment: data })
 }

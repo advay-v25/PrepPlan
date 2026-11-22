@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
 import { recoverActivation } from '../../../../lib/planning/activation/recoverActivation'
+import { requireSetupAccess } from '../../../../lib/auth/applicationAccess'
+import { rateLimit } from '../../../../lib/auth/securityServer'
 
 /**
  * Activation recovery. POST only — a link prefetch or page render must never
@@ -9,8 +11,11 @@ import { recoverActivation } from '../../../../lib/planning/activation/recoverAc
  */
 export async function POST() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireSetupAccess(supabase)
+  if (!access.ok) return access.response
+  const { user } = access
+  const limited = await rateLimit('study_activation', user.id)
+  if (limited) return limited
 
   const requestId = crypto.randomUUID()
   try {

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
 import { createAdminClient } from '../../../../lib/supabase/admin'
+import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,8 +16,9 @@ const BANDS = ['repair', 'verify', 'maintain', 'untested']
  */
 export async function POST(request: Request) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
   const body = await request.json().catch(() => null) as any
   if (!body || typeof body.outcomeId !== 'string' || body.outcomeId.length > 60 || !['set', 'revoke'].includes(body.action)) {
     return NextResponse.json({ ok: false, error: 'Invalid request.' }, { status: 400 })

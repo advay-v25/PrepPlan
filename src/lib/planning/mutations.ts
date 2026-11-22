@@ -21,7 +21,7 @@ export type Occupant = Interval & {
   title: string
   /** Protected occupants refuse overlap; everything else merely warns. */
   isProtected: boolean
-  kind: 'commitment' | 'class' | 'task'
+  kind: 'commitment' | 'class' | 'task' | 'mock'
 }
 
 export const end = (i: Interval) => i.start + i.durationMinutes
@@ -149,7 +149,7 @@ export function formatMinutes(minutes: number): string {
 
 export type SplitResult = {
   first: { durationMinutes: number }
-  second: { durationMinutes: number; date: string; start: number | null }
+  second: { durationMinutes: number; date: string | null; start: number | null }
 }
 
 /**
@@ -167,28 +167,19 @@ export function splitTask(
   const total = task.durationMinutes
   if (total < 30) throw new Error('A session shorter than 30 minutes cannot usefully be split')
 
-  const rawFirst = options.at ?? Math.round(total / 2)
-  // Keep both halves on the 5-minute grid and each at least 15 minutes.
-  const first = Math.max(15, Math.min(total - 15, Math.round(rawFirst / 5) * 5))
+  const first = options.at ?? Math.floor(total / 10) * 5
+  if (!Number.isInteger(first) || first < 15 || first > total - 15 || first % 5 !== 0) {
+    throw new Error('Each sitting needs at least 15 minutes; use a whole 5-minute split point.')
+  }
   const second = total - first
-
-  const occupants = options.occupants ?? []
-  const ignoreIds = options.ignoreIds ?? []
-
-  // Try to place the second half the same day, after the first; otherwise leave
-  // it dated but unplaced rather than inventing a slot that does not fit.
-  const sameDay = suggestSlots(
-    { date: task.date, start: task.start + first + 15, durationMinutes: second },
-    occupants,
-    { ignoreIds, searchDays: [task.date], limit: 1 }
-  )
-
+  // The student places the remaining sitting. Never invent a time or spill it
+  // beyond the accepted cycle merely because a class fills today's gaps.
   return {
     first: { durationMinutes: first },
     second: {
       durationMinutes: second,
-      date: sameDay.length ? sameDay[0].date : addDays(task.date, 1),
-      start: sameDay.length ? sameDay[0].start : null,
+      date: null,
+      start: null,
     },
   }
 }
@@ -229,6 +220,8 @@ export type Occurrence = {
   durationMinutes: number
   /** True when this occurrence was individually moved from its series slot. */
   moved: boolean
+  /** The series slot this occurrence belongs to (its identity); equals `date` unless it was moved. */
+  originalDate: string
 }
 
 function timeToMinutes(t: string): number {
@@ -285,7 +278,7 @@ export function expandCommitment(
       out.push({
         commitmentId: commitment.id, label: commitment.label, kind: commitment.kind,
         isProtected: commitment.isProtected, date: movedDate, start,
-        durationMinutes: Math.max(15, finish - start), moved: true,
+        durationMinutes: Math.max(15, finish - start), moved: true, originalDate: date,
       })
       continue
     }
@@ -294,7 +287,7 @@ export function expandCommitment(
     out.push({
       commitmentId: commitment.id, label: commitment.label, kind: commitment.kind,
       isProtected: commitment.isProtected, date, start: baseStart,
-      durationMinutes: baseDuration, moved: false,
+      durationMinutes: baseDuration, moved: false, originalDate: date,
     })
   }
 
@@ -308,9 +301,9 @@ export function expandCommitment(
 export const MIN_DURATION = 5
 export const MAX_DURATION = 180
 
-export function validateDuration(minutes: number): { ok: true; value: number } | { ok: false; error: string } {
+export function validateDuration(minutes: number, existing?: number): { ok: true; value: number } | { ok: false; error: string } {
   if (!Number.isFinite(minutes)) return { ok: false, error: 'Duration must be a number' }
-  const rounded = Math.round(minutes / 5) * 5
+  const rounded = minutes === existing && Number.isInteger(minutes) ? minutes : Math.round(minutes / 5) * 5
   if (rounded < MIN_DURATION) return { ok: false, error: `A session cannot be shorter than ${MIN_DURATION} minutes` }
   if (rounded > MAX_DURATION) return { ok: false, error: `A single sitting longer than ${MAX_DURATION} minutes is not a session — split it instead` }
   return { ok: true, value: rounded }
@@ -321,4 +314,14 @@ export function validateStart(minutes: number): { ok: true; value: number } | { 
   const rounded = Math.round(minutes / 5) * 5
   if (rounded < 0 || rounded >= 24 * 60) return { ok: false, error: 'Start time must fall within the day' }
   return { ok: true, value: rounded }
+}
+
+/** Manual changes can be exceptions to usual preferences, but never silently. Protected-time checks remain separate and cannot be overridden. */
+export function manualPlacementWarnings(start: number | null, duration: number, maxSession: number | null, windows: { start: number; end: number }[]): string[] {
+  const warnings: string[] = []
+  if (maxSession !== null && duration > maxSession) warnings.push(`This ${duration}-minute sitting is longer than your usual ${maxSession}-minute limit.`)
+  if (start !== null && !windows.some(w => start >= w.start && start + duration <= w.end)) warnings.push('This sitting is outside your saved study windows. Keep it only if you have time on this occasion.')
+  else if (start === null && windows.length === 0) warnings.push('You have no saved study window on this day. Keep it only if you have time on this occasion.')
+  else if (start === null && !windows.some(w => w.end - w.start >= duration)) warnings.push('No single saved study window on this day is long enough for this sitting. Keep it only if you have extra time on this occasion.')
+  return warnings
 }

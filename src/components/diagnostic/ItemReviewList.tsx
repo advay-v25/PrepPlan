@@ -28,11 +28,14 @@ export type ReviewRow = {
   errorDescription: string | null
   unreviewed: boolean
   challenged: boolean
+  omitted?: boolean
+  flagged?: boolean
+  challengeStatus?: 'pending' | 'upheld' | 'dismissed' | null
   /** Reading, outcome, timing and pattern context (present for the newer taking flow). */
   extra?: { readingLabel: string | null; readingHref: string | null; outcomeTitle: string | null; difficulty: string | null; form: string | null; timing: string; pattern: string | null; tags: string[]; activeSeconds: number | null }
 }
 
-type Filter = 'all' | 'wrong' | 'unsure' | 'patterns'
+type Filter = 'all' | 'wrong' | 'unsure' | 'omitted' | 'flagged' | 'patterns'
 
 const TAG_LABEL: Record<string, string> = { correct_guess: 'Correct guess', slow_correct: 'Slow but correct', confident_mistake: 'Confident mistake', repeated_misconception: 'Repeated mistake', changed_answer: 'Changed answer', interrupted: 'Interrupted' }
 const PATTERN_LABEL: Record<string, string> = { stronger_evidence: 'Right and sure — stronger evidence', possible_recognition: 'Right but guessing — possible recognition', confident_misconception: 'Wrong and sure — possible misconception', knowledge_gap: 'Wrong and guessing — a gap', unsettled: 'Medium confidence — unsettled' }
@@ -40,25 +43,29 @@ const PATTERN_LABEL: Record<string, string> = { stronger_evidence: 'Right and su
 const CONFIDENCE_LABEL: Record<number, string> = { 1: 'not sure', 2: 'not sure', 3: 'fairly sure', 4: 'confident', 5: 'confident' }
 
 export function ItemReviewList({ rows, attemptId }: { rows: ReviewRow[]; attemptId: string }) {
-  const [filter, setFilter] = useState<Filter>(rows.some(r => r.isCorrect === false) ? 'wrong' : 'all')
+  const [filter, setFilter] = useState<Filter>(rows.some(r => r.isCorrect === false && !r.omitted) ? 'wrong' : 'all')
 
   // Open the first question that needs attention. Landing on a wall of collapsed
   // rows makes the reader hunt for the thing they came here to see.
   const [open, setOpen] = useState<Set<string>>(() => {
-    const first = rows.find(r => r.isCorrect === false) ?? rows[0]
+    const first = rows.find(r => r.isCorrect === false && !r.omitted) ?? rows[0]
     return first ? new Set([first.itemId]) : new Set()
   })
   const [challenging, setChallenging] = useState<string | null>(null)
   const [challenged, setChallenged] = useState<Set<string>>(new Set(rows.filter(r => r.challenged).map(r => r.itemId)))
 
-  const wrongCount = rows.filter(r => r.isCorrect === false).length
-  const unsureCount = rows.filter(r => (r.confidence ?? 5) <= 2).length
+  const wrongCount = rows.filter(r => r.isCorrect === false && !r.omitted).length
+  const unsureCount = rows.filter(r => !r.omitted && (r.confidence ?? 5) <= 2).length
+  const omittedCount = rows.filter(r => r.omitted).length
+  const flaggedCount = rows.filter(r => r.flagged).length
   const patternRows = (r: ReviewRow) => (r.extra?.tags ?? []).some(t => ['correct_guess', 'slow_correct', 'confident_mistake', 'repeated_misconception'].includes(t))
   const patternCount = rows.filter(patternRows).length
 
   const visible = rows.filter(row => {
-    if (filter === 'wrong') return row.isCorrect === false
-    if (filter === 'unsure') return (row.confidence ?? 5) <= 2
+    if (filter === 'wrong') return row.isCorrect === false && !row.omitted
+    if (filter === 'unsure') return !row.omitted && (row.confidence ?? 5) <= 2
+    if (filter === 'omitted') return Boolean(row.omitted)
+    if (filter === 'flagged') return Boolean(row.flagged)
     if (filter === 'patterns') return patternRows(row)
     return true
   })
@@ -75,6 +82,8 @@ export function ItemReviewList({ rows, attemptId }: { rows: ReviewRow[]; attempt
   const filters: { key: Filter; label: string; count: number }[] = [
     { key: 'wrong', label: 'Got wrong', count: wrongCount },
     { key: 'unsure', label: 'Unsure', count: unsureCount },
+    { key: 'omitted', label: 'Not answered', count: omittedCount },
+    { key: 'flagged', label: 'Flagged', count: flaggedCount },
     { key: 'patterns', label: 'Patterns', count: patternCount },
     { key: 'all', label: 'All', count: rows.length },
   ]
@@ -83,7 +92,7 @@ export function ItemReviewList({ rows, attemptId }: { rows: ReviewRow[]; attempt
     <div className="review-list">
       <div className="review-filters" role="tablist" aria-label="Filter questions">
         {filters.map(f => (
-          <button
+          <button type="button"
             key={f.key}
             role="tab"
             aria-selected={filter === f.key}
@@ -98,16 +107,17 @@ export function ItemReviewList({ rows, attemptId }: { rows: ReviewRow[]; attempt
 
       {visible.length === 0 ? (
         <p className="text-muted">
-          {filter === 'wrong' ? 'You did not get any of these wrong.' : 'Nothing matches that filter.'}
+          {filter === 'wrong' ? 'You did not get any of these wrong.' : filter === 'omitted' ? 'You answered every question.' : 'Nothing matches that filter.'}
         </p>
       ) : (
         <div className="review-rows">
           {visible.map(row => {
             const isOpen = open.has(row.itemId)
             const correct = row.isCorrect === true
+            const skipped = Boolean(row.omitted)
             return (
-              <article key={row.itemId} className={`review-item ${correct ? 'is-correct' : 'is-wrong'}`}>
-                <button
+              <article key={row.itemId} data-omitted={skipped || undefined} className={`review-item ${correct ? 'is-correct' : 'is-wrong'}`}>
+                <button type="button"
                   className="review-item__head"
                   onClick={() => toggle(row.itemId)}
                   aria-expanded={isOpen}
@@ -119,6 +129,8 @@ export function ItemReviewList({ rows, attemptId }: { rows: ReviewRow[]; attempt
                     <span className="review-item__stem">{row.stem}</span>
                     <span className="review-item__meta">
                       {row.conceptName && <span>{row.conceptName}</span>}
+                      {skipped && <span className="review-item__error">Not answered — no cause is assumed</span>}
+                      {row.flagged && <span>flagged</span>}
                       {row.confidence !== null && <span>you were {CONFIDENCE_LABEL[row.confidence] ?? 'unsure'}</span>}
                       {row.errorLabel && <span className="review-item__error">{row.errorLabel}</span>}
                       {(row.extra?.tags ?? []).filter(t => t !== 'changed_answer').map(t => <span key={t} className="review-item__error">{TAG_LABEL[t] ?? t}</span>)}
@@ -141,7 +153,7 @@ export function ItemReviewList({ rows, attemptId }: { rows: ReviewRow[]; attempt
 
                     {row.extra && (
                       <p className="review-context">
-                        {row.extra.readingHref && row.extra.readingLabel && <a href={row.extra.readingHref}>{row.extra.readingLabel}</a>}
+                        {row.extra.readingHref && row.extra.readingLabel && <><a href={row.extra.readingHref}>{row.extra.readingLabel}</a> · <a href={`${row.extra.readingHref}#notes-h`}>your note on this reading</a></>}
                         {row.extra.outcomeTitle && <> · {row.extra.outcomeTitle}</>}
                         {row.extra.difficulty && <> · {row.extra.difficulty}</>}
                         {row.extra.activeSeconds !== null && <> · {row.extra.activeSeconds}s active{row.extra.timing === 'slow' ? ' (slow for this type)' : ''}</>}
@@ -189,10 +201,14 @@ export function ItemReviewList({ rows, attemptId }: { rows: ReviewRow[]; attempt
                     )}
 
                     <div className="review-item__foot">
-                      {challenged.has(row.itemId) ? (
-                        <span className="status-line"><i />Challenge raised — under review</span>
+                      {row.challengeStatus === 'upheld' ? (
+                        <span className="status-line"><i />Your report was upheld — this question was set aside and your score adjusted.</span>
+                      ) : row.challengeStatus === 'dismissed' ? (
+                        <span className="status-line"><i />Your report was reviewed and the question stands; your score is unchanged.</span>
+                      ) : challenged.has(row.itemId) ? (
+                        <span className="status-line"><i />Challenge raised — under review, still counted for now</span>
                       ) : (
-                        <button className="flag-button" onClick={() => setChallenging(row.itemId)}>
+                        <button type="button" className="flag-button" onClick={() => setChallenging(row.itemId)}>
                           <Flag size={14} aria-hidden /> Something is wrong with this question
                         </button>
                       )}

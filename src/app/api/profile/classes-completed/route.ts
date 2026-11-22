@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
 import { todayInZone } from '../../../../lib/planning/studyWeek'
+import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
+import { createAdminClient } from '../../../../lib/supabase/admin'
 
 /**
  * Manual fallback for "my classes have finished" — the only signal of this kind
@@ -12,11 +14,13 @@ import { todayInZone } from '../../../../lib/planning/studyWeek'
  */
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Not signed in' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
-  const body = await req.json().catch(() => ({}))
-  const done = body.done !== false
+  const body = await req.json().catch(() => null)
+  if (typeof body?.done !== 'boolean') return NextResponse.json({ ok: false, error: 'Choose whether your classes have finished.' }, { status: 400 })
+  const done = body.done
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -29,11 +33,14 @@ export async function POST(req: NextRequest) {
   }
 
   const classesCompletedAt = done ? todayInZone(profile.timezone ?? 'UTC', new Date()) : null
-  const { error } = await supabase
-    .from('profiles')
-    .update({ classes_completed_at: classesCompletedAt })
-    .eq('id', user.id)
+  // One transaction: the profile date AND the future of the weekly class series (see set_classes_finished). Past classes, logs and the accepted cycle are untouched.
+  const { data: result, error } = await createAdminClient().rpc('set_classes_finished', { p_user: user.id, p_done: done, p_date: classesCompletedAt ?? todayInZone(profile.timezone ?? 'UTC', new Date()) })
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
-  return NextResponse.json({ ok: true, classesCompletedAt })
+  if (error) { console.error('[classes-completed]', error.message); return NextResponse.json({ ok: false, error: 'Could not save this. Nothing was changed; try again.' }, { status: 500 }) }
+  const r = result as { ok: boolean; code?: string; conflicts?: { series: string; date: string; mock: string }[] }
+  if (!r.ok && r.code === 'UNDO_CONFLICT') {
+    // Nothing was changed. Restoring the classes would put one over a booked mock; the student reviews the mock (or keeps classes finished).
+    return NextResponse.json({ ok: false, code: 'UNDO_CONFLICT', conflicts: r.conflicts ?? [], error: 'Your classes were not restored: a class would land on a mock you booked. Nothing was changed. Move or cancel that mock in Calendar, then undo again, or keep your classes finished.', reviewHref: '/app/calendar' }, { status: 409 })
+  }
+  return NextResponse.json({ ok: true, classesCompletedAt: done ? classesCompletedAt : null, ...(result as object) })
 }

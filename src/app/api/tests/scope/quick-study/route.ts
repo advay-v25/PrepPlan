@@ -1,53 +1,28 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../../lib/supabase/server'
-import { createAdminClient } from '../../../../../lib/supabase/admin'
-import { todayInZone } from '../../../../../lib/planning/studyWeek'
+import { requireApplicationAccess } from '../../../../../lib/auth/applicationAccess'
+import { LearningLogError, learningLogSchema, recordLearning } from '../../../../../lib/learning/log'
 
 export const dynamic = 'force-dynamic'
 
-/**
- * "I studied this": records extra learning as a COMPLETED, curriculum-mapped Calendar block in the
- * open cycle, so it joins the paper's scope and stays visible on Calendar. Idempotent per key.
- * Body: { idempotencyKey, outcomeIds: string[], minutes?: 5..180 }. POST only.
- */
+/** Compatibility adapter. The UI now opens the same learning sheet as Home and Calendar. */
 export async function POST(request: Request) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
-  const body = await request.json().catch(() => null) as any
-  const key = body?.idempotencyKey
-  if (!body || typeof key !== 'string' || !/^[A-Za-z0-9_-]{8,60}$/.test(key) || !Array.isArray(body.outcomeIds) || body.outcomeIds.length < 1 || body.outcomeIds.length > 20
-    || body.outcomeIds.some((o: unknown) => typeof o !== 'string')) {
-    return NextResponse.json({ ok: false, error: 'Invalid request.' }, { status: 400 })
+  const db = await createClient()
+  const access = await requireApplicationAccess(db)
+  if (!access.ok) return access.response
+  const body = await request.json().catch(() => null)
+  const parsed = learningLogSchema.omit({ reading_id: true }).safeParse({
+    activity_type: 'independent_study', outcome_ids: body?.outcomeIds,
+    duration_minutes: body?.minutes, idempotency_key: body?.idempotencyKey,
+  })
+  if (!parsed.success) return NextResponse.json({ ok: false, error: 'Choose covered outcomes and optional whole minutes (1–720).' }, { status: 400 })
+  try {
+    const { data: outcomes } = await db.from('reading_los').select('id,reading_id').in('id', [...new Set(parsed.data.outcome_ids)]).throwOnError()
+    const readings = new Set((outcomes ?? []).map(o => o.reading_id as string))
+    if (readings.size !== 1 || outcomes?.length !== new Set(parsed.data.outcome_ids).size) return NextResponse.json({ ok: false, error: 'Log one reading per sitting, choosing its covered outcomes.' }, { status: 400 })
+    return NextResponse.json(await recordLearning(db, { ...parsed.data, reading_id: [...readings][0] }))
+  } catch (error) {
+    return NextResponse.json({ ok: false, code: error instanceof LearningLogError ? error.code : 'SAVE_UNCONFIRMED',
+      error: error instanceof LearningLogError ? error.message : 'Could not confirm the save. Retry the same log to check safely.' }, { status: error instanceof LearningLogError ? error.status : 503 })
   }
-  const minutes = body.minutes === undefined ? 30 : Number(body.minutes)
-  if (!Number.isInteger(minutes) || minutes < 5 || minutes > 180) return NextResponse.json({ ok: false, error: 'Minutes must be between 5 and 180.' }, { status: 400 })
-
-  const admin = createAdminClient()
-  const { data: cycle } = await admin.from('planning_cycles').select('id, timezone, starts_at_local, ends_at_local').eq('user_id', user.id).eq('status', 'active').maybeSingle()
-  if (!cycle) return NextResponse.json({ ok: false, code: 'no_cycle', error: 'There is no open week to add this to. Prepare your week in Calendar first.' }, { status: 409 })
-
-  const ids = [...new Set(body.outcomeIds as string[])]
-  const { data: los } = await admin.from('reading_los').select('id, title, reading_id').in('id', ids)
-  const { data: readings } = await admin.from('curriculum_readings').select('id, reading_no, structure_pending').in('id', [...new Set((los ?? []).map(l => l.reading_id as string))])
-  const rmap = new Map((readings ?? []).map(r => [r.id as string, r]))
-  if ((los ?? []).length !== ids.length || (los ?? []).some(l => rmap.get(l.reading_id as string)?.structure_pending)) {
-    return NextResponse.json({ ok: false, error: 'One of those outcomes is not part of the syllabus list yet.' }, { status: 400 })
-  }
-
-  const today = todayInZone((cycle.timezone as string | null) ?? 'UTC')
-  const rows = (los ?? []).map(l => ({
-    id: `qs-${key}-${l.id}`, user_id: user.id, cycle_id: cycle.id, title: `Studied: ${l.title} (Reading ${rmap.get(l.reading_id as string)!.reading_no})`,
-    detail: '', task_type: 'study', origin: 'student', priority: 'core', placement: 'day_preferred', execution: 'completed',
-    local_date: today, day: today, duration_minutes: minutes, duration: String(minutes), lm_id: l.reading_id, outcome_id: l.id,
-    rationale: 'Extra learning you recorded yourself.', created_by: 'student',
-  }))
-  // Deterministic ids make a repeat of the same key a no-op.
-  const { error } = await admin.from('plan_blocks').upsert(rows, { onConflict: 'id', ignoreDuplicates: true })
-  if (error) {
-    const requestId = crypto.randomUUID()
-    console.error(`[tests/scope/quick-study ${requestId}]`, error.message)
-    return NextResponse.json({ ok: false, error: 'Could not record it.', requestId }, { status: 500 })
-  }
-  return NextResponse.json({ ok: true, blocks: rows.length })
 }

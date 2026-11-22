@@ -15,7 +15,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const body = await req.json().catch(() => null) as any
   if (!body || !['pause', 'resume'].includes(body.action)) return NextResponse.json({ ok: false, error: 'Invalid request.' }, { status: 400 })
   if (!['ready', 'in_progress'].includes(attempt.status)) return NextResponse.json({ ok: false, code: 'closed', error: 'This attempt is closed.' }, { status: 409 })
-  if (attempt.deadline_at) return NextResponse.json({ ok: false, code: 'timed', error: 'A timed session cannot be paused.' }, { status: 409 })
+  if (attempt.deadline_at || attempt.time_limit_minutes) return NextResponse.json({ ok: false, code: 'timed', error: 'A timed session cannot be paused.' }, { status: 409 })
 
   const now = new Date()
   if (body.action === 'pause') {

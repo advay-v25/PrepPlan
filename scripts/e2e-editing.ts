@@ -1,82 +1,55 @@
 /**
- * C2 exit test.
+ * Calendar editing exit test (originally C2).
  *
- * The phase's stated bar: "two devices cannot silently overwrite each other,
- * and every accepted change has a visible history." Both are checked here
- * against the live endpoints, plus conflict refusal, split, undo, and
- * commitment recurrence with exceptions.
+ * The phase's stated bar: "two devices cannot silently overwrite each other, and every accepted change has a visible history." Both are checked
+ * here against the live endpoints, plus conflict refusal, split, undo, and commitment recurrence with exceptions.
  *
- *   npm run dev
- *   npx tsx scripts/e2e-editing.ts --reset
+ * It runs on its OWN freshly created, ordinary student (registered the moment it exists and deleted at the end, also on failure), so nothing a
+ * parallel worker holds on a shared account (a booked mock, an open week) can change its result, and it never touches another account.
+ *
+ *   npm run dev            (or an owned server; set E2E_BASE_URL)
+ *   npx tsx scripts/e2e-editing.ts
  */
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
-import { DEFAULT_DIAGNOSTIC_DAY, resolveStudyWeek, type Weekday } from '../src/lib/planning/studyWeek'
+import { addDays, todayInZone } from '../src/lib/planning/studyWeek'
+import { createStudent, preflightServer } from './lib/e2eSession'
 
 dotenv.config({ path: '.env.local', quiet: true } as any)
-
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
-
-const BASE = E2E_BASE_URL
-const EMAIL = getE2EEmail()
 
 let passed = 0, failed = 0
 const check = (n: string, ok: boolean, d = '') => { ok ? (passed++, console.log(`  ✓ ${n}`)) : (failed++, console.log(`  ✗ ${n}${d ? ` — ${d}` : ''}`)) }
 
-const jar = new Map<string, string>()
-function store(res: Response) {
-  for (const line of ((res.headers as any).getSetCookie?.() ?? []) as string[]) {
-    const [pair] = line.split(';'); const i = pair.indexOf('=')
-    if (i > 0) jar.set(pair.slice(0, i).trim(), pair.slice(i + 1).trim())
-  }
-}
-async function req(path: string, init: RequestInit = {}) {
-  const cookie = [...jar.entries()].map(([k, v]) => `${k}=${v}`).join('; ')
-  const res = await fetch(`${BASE}${path}`, { ...init, redirect: 'manual', headers: { ...(init.headers ?? {}), ...(cookie ? { cookie } : {}) } })
-  store(res); return res
-}
-async function json(path: string, init: RequestInit = {}) {
-  const res = await req(path, init); const t = await res.text()
-  try { return { status: res.status, body: JSON.parse(t) } } catch { return { status: res.status, body: { raw: t.slice(0, 200) } } }
-}
+const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+const owned: string[] = []
+let S: Awaited<ReturnType<typeof createStudent>>
+const req = (path: string, init: RequestInit = {}) => S.s.req(path, init)
+const json = (path: string, init: RequestInit = {}) => S.s.json(path, init)
 const send = (m: string) => (p: string, b?: unknown) =>
   json(p, { method: m, headers: { 'Content-Type': 'application/json' }, body: b === undefined ? undefined : JSON.stringify(b) })
 const post = send('POST'), patch = send('PATCH'), del = send('DELETE')
 
-const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
-
 async function main() {
-  console.log(`\nC2 exit test: calendar editing against ${BASE}\n`)
+  await preflightServer()
+  S = await createStudent(admin, 'ed', { onboard: true, register: id => owned.push(id) })
+  const uid = S.id
+  console.log(`\nCalendar editing exit test against a fresh student\n`)
+  check('signed in', true)
 
-  const { data: link } = await admin.auth.admin.generateLink({ type: 'magiclink', email: EMAIL })
-  let path = `/auth/confirm?token_hash=${(link!.properties as any).hashed_token}&type=magiclink&next=/app/calendar`
-  for (let i = 0; i < 5; i++) {
-    const res = await req(path); const loc = res.headers.get('location')
-    if (!loc) break
-    const u = new URL(loc, BASE); path = u.pathname + u.search
-    if (path.startsWith('/app')) break
-  }
-  check('signed in', path.startsWith('/app'))
-
-  const uid = await verifyAndGetE2EUser(admin)
-
-  if (process.argv.includes('--reset')) {
-    await admin.from('task_events').delete().eq('user_id', uid)
-    await admin.from('commitment_exceptions').delete().eq('user_id', uid)
-    await admin.from('calendar_commitments').delete().eq('user_id', uid)
-    await admin.from('plan_blocks').delete().eq('user_id', uid)
-    console.log('  (reset)')
-  }
-
-  const { data: profile } = await admin.from('profiles').select('diagnostic_day, timezone').eq('id', uid).maybeSingle()
-  const anchor = (profile?.diagnostic_day ?? DEFAULT_DIAGNOSTIC_DAY) as Weekday
-  const week = resolveStudyWeek({ anchorDay: anchor, timezone: profile?.timezone || 'UTC' })
-  const day = week.days[2]
-  const otherDay = week.days[3]
+  const cycle = (await admin.from('planning_cycles').select('starts_at_local, ends_at_local, timezone').eq('user_id', uid).eq('status', 'active').single()).data!
+  const today = todayInZone((cycle.timezone as string) || 'Europe/London')
+  // Unfinished work cannot be placed in the past, and the weekly paper owns the cycle's last day: use two days of the accepted cycle that are still ahead.
+  const ahead: string[] = []
+  for (let d = cycle.starts_at_local as string; d <= (cycle.ends_at_local as string); d = addDays(d, 1)) if (d >= today) ahead.push(d)
+  const week = { startDate: cycle.starts_at_local as string }
+  const day = ahead.length >= 3 ? ahead[ahead.length - 3] : ahead[0], otherDay = ahead.length >= 3 ? ahead[ahead.length - 2] : ahead[ahead.length - 1]
+  // The persona's weekday "Work" block (9:00-17:30) would block the daytime slots this script uses; it is this student's own row.
+  await admin.from('calendar_commitments').delete().eq('user_id', uid).eq('kind', 'work')
+  await admin.from('plan_blocks').delete().eq('user_id', uid).in('local_date', [day, otherDay]).neq('task_type', 'diagnostic')   // a clean pair of days (only this student's own rows)
 
   // --- Creating -----------------------------------------------------------
   console.log('\nCreating')
-  const created = await post('/api/tasks', { title: 'Quant drill', date: day, startMinutes: 10 * 60, durationMinutes: 60 })
+  const created = await post('/api/tasks', { title: 'Quant drill', date: day, startMinutes: 19 * 60, durationMinutes: 60 })
   check('a task can be created', created.body?.ok === true, JSON.stringify(created.body).slice(0, 160))
   const taskId = created.body?.task?.id
   if (!taskId) return finish()
@@ -139,7 +112,9 @@ async function main() {
 
   // --- Occurrence exceptions ---------------------------------------------
   console.log('\nOne-off changes to a series')
-  const skip = await patch(`/api/commitments/${classId}`, { scope: 'occurrence', occurrenceDate: day, kind: 'skipped' })
+  const skipBody = { action: 'occurrence_cancel', occurrenceDate: day }
+  const skipPreview = await post(`/api/commitments/${classId}/preview`, skipBody)
+  const skip = await patch(`/api/commitments/${classId}`, { ...skipBody, operationKey: `ed-${classId.slice(0, 8)}-skip`, fingerprint: skipPreview.body?.fingerprint })
   check('a single class can be cancelled', skip.body?.ok === true, JSON.stringify(skip.body).slice(0, 140))
 
   const nowFree = await patch(`/api/tasks/${taskId}`, { action: 'move', date: day, startMinutes: 18 * 60 + 30, durationMinutes: 60, expectedRevision: rev })
@@ -211,7 +186,6 @@ async function main() {
   check('deleting with the current revision works', deleted.body?.ok === true)
   check('and it is gone', (await admin.from('plan_blocks').select('id').eq('id', taskId).maybeSingle()).data === null)
 
-  finish()
 }
 
 function finish() {
@@ -219,4 +193,7 @@ function finish() {
   process.exit(failed === 0 ? 0 : 1)
 }
 
-main().catch(e => { console.error('\nCrashed:', e); process.exit(1) })
+main().catch(e => { console.error('\nCrashed:', e); failed++ }).finally(async () => {
+  for (const id of owned.splice(0)) { const r = await admin.auth.admin.deleteUser(id); if (r.error && !/not found/i.test(r.error.message)) console.log(`  cleanup of ${id} failed: ${r.error.message}`) }
+  finish()
+})

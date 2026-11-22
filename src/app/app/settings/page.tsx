@@ -5,14 +5,20 @@ import { CalendarDays, CheckCircle2, Clock, GraduationCap, Target } from 'lucide
 import { createClient } from '../../../lib/supabase/server'
 import { readCanonicalState } from '../../../lib/onboarding/service'
 import { ROUTE_OPTIONS } from '../../../lib/onboarding/steps'
-import { capacityRange, minutesBetween, weekdayName } from '../../../lib/planning/weekday'
-import type { Weekday } from '../../../lib/planning/studyWeek'
-import { resolvePulseDay } from '../../../lib/planning/pulse/weekBoundary'
 import { Card } from '../../../components/ui/Card'
 import { Notice } from '../../../components/ui/Notice'
 import { Badge } from '../../../components/ui/Badge'
+import { ReminderPrefs } from '../../../components/settings/ReminderPrefs'
+import { SupportLink } from '../../../components/legal/SupportLink'
 import { AccountActions } from '../../../components/settings/AccountActions'
+import { CalendarExport } from '../../../components/calendar/CalendarExport'
+import { DisplayNameForm } from '../../../components/settings/DisplayNameForm'
 import { ClassesCompletedToggle } from '../../../components/settings/ClassesCompletedToggle'
+import { listAppointments, type AppointmentSummary } from '../../../lib/planning/checkpointService'
+import { MOCK_KIND_LABEL } from '../../../lib/curriculum/entryContext'
+import { addDays, todayInZone } from '../../../lib/planning/studyWeek'
+
+export const metadata = { title: 'Settings' }
 
 export const dynamic = 'force-dynamic'
 
@@ -30,24 +36,20 @@ export default async function SettingsPage() {
 
   const state = await readCanonicalState(user.id)
   const p = (state.profile ?? {}) as Record<string, any>
+  const localToday = todayInZone(p.timezone || 'UTC')
   const route = ROUTE_OPTIONS.find(r => r.value === p.prep_mode)
 
   const availableSlots = state.availability
-  const totalMinutes = availableSlots.reduce((sum: number, a: any) => {
-    if (!a.start_time || !a.end_time) return sum
-    return sum + Math.max(0, minutesBetween(String(a.start_time).slice(0, 5), String(a.end_time).slice(0, 5)))
-  }, 0)
-  const range = capacityRange(totalMinutes)
-  
-  const { data: commitments } = await supabase.from('calendar_commitments').select('*').eq('user_id', user.id).eq('status', 'active')
+  // A failed read is "unavailable", never "none".
+  const mocksRead = await listAppointments(user.id).then(r => ({ ok: true as const, rows: r.filter(a => a.status === 'planned') })).catch(() => ({ ok: false as const, rows: [] as AppointmentSummary[] }))
+  const mockSchedule = mocksRead.rows
+  const commitmentsRead = await supabase.from('calendar_commitments').select('*').eq('user_id', user.id).eq('status', 'active')
+  const commitments = commitmentsRead.error ? null : commitmentsRead.data
   const classCount = (commitments ?? []).filter((c: any) => c.kind === 'class').length
   const otherCount = (commitments ?? []).filter((c: any) => c.kind !== 'class').length
-  const classWeekdays = (commitments ?? [])
-    .filter((c: any) => c.kind === 'class')
-    .flatMap((c: any) => (c.weekdays ?? []) as Weekday[])
-  const closingDay = resolvePulseDay(classWeekdays)
-  
-  const started = state.coverage.length
+
+  // `state.coverage` is TOPIC exposure the student reported (self-report), not modules and not evidence.
+  const reportedTopics = state.coverage.length
   const sections = [
     {
       icon: Target, title: 'Your exam',
@@ -57,46 +59,46 @@ export default async function SettingsPage() {
       badge: p.exam_sitting && p.exam_year
         ? (p.registered ? { label: 'registered', tone: 'success' as const } : { label: 'not registered yet', tone: 'neutral' as const })
         : null,
-      detail: 'Changing this rebuilds your roadmap phases around the new date.',
+      detail: `${p.registered && p.exam_date ? `Booked for ${p.exam_date}. ` : p.exam_sitting ? 'Target month only, no booked date yet. ' : ''}Changing this rebuilds your roadmap phases around the new date.`,
       href: onboardingHref('exam', ROUTES.app.settings),
+      examHref: '/app/exam',
     },
     {
       icon: GraduationCap, title: 'How you study',
       value: route ? route.label : 'Not chosen yet',
       badge: null,
       detail: classCount
-        ? `${classCount} weekly class slot${classCount === 1 ? '' : 's'}. Your classes lead the order of topics.`
-        : 'Roadmap decides the order of topics.',
+        ? `${classCount} weekly class slot${classCount === 1 ? '' : 's'}. Changing the class schedule can change when your next review happens and what comes next.`
+        : commitments === null ? 'Your classes could not be loaded right now; reload to try again.' : 'Adding classes can change the study order and review dates for future weeks.',
       href: onboardingHref('route', ROUTES.app.settings),
     },
     {
       icon: CheckCircle2, title: 'Where you are',
-      value: started > 0 ? `${started} modules marked as started or done` : 'Starting fresh',
+      value: reportedTopics > 0 ? `${reportedTopics} topic${reportedTopics === 1 ? '' : 's'} you reported as covered or in progress` : 'Nothing reported yet',
       badge: null,
-      detail: 'Only a diagnostic can mark something verified. This is context for planning.',
+      detail: p.mock_date
+        ? `Self-report: it orders your plan and never counts as evidence; only a scored paper does. This is context for planning. Your next mock is on ${p.mock_date}; your whole mock schedule (it can hold several) lives in Calendar, and this is the same schedule.`
+        : 'Self-report: it orders your plan and never counts as evidence; only a scored paper does.',
       href: onboardingHref('position', ROUTES.app.settings),
     },
     {
       icon: Clock, title: 'Your week',
-      value: availableSlots.length > 0
-        ? `${availableSlots.length} slots — roughly ${range.lowHours}–${range.highHours} hours`
-        : 'Not set',
+      value: availableSlots.length > 0 ? `${availableSlots.length} study window${availableSlots.length === 1 ? '' : 's'}${p.max_session_minutes ? ` · sittings up to ${p.max_session_minutes} min` : ''}` : 'Not set',
       badge: null,
-      detail: otherCount
-        ? `${otherCount} fixed commitment${otherCount === 1 ? '' : 's'} that study is never scheduled over.`
-        : 'Study work is placed inside these windows and nowhere else.',
+      detail: commitments === null
+        ? 'Your fixed commitments could not be loaded right now. They are not gone; reload to try again.'
+        : `Windows are when work MAY be placed, not a weekly target. ${otherCount ? `${otherCount} fixed commitment${otherCount === 1 ? '' : 's'} that study is never scheduled over.` : 'Study work is placed inside these windows and nowhere else.'} Changing them does not move accepted work; Calendar shows what needs a reviewed adjustment.`,
       href: onboardingHref('week', ROUTES.app.settings),
     },
   ]
 
   return (
-    <div className="page-content settings-page">
+    <main className="page-content settings-page">
       <header className="page-header">
         <div>
           <h1>Your setup</h1>
           <p>
-            Everything you told Roadmap, editable as life changes. Nothing here decides access or assigns you
-            a number of study hours.
+            Everything you told Roadmap. Change it any time.
           </p>
         </div>
       </header>
@@ -121,12 +123,31 @@ export default async function SettingsPage() {
                   {section.badge && <Badge tone={section.badge.tone} className="settings-section__badge">{section.badge.label}</Badge>}
                 </p>
                 <p className="fine-print">{section.detail}</p>
+                {section.examHref && <Link className="text-button" href={section.examHref}>Exam status and retake</Link>}
               </div>
               <Link href={section.href} className="secondary-button">Change</Link>
             </Card>
           )
         })}
       </div>
+
+      <Card className="settings-section settings-section--standalone" data-reminders>
+        <Clock size={18} aria-hidden />
+        <div><h2>Reminders</h2><ReminderPrefs /></div>
+      </Card>
+
+      {!mocksRead.ok && <Notice tone="info">Your mock schedule could not be loaded right now. It is not gone; reload to try again.</Notice>}
+      {mockSchedule.length > 0 && (
+        <Card className="settings-section settings-section--standalone" data-mock-schedule>
+          <CheckCircle2 size={18} aria-hidden />
+          <div>
+            <h2>Your mocks and rehearsals</h2>
+            <p className="fine-print">This is the same schedule Calendar, Home, Tests and your roadmap use. Open one to edit, move or cancel it.</p>
+            <ul>{mockSchedule.map(a => <li key={a.id} data-appointment={a.id}><Link href={a.href}>{a.title}</Link> — {a.date}{a.startTime ? ` ${a.startTime}` : ''} ({MOCK_KIND_LABEL[a.kind]}){a.designated ? ' · counts for its week' : ''}</li>)}</ul>
+          </div>
+          <Link href="/app/calendar#checkpoint" className="secondary-button">Open schedule</Link>
+        </Card>
+      )}
 
       {(p.prep_mode === 'instructor_led' || p.prep_mode === 'hybrid') && (
         <Card className="settings-section settings-section--standalone">
@@ -138,12 +159,20 @@ export default async function SettingsPage() {
         </Card>
       )}
 
+      <Card className="settings-section settings-section--standalone" data-calendar-export-card>
+        <CalendarDays size={18} aria-hidden />
+        <div><h2>Download your calendar</h2><CalendarExport initialFrom={localToday} initialTo={addDays(localToday,34)} /></div>
+      </Card>
+
       <section className="settings-account">
         <h2>Account</h2>
+        <DisplayNameForm initial={p.display_name ?? ''} />
+        <p className="fine-print">Email: {user.email} (changed through sign-in, not here).</p>
         <p className="fine-print">Password recovery is available through your account email.</p>
         <Link href="/forgot-password" className="text-button block mb-4">Reset your password</Link>
-        <AccountActions />
+        <AccountActions email={user.email ?? ''} />
+        <p className="fine-print" data-support>Help, privacy questions or a problem with your account: <SupportLink subject="Roadmap beta support" />. See the <Link href="/privacy">privacy</Link> and <Link href="/terms">terms</Link> drafts.</p>
       </section>
-    </div>
+    </main>
   )
 }

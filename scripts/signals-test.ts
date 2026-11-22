@@ -76,7 +76,7 @@ console.log('\nConfidence calibration\n')
 console.log('\nOperating-state bridge\n')
 {
   const state: any = {
-    schemaVersion: 1, papers: { availablePapers: [], activeReservation: null }, capabilities: { canTakeDiagnostic: false, canTakeRevisionary: false, canCloseWeek: false },
+    schemaVersion: 1, cycle: null, today: { dateLocal: '2026-11-05', blocks: [], protectedCommitments: [] }, papers: { availablePapers: [], activeReservation: null }, capabilities: { canTakeDiagnostic: false, canTakeRevisionary: false, canCloseWeek: false },
     preparedness: null, evidence: { recentChanges: [], preparednessBand: null }, repairs: { openThreads: [{ id: 't1', conceptName: 'uuid-1234' }, { id: 't2', conceptName: 'uuid-5678' }], proposals: [] },
     integrity: { isStale: false, activationFailed: false, insufficientPaperBank: false, crossPageInvariantFailed: false, partialServiceFailure: [] }, attention: [], nextAction: null,
   }
@@ -84,6 +84,7 @@ console.log('\nOperating-state bridge\n')
   const bridge: TestsBridge = {
     papers: { availablePapers: [{ id: 'weekly:x', revision: 0, availability: 'available', destination: '/app/tests', permittedCommands: ['start_paper'], purpose: 'diagnostic', estimatedDurationMinutes: 12, sufficientBank: true }], activeReservation: null },
     capabilities: { canTakeDiagnostic: true, canTakeRevisionary: false, canCloseWeek: false }, preparedness: null, preparednessBand: 'Insufficient evidence', repairNames: { t1: 'Diluted EPS' }, insufficientPaperBank: false, signals: sig([]),
+    assessment: { state: 'ready', destination: '/app/tests', attemptId: null, unresolvedBlocks: 0, message: null }, closure: null,
   }
   const merged = mergeTestsBridge(state, bridge)
   check('the bridge fills papers and capabilities', merged.papers.availablePapers.length === 1 && merged.capabilities.canTakeDiagnostic === true)

@@ -1,5 +1,7 @@
+import { routeFailure } from '../../../../lib/ops/routeFailure'
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
+import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
 
 /**
  * Records a learner's challenge to an item (§13.2) via RPC.
@@ -12,8 +14,9 @@ const REASONS = new Set(['no_correct_answer', 'two_correct_answers', 'off_syllab
 
 export async function POST(req: Request) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
   const body = await req.json().catch(() => ({} as any))
   const itemId: string | undefined = body.itemId
@@ -44,7 +47,7 @@ export async function POST(req: Request) {
     if (rpcErr.message.includes('Response not found')) {
        return NextResponse.json({ ok: false, error: 'Response not found' }, { status: 404 })
     }
-    return NextResponse.json({ ok: false, error: rpcErr.message }, { status: 500 })
+    return routeFailure('challenge.open', 'Could not confirm the challenge. Check the result and try again.', rpcErr)
   }
 
   return NextResponse.json({ ok: true, id: challengeId })

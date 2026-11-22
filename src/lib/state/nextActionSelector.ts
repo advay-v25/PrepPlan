@@ -1,5 +1,14 @@
 import { OperatingState, ActionableDecision, PlanBlock, PaperForm, CoachProposal } from './types'
 import { calendarTaskHref } from '../routing/calendar'
+import { buildWork } from './homeModel'
+import { coachProposalHref } from '../coach/selection'
+
+/** A revision task says why it is next, in the planner's own words (first sentence); other tasks keep their generic line. */
+function whyNow(task: PlanBlock, fallback: string): string {
+  if (task.taskType !== 'review' || !task.rationale) return fallback
+  const first = task.rationale.split(/(?<=\.)\s/)[0]
+  return `Revision. ${first}`
+}
 
 export function selectNextAction(state: OperatingState): ActionableDecision {
   const { integrity, cycle, today, execution, papers, repairs, attention } = state
@@ -55,50 +64,60 @@ export function selectNextAction(state: OperatingState): ActionableDecision {
     }
   }
 
-  // Eligible today-work: anything not already finished, and not skipped or
-  // deferred — a skipped task was explicitly declined and a deferred one was
-  // explicitly set aside, so neither is "what's next" until it is re-placed
-  // (which gives it a fresh plan_block, not this same still-deferred one).
-  // class_consolidation was previously excluded outright, which meant a
-  // class-led student's actual next task (the consolidation work from their
-  // last class) could never be selected — there is no reason that task type
-  // is less eligible than any other.
-  const INELIGIBLE_EXECUTION = ['completed', 'skipped', 'deferred']
-  const tasks = today.blocks.filter(b => !INELIGIBLE_EXECUTION.includes(b.execution))
+  // Today's work comes from the shared Home work model: today's, overdue and undated tasks, already in a deterministic order
+  // (see homeModel.ts). A state built without it (older callers, tests) gets the same model from its own today list.
+  const work = state.work ?? buildWork(today.blocks.map(b => ({ ...b, localDate: b.localDate ?? today.dateLocal })), [], today.dateLocal, Date.now())
+  const assessment = state.assessment
+  // A paper or re-check that is waiting or unavailable is not something to do now; it is explained where it appears, never "done" by hand.
+  const dated = work.open.filter(t => t.workStatus !== 'unplaced' && (!t.assessmentControl || ['start', 'resume', 'result'].includes(t.assessmentControl.kind)))
+  const hasOpenToday = dated.length > 0
 
-  // 3. Resume an in-progress executable task
-  const inProgressTask = tasks.find(t => t.execution === 'in_progress')
-  if (inProgressTask) {
+  const taskDecision = (t: (typeof work.open)[number]): ActionableDecision => {
+    const c = t.assessmentControl
+    if (c) {
+      const check = t.taskType === 'recheck'
+      return {
+        id: t.id, revision: t.revision, availability: 'available', destination: c.href,
+        permittedCommands: c.kind === 'resume' ? ['resume_paper'] : c.kind === 'result' ? ['review_paper'] : ['start_paper'],
+        code: c.kind === 'result' ? 'review_scored_paper' : check ? 'repair_check' : 'take_paper',
+        title: c.kind === 'result' ? t.title : check ? `${c.kind === 'resume' ? 'Resume' : 'Start'} your re-check` : `${c.kind === 'resume' ? 'Resume' : 'Your'} ${t.taskType === 'diagnostic' ? 'weekly paper' : 'paper'}${c.kind === 'resume' ? '' : c.kind === 'start' ? ' is ready' : ''}`,
+        rationale: c.note ?? (check ? 'Your repair work is done and the spacing has passed.' : 'It tests only the work you have confirmed.'),
+        scope: t.taskType, timing: ({ in_progress: 'Now', current: 'Now', overdue: 'Overdue', upcoming: 'Scheduled', today: 'Today', unplaced: 'Soon' } as const)[t.workStatus], expectedDurationMinutes: t.durationMinutes,
+      }
+    }
+    const code = t.workStatus === 'in_progress' ? 'resume_task' : t.placement === 'timed' && t.startsAt ? 'start_timed_task' : t.placement === 'floating' ? 'place_task' : 'start_preferred_task'
+    const r = t.reportedMinutes, p = t.durationMinutes
+    // Planned, reported and remaining stay distinct: unknown time says so, and a used-up allocation says it is still open.
+    const partial = t.execution !== 'partial' ? ''
+      : r == null ? 'Partly done; time not reported. '
+      : r >= p && p > 0 ? `Partly done: ${r} min reported against ${p} min planned. The planned time is used, and it is still open. `
+      : `Partly done (${r} of ${p} min reported). `
+    const why = t.workStatus === 'in_progress' ? 'You already started this task.'
+      : t.workStatus === 'overdue' ? `${partial}Planned for ${t.localDate === today.dateLocal ? 'earlier today' : t.localDate} and still open.`
+      : t.workStatus === 'current' ? `${partial}Its time slot is under way.`
+      : t.workStatus === 'upcoming' ? `${partial}Scheduled for later today.`
+      : `${partial}This is your next priority task for today.`
     return {
-      id: inProgressTask.id,
-      revision: inProgressTask.revision,
-      availability: 'available',
-      destination: calendarTaskHref(inProgressTask.id, today.dateLocal),
-      permittedCommands: ['complete_task', 'defer_task'],
-      code: 'resume_task',
-      title: inProgressTask.title,
-      rationale: 'You already started this task.',
-      scope: inProgressTask.taskType,
-      timing: 'Now',
-      expectedDurationMinutes: inProgressTask.durationMinutes
+      id: t.id, revision: t.revision, availability: 'available',
+      destination: calendarTaskHref(t.id, t.localDate ?? today.dateLocal),
+      permittedCommands: code === 'resume_task' ? ['complete_task', 'defer_task'] : ['start_task', 'defer_task'],
+      code, title: t.title, rationale: whyNow(t, why), scope: t.taskType,
+      timing: ({ in_progress: 'Now', current: 'Now', overdue: 'Overdue', upcoming: 'Scheduled', today: 'Today', unplaced: 'Soon' } as const)[t.workStatus],
+      expectedDurationMinutes: t.durationMinutes,
     }
   }
 
+  // 3. Resume an in-progress executable task
+  const started = work.open.find(t => t.workStatus === 'in_progress')
+  if (started) return taskDecision(started)
+
   // 4. Complete missing logs required to unlock weekly closure
-  // (Assuming we can detect this if cycle.closureState === 'closure_ready' but there are unreported minutes)
-  if (cycle?.closureState === 'closure_ready' && execution.unreportedMinutes > 0) {
+  // Missing logs come first only when nothing is left to DO today or later: work still ahead (today's sessions, a re-check) is not "missing", it is next.
+  if (cycle?.closureState === 'closure_ready' && execution.unreportedMinutes > 0 && dated.every(t => t.workStatus === 'overdue')) {
     return {
-      id: 'complete-logs',
-      revision: cycle.revision,
-      availability: 'available',
-      destination: '/app/review-week',
-      permittedCommands: ['submit_logs'],
-      code: 'complete_logs',
-      title: 'Complete missing logs',
-      rationale: 'You need to log your remaining activities to close the week.',
-      scope: 'Weekly Closure',
-      timing: 'Now',
-      expectedDurationMinutes: 5
+      id: 'complete-logs', revision: cycle.revision, availability: 'available', destination: '/app/review-week', permittedCommands: ['submit_logs'],
+      code: 'complete_logs', title: 'Complete missing logs', rationale: 'You need to log your remaining activities to close the week.',
+      scope: 'Weekly Closure', timing: 'Now', expectedDurationMinutes: 5,
     }
   }
 
@@ -106,110 +125,53 @@ export function selectNextAction(state: OperatingState): ActionableDecision {
   if (papers.activeReservation) {
     const r = papers.activeReservation
     return {
-      id: r.id,
-      revision: r.revision,
-      availability: 'available',
-      destination: r.destination,
-      permittedCommands: ['resume_paper'],
-      code: 'take_paper',
-      title: `Resume your ${r.purpose} paper`,
-      rationale: 'Your paper is open and the clock only counts active time.',
-      scope: r.purpose,
-      timing: 'Now',
-      expectedDurationMinutes: 0
+      id: r.id, revision: r.revision, availability: 'available', destination: r.destination, permittedCommands: ['resume_paper'],
+      code: 'take_paper', title: `Resume your ${r.purpose} paper`, rationale: `Your paper is open. ${assessment?.clock ?? ''}`.trim(),
+      scope: r.purpose, timing: 'Now', expectedDurationMinutes: 0,
     }
   }
 
-  // 5. Take/resume a due and reservable diagnostic, revisionary, or mixed paper.
+  // 5. A paper that can actually be started, and is due (its due day has come). Before that day it is a decision, not the next step.
   const duePaper = papers.availablePapers.find(p => p.sufficientBank)
-  if (duePaper) {
+  if (duePaper && assessment?.state !== 'upcoming') {
     return {
-      id: duePaper.id,
-      revision: duePaper.revision,
-      availability: 'available',
-      destination: '/app/tests',
-      permittedCommands: ['start_paper'],
-      code: 'take_paper',
-      title: `Your ${duePaper.purpose} paper is ready`,
+      id: duePaper.id, revision: duePaper.revision, availability: 'available', destination: '/app/tests', permittedCommands: ['start_paper'],
+      code: 'take_paper', title: `Your ${duePaper.purpose} paper is ready`,
       rationale: (state.roadmap?.route === 'coaching' || state.roadmap?.route === 'hybrid') && state.identity.classPattern && state.identity.classPattern !== 'none'
-        ? 'Take your scheduled paper to close the cycle and unlock next week.' 
+        ? 'Take your scheduled paper to close the cycle and unlock next week.'
         : 'Take your weekly Sunday paper to close the seven-day cycle and unlock next week.',
-      scope: duePaper.purpose,
-      timing: 'Now',
-      expectedDurationMinutes: duePaper.estimatedDurationMinutes
+      scope: duePaper.purpose, timing: 'Now', expectedDurationMinutes: duePaper.estimatedDurationMinutes,
     }
   }
 
-  // 6. Review a scored paper and its plan consequences
-  // (Mocking this: if there's an attention item for a scored paper)
+  // 6. Dated work, in the shared order: under way, overdue (oldest first), upcoming, flexible today.
+  if (hasOpenToday) return taskDecision(dated[0])
+
+  // 7. Nothing dated is left: finished sittings that Tests cannot use until the student says what they covered.
+  if (assessment?.state === 'confirm_scope') {
+    return {
+      id: 'confirm-coverage', revision: 0, availability: 'available', destination: assessment.destination, permittedCommands: ['confirm_scope'],
+      code: 'confirm_coverage', title: 'Confirm what you covered',
+      rationale: assessment.message ?? 'Finished work needs the outcomes it covered before it can be tested.',
+      scope: 'Coverage', timing: 'Now', expectedDurationMinutes: 2,
+    }
+  }
+
+  // 8. A scored paper's result, and what it opened.
   const scoredPaperReview = attention.find(a => a.code === 'scored_paper')
   if (scoredPaperReview) {
     return {
-      id: scoredPaperReview.id,
-      revision: 0,
-      availability: 'available',
-      destination: scoredPaperReview.destination,
-      permittedCommands: ['review_paper'],
-      code: 'review_scored_paper',
-      title: scoredPaperReview.title,
-      rationale: scoredPaperReview.description,
-      scope: 'Review',
-      timing: 'Now',
-      expectedDurationMinutes: null
+      id: scoredPaperReview.id, revision: 0, availability: 'available', destination: scoredPaperReview.destination, permittedCommands: ['review_paper'],
+      code: 'review_scored_paper', title: scoredPaperReview.title, rationale: scoredPaperReview.description, scope: 'Review', timing: 'Now', expectedDurationMinutes: null,
     }
   }
 
-  // 7. Review a repair/recheck proposal that affects the active week
+  // 9. Review a repair/recheck proposal that affects the active week
   if (repairs.proposals.length > 0) {
     const proposal = repairs.proposals[0]
     return {
-      id: proposal.id,
-      revision: proposal.revision,
-      availability: 'available',
-      destination: '/app/coach',
-      permittedCommands: ['accept_proposal', 'reject_proposal'],
-      code: 'review_repair',
-      title: `Review proposal: ${proposal.title}`,
-      rationale: proposal.summary,
-      scope: 'Repair',
-      timing: 'Now',
-      expectedDurationMinutes: null
-    }
-  }
-
-  // 8. Start the next timed executable class/study/repair action due now or today
-  const timedTask = tasks.find(t => t.placement === 'timed' && t.startsAt)
-  if (timedTask) {
-    return {
-      id: timedTask.id,
-      revision: timedTask.revision,
-      availability: 'available',
-      destination: calendarTaskHref(timedTask.id, today.dateLocal),
-      permittedCommands: ['start_task', 'defer_task'],
-      code: 'start_timed_task',
-      title: timedTask.title,
-      rationale: 'This is scheduled for a specific time today.',
-      scope: timedTask.taskType,
-      timing: 'Scheduled',
-      expectedDurationMinutes: timedTask.durationMinutes
-    }
-  }
-
-  // 9. Start the next accepted day-preferred core task
-  const preferredTask = tasks.find(t => t.placement === 'day_preferred')
-  if (preferredTask) {
-    return {
-      id: preferredTask.id,
-      revision: preferredTask.revision,
-      availability: 'available',
-      destination: calendarTaskHref(preferredTask.id, today.dateLocal),
-      permittedCommands: ['start_task', 'defer_task'],
-      code: 'start_preferred_task',
-      title: preferredTask.title,
-      rationale: 'This is your next priority task for today.',
-      scope: preferredTask.taskType,
-      timing: 'Today',
-      expectedDurationMinutes: preferredTask.durationMinutes
+      id: proposal.id, revision: proposal.revision, availability: 'available', destination: coachProposalHref(proposal.id), permittedCommands: ['accept_proposal', 'reject_proposal'],
+      code: 'review_repair', title: `Review proposal: ${proposal.title}`, rationale: proposal.summary, scope: 'Repair', timing: 'Now', expectedDurationMinutes: null,
     }
   }
 
@@ -217,69 +179,69 @@ export function selectNextAction(state: OperatingState): ActionableDecision {
   const pendingDraft = attention.find(a => a.code === 'pending_draft')
   if (pendingDraft) {
     return {
-      id: pendingDraft.id,
-      revision: 0,
-      availability: 'available',
-      destination: pendingDraft.destination,
-      permittedCommands: ['accept_draft', 'review_draft'],
-      code: 'review_draft',
-      title: pendingDraft.title,
-      rationale: pendingDraft.description,
-      scope: 'Planning',
-      timing: 'Now',
-      expectedDurationMinutes: null
+      id: pendingDraft.id, revision: 0, availability: 'available', destination: pendingDraft.destination, permittedCommands: ['accept_draft', 'review_draft'],
+      code: 'review_draft', title: pendingDraft.title, rationale: pendingDraft.description, scope: 'Planning', timing: 'Now', expectedDurationMinutes: null,
     }
   }
 
-  // 11. Place an unplaced core task
-  const floatingTask = tasks.find(t => t.placement === 'floating')
-  if (floatingTask) {
+  // 11. Work with no day yet is unresolved planning, not a free day.
+  if (work.unplaced > 0) {
+    const first = work.open.find(t => t.workStatus === 'unplaced')!
     return {
-      id: floatingTask.id,
-      revision: floatingTask.revision,
-      availability: 'available',
-      destination: calendarTaskHref(floatingTask.id, today.dateLocal),
-      permittedCommands: ['place_task'],
-      code: 'place_task',
-      title: floatingTask.title,
-      rationale: 'This task needs to be scheduled.',
-      scope: floatingTask.taskType,
-      timing: 'Soon',
-      expectedDurationMinutes: floatingTask.durationMinutes
+      id: 'place-work', revision: first.revision, availability: 'available', destination: `${calendarTaskHref(first.id, today.dateLocal)}#unplaced`, permittedCommands: ['place_task'],
+      code: 'place_task', title: `Place ${work.unplaced} unplaced task${work.unplaced === 1 ? '' : 's'}`,
+      rationale: 'These belong to this week but have no day. Roadmap does not invent a time for them.', scope: 'Planning', timing: 'Soon',
+      expectedDurationMinutes: work.open.filter(t => t.workStatus === 'unplaced').reduce((n, t) => n + t.durationMinutes, 0) || null,
     }
   }
 
-  // 12. Complete weekly closure and generate/review the next week
+  // 12. Complete weekly closure, with the canonical gate's own reason (scored paper, external mock, rehearsal, or no paper permitted).
   if (cycle?.closureState === 'closure_ready') {
+    const c = state.closure
     return {
-      id: 'weekly-closure',
-      revision: cycle.revision,
-      availability: 'available',
-      destination: '/app/review-week',
-      permittedCommands: ['start_closure'],
-      code: 'complete_closure',
-      title: 'Close the week',
-      rationale: (state.roadmap?.route === 'coaching' || state.roadmap?.route === 'hybrid') && state.identity.classPattern && state.identity.classPattern !== 'none'
-        ? 'Complete your cycle closure to confirm your execution.'
-        : 'Complete your weekly Sunday paper to close the seven-day cycle.',
-      scope: 'closure',
-      timing: 'Now',
-      expectedDurationMinutes: 10
+      id: 'weekly-closure', revision: cycle.revision, availability: 'available', destination: '/app/review-week', permittedCommands: ['start_closure'],
+      code: 'complete_closure', title: c?.canClose ? 'Close the week' : 'Close the week',
+      rationale: c ? `${c.label}. ${c.reason}` : 'Review what happened this week and plan the next.',
+      scope: 'closure', timing: 'Now', expectedDurationMinutes: 10,
     }
   }
 
-  // 13. If none applies, return a typed honest empty state
+  const weekPlan = state.weekPlan
+  if (weekPlan?.action && weekPlan.kind !== 'intentionally_empty') {
+    return {
+      id: 'week-plan', revision: weekPlan.draft?.revision ?? 0, availability: 'available',
+      destination: weekPlan.action.href, permittedCommands: [], code: 'review_current_week',
+      title: weekPlan.title, rationale: weekPlan.message, scope: 'Planning', timing: 'Now',
+      expectedDurationMinutes: null, actionLabel: weekPlan.action.label,
+    }
+  }
+
+  // 13. A week accepted without study times is not "all caught up".
+  const needsTimes = attention.find(a => a.code === 'week_availability_needed')
+  if (needsTimes) {
+    return {
+      id: 'add-availability', revision: 0, availability: 'available', destination: needsTimes.destination, permittedCommands: [],
+      code: 'add_availability', title: needsTimes.title, rationale: needsTimes.description, scope: 'Setup', timing: 'Now', expectedDurationMinutes: null,
+    }
+  }
+
+  // 13b. Class follow-up with no task yet is an actionable obligation: never "all caught up" while it exists.
+  const owedFollowUp = attention.find(a => a.code === 'class_followup_owed')
+  if (owedFollowUp) {
+    return {
+      id: 'class-followup-owed', revision: 0, availability: 'available', destination: owedFollowUp.destination, permittedCommands: [],
+      code: 'class_followup_owed', title: owedFollowUp.title, rationale: owedFollowUp.description, scope: 'Planning', timing: 'Now', expectedDurationMinutes: null, actionLabel: owedFollowUp.actionLabel,
+    }
+  }
+
+  // 14. Honest empty states, kept distinct: a day that was worked, and a day with nothing planned.
+  const done = work.completedToday.length > 0
   return {
-    id: 'empty',
-    revision: 0,
-    availability: 'unavailable',
-    destination: '/app/calendar',
-    permittedCommands: [],
-    code: 'honest_empty',
-    title: 'You are all caught up',
-    rationale: 'There are no required actions for today.',
-    scope: 'Rest',
-    timing: 'Future',
-    expectedDurationMinutes: null
+    id: 'empty', revision: 0, availability: 'unavailable', destination: '/app/calendar', permittedCommands: [],
+    code: 'honest_empty', title: done ? 'Today’s work is done' : 'Nothing is planned today',
+    rationale: done
+      ? `${work.completedToday.length} session${work.completedToday.length === 1 ? '' : 's'} completed${work.reportedMinutesToday ? ` · ${work.reportedMinutesToday} min reported` : ''}. Nothing else is required today.`
+      : 'This is a free day in your plan. Add work in Calendar if you want to use it.',
+    scope: 'Rest', timing: 'Future', expectedDurationMinutes: null,
   }
 }

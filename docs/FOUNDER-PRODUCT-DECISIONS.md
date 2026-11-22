@@ -1,7 +1,7 @@
 # Roadmap founder product decisions
 
 **Authority:** canonical product-direction register  
-**Last updated:** 19 September 2026  
+**Last updated:** 18 November 2026  
 **Rule:** Later implementation plans and code must follow this document. If another document conflicts with it, this document wins until the founder explicitly changes the decision.
 
 ## 1. Product boundary
@@ -186,7 +186,43 @@ Only active processing should be described as active. Future material upload mus
 ## 16. Failed first-week activation and baseline week
 
 - A failed first-week activation shows a recoverable state with retry, input review, and support diagnostics. It never shows a fabricated 0% operating dashboard.
-- The first week is a baseline-calibration week. Onboarding provides self-reported context; the first week captures actual execution, deviations, paper performance, confidence calibration, and logging behaviour.
-- The initial plan must therefore be conservative and transparent about assumptions.
-- After the first closure, Roadmap has enough first-party signals to personalise the second week more strongly.
+- The first week is Roadmap's first week with the candidate, not necessarily the candidate's first week studying. Calibration accompanies useful work appropriate to their starting position. It is not a mandatory beginner sequence or chapter-test gate.
+- The initial plan must be transparent about assumptions and use the candidate's existing preparation, evidence and upcoming commitments.
+- After the first closure, use whatever first-party signals are actually available to improve the next week. One closure does not guarantee enough reported time or scored evidence for a personal pace or preparedness judgment.
 - Personalisation continues to update from rolling evidence; the product must not assume one week permanently defines the candidate's capacity.
+
+## 17. Build priority — 29 October 2026
+
+- Defer domain configuration, Google OAuth enablement and email-delivery setup until the GitHub/repository stage, at the founder's explicit request.
+- Preserve the current authentication and mandatory-onboarding protections while developing. This deferral does not authorise bypassing access checks or removing working login.
+- Focus on completing and testing the student application first: usable planning, execution, Curriculum, Tests/analysis, Coach, revision, mocks and the exam journey. Do not resume external authentication/domain work without renewed direction.
+
+## 18. Adaptive entry and complete exam journey — 31 October 2026
+
+- Candidates must be able to join midway with uneven subject preparation, after finishing first pass, near mocks or after a break/previous attempt. Onboarding's context must affect the actual proposed plan.
+- Prior coverage, reported shakiness, recorded activity and demonstrated understanding are different facts. Do not invent past Calendar tasks, time or evidence to make prior study usable.
+- A completed first pass can lead directly to targeted revision, mixed assessment and mock preparation. Do not require testing every chapter before useful planning begins.
+- Scheduling must account for upcoming mocks as well as the exam, changing commitments, faster/slower progress and remaining work. Time to the exam alone cannot determine that a prepared candidate is behind.
+- Support users with different levels of consistency through practical next actions and honest evidence; do not classify people as lazy or promise an easy path to passing.
+- Complete the shared backend, test/question-bank pipeline and feature-by-feature lifecycle audit. The implementation proposal is `ADAPTIVE-ENTRY-TO-EXAM-COMPLETION-PLAN.md`; its calibration lengths and unapproved resolution/rehearsal defaults remain proposals.
+
+## 19. Class-pattern transition cycles — 15 November 2026
+
+- When recurring class days change, the first affected unaccepted transition cycle closes before the next class under the changed schedule, even if that makes the transition shorter than seven days.
+- Do not enforce B3's minimum-seven-day transition rule or skip the first relevant pre-class checkpoint merely to obtain a full week.
+- Preserve already accepted cycles, recorded history and frozen assessment forms. Any necessary adjustment to accepted future work uses the existing explicit review/acceptance flow.
+- This decision concerns the transition after a class-pattern change. Regular class-led cadence and self-study Monday–Saturday with Sunday testing remain unchanged. A shorter cycle does not justify inflating workload, fabricating a paper when scope/bank/time are insufficient, or scheduling into the past.
+
+## 20. Deliberate Calendar exceptions — 18 November 2026
+
+- A student may deliberately choose a longer sitting or a time outside their usual study windows after a clear one-time warning and confirmation.
+- The exception applies only to that placement. It does not edit the saved sitting limit, study windows or future generated plans.
+- Generated plans continue to respect the saved boundaries. Protected commitments/booked mocks, ownership, cycle/history and declared sitting order remain enforced; the warning cannot override them.
+
+## 21. In-progress class logging — 19 November 2026
+
+- Students may record material already covered while a scheduled class is still running. Class completion stays separate from reported coverage.
+- An early log must not consume the occurrence permanently: the student can return to the same class to add or correct coverage and finalise the class later. Keep one class identity, versioned updates and retry-safe commands.
+- Only explicitly reported material is used by planning and test scope. Part/continued outcome coverage remains pending until explicitly confirmed whole. A whole outcome can be reported while the broader class remains in progress; neither its timetable end nor a completed follow-up task proves other outcomes were covered.
+- Incremental reports must not duplicate coverage, tasks, owed work, minutes or evidence. Preserve earlier history, accepted work and frozen papers; use the existing reviewed planning and scope-revision rules for updates.
+- This supersedes the unapproved blanket rule introduced in migration `20270119_class_occurrence_authority` that all logging must wait for the scheduled class to end. Preserve its ownership, occurrence, cancellation/move, locking and replay protections when changing that rule.

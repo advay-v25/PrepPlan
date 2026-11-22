@@ -8,10 +8,10 @@ import { getSignals } from './signals-loader'
  * It contains no answer keys, no question text and no internal identifiers beyond outcome ids the
  * student can see in Curriculum. The Coach may suggest; only the student confirms.
  */
-export async function getCoachEvidencePack(userId: string, now = new Date()) {
-  const [signals, tracker, preview] = await Promise.all([getSignals(userId, now), getLosTracker(userId, now), getPaperPreview(userId, undefined, now)])
+export async function getCoachEvidencePack(userId: string, now = new Date(), tracker?: Awaited<ReturnType<typeof getLosTracker>>) {
+  const [signals, trk, preview] = await Promise.all([getSignals(userId, now), tracker ?? getLosTracker(userId, now), getPaperPreview(userId, undefined, now)])
   const weekly = await getWeeklyPaperState(userId, preview)
-  const rows = tracker.topics.flatMap(t => t.modules.map(m => ({ m, subject: t.name })).flatMap(({ m, subject }) => m.rows.map(r => ({ ...r, reading: `Reading ${m.readingNo}: ${m.name}`, subject }))))
+  const rows = trk.topics.flatMap(t => t.modules.map(m => ({ m, subject: t.name })).flatMap(({ m, subject }) => m.rows.map(r => ({ ...r, reading: `Reading ${m.readingNo}: ${m.name}`, subject }))))
   const top = rows.filter(r => r.verdict === 'concept_miss' || r.verdict === 'known_gap').slice(0, 5)
     .map(r => ({ outcome: r.name, reading: r.reading, subject: r.subject, verdict: r.verdict, why: r.rationale }))
   const unknowns: string[] = []

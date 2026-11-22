@@ -8,7 +8,7 @@ import { getStudyWeekContext } from '../schedule'
  * A draft is identified by what it was built from: the student's setup
  * version and the week it covers (plan_drafts.context_fingerprint, backed by
  * a unique index on ready onboarding drafts per setup version). Asking twice
- * returns the same draft; changed setup or a new week supersedes the old one.
+ * returns the same draft; changed setup, policy or local day supersedes the old one.
  * Nothing here writes plan_blocks — tasks only exist after the atomic
  * acceptance RPC (accept_onboarding_preview).
  */
@@ -20,7 +20,7 @@ export type DraftTask = {
 }
 
 export type SkippedModule = { moduleId: string; name: string; purpose: 'diagnostic' | 'revisionary'; reason: 'insufficient_bank'; available: number; required: number }
-export type PaperSummary = { kind: 'paper' | 'none'; reason: 'no_scope' | 'insufficient_bank' | 'below_minimum_paper' | null; purpose: 'diagnostic' | 'revisionary' | 'mixed' | null; skipped: SkippedModule[] }
+export type PaperSummary = { kind: 'paper' | 'none'; reason: 'no_scope' | 'insufficient_bank' | 'below_minimum_paper' | 'mock_chosen' | null; purpose: 'diagnostic' | 'revisionary' | 'mixed' | null; skipped: SkippedModule[] }
 export type ReadyDraft = { draftId: string; revision: number; tasks: DraftTask[]; reused: boolean; paper: PaperSummary }
 
 const NO_PAPER_INFO: PaperSummary = { kind: 'none', reason: 'no_scope', purpose: null, skipped: [] }
@@ -69,14 +69,32 @@ async function supersedeOtherReady(userId: string, keepFingerprint: string) {
   }
 }
 
+const inflight = new Map<string, Promise<ReadyDraft>>()
+
+/** Concurrent callers for the same setup version and week share one build (two tabs, a double click, a retry). */
 export async function getOrCreateReadyDraft(userId: string): Promise<ReadyDraft> {
+  // The setup can move while a preview is built; start again from the new setup, a few times at most.
+  for (let attempt = 0; ; attempt++) {
+    try { return await getOrBuild(userId) } catch (e: any) { if (e?.code !== 'CONTEXT_CHANGED' || attempt >= 2) throw e }
+  }
+}
+
+async function getOrBuild(userId: string): Promise<ReadyDraft> {
   const admin = createAdminClient()
   const [{ data: profile }, ctx] = await Promise.all([
     admin.from('profiles').select('onboarding_context_version').eq('id', userId).maybeSingle(),
     getStudyWeekContext(userId),
   ])
-  const fingerprint = draftFingerprint((profile?.onboarding_context_version ?? 1) as number, ctx.week.startDate)
+  const fingerprint = draftFingerprint((profile?.onboarding_context_version ?? 1) as number, ctx.week.startDate, ctx.today)
+  const key = `${userId}:${fingerprint}`
+  const running = inflight.get(key)
+  if (running) return running
+  const job = build(userId, fingerprint).finally(() => inflight.delete(key))
+  inflight.set(key, job)
+  return job
+}
 
+async function build(userId: string, fingerprint: string): Promise<ReadyDraft> {
   const existing = await findMatchingReady(userId, fingerprint)
   if (existing) return existing
 

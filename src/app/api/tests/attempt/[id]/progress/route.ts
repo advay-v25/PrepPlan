@@ -1,33 +1,45 @@
 import { NextResponse } from 'next/server'
 import { withOwnedAttempt } from '../../../../../../lib/tests/attemptAccess'
-import { acceptProgress, firstReportWindow } from '../../../../../../lib/tests/attemptTiming'
 
 export const dynamic = 'force-dynamic'
 
-/** Heartbeat: active/interrupted seconds and the flag for one question, so time survives a refresh. */
+/**
+ * Heartbeat: active/interrupted seconds and the flag for one question, so time survives a refresh. The write is ONE atomic, monotonic
+ * database command (record_item_progress): an older or overlapping heartbeat can never lower saved time, and nothing is written to an attempt
+ * that has closed. Every response carries a machine-readable `code` and a request id; stage timings go to the server log and the
+ * Server-Timing header. No cookie, token or answer content is ever logged.
+ */
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const t0 = performance.now(), requestId = crypto.randomUUID(), stages: Record<string, number> = {}
+  const mark = (name: string, from: number) => { stages[name] = Math.round(performance.now() - from) }
+  const finish = (status: number, code: string, body: Record<string, unknown>, attemptId?: string) => {
+    mark('total', t0)
+    // Only identifiers, the outcome and timings. A slow stage is visible without a debugger.
+    console.info(JSON.stringify({ event: 'tests.progress', requestId, attemptId: attemptId ?? null, status, code, ms: stages }))
+    return NextResponse.json({ ...body, code, requestId }, { status, headers: { 'x-request-id': requestId, 'Server-Timing': Object.entries(stages).map(([k, v]) => `${k};dur=${v}`).join(', ') } })
+  }
   const { id } = await params
+  const tAccess = performance.now()
   const a = await withOwnedAttempt(id)
-  if (!a.ok) return a.response
+  mark('access_and_ownership', tAccess)
+  if (!a.ok) {
+    const b = await a.response.json().catch(() => ({} as any))
+    const status = a.response.status
+    return finish(status, b.code ?? (status === 401 ? 'unauthenticated' : status === 403 ? 'forbidden' : status === 404 ? 'not_found' : 'error'), { ok: false, error: b.error ?? 'Not allowed.' }, id)
+  }
   const { admin, userId, attempt } = a
-  if (!['ready', 'in_progress'].includes(attempt.status)) return NextResponse.json({ ok: false, code: 'closed', error: 'This attempt is closed.' }, { status: 409 })
+  if (!['ready', 'in_progress'].includes(attempt.status)) return finish(409, 'closed', { ok: false, error: 'This attempt is closed.' }, id)
   const body = await req.json().catch(() => null) as any
-  if (!body || typeof body.itemId !== 'string') return NextResponse.json({ ok: false, error: 'Invalid request.' }, { status: 400 })
-  const { data: inForm } = await admin.from('form_items').select('item_id').eq('form_id', attempt.form_id).eq('item_id', body.itemId).maybeSingle()
-  if (!inForm) return NextResponse.json({ ok: false, error: 'Item not in this attempt.' }, { status: 400 })
+  if (!body || typeof body.itemId !== 'string') return finish(400, 'bad_request', { ok: false, error: 'Invalid request.' }, id)
 
-  const now = new Date()
-  const { data: prev } = await admin.from('attempt_item_progress').select('active_seconds, interrupted_seconds, last_seen_at, visits, flagged').eq('attempt_id', id).eq('item_id', body.itemId).maybeSingle()
-  const wall = prev ? (now.getTime() - new Date(prev.last_seen_at as string).getTime()) / 1000 : firstReportWindow(a.attempt.started_at, now)
-  const accepted = acceptProgress({ activeSeconds: (prev?.active_seconds as number) ?? 0, interruptedSeconds: (prev?.interrupted_seconds as number) ?? 0 },
-    { activeSeconds: Number(body.activeSeconds), interruptedSeconds: Number(body.interruptedSeconds) }, wall)
-  const { error } = await admin.from('attempt_item_progress').upsert({
-    attempt_id: id, item_id: body.itemId, user_id: userId, active_seconds: accepted.activeSeconds, interrupted_seconds: accepted.interruptedSeconds,
-    visits: ((prev?.visits as number) ?? 0) + (body.visit === true ? 1 : prev ? 0 : 1),
-    flagged: typeof body.flagged === 'boolean' ? body.flagged : (prev?.flagged as boolean) ?? false, last_seen_at: now.toISOString(),
-  }, { onConflict: 'attempt_id,item_id' })
-  if (error) { const requestId = crypto.randomUUID(); console.error(`[tests/progress ${requestId}]`, error.message); return NextResponse.json({ ok: false, error: 'Could not save progress.', requestId }, { status: 500 }) }
-  // Keep a flag on an already-answered question in step with its response.
-  if (typeof body.flagged === 'boolean') await admin.from('assessment_responses').update({ flagged: body.flagged }).eq('attempt_id', id).eq('item_id', body.itemId)
-  return NextResponse.json({ ok: true, activeSeconds: accepted.activeSeconds, interruptedSeconds: accepted.interruptedSeconds })
+  const tWrite = performance.now()
+  const { data, error } = await admin.rpc('record_item_progress', {
+    p_attempt: id, p_user: userId, p_item: body.itemId, p_active: Math.floor(Number(body.activeSeconds) || 0), p_interrupted: Math.floor(Number(body.interruptedSeconds) || 0),
+    p_visit: body.visit === true, p_flagged: typeof body.flagged === 'boolean' ? body.flagged : null,
+  })
+  mark('progress_write', tWrite)
+  if (error) { console.error(`[tests/progress ${requestId}]`, error.message); return finish(500, 'write_failed', { ok: false, error: 'Could not save progress.' }, id) }
+  const r = data as { ok: boolean; code?: string; activeSeconds?: number; interruptedSeconds?: number }
+  if (!r.ok) return finish(r.code === 'closed' ? 409 : r.code === 'not_found' ? 404 : 400, r.code ?? 'error', { ok: false, error: r.code === 'closed' ? 'This attempt is closed.' : 'Item not in this attempt.' }, id)
+  return finish(200, 'ok', { ok: true, activeSeconds: r.activeSeconds, interruptedSeconds: r.interruptedSeconds }, id)
 }

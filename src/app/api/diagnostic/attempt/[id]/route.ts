@@ -1,6 +1,8 @@
+import { routeFailure } from '../../../../../lib/ops/routeFailure'
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../../lib/supabase/server'
 import { createAdminClient } from '../../../../../lib/supabase/admin'
+import { requireApplicationAccess } from '../../../../../lib/auth/applicationAccess'
 
 /**
  * Serves the next unanswered item on an attempt, plus progress.
@@ -10,8 +12,9 @@ import { createAdminClient } from '../../../../../lib/supabase/admin'
  */
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
   const { id: attemptId } = await params
 
@@ -29,7 +32,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .eq('user_id', user.id)
     .maybeSingle()
 
-  if (attemptErr) return NextResponse.json({ ok: false, error: attemptErr.message }, { status: 500 })
+  if (attemptErr) return routeFailure('diagnostic.read', 'Your paper could not be loaded. Try again.', attemptErr)
   if (!attempt) return NextResponse.json({ ok: false, error: 'Attempt not found' }, { status: 404 })
 
   const { data: responses } = await supabase

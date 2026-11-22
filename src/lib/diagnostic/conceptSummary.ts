@@ -138,44 +138,46 @@ export async function getConceptSummariesForCurrentUser(): Promise<ConceptSummar
 /**
  * Retrieves and reduces evidence for a specific attempt into unique concept summaries.
  */
+export class ConceptEvidenceUnavailable extends Error { constructor(m: string) { super(m); this.name = 'ConceptEvidenceUnavailable' } }
+
+/**
+ * Concept evidence AS OF this attempt: only observations recorded up to when this paper was scored, so a later paper cannot change what
+ * this one showed. (Cumulative status lives in Curriculum.) Reads are paged and the concept filter is chunked, so a long history is never
+ * truncated and no single request carries an unbounded list. A failed read THROWS: unavailable is not an empty history.
+ */
 export async function getAttemptConceptSummaries(attemptId: string): Promise<ConceptSummary[]> {
   const supabase = await createClient()
-  
-  // Need to get all prior events for concepts in this attempt to determine accurate state.
-  // First get the concepts in this attempt
-  const { data: attemptEvents } = await supabase
-    .from('evidence_events')
-    .select('concept_id')
-    .eq('attempt_id', attemptId)
-
-  if (!attemptEvents || attemptEvents.length === 0) return []
-  const conceptIds = Array.from(new Set(attemptEvents.map(e => e.concept_id as string)))
-
-  // Then fetch ALL events for these concepts for this user up to this attempt
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data: allEvents, error } = await supabase
-    .from('evidence_events')
-    .select('*, concept:curriculum_concepts(name)')
-    .eq('user_id', user.id)
-    .in('concept_id', conceptIds)
-    .order('created_at', { ascending: true })
-    .order('id', { ascending: true })
+  const { data: attemptEvents, error: e1 } = await supabase.from('evidence_events').select('concept_id, created_at').eq('attempt_id', attemptId).eq('user_id', user.id)
+  if (e1) throw new ConceptEvidenceUnavailable(e1.message)
+  if (!attemptEvents || attemptEvents.length === 0) return []
+  const conceptIds = Array.from(new Set(attemptEvents.map(e => e.concept_id as string)))
+  const asOf = attemptEvents.map(e => String(e.created_at)).sort().at(-1)!
 
-  if (error || !allEvents) return []
+  const allEvents: any[] = []
+  for (let i = 0; i < conceptIds.length; i += 40) {
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await supabase.from('evidence_events').select('*, concept:curriculum_concepts(name)')
+        .eq('user_id', user.id).in('concept_id', conceptIds.slice(i, i + 40)).lte('created_at', asOf)
+        .order('created_at', { ascending: true }).order('id', { ascending: true }).range(from, from + 999)
+      if (error) throw new ConceptEvidenceUnavailable(error.message)
+      allEvents.push(...(data ?? []))
+      if ((data ?? []).length < 1000) break
+    }
+  }
 
   const grouped = new Map<string, any[]>()
   for (const ev of allEvents) {
     if (!grouped.has(ev.concept_id)) grouped.set(ev.concept_id, [])
     grouped.get(ev.concept_id)!.push(ev)
   }
-
+  allEvents.sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)) || String(x.id).localeCompare(String(y.id)))
   const summaries: ConceptSummary[] = []
-  for (const [conceptId, conceptEvents] of grouped.entries()) {
-    const label = conceptEvents[0]?.concept?.name || 'Unknown Concept'
-    summaries.push(reduceConceptEvidence(conceptEvents, label, null)) // Repair thread ID not strictly needed for attempt result
+  for (const [, conceptEvents] of grouped.entries()) {
+    conceptEvents.sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)) || String(x.id).localeCompare(String(y.id)))
+    summaries.push(reduceConceptEvidence(conceptEvents, conceptEvents[0]?.concept?.name || 'Unknown Concept', null))
   }
-
   return summaries
 }

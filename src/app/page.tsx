@@ -11,6 +11,8 @@ import { ReadinessDemo } from '../components/landing/ReadinessDemo'
 import { WeekPreview } from '../components/landing/WeekPreview'
 import { CountUpStat } from '../components/landing/CountUpStat'
 
+export const metadata = { title: { absolute: 'CFA Level I study planner · Roadmap' } }
+
 export const dynamic = 'force-dynamic'
 
 const STEPS = [
@@ -47,16 +49,15 @@ export default async function LandingPage() {
         <div className="landing-hero-section__inner">
           <p className="landing-hero-section__eyebrow">CFA Level I &middot; Built from what actually happened</p>
           <h1 className="landing-hero-section__title">
-            We don&apos;t teach CFA.<br />We tell you how to study it.
+            How to study.<br />When to study.
           </h1>
           <p className="landing-hero-section__subtitle">
-            Roadmap doesn&apos;t replace your notes, your course, or your classes. It watches what you&apos;ve
-            covered, what diagnostics show you actually know, and tells you exactly what to study next, how much
-            time it needs, and whether you&apos;re actually ready — one real week at a time.
+            A CFA Level I plan built around your real week, and rebuilt from what you actually cover and get right.
           </p>
           <div className="landing-hero-section__actions">
             <ButtonLink size="lg" href="/signup">Get started</ButtonLink>
-            <span className="landing-hero-section__meta">No readiness screening to get in. No prescribed hours.</span>
+            <Link className="secondary-button" href="/demo">Try the walkthrough</Link>
+            <span className="landing-hero-section__meta">Private beta · sign-up needs an invitation.</span>
           </div>
         </div>
       </section>
@@ -66,11 +67,7 @@ export default async function LandingPage() {
         <ScrollReveal className="story-section__head">
           <p className="story-section__eyebrow">What &ldquo;telling you how to study&rdquo; looks like</p>
           <h2>Four signals, never blended into one number</h2>
-          <p className="story-section__lede">
-            Studying isn&apos;t understanding, following the plan isn&apos;t knowing it, and feeling confident isn&apos;t
-            being right. Roadmap tracks each separately, because collapsing them into one score is how students end
-            up surprised on exam day.
-          </p>
+          <p className="story-section__lede">Studying isn&apos;t understanding, and confidence isn&apos;t accuracy. Roadmap tracks each on its own.</p>
         </ScrollReveal>
         <ReadinessDemo />
       </section>
@@ -85,17 +82,17 @@ export default async function LandingPage() {
           <div className="contrast-card">
             <Badge tone="neutral">A course</Badge>
             <h3>Teaches content</h3>
-            <p>Delivers the syllabus in order, at its own pace, whether or not it matches what you still need.</p>
+            <p>Delivers the syllabus in order, whatever you still need.</p>
           </div>
           <div className="contrast-card">
             <Badge tone="neutral">A tutor</Badge>
             <h3>Repeats what you got wrong</h3>
-            <p>Reacts to your last mistake, but rarely tracks whether the repair actually held two weeks later.</p>
+            <p>Reacts to your last mistake, but rarely checks the repair held.</p>
           </div>
           <div className="contrast-card contrast-card--accent">
             <Badge tone="accent">Roadmap</Badge>
-            <h3>Tells you what to study, when, and how much</h3>
-            <p>Orders the syllabus, sizes each week to your real hours, and re-checks a repair before calling it done.</p>
+            <h3>Tells you what, when and how much</h3>
+            <p>Orders the syllabus, sizes each week to your hours, and re-checks every repair.</p>
           </div>
         </ScrollStagger>
       </section>
@@ -104,7 +101,7 @@ export default async function LandingPage() {
       <section className="story-section">
         <ScrollReveal className="story-section__head">
           <p className="story-section__eyebrow">The cycle, every week</p>
-          <h2>An evidence-driven loop, not a syllabus you scroll through</h2>
+          <h2>An evidence-driven loop</h2>
         </ScrollReveal>
         <ScrollStagger className="steps-row" stagger={0.1}>
           {STEPS.map((step, i) => (
@@ -122,12 +119,8 @@ export default async function LandingPage() {
       <section className="story-section story-section--tint">
         <ScrollReveal className="story-section__head">
           <p className="story-section__eyebrow">Your actual week, not a fixed calendar</p>
-          <h2>The plan adjusts to your week — not the other way round</h2>
-          <p className="story-section__lede">
-            Tell it what you can commit, and the roadmap places real work inside your real hours. A diagnostic
-            closes every week and the following week is rebuilt from what it finds — not from a schedule that
-            assumed you&apos;d get to everything.
-          </p>
+          <h2>The plan adapts to your week</h2>
+          <p className="story-section__lede">Work is placed inside your real hours, and each week is rebuilt from what the last one showed.</p>
         </ScrollReveal>
         <WeekPreview />
       </section>
@@ -137,15 +130,15 @@ export default async function LandingPage() {
         <ScrollStagger className="stats-row" stagger={0.1}>
           <div className="stat-card">
             <strong><CountUpStat value={4} /></strong>
-            <span>Signals tracked separately — never blended into one score</span>
+            <span>signals, never blended into one score</span>
           </div>
           <div className="stat-card">
             <strong><CountUpStat value={0} /></strong>
-            <span>Hours prescribed before you tell it what you actually have</span>
+            <span>hours prescribed before you share yours</span>
           </div>
           <div className="stat-card">
             <strong><CountUpStat value={1} /></strong>
-            <span>Diagnostic closing every study week, rebuilding what&apos;s next</span>
+            <span>diagnostic closes each week</span>
           </div>
         </ScrollStagger>
       </section>
@@ -155,7 +148,7 @@ export default async function LandingPage() {
         <ScrollReveal className="landing-cta__inner">
           <CheckCircle2 size={28} aria-hidden />
           <h2>Tell Roadmap what you can commit.</h2>
-          <p>Six short screens, every answer editable later. No readiness screening to get in.</p>
+          <p>Five short steps, every answer editable later.</p>
           <ButtonLink size="lg" href="/signup">Get started</ButtonLink>
         </ScrollReveal>
       </section>

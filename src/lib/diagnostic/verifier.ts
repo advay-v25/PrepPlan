@@ -1,5 +1,6 @@
 import { create, all } from 'mathjs'
-import { generateStructuredOutput } from '../llm'
+import { generateStructuredOutput, LlmStopped } from '../llm'
+import { checkItemFormat } from './formatRules'
 import { BlueprintCell, ERROR_TAXONOMY, ErrorCode, GeneratedItemDraft } from './types'
 
 /**
@@ -31,6 +32,7 @@ const math = create(all, {})
 // still works. Disabling first and calling math.evaluate afterwards disables
 // the verifier itself.
 const limitedEvaluate = math.evaluate
+const parseFormula = math.parse
 
 math.import(
   {
@@ -89,10 +91,25 @@ export function parseOptionNumber(text: string): number {
   return negative ? -value : value
 }
 
-/** Relative tolerance, with an absolute floor so values near zero still compare. */
-function closeEnough(a: number, b: number): boolean {
-  const scale = Math.max(Math.abs(a), Math.abs(b), 1)
-  return Math.abs(a - b) <= Math.max(0.005 * scale, 0.01)
+/** Decimal places an option DISPLAYS: "12.50%" is 2, "$1,470,000" is 0. The option's own precision is the only tolerance there is. */
+export function optionDecimals(text: string): number {
+  const m = String(text).match(/\d[\d,]*\.(\d+)/)
+  return m ? m[1].length : 0
+}
+const decimalsOfNumber = (v: number) => { const m = String(v).match(/\.(\d+)$/); return m ? m[1].length : 0 }
+
+/**
+ * A computed value matches an option only if, rounded half away from zero to the option's displayed precision, it IS that option.
+ * There is no relative tolerance: 1,003 is not "1,000". A value sitting exactly on a rounding boundary is reported as a tie, because the
+ * stem would have to state a rounding rule for either neighbouring option to be the single correct one.
+ */
+export function matchesAtPrecision(scaled: number, optionValue: number, decimals: number): { match: boolean; tie: boolean } {
+  const f = 10 ** decimals
+  const x = Math.abs(scaled) * f
+  const frac = x - Math.floor(x + 1e-9)
+  const tie = Math.abs(frac - 0.5) < 1e-9
+  const rounded = Math.sign(scaled) * Math.round(x * (1 + 1e-12)) / f
+  return { match: Math.abs(rounded - optionValue) <= 1e-9 * Math.max(1, Math.abs(optionValue)), tie }
 }
 
 /**
@@ -106,6 +123,7 @@ export function allowedScales(options: string[]): number[] {
   const every = (pattern: RegExp) => options.every(o => pattern.test(o))
   const scales = [1]
   if (every(/%/)) scales.push(100)            // computed a ratio, options are percentages
+  if (every(/\b(bps|basis points?)\b/i)) scales.push(1e4)  // computed a fraction, options are basis points
   if (every(/\bbillions?\b/i)) scales.push(1e-9)
   if (every(/\bmillions?\b/i)) scales.push(1e-6)
   if (every(/\b(thousands?|000s)\b/i)) scales.push(1e-3)
@@ -120,16 +138,18 @@ export function allowedScales(options: string[]): number[] {
 export function matchComputedToOption(
   computed: number,
   optionValues: number[],
-  scales: number[]
-): { index: number | null; scale: number; multiple: boolean } {
-  let sawMultiple = false
+  scales: number[],
+  decimals: number[] = optionValues.map(decimalsOfNumber)
+): { index: number | null; scale: number; multiple: boolean; tie: boolean } {
+  let sawMultiple = false, sawTie = false
   for (const scale of scales) {
     const scaled = computed * scale
-    const hits = optionValues.map((v, i) => ({ v, i })).filter(({ v }) => closeEnough(v, scaled))
-    if (hits.length === 1) return { index: hits[0].i, scale, multiple: false }
+    const hits = optionValues.map((v, i) => ({ i, ...matchesAtPrecision(scaled, v, decimals[i] ?? 0) })).filter(h => h.match)
+    if (hits.some(h => h.tie)) sawTie = true
+    if (hits.length === 1) return { index: hits[0].i, scale, multiple: false, tie: sawTie || hits[0].tie }
     if (hits.length > 1) sawMultiple = true
   }
-  return { index: null, scale: 1, multiple: sawMultiple }
+  return { index: null, scale: 1, multiple: sawMultiple, tie: sawTie }
 }
 
 // ---------------------------------------------------------------------------
@@ -160,7 +180,24 @@ type NumericPlan = { variables?: Record<string, unknown>; keyFormula?: string; n
  * Exported so the self-test can exercise it without a model call — the
  * sandboxing here is easy to break silently.
  */
+const ALLOWED_FUNCTIONS = new Set(['abs', 'sqrt', 'pow', 'exp', 'log', 'log10', 'min', 'max', 'round', 'floor', 'ceil'])
+const MAX_FORMULA_CHARS = 400, MAX_FORMULA_NODES = 80
+/** The sandbox is an allow-list over the parsed expression, not a list of disabled names: bounded size, plain arithmetic and a few functions only. */
+function assertBoundedFormula(formula: string, scope: Record<string, number>) {
+  if (formula.length > MAX_FORMULA_CHARS) throw new Error('formula is too long to check')
+  let nodes = 0
+  parseFormula(formula).traverse((n: any) => {
+    if (++nodes > MAX_FORMULA_NODES) throw new Error('formula is too large to check')
+    const t = n.type as string
+    if (t === 'ConstantNode' || t === 'ParenthesisNode' || t === 'OperatorNode') return
+    if (t === 'SymbolNode') { if (!(n.name in scope) && !ALLOWED_FUNCTIONS.has(n.name)) throw new Error(`unknown name "${n.name}"`); return }
+    if (t === 'FunctionNode') { if (!ALLOWED_FUNCTIONS.has(n.fn?.name)) throw new Error(`function "${n.fn?.name}" is not allowed`); return }
+    throw new Error(`${t} is not allowed in a formula`)
+  })
+}
+
 export function safeEvaluate(formula: string, scope: Record<string, number>): number {
+  assertBoundedFormula(formula, scope)
   const result = limitedEvaluate(formula, { ...scope })
   const value = typeof result === 'number' ? result : Number(result)
   if (!Number.isFinite(value)) throw new Error(`formula did not evaluate to a finite number: ${formula}`)
@@ -186,9 +223,10 @@ async function numericalGate(
     plan = await generateStructuredOutput<NumericPlan>(
       NUMERIC_SYSTEM_PROMPT,
       `Question:\n${draft.stem}`,
-      { tier: 'reasoning', temperature: 0.1, maxTokens: 1200, onModelResolved: onModel }
+      { tier: 'verifier', temperature: 0.1, maxTokens: 1200, stage: 'verify-numeric', stageMs: 60_000, onModelResolved: onModel }
     )
   } catch (error: any) {
+    if (error instanceof LlmStopped) throw error
     gates.push({ gate: 'numerical', passed: false, detail: `verifier could not derive a solution: ${error.message}` })
     return { gates, defects: ['NUM_DERIVATION_FAILED'], fatal: false, undecided: true }
   }
@@ -219,7 +257,7 @@ async function numericalGate(
 
   // Which option does the computed value correspond to? Spec requires exactly one.
   const scales = allowedScales(draft.options)
-  const match = matchComputedToOption(computedKey, optionValues, scales)
+  const match = matchComputedToOption(computedKey, optionValues, scales, draft.options.map(optionDecimals))
 
   const derivation: VerificationResult['derivation'] = {
     variables,
@@ -228,6 +266,12 @@ async function numericalGate(
     matchedOptionIndex: match.index,
   }
   const scaleNote = match.scale === 1 ? '' : ` (×${match.scale} to the options' unit)`
+
+  if (match.tie) {
+    gates.push({ gate: 'numerical', passed: false, detail: `computed ${computedKey} sits exactly on a rounding boundary at the options' precision; the stem must state a rounding rule` })
+    defects.push('NUM_ROUNDING_AMBIGUOUS')
+    return { gates, defects, derivation, fatal: false, undecided: true }
+  }
 
   if (match.index === null && match.multiple) {
     gates.push({
@@ -322,9 +366,10 @@ async function reproduceDistractors(
         `The correct answer is option ${draft.keyIndex}: "${draft.options[draft.keyIndex]}" (numeric value ${computedKey * scale}).\n` +
         `Wrong options to explain:\n` +
         wrongIndices.map(i => `  ${i}: "${draft.options[i]}" (numeric value ${parseOptionNumber(draft.options[i])})`).join('\n'),
-      { tier: 'reasoning', temperature: 0.2, maxTokens: 1100, onModelResolved: onModel }
+      { tier: 'verifier', temperature: 0.2, maxTokens: 1100, stage: 'verify-distractor', stageMs: 60_000, onModelResolved: onModel }
     )
-  } catch {
+  } catch (error) {
+    if (error instanceof LlmStopped) throw error
     return {
       gate: { gate: 'distractors', passed: false, detail: 'verifier could not derive distractor pathways' },
       formulas,
@@ -351,7 +396,7 @@ async function reproduceDistractors(
       // no scaling is applied here — applying it twice was the earlier hazard.
       const value = safeEvaluate(formula, scope)
       const target = parseOptionNumber(draft.options[i])
-      const ok = closeEnough(value, target)
+      const ok = matchesAtPrecision(value, target, optionDecimals(draft.options[i])).match
       reproduced[String(i)] = ok
       if (!ok) failures.push(`option ${i}: "${formula}" gives ${value}, option states ${target}`)
     } catch (error: any) {
@@ -426,9 +471,10 @@ async function editorialGate(
       `Concept under test: ${cell.conceptName}\nScope of that concept: ${cell.conceptScope}\nTopic: ${cell.topic}\n\nItem:\n${draft.stem}\n\nOptions:\n${draft.options
         .map((o, i) => `  ${i}. ${o}`)
         .join('\n')}`,
-      { tier: 'reasoning', temperature: 0.1, maxTokens: 1200, onModelResolved: onModel }
+      { tier: 'verifier', temperature: 0.1, maxTokens: 1200, stage: 'verify-editorial', stageMs: 60_000, onModelResolved: onModel }
     )
   } catch (error: any) {
+    if (error instanceof LlmStopped) throw error
     gates.push({ gate: 'editorial', passed: false, detail: `editorial pass failed: ${error.message}` })
     return { gates, defects: ['EDITORIAL_FAILED'], fatal: false, undecided: true }
   }
@@ -479,6 +525,26 @@ async function editorialGate(
   return { gates, defects, answerIndex, fatal: !scopeOk || !uniqueOk, undecided: false }
 }
 
+export type StemInputDefect = { code: 'UNIT_MIXED' | 'OPTION_VALUES_COLLIDE' | 'NUMERIC_NO_INPUTS' | 'NUMERIC_STEM_NO_FIGURES'; detail: string }
+
+const unitOf = (o: string) => /%/.test(o) ? '%' : /\b(bps|basis points?)\b/i.test(o) ? 'bps' : /[$€£]/.test(o) ? 'currency' : /\b(x|times)\b/i.test(o) ? 'x' : 'plain'
+
+/**
+ * Deterministic stem/option consistency for a NUMERICAL item. Establishes structure only (units agree, options are distinguishable at their own
+ * precision, inputs were declared); says nothing about whether the finance is right. No generated code is executed here.
+ */
+export function stemInputDefects(draft: Pick<GeneratedItemDraft, 'stem' | 'options' | 'card'>): StemInputDefect[] {
+  if (!draft.card.isNumeric) return []
+  const out: StemInputDefect[] = []
+  const units = new Set(draft.options.map(unitOf))
+  if (units.size > 1) out.push({ code: 'UNIT_MIXED', detail: `options mix units (${[...units].join(', ')}); every option must use the same unit and format` })
+  const values = draft.options.map(parseOptionNumber)
+  if (values.every(Number.isFinite) && new Set(values).size < values.length) out.push({ code: 'OPTION_VALUES_COLLIDE', detail: 'two options have the same numeric value once formatting is ignored (a rounding collision)' })
+  if (!Object.keys(draft.card.exactNumericValues ?? {}).length) out.push({ code: 'NUMERIC_NO_INPUTS', detail: 'the item is marked numerical but declares no numeric inputs, so nothing can be checked against the stem' })
+  if (!/\d/.test(draft.stem)) out.push({ code: 'NUMERIC_STEM_NO_FIGURES', detail: 'the item is marked numerical but the stem contains no figures' })
+  return out
+}
+
 // ---------------------------------------------------------------------------
 // Gate 3: distractor taxonomy and exposure — checked locally, no model needed
 // ---------------------------------------------------------------------------
@@ -510,6 +576,16 @@ function structuralGates(draft: GeneratedItemDraft, existingFingerprints: Set<st
       detail: draft.card.distractorDiagnoses.map(d => `option ${d.optionIndex} → ${d.errorCode} (${ERROR_TAXONOMY[d.errorCode as ErrorCode]})`).join('; '),
     })
   }
+
+  const format = checkItemFormat(draft.stem, draft.options)
+  gates.push({ gate: 'format', passed: format.length === 0, detail: format.length ? format.map(f => `${f.code}: ${f.detail}`).join(' | ') : 'lead-in, options and ordering follow the Level I format' })
+  for (const f of format) defects.push(f.code)
+  if (format.some(f => f.blocking)) fatal = true
+
+  const inputs = stemInputDefects(draft)
+  gates.push({ gate: 'stem_inputs', passed: inputs.length === 0, detail: inputs.length ? inputs.map(f => `${f.code}: ${f.detail}`).join(' | ') : draft.card.isNumeric ? 'units agree, options are distinguishable and inputs are declared (structure only; not proof the finance is right)' : 'not a numerical item' })
+  for (const f of inputs) defects.push(f.code)
+  if (inputs.some(f => f.code === 'OPTION_VALUES_COLLIDE')) fatal = true
 
   const duplicate = existingFingerprints.has(fingerprint)
   gates.push({

@@ -1,0 +1,447 @@
+{
+ "takenFrom": "disposable development project (reference withheld)",
+ "serverMajor": 17,
+ "snapshotSha256": "30670ec95f7482c7601ea01e3c599ad32f2175a6d54934db105b4455a2a29a89",
+ "covers": [
+  {
+   "version": "20260904_retire_onboarding_screening",
+   "checksum": "f274d214ab6a41708d7434194414e960fd12a77da8f5936572ec7714248f145d"
+  },
+  {
+   "version": "20260905_phase0_foundation",
+   "checksum": "e6f3df43a010513912d8f151729e41b41895e82d4b73d7257e9aa04d904faee7"
+  },
+  {
+   "version": "20260905_phase1_shell",
+   "checksum": "feb1483585dd386bc6eace03f0010a1784da93c487fc5196bc0fc5a7d034a034"
+  },
+  {
+   "version": "20260905_phase2_planner",
+   "checksum": "86415b4d89399dbcbb11cdd9c86246adaabd2f31810b391c658928c543dd4438"
+  },
+  {
+   "version": "20260905_phase3_diagnostics",
+   "checksum": "e2b2c3548b62cfcac97ddeb0498be512450bad8ad92dbf4a85d5c647327d3171"
+  },
+  {
+   "version": "20260907_diagnostic_item_pipeline",
+   "checksum": "38f7032bfa50be56658cc7d192941cf1bb233ec0596997efd7d5bbf9421feba7"
+  },
+  {
+   "version": "20260907_fsa_income_manifest_slice",
+   "checksum": "e30c34cf12337aa5966b65ead707ca5259682d5edc4dbdbbcacae27027264337"
+  },
+  {
+   "version": "20260907_rejected_drafts_nullable",
+   "checksum": "4817174eb9d375231ecdb81b32af2efbd9a57a83c2601d233ccf849f90f93538"
+  },
+  {
+   "version": "20260908_c2_calendar_editing",
+   "checksum": "9491e9032adb1a285d941fe7298ebc052dbd0e6565f2bc699d74390e2284ac4c"
+  },
+  {
+   "version": "20260908_c3_roadmap",
+   "checksum": "b5509c99b53de7738401e8025371ac892a0611c7b09c5eae90928811abf2dc76"
+  },
+  {
+   "version": "20260908_calendar_test_link",
+   "checksum": "a53dc68276cbad7f9cb277856419355e61ed49d36763adab9580904e40b66531"
+  },
+  {
+   "version": "20260908_lock_answer_keys",
+   "checksum": "34ec65caf3cab79ca76736f5c0012d03245d6b685a23fc2683c29b2d348f327f"
+  },
+  {
+   "version": "20260908_zz1_gate_a_schema",
+   "checksum": "689fdcf0c231c2c4ed1c206de949c7cfc5e878adf3aed88852dd2a568b6adea7"
+  },
+  {
+   "version": "20260908_zz2_gate_a_rpcs",
+   "checksum": "c7596b23409e58323fbb4c0cfb8e93c295534009f70f2ae16e73b2477a074050"
+  },
+  {
+   "version": "20260917_fix_finalize_manifest",
+   "checksum": "01c12c8a2da7e23a77283388a8798b423b3a5bfa0d603df8bcbfed949f9396ba"
+  },
+  {
+   "version": "20260917_fix_finalize_purpose",
+   "checksum": "71175fa45d0dd3a746c8e30ef9cde10aed9d21df04e71aa32531eac898f08354"
+  },
+  {
+   "version": "20260917_fix_repair_casts",
+   "checksum": "e7c37df4099235d6d8850d93d614797fec674a2f2f2c1fac9588ba8b65bd74ad"
+  },
+  {
+   "version": "20260917_onboarding_rebuild",
+   "checksum": "0ab3b4b1b7874934af9fedd47700a3edc0856100ed579fde6445e68aab245065"
+  },
+  {
+   "version": "20260917_repair_provenance",
+   "checksum": "15217fe07c8a62543cb2d239c8f887d7c456fe55b63ddf4fbad4ee05e5b62d2f"
+  },
+  {
+   "version": "20260918_canonical_onboarding",
+   "checksum": "70c8285f3a51093251e74b0aad8db3fffb8326c41920bbbf58dea450164b495c"
+  },
+  {
+   "version": "20260919_fix_onboarding_preview_rpc",
+   "checksum": "3e178b708855e5e0e9514b4d2aab738403bdbb94db161b78ba4590fe4262e9a0"
+  },
+  {
+   "version": "20260920_commit_pulse_week_rpc",
+   "checksum": "3b8c10b07b4fd9d8b8964784205c08f9768e6d4bbdfbdb410bc1a5f25906e43f"
+  },
+  {
+   "version": "20260921_fix_onboarding_preview_origin",
+   "checksum": "21b40b7c2371b83fddac2354e4837ea44f996584ca51819c12ef5c47f133a3f9"
+  },
+  {
+   "version": "20260922_fix_commit_pulse_week_grant",
+   "checksum": "455450cab9a031ef65d0f1fb677a5595f5243c433fb5c93baa92edc2d0d94e9b"
+  },
+  {
+   "version": "20260923_fix_onboarding_preview_cycle_and_review",
+   "checksum": "f71325737e8c2e45347dab3476c56476879de28a30c6322680ede54c89579c0a"
+  },
+  {
+   "version": "20260924_commit_pulse_week_authorize",
+   "checksum": "620f30d498716670a618b002b54b917a041f5c7ed38055b6e75767e23b360f38"
+  },
+  {
+   "version": "20260924_fix_onboarding_origin",
+   "checksum": "8347371ab01a394e9750777b450f2d981a9ca49321264221376719c5e5b8ae5c"
+  },
+  {
+   "version": "20260925_persist_paper_scope",
+   "checksum": "fb34ba5bd4aff634edb496fa3fbba56637fed2b1cd5384ec29b1b75b7317192f"
+  },
+  {
+   "version": "20260926_log_learning_coverage",
+   "checksum": "e69d6558833402acaed1fb664b8dfd9c912f36582e6b161f108246e17c73b7dd"
+  },
+  {
+   "version": "20260926_weekly_review",
+   "checksum": "4b477bf07cb61b575e7b089fb13e0af7e54aa042b8701af9483afb85489df380"
+  },
+  {
+   "version": "20260927_weekly_review_resolutions",
+   "checksum": "fc409fe754ddd94b593fa9bb2513b712f0d75bb8854a0fe209f1f777b10313c1"
+  },
+  {
+   "version": "20260928_curriculum_2027_spine",
+   "checksum": "0fd395db6a76a50d0ededc20480a767870b633a6ad6a93ec1ba3c828f8d05ff9"
+  },
+  {
+   "version": "20260929_class_log",
+   "checksum": "dab034445ddf8062f0a4ef82884cbf2ba67504ea59d52490f02758535779a859"
+  },
+  {
+   "version": "20260930_concept_outcome_map",
+   "checksum": "c43924f977dec9f6bb58353225769c1a29040a25f7b5a06b98d0f8a1f6351fd3"
+  },
+  {
+   "version": "20261001_switch_to_readings",
+   "checksum": "8b8b7a30a874289b65c00f31995f6e2c30eca4bf6b0d494cad4ae3a7d0daa080"
+  },
+  {
+   "version": "20261002_confidence_marks",
+   "checksum": "8b92ff162f2a0431a53b5bc610fa200f03703054f6cc99c2e35e2e8d8cd59f5c"
+  },
+  {
+   "version": "20261003_notes_and_flashcards",
+   "checksum": "22add21c61fa73307018c33678548a5cde3883a5c8263dc734baa249439633ed"
+  },
+  {
+   "version": "20261004_completed_scope",
+   "checksum": "edea35adb7141b730d76b3670dad265ab6c4df056a888d713513e6207cfe2bc5"
+  },
+  {
+   "version": "20261005_taking_flow",
+   "checksum": "48e8ff517fca648142f7d816f62385d1c8b9cd5e6b7520f3aa78728fbd86621b"
+  },
+  {
+   "version": "20261006_attempt_open_key",
+   "checksum": "360af0fc517585d29cdd3160f90aab6034ba0461bb64f3b0ccffc88a59dc872d"
+  },
+  {
+   "version": "20261007_weekly_review_completed_scope_paper",
+   "checksum": "0d2a376d0aef47b8c8ca87e0ccac3ccc12af071749302195ae271c925171c4b7"
+  },
+  {
+   "version": "20261008_coach_conversation",
+   "checksum": "004ece09078aeb21ae742c428191a83f387338ce08f30a3504e233a516d59579"
+  },
+  {
+   "version": "20261009_onboarding_safe_saves",
+   "checksum": "fa7e248a82e5e6e60487739b48c5c7edb8512688c3de02084302ee9a39f7f5fa"
+  },
+  {
+   "version": "20261010_onboarding_position_coverage",
+   "checksum": "e5524f04555f07fba857d0d8d55f0ac314d46884ac61f03441f0ba31fde03646"
+  },
+  {
+   "version": "20261011_variable_class_and_phase",
+   "checksum": "32ca03953b464f88b19c373153afcfbb5aee9fde482edb7dc0d33d8d313577a2"
+  },
+  {
+   "version": "20261012_next_class_defines_cycle",
+   "checksum": "0c2df8d73ee1360d08942d5ce246d5a5f33c2d695eac67d5c0ce8b29b8a17877"
+  },
+  {
+   "version": "20261013_auth_cascade_fixes",
+   "checksum": "fa000c33bbbc751356ae68d0f84f062dc44e301014b81a0aaa75c839c2150671"
+  },
+  {
+   "version": "20261014_profiles_cascade_and_trigger",
+   "checksum": "c978b6a3714bc787c1e4cafa3eea414069b84c95d6b0e0960caf1d0f9988caf8"
+  },
+  {
+   "version": "20261015_log_learning_entry",
+   "checksum": "b1b18d5bdeb18556f8acd4936a353bf72dce18f2eff299cdd46040df9fb23068"
+  },
+  {
+   "version": "20261028_atomic_task_execution",
+   "checksum": "8fe006f7efb13456133dcce1bd65b0f63451757945f373f8415f2a961edf22d2"
+  },
+  {
+   "version": "20261028_task_scope_and_split",
+   "checksum": "22bb3c631ab664255f0beb74af68bc59f8cfe35a51dc7db526d5aa1caaa56dab"
+  },
+  {
+   "version": "20261029_weekly_continuity",
+   "checksum": "460f8983ea36fca054335032a0eed9c356605886647ec9072d88a735003b13cd"
+  },
+  {
+   "version": "20261029_weekly_continuity_account_delete",
+   "checksum": "ff215a0337eb562d24f8784a6c620d4fa81bb4f8f2c60ca2c877a72bd6826935"
+  },
+  {
+   "version": "20261030_learning_sittings",
+   "checksum": "1d8c248faa0087f50db58fa054b1dd1c6314211c11d05cef171c09cc0eff9e33"
+  },
+  {
+   "version": "20261031_repair_loop",
+   "checksum": "ff42d1329fcc2382bb5602249dc00081704058f1a5fa562cf91babe60b45e0a4"
+  },
+  {
+   "version": "20261101_write_boundary",
+   "checksum": "92349624e3ea0793f17a9a52ef9e51c74a8b0fda7f241d1e22dea22d4e40d48b"
+  },
+  {
+   "version": "20261102_lock_migration_ledger",
+   "checksum": "31d3d3aa095edfb29f79b5327c51c9f0bd7f37d4642debaa5cd480b83635487a"
+  },
+  {
+   "version": "20261102_revoke_attempt_insert",
+   "checksum": "35dd6a98a87a5c2b27ee3e8e0ceef834c8aca7202c2c5f9ab39aa8d8536d4e66"
+  },
+  {
+   "version": "20261103_state_ownership",
+   "checksum": "034c9e9c0d012d2325206f3637bfb897b77dfc5e0e1b3d2d67b2b16a205ceafc"
+  },
+  {
+   "version": "20261104_entry_context",
+   "checksum": "792528993e15a592bc98303d618355a9f8026162e3209991b2359b2b89fa1056"
+  },
+  {
+   "version": "20261104_onboarding_accept_guidance",
+   "checksum": "472a298d5f310aba9485ce0467050823bd4d27cee7797c46023d76cdaf486197"
+  },
+  {
+   "version": "20261105_mock_checkpoint",
+   "checksum": "c85fc20f02a96186bc8dfe196287ade58a2eed956b1b8b77d6198b251c026bfc"
+  },
+  {
+   "version": "20261106_checkpoint_commands",
+   "checksum": "0b3fa520794ed989ae413e6d92ec0efdb0b9169d068085fb3ed00a9af406dc22"
+  },
+  {
+   "version": "20261107_reviewer_workspace",
+   "checksum": "08ca6942acaa42b77f6cb4aa575cf7da12337b9334e66d644e5d6f8f7da41565"
+  },
+  {
+   "version": "20261108_publish_blockers",
+   "checksum": "1ad52b6d5e7a8e61b830c2f53d16c4b6ff7bcdad1fa5fd99a1dd9a5eca4c9795"
+  },
+  {
+   "version": "20261109_blockers_array_append",
+   "checksum": "4961119cdef57a789bcae91b4d59cfb69bfa23fcbb4a5543f75ed48cf8911f8f"
+  },
+  {
+   "version": "20261110_paper_contract",
+   "checksum": "fc430d3f0a5f0217c38f6c4a41009494b4d7f136392595005b60e3bcfcf2ab42"
+  },
+  {
+   "version": "20261111_coach_confirm_and_scope",
+   "checksum": "67065ce00a8a6073d3ef5827709ea0e3a837d5eb2e7345a254f045401fa78995"
+  },
+  {
+   "version": "20261112_linked_mocks",
+   "checksum": "7d954a1d9efded99a9f6f9779a5c25ff6168f7b9f58243e4394021286dbcbdc1"
+  },
+  {
+   "version": "20261113_rehearsal_pinned",
+   "checksum": "2b04a738b7f563c798c84f07183cb8ef133fb1e446ceba9e49765da04e64dace"
+  },
+  {
+   "version": "20261114_fix_projection_guard",
+   "checksum": "824cf270b8dfc0aa44311bdbc0e29bc8d93cf9877a952193ab175c5dadab76fc"
+  },
+  {
+   "version": "20261115_exam_completion_command",
+   "checksum": "7b50d264966c01592d1ab56249c1e88a3de34267716d46abb711d52bb33de283"
+  },
+  {
+   "version": "20261116_beta_admission_and_reminders",
+   "checksum": "1f556a45070216e0f5b0b3e9a32518a89c3086447b81faffdf0f7858c2af5306"
+  },
+  {
+   "version": "20261117_accept_checks_setup_version",
+   "checksum": "1b31a59f972de1ef40df37aeca85a2b47b03da65376a5e33bb1795eee37516dd"
+  },
+  {
+   "version": "20261118_atomic_setup_and_current_week_plan",
+   "checksum": "96a31977bfe3999c67d6ee8b833c220c6a84a4d3ac5c4d42d7295fb656cd61d7"
+  },
+  {
+   "version": "20261119_mock_profile_path_rehearsal_guard",
+   "checksum": "bd2417624d05dc59fc4708d1a68de80476b7600389db40ca50470812b43260b0"
+  },
+  {
+   "version": "20261120_fix_guard_missing_ok",
+   "checksum": "71a11b26711d6a6666be97de63184d1ca177c6af2ac15330d13a1908b2b31cef"
+  },
+  {
+   "version": "20261121_result_viewed",
+   "checksum": "b45eaa38e148a0c382a4c85a49316560a00040a7713727c954dcb5020639f049"
+  },
+  {
+   "version": "20261122_system_assessment_tasks",
+   "checksum": "240756692f624d1dc4749a4a7ebee5b337664bc3f415089899b67d8192f37ee6"
+  },
+  {
+   "version": "20261123_redistribution_receipts",
+   "checksum": "503d293b8a22e037aac8e6362588f075531fdbe238a2d74b1ad46fc77ba7df25"
+  },
+  {
+   "version": "20261124_current_week_consistency",
+   "checksum": "389b8b82c924dbf51ac69cda132bdd4cc45a95e15f16c78deeb3d195f16ec4b9"
+  },
+  {
+   "version": "20261125_atomic_closing_snapshot",
+   "checksum": "49fd53bb368e3f52312382aa3ed61e666898c0c358f1894eef7b632f96f180ac"
+  },
+  {
+   "version": "20261126_current_week_profile_writers",
+   "checksum": "253f9c8e3a8f84c842d6d46ee60e7759fee68ae36592bb8c5046d7dccdcf58ca"
+  },
+  {
+   "version": "20261127_redistribution_slots_and_lock",
+   "checksum": "004279a5366683f7134a554a8abba4301dab699beae56f654e3184628bb7335f"
+  },
+  {
+   "version": "20261128_timed_booking_guard",
+   "checksum": "db6ae02551959a0bf83ca1a2bdbe81877fc9310e0eba9244b3e1ba8c3b8e4b10"
+  },
+  {
+   "version": "20261129_preparation_basis_date",
+   "checksum": "8bfe920cb187883de9f62b60529302f3177f4d94b945f9e5b54bbe0cf2c2cb86"
+  },
+  {
+   "version": "20261130_protect_verified_coverage",
+   "checksum": "ae77853038ebbb7c70293b55aedc519064ca1250ad1bd310be29141db6138073"
+  },
+  {
+   "version": "20261201_booking_guard_restore_and_names",
+   "checksum": "8f80e95d58d1395b2a4012a0d2bd86697f11b5258e49cab522984d37ca984034"
+  },
+  {
+   "version": "20261202_answer_ordering",
+   "checksum": "ed2fe0db90da14463b6412734d852a904807a10f5d6fe5b418fe3f75828cf0d0"
+  },
+  {
+   "version": "20261203_atomic_roadmap_replacement",
+   "checksum": "bc5b45dae3d2a834f602d9ec519da2b7a39ed4eea19d9e0c4b20585d4535317b"
+  },
+  {
+   "version": "20261204_topic_summary_wording",
+   "checksum": "7eaff6988a781b4e7ddf30a6d96a1745d54a20f22ba47af0a654a5fe1560cf41"
+  },
+  {
+   "version": "20261205_paper_score_ledger",
+   "checksum": "72979cd7e569f338ee090180a56c596b9bc8bc52d5862cd345c6380a19dd9127"
+  },
+  {
+   "version": "20261206_finalize_restore_patches",
+   "checksum": "3a4703d41b36345167ede89c601dc8f75017f05715f1560d17bb4edbd86a406c"
+  },
+  {
+   "version": "20261207_challenge_score_ledger",
+   "checksum": "5a3fb00ac5ef4f70d45b2d8e4a572cc20d334ddf501960f3eca89c8a091feee5"
+  },
+  {
+   "version": "20261208_challenge_seen_items",
+   "checksum": "2af1b117a326dbc76991fde11bfa9c4e3a46a2febb1df0e48dba143ae23e2a90"
+  },
+  {
+   "version": "20261209_challenge_seen_items_fix",
+   "checksum": "79a6de1dec86a6a9f437ba644abdc8c62bb992fc725b602c8e6339525dd18b9b"
+  },
+  {
+   "version": "20261210_batch_integrity",
+   "checksum": "b0c92162acb79684425128f69592a111487baee2f095e14c5f818788ac1723eb"
+  },
+  {
+   "version": "20261211_blocked_cells",
+   "checksum": "36dd5a0612457d398e8157e9a57e84d45c0e95387f25784a8e72e6b17073d824"
+  },
+  {
+   "version": "20261212_progress_atomic",
+   "checksum": "06f4eb1f41fbf5e5aa3badb030f605b192463e0c45e64822a758c58e7722072d"
+  },
+  {
+   "version": "20261213_legacy_rescore_counts",
+   "checksum": "c51d671cbf06081cf7a9768b682795c85fa89c71cd32d05226d50128739adfed"
+  },
+  {
+   "version": "20261214_legacy_rescore_stored_semantics",
+   "checksum": "a09db78406816716e397bc5e70a2c9be4bcca18d3bccefcc5a78fa6cfcbbf87f"
+  },
+  {
+   "version": "20261215_difficulty_adaptive",
+   "checksum": "c56b0d19b70d5f77bc5c901f79981a4c41c47f3d9d0c0c30e6d804e0e1f9689f"
+  },
+  {
+   "version": "20261216_practice_receipts_and_level_lock",
+   "checksum": "bb02e0d07d25d33d5b843f69d9d607aa914cf10904112cee0172a6c23642996e"
+  },
+  {
+   "version": "20261217_coach_turns",
+   "checksum": "c6e7a051d3cf2215123ddd41cc091ea9679f281cf1876f8928449e799b202557"
+  },
+  {
+   "version": "20261218_coach_turn_integrity_and_move",
+   "checksum": "504fdaa399038fac7484d038530f7dc6be4fe6af722f3c39ec24c0c0aa4af42f"
+  }
+ ],
+ "objects": {
+  "tables": 98,
+  "functions": 121,
+  "policies": 94,
+  "triggers": 39,
+  "views": 3
+ },
+ "referenceRows": {
+  "beta_settings": 1,
+  "topics": 10,
+  "exam_windows": 8,
+  "curriculum_manifests": 1,
+  "learning_modules": 165,
+  "curriculum_readings": 102,
+  "reading_modules": 170,
+  "reading_los": 343,
+  "lm_edges": 150,
+  "institutes": 0,
+  "class_templates": 0
+ }
+}

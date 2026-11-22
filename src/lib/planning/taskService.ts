@@ -1,11 +1,16 @@
 import { createAdminClient } from '../supabase/admin'
+import { createClient } from '../supabase/server'
+import { executeTaskCommand, ExecutionCommandError, RevisionMismatchError, type ExecutionInput } from './executionCommand'
+import { taskScopeCommand } from './taskScopeCommands'
+export { RevisionMismatchError } from './executionCommand'
 import { getStudyWeekContext } from './schedule'
-import { utcToZonedParts, zonedTimeToUtc } from './studyWeek'
+import { parseLocalDate, utcToZonedParts, zonedTimeToUtc } from './studyWeek'
 import {
-  Occupant, findConflicts, splitTask, suggestSlots, validateDuration, validateStart,
-  expandCommitment, type CommitmentException, type RecurringCommitment,
+  Occupant, findConflicts, suggestSlots, validateDuration, validateStart,
+  expandCommitment, manualPlacementWarnings, type CommitmentException, type RecurringCommitment,
 } from './mutations'
-import { redistributeWeek } from './pulse/redistribute'
+import { redistributeMissedTask, reverseRedistribution } from './pulse/redistribute'
+import { calendarOccupantHref, calendarTaskHref } from '../routing/calendar'
 
 /**
  * Task mutation, with the two guarantees C2 exists to provide:
@@ -14,21 +19,15 @@ import { redistributeWeek } from './pulse/redistribute'
  *      write is refused and the caller is handed the current state — two
  *      devices cannot silently overwrite each other.
  *
- *   2. Every accepted change writes a task_event recording what it was before,
- *      so history reads as a difference and an undo has something to restore.
+ *   2. Execution changes commit the task and its event atomically through an
+ *      owned RPC. Splits are atomic too. Move, delete and undo still use separate legacy writes;
+ *      they must not be described as transactional until migrated and tested.
  */
 
 export class TaskConflictError extends Error {
   constructor(message: string, readonly conflicts: any[], readonly suggestions: any[]) {
     super(message)
     this.name = 'TaskConflictError'
-  }
-}
-
-export class RevisionMismatchError extends Error {
-  constructor(readonly current: any) {
-    super('This task changed somewhere else while you were editing it.')
-    this.name = 'RevisionMismatchError'
   }
 }
 
@@ -45,7 +44,7 @@ export type TaskRow = {
   is_protected_commitment: boolean
 }
 
-const SELECT = 'id, title, local_date, starts_at, duration_minutes, placement, execution, task_type, revision, is_protected_commitment, cycle_id, priority, origin, detail, rationale'
+const SELECT = 'id, title, local_date, starts_at, duration_minutes, placement, execution, task_type, revision, is_protected_commitment, cycle_id, priority, origin, detail, rationale, scope_group_id, continued_from_task_id, learning_activity_id'
 
 async function loadTask(userId: string, taskId: string) {
   const admin = createAdminClient()
@@ -59,6 +58,23 @@ async function loadTask(userId: string, taskId: string) {
  * Everything already occupying the days a change touches: protected
  * commitments (including expanded recurrences) and other timed tasks.
  */
+/** The task that continues this one in a later week, if any. */
+async function successorOf(userId: string, taskId: string) {
+  const { data, error } = await createAdminClient().from('plan_blocks')
+    .select('id, title, cycle_id, local_date, execution').eq('user_id', userId).eq('continued_from_task_id', taskId).maybeSingle()
+  if (error) throw new Error(error.message)
+  return data
+}
+
+/** A task that has been continued is history. Refuse to change it, with a reason a student can act on. */
+async function assertNotContinued(userId: string, taskId: string) {
+  const task = await loadTask(userId,taskId)
+  if (task?.learning_activity_id) throw new ExecutionCommandError('This is recorded learning. Remove an incorrect log and record it again.',409,'RECORDED_LEARNING')
+  if (await successorOf(userId, taskId)) {
+    throw new ExecutionCommandError('This task continues in a later week and can no longer be changed here. Open the continuation instead.', 409, 'CONTINUED')
+  }
+}
+
 export async function occupantsFor(userId: string, dates: string[], timezone: string): Promise<Occupant[]> {
   const admin = createAdminClient()
   const out: Occupant[] = []
@@ -71,8 +87,9 @@ export async function occupantsFor(userId: string, dates: string[], timezone: st
     .from('plan_blocks')
     .select('id, title, local_date, starts_at, duration_minutes, placement, is_protected_commitment')
     .eq('user_id', userId)
+    .is('cancelled_at', null)   // a cancelled task no longer holds its time
     .gte('local_date', from)
-    .lte('local_date', to)
+    .lte('local_date', to).throwOnError()
 
   for (const t of tasks ?? []) {
     if (t.placement !== 'timed' || !t.starts_at) continue
@@ -92,7 +109,7 @@ export async function occupantsFor(userId: string, dates: string[], timezone: st
   const { data: oneOffs } = await admin
     .from('calendar_commitments')
     .select('id, label, kind, starts_at, ends_at, is_protected, recurrence')
-    .eq('user_id', userId).eq('status', 'active').eq('recurrence', 'none')
+    .eq('user_id', userId).eq('status', 'active').eq('recurrence', 'none').throwOnError()
   for (const c of oneOffs ?? []) {
     const s = utcToZonedParts(new Date(c.starts_at as string), timezone)
     const e = utcToZonedParts(new Date(c.ends_at as string), timezone)
@@ -108,11 +125,11 @@ export async function occupantsFor(userId: string, dates: string[], timezone: st
   const { data: series } = await admin
     .from('calendar_commitments')
     .select('id, label, kind, is_protected, recurrence, weekdays, start_time, end_time, starts_on, ends_on')
-    .eq('user_id', userId).eq('status', 'active').eq('recurrence', 'weekly')
+    .eq('user_id', userId).eq('status', 'active').eq('recurrence', 'weekly').throwOnError()
 
   const seriesIds = (series ?? []).map(s => s.id as string)
   const { data: exceptionRows } = seriesIds.length
-    ? await admin.from('commitment_exceptions').select('*').in('commitment_id', seriesIds)
+    ? await admin.from('commitment_exceptions').select('*').in('commitment_id', seriesIds).throwOnError()
     : { data: [] as any[] }
 
   const exceptions: CommitmentException[] = (exceptionRows ?? []).map(e => ({
@@ -143,7 +160,34 @@ export async function occupantsFor(userId: string, dates: string[], timezone: st
     }
   }
 
+  // A booked mock or rehearsal with a clock time holds that time (protected: a task cannot be put over it). One without a time holds the day only.
+  const { data: mocks } = await admin
+    .from('mock_appointments')
+    .select('id, label, kind, planned_date, start_time, duration_minutes')
+    .eq('user_id', userId).eq('status', 'planned').gte('planned_date', from).lte('planned_date', to).not('start_time', 'is', null).throwOnError()
+  for (const m of mocks ?? []) {
+    if (!dates.includes(m.planned_date as string)) continue
+    const [h, mi] = String(m.start_time).split(':').map(Number)
+    out.push({
+      id: `mock:${m.id}`, title: (m.label as string | null) ?? 'Your mock', date: m.planned_date as string, start: h * 60 + mi,
+      durationMinutes: (m.duration_minutes ?? 180) as number, isProtected: true, kind: 'mock',
+    })
+  }
+
   return out
+}
+
+/**
+ * Work belongs to the cycle it was planned in. A date outside that cycle's own dates is a different week's plan: it is carried through the
+ * weekly review (a new linked task), never by editing the date here, so history and the closed week stay as they were.
+ */
+export async function assertDateInCycle(userId: string, cycleId: string | null, date: string) {
+  if (!parseLocalDate(date)) throw new Error('Choose a valid date.')
+  if (!cycleId) return
+  const { data: cycle } = await createAdminClient().from('planning_cycles').select('starts_at_local, ends_at_local').eq('id', cycleId).eq('user_id', userId).maybeSingle()
+  if (cycle?.starts_at_local && cycle.ends_at_local && (date < cycle.starts_at_local || date > cycle.ends_at_local)) {
+    throw new Error(`That day is outside this plan (${cycle.starts_at_local} to ${cycle.ends_at_local}). To carry the task into another week, use the weekly review.`)
+  }
 }
 
 async function recordEvent(
@@ -191,17 +235,27 @@ export type MoveInput = {
 export async function moveTask(userId: string, taskId: string, input: MoveInput) {
   const task = await loadTask(userId, taskId)
   if (!task) throw new Error('Task not found')
+  await assertNotContinued(userId, taskId)
   if (task.revision !== input.expectedRevision) throw new RevisionMismatchError(task)
 
   const ctx = await getStudyWeekContext(userId)
   const timezone = ctx.timezone
+  if (input.date !== task.local_date) await assertDateInCycle(userId, task.cycle_id as string | null, input.date)
+
+  // Unfinished work is placed today or later. Learning that already happened is recorded through Log learning, not by dragging an open task
+  // into the past (the founder rules forbid inventing past Calendar tasks or time). A task that is already dated earlier may be resized or
+  // kept where it is; its history and links stay as they were.
+  if (task.execution !== 'completed' && input.date < ctx.today && input.date !== task.local_date) {
+    throw new Error('Choose today or a later day for unfinished work. If this already happened, record it with Log learning.')
+  }
 
   const duration = input.durationMinutes ?? task.duration_minutes ?? 30
-  const validDuration = validateDuration(duration)
+  const validDuration = validateDuration(duration, task.duration_minutes)
   if (!validDuration.ok) throw new Error(validDuration.error)
 
   let startsAt: string | null = null
   let placement: 'timed' | 'day_preferred' = 'day_preferred'
+  const warnings: { title: string; overlapMinutes: number }[] = []
 
   if (input.startMinutes !== null) {
     const validStart = validateStart(input.startMinutes)
@@ -215,7 +269,7 @@ export async function moveTask(userId: string, taskId: string, input: MoveInput)
       const suggestions = suggestSlots(candidate, occupants, { ignoreIds: [taskId] })
       throw new TaskConflictError(
         `${blocking[0].occupant.title} is already there, and it is protected.`,
-        blocking.map(c => ({ title: c.occupant.title, kind: c.occupant.kind, overlapMinutes: c.overlapMinutes })),
+        blocking.map(c => ({ title: c.occupant.title, kind: c.occupant.kind, overlapMinutes: c.overlapMinutes, href: calendarOccupantHref(c.occupant.id, c.occupant.kind, c.occupant.date) })),
         suggestions
       )
     }
@@ -223,12 +277,7 @@ export async function moveTask(userId: string, taskId: string, input: MoveInput)
     if (!input.acceptWarnings) {
       const soft = findConflicts(candidate, occupants, { ignoreIds: [taskId] })
         .filter(c => !c.occupant.isProtected)
-      if (soft.length > 0) {
-        return {
-          needsConfirmation: true as const,
-          warnings: soft.map(c => ({ title: c.occupant.title, overlapMinutes: c.overlapMinutes })),
-        }
-      }
+      warnings.push(...soft.map(c => ({ title: c.occupant.title, overlapMinutes: c.overlapMinutes })))
     }
 
     const time = `${String(Math.floor(validStart.value / 60)).padStart(2, '0')}:${String(validStart.value % 60).padStart(2, '0')}`
@@ -236,47 +285,41 @@ export async function moveTask(userId: string, taskId: string, input: MoveInput)
     placement = 'timed'
   }
 
-  const before = snapshot(task)
-  const admin = createAdminClient()
-  const { data, error } = await admin
-    .from('plan_blocks')
-    .update({
-      local_date: input.date, day: input.date, starts_at: startsAt, placement,
-      duration_minutes: validDuration.value, duration: String(validDuration.value),
-    })
-    .eq('id', taskId).eq('user_id', userId).eq('revision', input.expectedRevision)
-    .select(SELECT).maybeSingle()
+  if (!input.acceptWarnings) {
+    warnings.push(...await windowWarnings(userId, input.date, startsAt ? utcToZonedParts(new Date(startsAt), timezone).minutesOfDay : null, validDuration.value))
+    if (warnings.length) return { needsConfirmation: true as const, warnings }
+  }
 
+  // The write, its protected-time and mock checks and its history event are ONE database command under the per-student scope lock
+  // (apply_task_move, shared with the Coach's confirmation). The TypeScript checks above only produce suggestions and the soft warning.
+  const { data: res, error } = await createAdminClient().rpc('apply_task_move', {
+    p_user: userId, p_task: taskId, p_revision: input.expectedRevision, p_date: input.date, p_starts: startsAt, p_minutes: validDuration.value, p_strict: false, p_source: 'calendar',
+  })
   if (error) throw new Error(error.message)
-  // The revision guard in the WHERE clause is the real race protection: another
-  // write landing between the read above and this update makes it match nothing.
-  if (!data) throw new RevisionMismatchError(await loadTask(userId, taskId))
+  const r = res as { ok: boolean; code?: string; title?: string; start?: string; end?: string; task?: any; reopened?: boolean }
+  if (!r.ok) {
+    if (r.code === 'REVISION' || r.code === 'NOT_FOUND') throw new RevisionMismatchError(await loadTask(userId, taskId))
+    if (r.code === 'PROTECTED' || r.code === 'MOCK') {
+      const occ = await occupantsFor(userId, [input.date], timezone)
+      const cand = { date: input.date, start: input.startMinutes ?? 0, durationMinutes: validDuration.value }
+      const conflicts = findConflicts(cand, occ, { ignoreIds: [taskId], protectedOnly: true }).map(c => ({ title: c.occupant.title, kind: c.occupant.kind, overlapMinutes: c.overlapMinutes, href: calendarOccupantHref(c.occupant.id, c.occupant.kind, c.occupant.date) }))
+      throw new TaskConflictError(`${r.title || 'Your mock'} is already there, and it is protected.`, conflicts.length ? conflicts : [{ title: r.title || 'Protected time', kind: r.code === 'MOCK' ? 'mock' : 'commitment', overlapMinutes: 0 }], suggestSlots(cand, occ, { ignoreIds: [taskId] }))
+    }
+    if (r.code === 'RECORDED') throw new ExecutionCommandError('This is recorded learning. Remove an incorrect log and record it again.', 409, 'RECORDED_LEARNING')
+    if (r.code === 'CONTINUED') throw new ExecutionCommandError('This task continues in a later week and can no longer be changed here. Open the continuation instead.', 409, 'CONTINUED')
+    if (r.code === 'ORDER') throw new ExecutionCommandError(`That would break the order you planned: ${r.title}. Move the other sitting first, or choose a different day.`, 409, 'SITTING_ORDER', calendarTaskHref(taskId, task.local_date ?? undefined))
+    if (r.code === 'OUTSIDE_CYCLE') throw new Error(`That day is outside this plan (${r.start} to ${r.end}). To carry the task into another week, use the weekly review.`)
+    if (r.code === 'PAST') throw new Error('Choose today or a later day for unfinished work. If this already happened, record it with Log learning.')
+    throw new Error(r.code === 'CANCELLED' ? 'This task was cancelled.' : 'That placement is no longer valid. Reload the calendar and try again.')
+  }
+  const data = r.task, reopen = Boolean(r.reopened)
+  // Having chosen its own time, the work no longer needs the minutes that were added elsewhere to carry it: take back exactly those.
+  const reversal = reopen ? await reverseRedistribution(userId, taskId) : null
 
-  const movedDay = before.local_date !== input.date || before.starts_at !== startsAt
-  const resized = before.duration_minutes !== validDuration.value
-  await recordEvent(
-    userId, taskId,
-    resized && !movedDay ? 'duration_changed' : 'moved',
-    { local_date: input.date, starts_at: startsAt, duration_minutes: validDuration.value, placement },
-    before
-  )
-
-  return { task: data, needsConfirmation: false as const }
+  return { task: data, needsConfirmation: false as const, reopened: reopen, outcome: reopen ? { message: `Placed on ${input.date} and open again.${reversal?.message ? ' ' + reversal.message : ''}` } : null }
 }
 
-export type ExecutionInput = {
-  execution: 'not_started' | 'in_progress' | 'partial' | 'completed' | 'skipped' | 'deferred'
-  expectedRevision: number
-  actualDurationMinutes?: number
-  note?: string
-}
-
-// The names task_events accepts. Reopening a completed task is recorded as
-// 'undone' because the schema has no 'restored'.
-const EVENT_FOR: Record<string, string> = {
-  in_progress: 'started', partial: 'partial', completed: 'completed',
-  skipped: 'skipped', deferred: 'deferred', not_started: 'undone',
-}
+export type { ExecutionInput } from './executionCommand'
 
 /**
  * Records what actually happened to a task.
@@ -286,41 +329,29 @@ const EVENT_FOR: Record<string, string> = {
  * creates no evidence — only a diagnostic does that.
  */
 export async function setExecution(userId: string, taskId: string, input: ExecutionInput) {
-  const task = await loadTask(userId, taskId)
-  if (!task) throw new Error('Task not found')
-  if (task.revision !== input.expectedRevision) throw new RevisionMismatchError(task)
+  await assertNotContinued(userId, taskId)
+  // Request-scoped JWT: ownership, verified email and setup are enforced again
+  // inside the RPC. Never fall back to separate admin writes if it is missing.
+  const result = await executeTaskCommand(await createClient(), userId, taskId, input)
 
-  const before = snapshot(task)
-  const admin = createAdminClient()
-  const { data, error } = await admin
-    .from('plan_blocks')
-    .update({ execution: input.execution })
-    .eq('id', taskId).eq('user_id', userId).eq('revision', input.expectedRevision)
-    .select(SELECT).maybeSingle()
-
-  if (error) throw new Error(error.message)
-  if (!data) throw new RevisionMismatchError(await loadTask(userId, taskId))
-
-  // The actual duration rides on the same event as the change. It used to be a second
-  // 'partial_progress' insert, which the current CHECK constraint rejects — so it was silently
-  // never recorded.
-  await recordEvent(
-    userId, taskId, EVENT_FOR[input.execution] ?? 'moved',
-    { execution: input.execution, note: input.note ?? null },
-    before,
-    input.actualDurationMinutes === undefined ? undefined : Math.min(600, Math.max(0, Math.round(input.actualDurationMinutes)))
-  )
-
-  if (input.execution === 'skipped' || input.execution === 'deferred') {
-    const cycleId = (data as any).cycle_id as string | null
-    if (cycleId) {
-      const ctx = await getStudyWeekContext(userId)
-      const result = await redistributeWeek(userId, cycleId, ctx.today).catch(e => ({ applied: false, reason: e?.message ?? String(e) }))
-      if (!result.applied) console.error(`[redistributeWeek] did not apply for cycle ${cycleId}:`, result.reason)
+  // What actually happened, in words the student can act on: the receipt reports only what was committed.
+  let outcome: { message: string; redistribution: { applied: boolean; reason: string | null; placedMinutes?: number; changes?: unknown[] } | null } | null = null
+  if (!result.replayed && (input.execution === 'skipped' || input.execution === 'deferred')) {
+    const verb = input.execution === 'skipped' ? 'skipped' : 'deferred'
+    try {
+      const r = await redistributeMissedTask(userId, taskId)
+      outcome = {
+        redistribution: { applied: r.applied, reason: r.reason, placedMinutes: r.placed, changes: r.changes },
+        message: r.applied
+          ? `Saved as ${verb}. ${r.message} Undo takes that back.`
+          : `Saved as ${verb}. ${r.message}${input.execution === 'deferred' ? ' You can choose another time for it.' : ''}`,
+      }
+    } catch {
+      console.error('[redistribute] Task saved; the week was not adjusted.')
+      outcome = { redistribution: { applied: false, reason: 'The adjustment failed.' }, message: `Saved as ${verb}. Calendar could not adjust the rest of the week, so nothing moved.` }
     }
   }
-
-  return { task: data }
+  return { ...result, outcome }
 }
 
 /**
@@ -330,76 +361,38 @@ export async function setExecution(userId: string, taskId: string, input: Execut
  * covers less than the original did between them.
  */
 export async function splitExisting(userId: string, taskId: string, expectedRevision: number, at?: number) {
-  const task = await loadTask(userId, taskId)
-  if (!task) throw new Error('Task not found')
-  if (task.revision !== expectedRevision) throw new RevisionMismatchError(task)
-  if (!task.local_date) throw new Error('A task with no date cannot be split yet — place it first')
-
-  const ctx = await getStudyWeekContext(userId)
-  const startMinutes = task.starts_at
-    ? utcToZonedParts(new Date(task.starts_at as string), ctx.timezone).minutesOfDay
-    : 9 * 60
-
-  const occupants = await occupantsFor(userId, [task.local_date as string], ctx.timezone)
-  const result = splitTask(
-    { date: task.local_date as string, start: startMinutes, durationMinutes: (task.duration_minutes ?? 60) as number },
-    { at, occupants, ignoreIds: [taskId] }
-  )
-
-  const admin = createAdminClient()
-  const before = snapshot(task)
-
-  const { data: shortened, error: shortenErr } = await admin
-    .from('plan_blocks')
-    .update({ duration_minutes: result.first.durationMinutes, duration: String(result.first.durationMinutes) })
-    .eq('id', taskId).eq('user_id', userId).eq('revision', expectedRevision)
-    .select(SELECT).maybeSingle()
-  if (shortenErr) throw new Error(shortenErr.message)
-  if (!shortened) throw new RevisionMismatchError(await loadTask(userId, taskId))
-
-  const secondId = `${taskId}-b${Date.now().toString(36).slice(-4)}`
-  const secondStartsAt = result.second.start !== null
-    ? zonedTimeToUtc(
-        result.second.date,
-        `${String(Math.floor(result.second.start / 60)).padStart(2, '0')}:${String(result.second.start % 60).padStart(2, '0')}`,
-        ctx.timezone
-      ).toISOString()
-    : null
-
-  const { error: insertErr } = await admin.from('plan_blocks').insert({
-    id: secondId,
-    user_id: userId,
-    cycle_id: (task as any).cycle_id ?? null,
-    title: `${task.title} (part 2)`,
-    detail: (task as any).detail ?? 'The remainder of a session that was split.',
-    task_type: task.task_type ?? 'study',
-    origin: (task as any).origin ?? 'student',
-    priority: (task as any).priority ?? 'core',
-    placement: secondStartsAt ? 'timed' : 'day_preferred',
-    execution: 'not_started',
-    local_date: result.second.date,
-    day: result.second.date,
-    starts_at: secondStartsAt,
-    duration_minutes: result.second.durationMinutes,
-    duration: String(result.second.durationMinutes),
-    rationale: `Split from "${task.title}" so it fits in shorter sittings. The scope is unchanged.`,
-    is_protected_commitment: false,
-    created_by: 'student',
+  await assertNotContinued(userId, taskId)
+  if (!Number.isInteger(expectedRevision) || expectedRevision < 1 || (at !== undefined && !Number.isInteger(at))) throw new Error('Use a valid revision and whole-minute split point.')
+  const result = await taskScopeCommand(await createClient(), 'split_study_task', {
+    p_user_id: userId, p_task_id: taskId, p_expected_revision: expectedRevision, p_first_minutes: at ?? null,
   })
-  if (insertErr) throw new Error(insertErr.message)
-
-  await recordEvent(userId, taskId, 'split',
-    { splitInto: secondId, firstDuration: result.first.durationMinutes, secondDuration: result.second.durationMinutes },
-    before)
-  await recordEvent(userId, secondId, 'created', { splitFrom: taskId }, {})
-
-  return { first: shortened, secondId }
+  return { first: result.task, secondId: result.secondId }
 }
 
 export async function deleteTask(userId: string, taskId: string, expectedRevision: number) {
   const task = await loadTask(userId, taskId)
   if (!task) throw new Error('Task not found')
   if (task.revision !== expectedRevision) throw new RevisionMismatchError(task)
+  if (task.learning_activity_id) {
+    const {data,error} = await (await createClient()).rpc('cancel_learning_sitting',{p_task_id:taskId,p_expected_revision:expectedRevision})
+    if(error)throw new ExecutionCommandError('Could not confirm removal. Refresh this sitting before trying again.',503,'SAVE_UNCONFIRMED')
+    if(data?.code==='REVISION_MISMATCH')throw new RevisionMismatchError(data.current)
+    if(!data?.ok)throw new ExecutionCommandError('Could not confirm removal.',503,'SAVE_UNCONFIRMED')
+    return {deleted:false,cancelled:true as const,task:await loadTask(userId,taskId)}
+  }
+  await assertNotContinued(userId, taskId)
+
+  // A continuation carries the lineage of earlier weeks, so it is removed from the plan rather than erased:
+  // the earlier occurrence must never look like the only record, and the history stays explainable.
+  if ((task as any).continued_from_task_id) {
+    const { data, error } = await createAdminClient().from('plan_blocks')
+      .update({ cancelled_at: new Date().toISOString() })
+      .eq('id', taskId).eq('user_id', userId).eq('revision', expectedRevision).select(SELECT).maybeSingle()
+    if (error) throw new Error(error.message)
+    if (!data) throw new RevisionMismatchError(await loadTask(userId, taskId))
+    await recordEvent(userId, taskId, 'cancelled', { reason: 'removed_from_plan' }, snapshot(task))
+    return { deleted: false, cancelled: true as const, task: data }
+  }
 
   const admin = createAdminClient()
   // Record before deleting: task_events cascades on task deletion, so the
@@ -420,21 +413,24 @@ export async function deleteTask(userId: string, taskId: string, expectedRevisio
     .eq('id', taskId).eq('user_id', userId).eq('revision', expectedRevision)
   if (error) throw new Error(error.message)
 
-  return { deleted: true, task }
+  return { deleted: true, cancelled: false as const, task }
 }
 
 /** Reverses the most recent change to a task, using the previous values it stored. */
 export async function undoLast(userId: string, taskId: string) {
+  await assertNotContinued(userId, taskId)
   const admin = createAdminClient()
   const { data: events } = await admin
     .from('task_events')
-    .select('id, event_type, previous, created_at')
+    .select('id, event_type, payload, previous, created_at')
     .eq('user_id', userId).eq('task_id', taskId)
     .order('created_at', { ascending: false })
     .limit(1)
 
   const last = events?.[0]
   if (!last) throw new Error('There is nothing to undo for this task')
+  if (last.event_type === 'split') throw new Error('Both sittings share one learning task. Move the remaining sitting rather than undoing only one half of the split.')
+  if (last.payload?.kind === 'scope_confirmation') throw new Error('Review the covered outcomes in Tests to change this confirmation.')
 
   const previous = (last.previous ?? {}) as Record<string, any>
   if (Object.keys(previous).length === 0) {
@@ -459,7 +455,87 @@ export async function undoLast(userId: string, taskId: string) {
     .select(SELECT).maybeSingle()
 
   if (error) throw new Error(error.message)
-  await recordEvent(userId, taskId, 'undone', { undid: last.event_type }, snapshot(task))
-  return { task: data }
+  // Name the exact event undone, so reported time reverses precisely that report (and an undo of an undo restores it).
+  await recordEvent(userId, taskId, 'undone', { undid: last.event_type, undid_event_id: last.id }, snapshot(task))
+  // Undoing a deferral or skip takes back exactly the minutes it had added to later sessions, and says so.
+  const reversal = ['deferred', 'skipped', 'placed'].includes(last.event_type) ? await reverseRedistribution(userId, taskId) : null
+  return { task: data, outcome: reversal?.message ? { message: reversal.message } : null }
 }
 
+/** The one-time "outside your usual windows / above your usual limit" warning, shared by move and creation. Never blocks; protected time is separate. */
+async function windowWarnings(userId: string, date: string, startMinutes: number | null, duration: number) {
+  const admin = createAdminClient(), weekday = new Date(`${date}T12:00:00Z`).getUTCDay()
+  const [profile, windows] = await Promise.all([
+    admin.from('profiles').select('max_session_minutes').eq('id', userId).single().throwOnError(),
+    admin.from('availability_windows').select('start_time,end_time').eq('user_id', userId).eq('weekday', weekday).eq('status', 'active').throwOnError(),
+  ])
+  const minutes = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5))
+  return manualPlacementWarnings(startMinutes, duration, profile.data.max_session_minutes, windows.data.map(w => ({ start: minutes(w.start_time), end: minutes(w.end_time) }))).map(title => ({ title, overlapMinutes: 0 }))
+}
+
+/**
+ * Adds a task the student chose to add: ONE database command (apply_task_create) writes the task and its history together, idempotent per key.
+ * Only ordinary study/revision/admin work; repairs, re-checks and mocks have their own commands.
+ */
+export async function createManualTask(userId: string, input: {
+  key: string; title: string; detail?: string; taskType?: string; priority?: string; date: string; startMinutes: number | null; durationMinutes: number; acceptWarnings?: boolean
+}) {
+  const ctx = await getStudyWeekContext(userId), timezone = ctx.timezone, admin = createAdminClient()
+  if (!parseLocalDate(input.date)) throw new ExecutionCommandError('Choose a valid day.', 400, 'BAD_DATE')
+  const duration = validateDuration(input.durationMinutes)
+  if (!duration.ok) throw new ExecutionCommandError(duration.error, 400, 'BAD_DURATION')
+  let startsAt: string | null = null
+  if (input.startMinutes !== null) {
+    const start = validateStart(input.startMinutes)
+    if (!start.ok) throw new ExecutionCommandError(start.error, 400, 'BAD_START')
+    startsAt = zonedTimeToUtc(input.date, `${String(Math.floor(start.value / 60)).padStart(2, '0')}:${String(start.value % 60).padStart(2, '0')}`, timezone).toISOString()
+  }
+  // A key that already has this student's receipt is a replay: the command decides it, before any check of today's calendar or warnings.
+  const { data: receipt } = await admin.from('task_create_receipts').select('key').eq('key', input.key).eq('user_id', userId).maybeSingle().throwOnError()
+  if (!receipt) {
+    if (input.date < ctx.today) throw new ExecutionCommandError('Choose today or a later day. If this already happened, record it with Log learning.', 400, 'PAST')
+    const conflict = await protectedConflict(userId, input.date, input.startMinutes, duration.value, timezone)
+    if (conflict) throw conflict
+    if (!input.acceptWarnings) {
+      const warnings = await windowWarnings(userId, input.date, input.startMinutes === null ? null : Math.round(input.startMinutes / 5) * 5, duration.value)
+      if (warnings.length) return { needsConfirmation: true as const, warnings }
+    }
+  }
+  const { data: res, error } = await admin.rpc('apply_task_create', {
+    p_user: userId, p_id: input.key, p_title: input.title, p_detail: input.detail ?? null, p_type: input.taskType ?? 'study', p_priority: input.priority ?? 'core',
+    p_date: input.date, p_starts: startsAt, p_minutes: duration.value,
+  })
+  // The command is atomic: an error the database ANSWERED with (a SQLSTATE) rolled everything back. Anything else (connection lost, timeout, gateway) may have
+  // come after the commit, so it is reported as unknown, never as "nothing was added"; retrying under the same key returns the saved result.
+  if (error) {
+    if (/^[0-9A-Z]{5}$/.test(error.code ?? '')) throw new Error(error.message)
+    throw new ExecutionCommandError('We could not confirm whether the task was saved. Press Retry: if it was saved you will get it back, never a second copy.', 502, 'OUTCOME_UNKNOWN')
+  }
+  const r = res as { ok: boolean; code?: string; title?: string; start?: string; end?: string; task?: any; current?: any; replayed?: boolean }
+  if (!r.ok) {
+    if (r.code === 'PROTECTED' || r.code === 'MOCK') {
+      // Lost a race to a booking made after the preflight: rebuild the same actionable links the preflight gives.
+      const conflict = await protectedConflict(userId, input.date, input.startMinutes, duration.value, timezone).catch(() => null)
+      throw conflict ?? new TaskConflictError(`${r.title || 'Protected time'} is already there, and it is protected.`, [{ title: r.title || 'Protected time', kind: r.code === 'MOCK' ? 'mock' : 'commitment', overlapMinutes: 0 }], [])
+    }
+    if (r.code === 'PAST') throw new ExecutionCommandError('Choose today or a later day. If this already happened, record it with Log learning.', 400, 'PAST')
+    if (r.code === 'NO_CYCLE') throw new ExecutionCommandError('You have no accepted plan week right now. Prepare your week from the Calendar first, then add the task.', 409, 'NO_CYCLE')
+    if (r.code === 'OUTSIDE_CYCLE') throw new ExecutionCommandError(`That day is outside this plan (${r.start} to ${r.end}). To carry work into another week, use the weekly review.`, 400, 'OUTSIDE_CYCLE')
+    if (r.code === 'BAD_TYPE') throw new ExecutionCommandError('Repairs, re-checks and mocks are created by their own steps, not added by hand.', 400, 'BAD_TYPE')
+    if (r.code === 'KEY_REUSED') throw new ExecutionCommandError('That request was already used for a different task. Reload and add it again.', 409, 'KEY_REUSED')
+    if (r.code === 'NO_RECEIPT') throw new ExecutionCommandError('This task was added before Roadmap kept a record of the original request, so it cannot be confirmed as the same one. It is already on your Calendar; nothing was added.', 409, 'NO_RECEIPT')
+    throw new ExecutionCommandError('That task could not be added. Nothing was changed.', 400, r.code ?? 'REFUSED')
+  }
+  return { needsConfirmation: false as const, task: r.task, current: r.current ?? null, replayed: Boolean(r.replayed) }
+}
+
+/** A protected booking over the chosen time as a conflict with links and nearby free slots, or null. */
+async function protectedConflict(userId: string, date: string, startMinutes: number | null, durationMinutes: number, timezone: string) {
+  if (startMinutes === null) return null
+  const candidate = { date, start: startMinutes, durationMinutes }
+  const occupants = await occupantsFor(userId, [date], timezone)
+  const blocking = findConflicts(candidate, occupants, { protectedOnly: true })
+  if (!blocking.length) return null
+  return new TaskConflictError(`${blocking[0].occupant.title} is already there, and it is protected.`,
+    blocking.map(c => ({ title: c.occupant.title, kind: c.occupant.kind, overlapMinutes: c.overlapMinutes, href: calendarOccupantHref(c.occupant.id, c.occupant.kind, c.occupant.date) })), suggestSlots(candidate, occupants))
+}

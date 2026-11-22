@@ -7,7 +7,7 @@
  */
 import {
   expandCommitment, findConflicts, formatMinutes, overlaps, splitTask,
-  suggestSlots, validateDuration, validateStart,
+  suggestSlots, validateDuration, validateStart, manualPlacementWarnings,
   type Occupant, type RecurringCommitment,
 } from '../src/lib/planning/mutations'
 
@@ -77,14 +77,15 @@ console.log('\nSplitting')
 const split = splitTask({ date: D, start: 14 * 60, durationMinutes: 90 }, { occupants: classDay })
 eq('halves sum to the original', split.first.durationMinutes + split.second.durationMinutes, 90)
 check('neither half is trivially short', split.first.durationMinutes >= 15 && split.second.durationMinutes >= 15)
-check('the second half is placed after the first, or dated for later',
+check('the second half never overlaps the first',
   split.second.start === null || split.second.start >= 14 * 60 + split.first.durationMinutes,
   JSON.stringify(split))
 const uneven = splitTask({ date: D, start: 14 * 60, durationMinutes: 90 }, { at: 20, occupants: [] })
 eq('an explicit split point is honoured', uneven.first.durationMinutes, 20)
 eq('and the remainder is the rest', uneven.second.durationMinutes, 70)
-const clamped = splitTask({ date: D, start: 14 * 60, durationMinutes: 40 }, { at: 2, occupants: [] })
-check('a split point below the minimum is clamped, not accepted', clamped.first.durationMinutes >= 15 && clamped.second.durationMinutes >= 15, JSON.stringify(clamped))
+try { splitTask({ date: D, start: 14 * 60, durationMinutes: 40 }, { at: 2, occupants: [] }); check('an invalid split point is refused rather than changed silently', false) }
+catch { check('an invalid split point is refused rather than changed silently', true) }
+check('the second sitting stays unplaced, without inventing a date or a class conflict', split.second.date === null && split.second.start === null)
 try { splitTask({ date: D, start: 600, durationMinutes: 20 }); check('splitting a very short session is refused', false) }
 catch { check('splitting a very short session is refused', true) }
 // Scope preservation is the point of splitting.
@@ -139,6 +140,8 @@ eq('an exception for another commitment is ignored',
 
 console.log('\nValue guards')
 eq('duration snaps to five minutes', validateDuration(47), { ok: true, value: 45 })
+eq('moving an existing 44-minute sitting preserves its exact minutes', validateDuration(44,44), {ok:true,value:44})
+eq('an explicitly resized sitting still uses the normal duration control', validateDuration(47,44), {ok:true,value:45})
 check('a two-minute session is refused', validateDuration(2).ok === false)
 check('a four-hour sitting is refused', validateDuration(240).ok === false)
 check('and the refusal suggests splitting', (validateDuration(240) as any).error.includes('split'))
@@ -152,5 +155,13 @@ eq('noon', formatMinutes(720), '12pm')
 eq('morning with minutes', formatMinutes(9 * 60 + 30), '9:30am')
 eq('evening on the hour', formatMinutes(19 * 60), '7pm')
 
+eq('manual placement within a saved window and sitting limit needs no exception', manualPlacementWarnings(1080,30,45,[{start:1080,end:1200}]), [])
+eq('day-only placement does not invent a clock constraint', manualPlacementWarnings(null,30,45,[{start:1080,end:1200}]), [])
+check('a manual longer sitting asks explicitly', manualPlacementWarnings(1080,60,45,[{start:1080,end:1200}]).length===1)
+check('outside a window asks explicitly', manualPlacementWarnings(1020,30,45,[{start:1080,end:1200}]).length===1)
+check('day-only work with no window asks explicitly', manualPlacementWarnings(null,30,45,[]).length===1)
+check('two fragmented windows are not one contiguous sitting', manualPlacementWarnings(1080,45,45,[{start:1080,end:1110},{start:1140,end:1170}]).length===1)
+check('day-only work longer than every saved window still asks for an exception', manualPlacementWarnings(null,45,60,[{start:1080,end:1110},{start:1140,end:1170}]).length===1)
+eq('ending at the saved boundary is allowed', manualPlacementWarnings(1170,30,45,[{start:1080,end:1200}]), [])
 console.log(`\n${passed} passed, ${failed} failed\n`)
 process.exit(failed === 0 ? 0 : 1)

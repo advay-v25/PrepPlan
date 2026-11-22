@@ -17,6 +17,7 @@ const ev = (o: Partial<LosEvidenceInput>): LosEvidenceInput => ({
 
 console.log('\nBand classification\n')
 check('no evidence -> untested, never maintain', classifyLos(null, now).band === 'untested')
+check('an open repair with no recorded observation stays Repair at any lifecycle state (sample 0, not 1)', classifyLos({ state: 'needs_repair', validSampleSize: 0, confidenceMismatch: false, latestAt: null, hasOpenRepair: true, repairOccurrences: 1 }, now).band === 'repair')
 check('zero valid observations -> untested', classifyLos(ev({ validSampleSize: 0 }), now).band === 'untested')
 check('insufficient state -> untested', classifyLos(ev({ state: 'insufficient' }), now).band === 'untested')
 check('needs_repair -> repair', classifyLos(ev({ state: 'needs_repair' }), now).band === 'repair')
@@ -62,9 +63,8 @@ check('within a band, core comes before supporting', sorted[0].importance === 'c
 check('verify precedes untested, maintain is last', sorted[2].band === 'verify' && sorted[sorted.length - 1].band === 'maintain')
 const c = countBands(rows)
 check('band counts add up to the total', c.repair + c.verify + c.maintain + c.untested === c.total && c.repair === 2 && c.total === 5)
-check('repair proof demands a retest and forbids guessed answers', /next-day retest/.test(BAND_METHOD.repair.proof) && /no guessed/.test(BAND_METHOD.repair.proof))
-check('repair asks for more questions than verify, verify more than maintain',
-  BAND_METHOD.repair.questionRange.startsWith('12') && BAND_METHOD.verify.questionRange.startsWith('6') && BAND_METHOD.maintain.questionRange.startsWith('3'))
+check('repair guidance states the real closing rule (a fresh eligible check, scheduled by Roadmap) and no fixed pass mark', /fresh, eligible check/.test(BAND_METHOD.repair.proof) && !/\d+\s*%/.test(BAND_METHOD.repair.proof) && !/\d+–\d+ (fresh )?questions/.test(BAND_METHOD.repair.howToImprove('x')))
+check('no band prescribes a fixed question count (it depends on the bank and the policy)', Object.values(BAND_METHOD).every(m => !/\d/.test(m.questionRange)))
 check('method text names the concept', BAND_METHOD.verify.howToImprove('Duration').includes('Duration'))
 check('no output promises a pass probability or an hours target',
   !/pass|probab|hours/i.test(Object.values(BAND_METHOD).map(m => m.proof + m.questionRange).join(' ')))

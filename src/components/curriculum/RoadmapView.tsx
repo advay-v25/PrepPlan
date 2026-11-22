@@ -6,7 +6,6 @@ import { AlertTriangle, CheckCircle2, ChevronDown, Loader2, RefreshCw, TrendingD
 import { useRouter } from 'next/navigation'
 import { PHASE_LABEL, PHASE_PURPOSE, type Roadmap } from '../../lib/curriculum/roadmap'
 import type { Progress } from '../../lib/curriculum/roadmapService'
-import { ProgressRing } from '../ui/ProgressRing'
 
 type TopicInfo = { id: string; name: string; weightMin: number; weightMax: number; summary: string }
 type ModuleInfo = { id: string; topic: string; name: string; summary: string; effortBand: number; difficulty: number }
@@ -32,7 +31,7 @@ function shortDate(d: string) {
  * a plan that cannot say whether it is working is decoration.
  */
 export function RoadmapView({
-  roadmap, status, progress, topics, modules, coverage, examLabel,
+  roadmap, status, progress, topics, modules, coverage, examLabel, changeExamHref,
 }: {
   roadmap: Roadmap
   status: string
@@ -41,6 +40,7 @@ export function RoadmapView({
   modules: ModuleInfo[]
   coverage: Record<string, string>
   examLabel: string | null
+  changeExamHref: string
 }) {
   const router = useRouter()
   const [open, setOpen] = useState<string | null>(
@@ -54,26 +54,34 @@ export function RoadmapView({
 
   const totalWeeks = roadmap.totalWeeks || 1
 
-  async function regenerate() {
-    setBusy(true)
+  // Every action reports what happened: pending, saved (and what it does and does not change), or a recoverable failure.
+  const [notice, setNotice] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null)
+  const fail = (text: string) => setNotice({ tone: 'error', text })
+
+  async function send(url: string, body: unknown): Promise<{ ok: boolean; error?: string; [k: string]: unknown }> {
     try {
-      await fetch('/api/roadmap', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ activate: true }),
-      })
-      router.refresh()
-    } finally { setBusy(false) }
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      const data = await res.json().catch(() => null)
+      return data && typeof data === 'object' && 'ok' in data ? data : { ok: false, error: 'The server sent an unexpected reply.' }
+    } catch { return { ok: false, error: 'No connection.' } }
+  }
+
+  async function regenerate() {
+    setBusy(true); setNotice(null)
+    const data = await send('/api/roadmap', { activate: true })
+    setBusy(false)
+    if (!data.ok) return fail(`The roadmap was not rebuilt (${data.error ?? 'unknown problem'}). Nothing changed; try again.`)
+    setNotice({ tone: 'ok', text: 'Roadmap rebuilt from where you are now. Your accepted week in Calendar is unchanged; the next weekly review plans from this roadmap.' })
+    router.refresh()
   }
 
   async function setCoverage(lmId: string, state: string) {
-    setSaving(lmId)
-    try {
-      await fetch('/api/curriculum/coverage', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lmId, state }),
-      })
-      router.refresh()
-    } finally { setSaving(null) }
+    setSaving(lmId); setNotice(null)
+    const data = await send('/api/curriculum/coverage', { lmId, state })
+    setSaving(null)
+    if (!data.ok) return fail(data.code === 'VERIFIED_COVERAGE_PROTECTED' ? String(data.error) : `Not saved (${data.error ?? 'unknown problem'}). Your previous answer is still in place.`)
+    setNotice({ tone: 'ok', text: 'Saved as your own report, not test evidence. This week’s accepted tasks are unchanged; the roadmap and your next weekly review use it.' })
+    router.refresh()
   }
 
   const feas = roadmap.feasibility
@@ -94,22 +102,28 @@ export function RoadmapView({
         <div className="glass-hero__top">
           <div>
             <p className="glass-hero__eyebrow">{examLabel ? `Sitting ${examLabel}` : 'Your roadmap'}</p>
-            <p className="glass-hero__date">{roadmap.totalWeeks} weeks to the exam</p>
+            <p className="glass-hero__date">{roadmap.totalWeeks} weeks to {roadmap.targetKind === 'sitting' ? 'the target sitting' : 'the exam'}</p>
             <p className="glass-hero__meta" style={{ marginTop: 6 }}>
               {shortDate(roadmap.startDate)} → {shortDate(roadmap.targetDate)}
               {status === 'draft' && ' · draft'}
               {' · '}Week {progress.weeksElapsed + 1} of {progress.totalWeeks}
             </p>
           </div>
-          <ProgressRing percent={progress.actualPercent} label="Actual" size={72} tone="light" />
+          <div className="glass-hero__facts" aria-label="Coverage, as you reported it">
+            <strong>{modules.filter(m => ['studied', 'verified'].includes(coverage[m.id] ?? '')).length} of {modules.length}</strong>
+            <span>readings reported covered</span>
+            <small>{modules.filter(m => coverage[m.id] === 'taught').length} partly covered · your own report, not test evidence</small>
+          </div>
         </div>
         <div className="glass-panel__foot" style={{ marginTop: 'var(--space-5)' }}>
-          <button className="glass-pill-button" onClick={regenerate} disabled={busy}>
+          <Link className="glass-pill-button" href={changeExamHref}>Change exam</Link>
+          <button type="button" className="glass-pill-button" onClick={regenerate} disabled={busy}>
             {busy ? <Loader2 size={15} className="animate-spin" aria-hidden /> : <RefreshCw size={15} aria-hidden />}
             Rebuild from where I am now
           </button>
         </div>
       </section>
+      <p role={notice?.tone === 'error' ? 'alert' : 'status'} className={notice ? `note${notice.tone === 'error' ? ' note--warn' : ''}` : 'sr-only'}>{notice?.text ?? (busy || saving ? 'Saving…' : '')}</p>
 
       {/* Phase bar — the shape of the whole run, including the reserved weeks. */}
       <div className="phase-bar" role="img" aria-label={`Plan phases: ${roadmap.phases.map(p => `${PHASE_LABEL[p.phase]} ${p.weeks} weeks`).join(', ')}`}>
@@ -157,22 +171,33 @@ export function RoadmapView({
               <small>{progress.plannedPercent}%</small>
             </div>
             <div>
-              <span>You have done</span>
+              <span>Covered so far</span>
               <div className="progress-track"><div className={`progress-fill ${progress.actualPercent >= progress.plannedPercent ? 'progress-fill--green' : 'progress-fill--amber'}`} style={{ width: `${progress.actualPercent}%` }} /></div>
               <small>{progress.actualPercent}%</small>
             </div>
           </div>
           <p>{progress.message}</p>
           <p className="fine-print">
-            Week {progress.weeksElapsed + 1} of {progress.totalWeeks} · {progress.modulesDone} of {progress.modulesTotal} modules verified.
-            Measured by effort, not module count — six easy modules are not three hard ones.
+            Week {progress.weeksElapsed + 1} of {progress.totalWeeks} · {progress.modulesDone} of {progress.modulesTotal} modules verified. Measured by effort; your setup coverage is an estimate, not test evidence.
           </p>
         </section>
       </div>
 
+      {(roadmap.checkpoints.length > 0 || roadmap.warnings.length > 0 || roadmap.assumptions.length > 0) && (
+        <details className="verdict verdict--neutral verdict--fold" aria-label="What this plan is based on">
+          <summary>What this plan is based on</summary>
+          <ul className="verdict-options">
+            {roadmap.checkpoints.map(c => <li key={c.id ?? c.date} data-appointment={c.id}>{c.label?.trim() || 'Your mock'} on {shortDate(c.date)}{c.startTime ? ` at ${c.startTime}` : ''} (week {c.week}). It shapes preparation; it does not replace your exam date. <Link href={`/app/calendar?week=${c.date}${c.id ? `&appointment=${c.id}` : ''}#checkpoint`} className="prose-link">See it in Calendar</Link></li>)}
+            {roadmap.warnings.map(w => <li key={w}>{w}</li>)}
+            {roadmap.assumptions.map(a => <li key={a}>{a}</li>)}
+          </ul>
+          <p className="fine-print">These come from your own answers, not from measured pace or test results. Change the mock in Calendar and the rest in Settings.</p>
+        </details>
+      )}
+
       {progress.currentMilestone && (
         <div className="roadmap-now">
-          <span className="eyebrow">This is what the calendar is drawing from</span>
+          <span className="eyebrow">Roadmap milestone</span>
           <strong>{progress.currentMilestone.topicName}</strong>
           <small>
             weeks {progress.currentMilestone.startWeek}–{progress.currentMilestone.endWeek} ·{' '}
@@ -208,7 +233,7 @@ export function RoadmapView({
 
           return (
             <li key={milestoneKey} className={`milestone ${isCurrent ? 'is-current' : ''}`}>
-              <button className="milestone__head" onClick={() => setOpen(isOpen ? null : milestoneKey)} aria-expanded={isOpen}>
+              <button type="button" className="milestone__head" onClick={() => setOpen(isOpen ? null : milestoneKey)} aria-expanded={isOpen}>
                 <span className="milestone__weeks">
                   <strong>wk {m.startWeek}{m.endWeek !== m.startWeek && `–${m.endWeek}`}</strong>
                   <small>{shortDate(m.startDate)}</small>
@@ -220,6 +245,8 @@ export function RoadmapView({
                     {mods.length} module{mods.length === 1 ? '' : 's'}
                     {done > 0 && ` · ${done} verified`}
                     {m.phase !== 'first_pass' && ` · ${PHASE_LABEL[m.phase].toLowerCase()}`}
+                    {m.basis === 'reported_uncertainty' && ' · you marked this to revisit'}
+                    {m.basis === 'mock_preparation' && ' · before your mock'}
                     {isCurrent && ' · current'}
                   </small>
                   <span className="progress-track" style={{ marginTop: 6 }}>

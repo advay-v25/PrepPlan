@@ -11,39 +11,66 @@ import { TaskItem } from '@tiptap/extension-task-item'
 
 type Status = 'saved' | 'saving' | 'unsaved' | 'conflict' | 'error'
 const LABEL: Record<Status, string> = {
-  saved: 'Saved', saving: 'Saving…', unsaved: 'Unsaved changes', conflict: 'This note changed elsewhere', error: 'Could not save',
+  saved: 'Saved', saving: 'Saving…', unsaved: 'Unsaved changes', conflict: 'This note changed elsewhere', error: 'Not saved',
 }
+const MAX_AUTO_RETRIES = 3
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
 /**
- * Notion-style block notes for one subject or reading. Autosaves after a short
- * pause with a revision guard: if the note was changed elsewhere it does NOT
- * overwrite — it asks the student to reload.
+ * Block notes for one subject or reading, autosaved with a revision guard.
+ *  - Saves are serial. What is acknowledged is the exact document that was sent: "Saved" is shown only when the visible document IS that one,
+ *    and a failure never replaces a newer draft with an older one.
+ *  - A conflict keeps BOTH versions: the student chooses the saved version, or keeps their own, or copies their text first.
+ *  - Permanent refusals (4xx) are not retried; transient failures retry a bounded number of times, then wait for the student's Retry.
+ *  - Every unsaved state is also kept locally (per signed-in user, per note) and offered back after a refresh or a failed navigation.
  */
-export function NoteEditor(props: { scopeType: 'subject' | 'reading'; scopeId: string; initialDoc: unknown; initialRevision: number; label: string }) {
+export function NoteEditor(props: { scopeType: 'subject' | 'reading'; scopeId: string; initialDoc: unknown; initialRevision: number; label: string; ownerId?: string }) {
   const [status, setStatus] = useState<Status>('saved')
+  const [message, setMessage] = useState<string | null>(null)
+  const [serverCopy, setServerCopy] = useState<{ doc: unknown; revision: number } | null>(null)
+  const [recovered, setRecovered] = useState<{ doc: unknown; at: string } | null>(null)
   const revision = useRef(props.initialRevision)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pending = useRef<unknown>(null)
+  const latest = useRef<unknown>(null)          // the newest document in the editor that has not been acknowledged (null = nothing unsaved)
   const saving = useRef(false)
+  const retries = useRef(0)
+  const stopped = useRef(false)                  // conflict or permanent refusal: no automatic saving until the student chooses
+  const draftKey = props.ownerId ? `roadmap-note-draft:${props.ownerId}:${props.scopeType}:${props.scopeId}` : null
+
+  const keepDraft = (doc: unknown) => { if (draftKey) try { localStorage.setItem(draftKey, JSON.stringify({ doc, at: new Date().toISOString(), base: revision.current })) } catch {} }
+  const clearDraft = () => { if (draftKey) try { localStorage.removeItem(draftKey) } catch {} }
 
   const save = async () => {
-    if (saving.current || pending.current === null) return
+    if (saving.current || latest.current === null || stopped.current) return
     saving.current = true
-    const doc = pending.current; pending.current = null
-    setStatus('saving')
+    const sent = latest.current
+    setStatus('saving'); setMessage(null)
+    let outcome: 'ok' | 'conflict' | 'permanent' | 'transient' = 'transient'
+    let body: any = null
     try {
       const res = await fetch('/api/curriculum/notes', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scopeType: props.scopeType, scopeId: props.scopeId, doc, expectedRevision: revision.current }),
+        body: JSON.stringify({ scopeType: props.scopeType, scopeId: props.scopeId, doc: sent, expectedRevision: revision.current }),
       })
-      const body = await res.json()
-      if (body.ok) { revision.current = body.revision; setStatus(pending.current === null ? 'saved' : 'unsaved') }
-      else if (body.code === 'stale_revision') { setStatus('conflict'); pending.current = null }
-      else { setStatus('error'); pending.current = doc }
-    } catch { setStatus('error'); pending.current = doc }
-    finally { saving.current = false; if (pending.current !== null && status !== 'conflict') schedule() }
+      body = await res.json().catch(() => null)
+      outcome = body?.ok ? 'ok' : body?.code === 'stale_revision' ? 'conflict' : res.status >= 400 && res.status < 500 ? 'permanent' : 'transient'
+    } catch { outcome = 'transient' }
+    saving.current = false
+    if (outcome === 'ok') {
+      revision.current = body.revision; retries.current = 0
+      if (same(latest.current, sent)) { latest.current = null; clearDraft(); setStatus('saved') }   // acknowledged exactly what is on screen
+      else { setStatus('unsaved'); schedule(0) }                                                       // typed more meanwhile: save that next
+      return
+    }
+    keepDraft(latest.current)                                                                        // whatever the failure, the newest text stays
+    if (outcome === 'conflict') { stopped.current = true; setServerCopy({ doc: body.doc, revision: body.revision }); setStatus('conflict'); return }
+    if (outcome === 'permanent') { stopped.current = true; setStatus('error'); setMessage(body?.error ?? 'This note could not be saved as written.'); return }
+    setStatus('error')
+    if (retries.current < MAX_AUTO_RETRIES) { retries.current += 1; setMessage('Could not reach the server. Trying again…'); schedule(2000 * retries.current) }
+    else setMessage('Still not saved. Your text is kept here; press Retry when your connection is back.')
   }
-  const schedule = () => { if (timer.current) clearTimeout(timer.current); timer.current = setTimeout(save, 1200) }
+  const schedule = (ms = 1200) => { if (timer.current) clearTimeout(timer.current); timer.current = setTimeout(save, ms) }
+  const retryNow = () => { stopped.current = false; retries.current = 0; void save() }
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -53,13 +80,31 @@ export function NoteEditor(props: { scopeType: 'subject' | 'reading'; scopeId: s
       Placeholder.configure({ placeholder: `Notes on ${props.label}. Write freely, add a checklist or a table, and paste a link to keep it handy.` }),
     ],
     content: props.initialDoc as any,
-    editorProps: { attributes: { class: 'note-editor__content', 'aria-label': `Notes on ${props.label}`, role: 'textbox', 'aria-multiline': 'true' } },
-    onUpdate: ({ editor }) => { pending.current = editor.getJSON(); setStatus('unsaved'); schedule() },
+    editorProps: {
+      attributes: { class: 'note-editor__content', 'aria-label': `Notes on ${props.label}`, role: 'textbox', 'aria-multiline': 'true' },
+      // IME: a composition in progress is not a finished edit. The text is kept locally as it changes, but saving waits for the composition to end.
+      handleDOMEvents: { compositionend: () => { if (!stopped.current && latest.current !== null) schedule(); return false } },
+    },
+    onUpdate: ({ editor }) => {
+      latest.current = editor.getJSON(); keepDraft(latest.current)
+      if (!stopped.current) { setStatus('unsaved'); if (!editor.view.composing) schedule() }
+    },
   })
 
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current) }, [])
+  // A draft left behind by a refresh, a failed save or a closed tab: offered back, never applied silently.
   useEffect(() => {
-    const warn = (e: BeforeUnloadEvent) => { if (status === 'unsaved' || status === 'saving') e.preventDefault() }
+    if (!draftKey) return
+    try {
+      const raw = localStorage.getItem(draftKey); if (!raw) return
+      const d = JSON.parse(raw) as { doc: unknown; at: string }
+      if (d?.doc && !same(d.doc, props.initialDoc)) setRecovered({ doc: d.doc, at: d.at }); else clearDraft()
+    } catch {}
+  }, [draftKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Leaving the page or switching notes: flush what is unsaved (the local draft already holds it), and stop timers.
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); if (latest.current !== null && !stopped.current && !saving.current) void save() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const warn = (e: BeforeUnloadEvent) => { if (latest.current !== null || status === 'saving') e.preventDefault() }
     window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn)
   }, [status])
 
@@ -92,11 +137,28 @@ export function NoteEditor(props: { scopeType: 'subject' | 'reading'; scopeId: s
         {btn('Table', editor.isActive('table'), () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run())}
         {btn('Link', editor.isActive('link'), setLink)}
         {btn('Divider', false, () => editor.chain().focus().setHorizontalRule().run())}
+        {btn('Add mistake notes', false, () => editor.chain().focus('end').insertContent([
+          { type: 'heading', attrs: { level: 3 }, content: [{ type: 'text', text: 'What I missed' }] }, { type: 'paragraph' },
+          { type: 'heading', attrs: { level: 3 }, content: [{ type: 'text', text: 'What I will check next' }] }, { type: 'paragraph' },
+          { type: 'heading', attrs: { level: 3 }, content: [{ type: 'text', text: 'Personal reference' }] }, { type: 'paragraph' },
+        ]).run())}
         <span className={`note-editor__status is-${status}`} role="status" aria-live="polite">{LABEL[status]}</span>
       </div>
+      {recovered && (
+        <p role="status" className="note">An unsaved draft from {new Date(recovered.at).toLocaleString('en-GB')} was kept on this device.{' '}
+          <button type="button" className="text-button" onClick={() => { editor.commands.setContent(recovered.doc as any); latest.current = editor.getJSON(); setRecovered(null); setStatus('unsaved'); schedule(0) }}>Restore it</button>{' · '}
+          <button type="button" className="text-button" onClick={() => { clearDraft(); setRecovered(null) }}>Discard it</button></p>
+      )}
+      {status === 'error' && <p role="alert" className="review-error">{message ?? 'Not saved.'}{' '}<button type="button" className="text-button" onClick={retryNow}>Retry</button></p>}
       {status === 'conflict' && (
-        <p role="alert" className="review-error">This note was changed somewhere else, so nothing was overwritten.{' '}
-          <button type="button" className="text-button" onClick={() => window.location.reload()}>Reload the latest version</button></p>
+        <div role="alert" className="review-error">
+          <p>This note was changed somewhere else, so nothing was overwritten. Your text is still here.</p>
+          <p>
+            <button type="button" className="text-button" onClick={() => { void navigator.clipboard?.writeText(JSON.stringify(editor.getText())) .catch(() => {}); setMessage('Your text was copied.') }}>Copy my text</button>{' · '}
+            <button type="button" className="text-button" onClick={() => { if (serverCopy) { revision.current = serverCopy.revision; editor.commands.setContent((serverCopy.doc ?? { type: 'doc', content: [{ type: 'paragraph' }] }) as any); latest.current = null; clearDraft(); stopped.current = false; setServerCopy(null); setStatus('saved') } }}>Use the saved version</button>{' · '}
+            <button type="button" className="text-button" onClick={() => { if (serverCopy) { revision.current = serverCopy.revision; stopped.current = false; setServerCopy(null); retryNow() } }}>Keep mine and replace it</button>
+          </p>
+        </div>
       )}
       <EditorContent editor={editor} />
     </div>

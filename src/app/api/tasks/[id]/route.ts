@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
 import { createAdminClient } from '../../../../lib/supabase/admin'
+import { ExecutionCommandError } from '../../../../lib/planning/executionCommand'
+import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
+import { getTaskLineage } from '../../../../lib/planning/taskLineageService'
 import {
   RevisionMismatchError, TaskConflictError,
   deleteTask, moveTask, setExecution, splitExisting, undoLast,
@@ -17,6 +20,9 @@ import {
 const EXECUTIONS = ['not_started', 'in_progress', 'partial', 'completed', 'skipped', 'deferred']
 
 function handle(error: unknown) {
+  if (error instanceof ExecutionCommandError) {
+    return NextResponse.json({ ok: false, code: error.code, error: error.message, ...(error.nextUrl ? { nextUrl: error.nextUrl } : {}) }, { status: error.status })
+  }
   if (error instanceof RevisionMismatchError) {
     return NextResponse.json(
       { ok: false, code: 'REVISION_MISMATCH', error: error.message, current: error.current },
@@ -29,43 +35,52 @@ function handle(error: unknown) {
       { status: 409 }
     )
   }
+  if (error && typeof error === 'object' && 'code' in error) return NextResponse.json({ ok: false, error: 'Your schedule could not be checked. Nothing was changed; try again.', code: 'SCHEDULE_UNAVAILABLE' }, { status: 503 })
   const message = error instanceof Error ? error.message : 'Something went wrong'
   return NextResponse.json({ ok: false, error: message }, { status: 400 })
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const { user } = access
 
   const { id } = await params
   const admin = createAdminClient()
 
-  const { data: task } = await admin
+  const { data: task, error: taskError } = await admin
     .from('plan_blocks').select('*').eq('id', id).eq('user_id', user.id).maybeSingle()
+  if (taskError) return NextResponse.json({ ok: false, error: 'Your task could not be loaded. Try again shortly.' }, { status: 503 })
   if (!task) return NextResponse.json({ ok: false, error: 'Task not found' }, { status: 404 })
 
-  const { data: history } = await admin
+  const { data: history, error: historyError } = await admin
     .from('task_events')
     .select('id, event_type, payload, previous, actual_duration_minutes, notes, created_at')
     .eq('task_id', id).eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(25)
+  if (historyError) return NextResponse.json({ ok: false, error: 'Your task history could not be loaded. Try again shortly.' }, { status: 503 })
 
-  return NextResponse.json({ ok: true, task, history: history ?? [] })
+  const lineage = (await getTaskLineage(user.id, id).catch(() => null))?.info ?? null
+  return NextResponse.json({ ok: true, task, history: history ?? [], lineage })
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const { user } = access
 
   const { id } = await params
-  const body = await req.json().catch(() => ({} as any))
+  const body = await req.json().catch(() => null)
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return NextResponse.json({ ok: false, error: 'Send a task action as a JSON object.' }, { status: 400 })
+  }
   const action: string = body.action ?? ''
   const expectedRevision = Number(body.expectedRevision)
 
-  if (action !== 'undo' && !Number.isInteger(expectedRevision)) {
+  if (action !== 'undo' && (!Number.isInteger(expectedRevision) || expectedRevision < 1)) {
     return NextResponse.json(
       { ok: false, error: 'expectedRevision is required — it is what stops two devices overwriting each other' },
       { status: 400 }
@@ -87,7 +102,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         if (result.needsConfirmation) {
           return NextResponse.json({ ok: false, code: 'NEEDS_CONFIRMATION', warnings: result.warnings }, { status: 409 })
         }
-        return NextResponse.json({ ok: true, task: result.task })
+        return NextResponse.json({ ok: true, task: result.task, outcome: result.outcome ?? null, reopened: result.reopened ?? false })
       }
 
       case 'execution': {
@@ -97,10 +112,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         const result = await setExecution(user.id, id, {
           execution: body.execution,
           expectedRevision,
-          actualDurationMinutes: body.actualDurationMinutes === undefined ? undefined : Number(body.actualDurationMinutes),
-          note: typeof body.note === 'string' ? body.note.slice(0, 2000) : undefined,
+          actualDurationMinutes: body.actualDurationMinutes == null ? undefined : body.actualDurationMinutes,
+          note: body.note == null ? undefined : body.note,
         })
-        return NextResponse.json({ ok: true, task: result.task })
+        return NextResponse.json({ ok: true, task: result.task, outcome: result.outcome })
       }
 
       case 'split': {
@@ -110,7 +125,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
       case 'undo': {
         const result = await undoLast(user.id, id)
-        return NextResponse.json({ ok: true, task: result.task })
+        return NextResponse.json({ ok: true, task: result.task, outcome: result.outcome })
       }
 
       default:
@@ -126,18 +141,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const { user } = access
 
   const { id } = await params
   const expectedRevision = Number(new URL(req.url).searchParams.get('expectedRevision'))
-  if (!Number.isInteger(expectedRevision)) {
+  if (!Number.isInteger(expectedRevision) || expectedRevision < 1) {
     return NextResponse.json({ ok: false, error: 'expectedRevision is required' }, { status: 400 })
   }
 
   try {
     const result = await deleteTask(user.id, id, expectedRevision)
-    return NextResponse.json({ ok: true, deleted: result.deleted })
+    return NextResponse.json({ ok: true, deleted: result.deleted, cancelled: result.cancelled })
   } catch (error) {
     return handle(error)
   }

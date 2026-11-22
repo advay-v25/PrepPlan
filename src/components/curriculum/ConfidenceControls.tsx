@@ -15,14 +15,19 @@ export function MarkControl({ scopeType, scopeId, current, label }: { scopeType:
   const [value, setValue] = useState(current)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
 
   async function pick(v: string) {
-    const prev = value; setValue(v); setBusy(true); setError(null)
+    setBusy(true); setError(null); setSaved(false)
     try {
-      const res = await fetch('/api/curriculum/marks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scopeType, scopeId, level: v }) })
-      const body = await res.json()
-      if (!body.ok) { setValue(prev); setError(body.error ?? 'Could not save.'); return }
+      const res = await fetch('/api/curriculum/marks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scopeType, scopeId, level: v }), signal: AbortSignal.timeout(12_000) })
+      const body = await res.json().catch(() => null)
+      if (!res.ok || !body?.ok) { setError(body?.error ?? 'Could not confirm the save. Try again.'); return }
+      setValue(v)
+      setSaved(true)
       router.refresh()
+    } catch {
+      setError('Could not confirm the save. Try again.')
     } finally { setBusy(false) }
   }
 
@@ -34,6 +39,7 @@ export function MarkControl({ scopeType, scopeId, current, label }: { scopeType:
         </label>
       ))}
       {error && <span role="alert" className="review-error">{error}</span>}
+      <span role="status">{busy ? 'Saving…' : saved ? 'Confidence saved.' : ''}</span>
     </div>
   )
 }
@@ -51,10 +57,12 @@ export function OverrideControl({ outcomeId, current }: { outcomeId: string; cur
   async function call(payload: object) {
     setBusy(true); setError(null)
     try {
-      const res = await fetch('/api/curriculum/overrides', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      const body = await res.json()
-      if (!body.ok) { setError(body.error ?? 'Could not save.'); return }
+      const res = await fetch('/api/curriculum/overrides', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal: AbortSignal.timeout(12_000) })
+      const body = await res.json().catch(() => null)
+      if (!res.ok || !body?.ok) { setError(body?.error ?? 'Could not confirm the change. Try again.'); return }
       setOpen(false); setReason(''); setAck(false); router.refresh()
+    } catch {
+      setError('Could not confirm the change. Try again.')
     } finally { setBusy(false) }
   }
 
@@ -63,6 +71,7 @@ export function OverrideControl({ outcomeId, current }: { outcomeId: string; cur
       <p className="override-note">
         <strong>Manual change:</strong> shown as {current.band} — “{current.reason}”. The evidence is unchanged.{' '}
         <button type="button" className="text-button" disabled={busy} onClick={() => call({ action: 'revoke', outcomeId })}>Remove the manual change</button>
+        {error && <span role="alert" className="review-error">{error}</span>}
       </p>
     )
   }

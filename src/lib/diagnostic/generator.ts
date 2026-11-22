@@ -1,4 +1,5 @@
 import { generateStructuredOutput } from '../llm'
+import { renderPacketForPrompt, type GroundingPacket } from './groundingPacket'
 import {
   BlueprintCell,
   ERROR_TAXONOMY,
@@ -24,12 +25,13 @@ import {
  * wording, numbers, or entities are carried from any source paper.
  */
 
-const LEAD_INS = [
-  'is most likely',
-  'is least likely',
-  'is closest to',
-  'is best described as',
-  'will most likely',
+/** Accepted lead-in shapes. A real Level I paper mixes these; none is forced and none is banned except the formats formatRules.ts refuses. */
+const LEAD_IN_SHAPES = [
+  'a direct question (for example "Which of the following best describes ...?" or "What is the ...?")',
+  'a sentence to complete ("... is closest to:", "... is most likely to:", "... is best described as:")',
+  'an interpretation ("The result most likely indicates:")',
+  'a calculation ("The value is closest to:")',
+  'a "least likely" question, stated plainly',
 ]
 
 const FORM_GUIDANCE: Record<string, string> = {
@@ -37,7 +39,7 @@ const FORM_GUIDANCE: Record<string, string> = {
   scenario: 'Open with a brief analyst or company situation (two or three sentences), then ask what follows from it.',
   data_table: 'Present the financial data as an inline labelled list of line items and values, then ask for a derived figure or interpretation.',
   calculation: 'Give every input needed and require a numerical answer. All three options must be numbers in the same unit and format.',
-  exception: 'Ask which of three statements is least likely to be correct, or which does not belong. Make the negation unmistakable.',
+  exception: 'Ask which option is LEAST LIKELY (to be correct, to occur, to apply). Use the words "least likely"; never "except", "not true", "false" or "incorrect". Keep the other two options plainly plausible.',
   integrated: 'Require two distinct concepts to be combined. Neither alone is sufficient to reach the answer.',
 }
 
@@ -58,7 +60,7 @@ const DIFFICULTY_GUIDANCE: Record<string, string> = {
   stretch: 'Requires the concept to be applied in an unfamiliar framing, or combined with a second idea.',
 }
 
-function systemPrompt(cell: BlueprintCell): string {
+function systemPrompt(cell: BlueprintCell, packet?: GroundingPacket): string {
   const taxonomy = (Object.entries(ERROR_TAXONOMY) as [ErrorCode, string][])
     .map(([code, meaning]) => `  ${code} = ${meaning}`)
     .join('\n')
@@ -76,18 +78,19 @@ SPECIFICATION FOR THIS ITEM
   Item form:  ${cell.itemForm} — ${FORM_GUIDANCE[cell.itemForm]}
   Difficulty: ${cell.difficulty} — ${DIFFICULTY_GUIDANCE[cell.difficulty]}
 
-You must stay inside the stated concept scope. Do not test an adjacent concept because it is easier to write. Do not reach into Level II material.
+${packet ? `GROUNDING\n${renderPacketForPrompt(packet)}\nUse only the reference material and the concept scope. If the material cannot support an item, return {"blocked": "reason"} instead of drawing on memory.\n\n` : ''}You must stay inside the stated concept scope. Do not test an adjacent concept because it is easier to write. Do not reach into Level II material.
 
 HARD REQUIREMENTS
 1. The stem is self-contained. Every number, standard, and assumption needed to answer is stated in the stem. The reader has no other material.
 2. Exactly three options. Exactly one is defensible as best under the stated assumptions.
 3. Options are parallel: same grammatical form, same unit, same level of specificity, similar length. A reader must not be able to pick the answer from its shape.
-4. The lead-in ends with one of: ${LEAD_INS.map(l => `"${l}"`).join(', ')}.
+4. The lead-in is any of: ${LEAD_IN_SHAPES.join('; ')}. Do not use "except", "all of the above", "none of the above", "A and B", true/false or "which is not" wording. Numeric options are in ascending or descending order.
 5. Every wrong option is a place a real candidate lands by making one identifiable mistake. Never a random number, never an obviously absurd option.
 6. Each wrong option is labelled with the error it represents, from this taxonomy:
 ${taxonomy}
 7. If the item is numerical, every option must be a number in the same unit and rounding, and you must list every numeric input from the stem in exactNumericValues.
-8. Write in precise professional English. No emoji, no rhetorical questions, no addressing the reader as "you".
+8. For a numerical item the stem states the rounding or precision expected, and the options are already rounded that way.
+9. Write in precise professional English. No emoji, no rhetorical questions, no addressing the reader as "you".
 
 Return ONLY a JSON object of this exact shape:
 {
@@ -206,23 +209,25 @@ function coerceDraft(raw: RawDraft, cell: BlueprintCell, model: string): Generat
   return { stem, options, keyIndex, perOptionFeedback: feedback, card, generatorModel: model }
 }
 
-export async function generateItemDraft(cell: BlueprintCell): Promise<GeneratedItemDraft> {
+export async function generateItemDraft(cell: BlueprintCell, packet?: GroundingPacket): Promise<GeneratedItemDraft> {
   if (!COGNITIONS.includes(cell.cognition)) throw new Error(`bad cognition: ${cell.cognition}`)
   if (!ITEM_FORMS.includes(cell.itemForm)) throw new Error(`bad item form: ${cell.itemForm}`)
   if (!DIFFICULTIES.includes(cell.difficulty)) throw new Error(`bad difficulty: ${cell.difficulty}`)
 
   let model = 'unknown'
   const raw = await generateStructuredOutput<RawDraft>(
-    systemPrompt(cell),
+    systemPrompt(cell, packet),
     `Write the item now, to the specification above. Return only the JSON object.`,
     {
       tier: 'reasoning',
       temperature: 0.85, // variety across a run; the verifier is the quality gate
       maxTokens: 3600,
+      stage: 'generate', stageMs: 150_000,   // the authoring stage gets its own deadline, so a stall is attributable to it
       onModelResolved: m => { model = m },
     }
   )
 
+  if (typeof (raw as { blocked?: unknown }).blocked === 'string') throw new DraftShapeError(`generator declined: ${(raw as { blocked: string }).blocked.slice(0, 200)}`)
   return coerceDraft(raw, cell, model)
 }
 

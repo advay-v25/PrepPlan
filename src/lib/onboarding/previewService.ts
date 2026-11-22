@@ -4,30 +4,44 @@ import { loadRoadmapInputs } from '../curriculum/roadmapService'
 import { buildRoadmap } from '../curriculum/roadmap'
 import { buildWeekPlanWithPaper } from '../planning/pulse/generateWeek'
 import { getStudyWeekContext } from '../planning/schedule'
-import { zonedTimeToUtc } from '../planning/studyWeek'
-import { PAPER_START_TIME } from '../planning/pulse/paper'
+import { zonedTimeToUtc, todayInZone } from '../planning/studyWeek'
+import { toDraftTasks } from '../planning/draftTasks'
+import { trace } from '../ops/trace'
 
-export function draftFingerprint(contextVersion: number, weekStart: string) {
-  return `onboarding_initial_week:v${contextVersion}:${weekStart}`
+export function draftFingerprint(contextVersion: number, weekStart: string, planningDate = weekStart) {
+  return `onboarding_initial_week:p2:v${contextVersion}:${weekStart}:${planningDate}`
 }
 
-export async function generatePreview(userId: string) {
+const contextVersionOf = async (userId: string) =>
+  ((await createAdminClient().from('profiles').select('onboarding_context_version').eq('id', userId).maybeSingle()).data?.onboarding_context_version ?? 1) as number
+
+/** `afterInputsRead` exists for the race test only: it runs between reading the planning inputs and labelling the draft. */
+export async function generatePreview(userId: string, opts: { afterInputsRead?: () => Promise<void> } = {}) {
   const admin = createAdminClient()
+
+  // 0. The version FIRST. Every input below is read at or after this version, so a setup edit made while the preview
+  // is generated can only make the draft look older than the setup, never newer (which would let it be accepted).
+  const contextVersion = await contextVersionOf(userId)
+  const laps: Record<string, number> = {}; let t0 = Date.now()
+  const lap = (name: string) => { const n = Date.now(); laps[name] = n - t0; t0 = n }
 
   // 1. Read canonical state
   const state = await readCanonicalState(userId)
+  lap('state')
 
   // 2. Fetch inputs to build the roadmap
   const input = await loadRoadmapInputs(userId)
   if (!input) throw new Error('Cannot build roadmap: missing inputs')
 
   // 3. Generate Roadmap Sequence
+  lap('roadmap_inputs')
   const roadmap = buildRoadmap(input)
 
   // 4. The cycle's dates must be the same pulse week buildWeekPlan (below)
   // builds tasks for — that week includes today and ends on the student's
   // derived pulse day, not an arbitrary tomorrow-plus-six span.
   const ctx = await getStudyWeekContext(userId)
+  lap('roadmap_build_and_week_context')
   const cycleStartDate = ctx.week.startDate
   const cycleEndDate = ctx.week.endDate
 
@@ -51,7 +65,9 @@ export async function generatePreview(userId: string) {
   // 6. Generate first week's tasks — the real Pulse engine (spec Phase A)
   // Now buildWeekPlan's internal getActiveRoadmap() can find the persisted roadmap. The paper decision is
   // kept (not discarded) so the review screen can explain an honest "no paper" rather than guess why.
+  lap('roadmap_insert')
   const { days: dayPlans, paper } = await buildWeekPlanWithPaper(userId, ctx.week)
+  lap('week_plan')
 
   // Names for whatever the paper decision names by id, so the review screen can explain a skipped module
   // by name rather than a bare id — the same reason a student would want, not the id an engineer would.
@@ -67,32 +83,8 @@ export async function generatePreview(userId: string) {
     skipped: paper.skipped.map(s => ({ ...s, name: moduleNames.get(s.moduleId) ?? s.moduleId })),
   }
 
-  const { data: profileRow } = await admin.from('profiles').select('reminder_at, onboarding_context_version').eq('id', userId).maybeSingle()
-  const contextVersion = (profileRow?.onboarding_context_version ?? 1) as number
-  const reviewTime = PAPER_START_TIME // the weekly paper is always a morning sitting
-
-  const tasks = dayPlans.flatMap(day => day.portions.map(p => {
-    const isReview = p.taskType === 'diagnostic'
-    return {
-      id: crypto.randomUUID(),
-      title: p.title,
-      duration: p.durationMinutes,
-      duration_minutes: p.durationMinutes,
-      detail: p.detail,
-      task_type: p.taskType,
-      local_date: day.date,
-      lm_id: p.lmId,
-      repair_thread_id: p.repairThreadId,
-      priority: 'core',
-      // The weekly cumulative review needs a real clock time (spec §6);
-      // everything else stays day-preferred, matching commitWeekPlan.
-      placement: isReview ? 'timed' : 'day_preferred',
-      starts_at: isReview ? zonedTimeToUtc(day.date, reviewTime, ctx.timezone).toISOString() : null,
-      origin: isReview ? 'diagnostic' : 'planner',
-      assessment_scope: p.assessmentScope ?? null,
-      rationale: p.rationale ?? '',
-    }
-  }))
+  await opts.afterInputsRead?.()
+  const { tasks, draftTasks } = toDraftTasks(dayPlans, ctx.timezone)
 
   // 7. Store preview in plan_drafts
   const { data: draft, error } = await admin.from('plan_drafts').insert({
@@ -107,28 +99,9 @@ export async function generatePreview(userId: string) {
     // What this draft was built from: the same setup version and week always
     // resolve to the same draft, which is what makes recovery idempotent.
     onboarding_context_version: contextVersion,
-    context_fingerprint: draftFingerprint(contextVersion, cycleStartDate),
+    context_fingerprint: draftFingerprint(contextVersion, cycleStartDate, ctx.today),
     draft_json: {
-      tasks: tasks.map(t => ({
-        id: t.id,
-        title: t.title,
-        purpose: 'learning',
-        scheduled_date: t.local_date,
-        duration_minutes: t.duration_minutes,
-        is_floating: false,
-        metadata: {
-          detail: t.detail,
-          task_type: t.task_type,
-          lm_id: t.lm_id,
-          repair_thread_id: t.repair_thread_id,
-          priority: t.priority,
-          placement: t.placement,
-          starts_at: t.starts_at,
-          origin: t.origin,
-          assessment_scope: t.assessment_scope,
-          rationale: t.rationale
-        }
-      })),
+      tasks: draftTasks,
       paper: paperSummary
     }
   }).select().single()
@@ -139,6 +112,14 @@ export async function generatePreview(userId: string) {
     throw Object.assign(new Error(`Draft generation failed: ${error.message}`), { code: (error as any).code as string | undefined })
   }
 
+  lap('draft_insert')
+  trace('onboarding', 'preview_built', { ms: laps, tasks: tasks.length })
+  // An edit that landed while this was generated makes the draft stale at birth: retire it now rather than offer it.
+  if (await contextVersionOf(userId) !== contextVersion) {
+    await admin.from('plan_drafts').update({ status: 'superseded' }).eq('id', draft.id).eq('status', 'ready')
+    await admin.from('study_roadmaps').update({ status: 'superseded' }).eq('id', tempRoadmap.id).eq('status', 'draft')
+    throw Object.assign(new Error('Your setup changed while the preview was prepared.'), { code: 'CONTEXT_CHANGED' })
+  }
   return { draftId: draft.id, tasks, revision: draft.revision, paper: paperSummary }
 }
 
@@ -146,11 +127,31 @@ import { createClient } from '../supabase/server'
 
 export async function confirmPreview(userId: string, draftId: string, expectedRevision: number) {
   const supabase = await createClient()
+  const [draft, profile] = await Promise.all([
+    supabase.from('plan_drafts').select('status,context_fingerprint,onboarding_context_version,cycle_start_date,timezone').eq('id', draftId).eq('user_id', userId).maybeSingle().throwOnError(),
+    supabase.from('profiles').select('onboarding_context_version').eq('id', userId).maybeSingle().throwOnError(),
+  ])
+  if (draft.data?.status === 'ready') {
+    // The cycle a preview names is part of what the student agreed to. If the shared first-cycle decision now
+    // lands elsewhere (availability, classes or the clock moved on), the preview is stale rather than silently moved.
+    const now = await getStudyWeekContext(userId)
+    if (now.week.startDate !== draft.data.cycle_start_date) {
+      throw Object.assign(new Error('Your preview is out of date. Reopen the review to prepare a current plan.'), { code: 'STALE_PREVIEW' })
+    }
+    const expected = draftFingerprint(profile.data?.onboarding_context_version ?? 1, draft.data.cycle_start_date,
+      todayInZone(draft.data.timezone ?? 'UTC'))
+    if (draft.data.context_fingerprint !== expected) {
+      throw Object.assign(new Error('Your preview is out of date. Reopen the review to prepare a current plan.'), { code: 'STALE_PREVIEW' })
+    }
+  }
   const { data, error } = await supabase.rpc('accept_onboarding_preview', {
     p_draft_id: draftId,
     p_expected_revision: expectedRevision
   })
   
-  if (error) throw error
-  return data
+  if (error) {
+    if (error.message?.includes('STALE_PREVIEW')) throw Object.assign(new Error('Your setup changed after this preview was prepared. Rebuild the preview to continue.'), { code: 'STALE_PREVIEW' })
+    throw error
+  }
+  return data as { roadmap_id: string | null; cycle_id: string }
 }

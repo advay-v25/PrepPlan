@@ -13,29 +13,6 @@ export function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-export function fadeInUp(target: gsap.TweenTarget, opts?: { delay?: number }) {
-  if (prefersReducedMotion()) {
-    gsap.set(target, { opacity: 1, y: 0 })
-    return
-  }
-  gsap.fromTo(
-    target,
-    { opacity: 0, y: 12 },
-    { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', delay: opts?.delay ?? 0 }
-  )
-}
-
-export function staggerIn(targets: gsap.TweenTarget, opts?: { stagger?: number }) {
-  if (prefersReducedMotion()) {
-    gsap.set(targets, { opacity: 1, y: 0 })
-    return
-  }
-  gsap.fromTo(
-    targets,
-    { opacity: 0, y: 12 },
-    { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: opts?.stagger ?? 0.05 }
-  )
-}
 
 export function slideDrawer(el: gsap.TweenTarget, direction: 'in' | 'out', onComplete?: () => void) {
   if (prefersReducedMotion()) {

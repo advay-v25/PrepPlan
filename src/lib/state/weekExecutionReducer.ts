@@ -1,10 +1,13 @@
 import { PlanBlock, ExecutionSummary } from './types'
+import { taskTimes } from './reportedTime'
 
 export interface RawTaskEvent {
+  payload?: any
   id: string
   task_id: string
   event_type: string
-  duration_minutes: number | null
+  duration_minutes?: number | null
+  actual_duration_minutes?: number | null
   created_at: string
 }
 
@@ -33,8 +36,13 @@ export function computeWeekExecution(blocks: (PlanBlock & { localDate?: string }
         completedMinutes += block.durationMinutes
         break
       case 'in_progress':
-        partialMinutes += block.durationMinutes
+      case 'partial': {
+        // Partly done is its own state: what was reported counts as partial, the rest is still open (never "unreported").
+        // What was reported (undo reversed, unknown left out); with no minutes given the whole planned block is what we know of.
+        const reported = taskTimes(taskEvents).get(block.id)?.minutes
+        partialMinutes += reported == null ? block.durationMinutes : Math.min(block.durationMinutes, reported)
         break
+      }
       case 'deferred':
         deferredMinutes += block.durationMinutes
         deviations.push(`Deferred: ${block.title}`)

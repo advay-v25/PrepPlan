@@ -8,15 +8,17 @@ import type { AttentionItem, RepairThread } from '../../lib/state/types'
  * weakness. Renders nothing when there is nothing to decide.
  */
 export function NeedsAttention({ items, threads }: { items: AttentionItem[]; threads: RepairThread[] }) {
-  if (items.length === 0 && threads.length === 0) return null
-  const shownThreads = threads.slice(0, 3)
+  // At most three decisions in all: the queue first (already deduplicated by identity), weak areas filling what is left.
+  const shownItems = items.slice(0, 3)
+  const shownThreads = threads.slice(0, Math.max(0, 3 - shownItems.length))
+  if (shownItems.length === 0 && shownThreads.length === 0) return null
   return (
     <section className="home-card attention" aria-labelledby="attention-h">
       <header className="home-card__head">
-        <h2 id="attention-h">Needs attention</h2>
+        <h2 id="attention-h">Needs your decision</h2>
       </header>
       <ul className="attention__list">
-        {items.map(item => (
+        {shownItems.map(item => (
           <li key={item.id}>
             <Link href={item.destination} className="attention__row">
               <AlertTriangle size={16} aria-hidden className="attention__icon is-warn" />
@@ -35,8 +37,8 @@ export function NeedsAttention({ items, threads }: { items: AttentionItem[]; thr
           </li>
         ))}
       </ul>
-      {threads.length > shownThreads.length && (
-        <footer className="home-card__foot"><span /><Link href="/app/tests" className="text-button">{threads.length - shownThreads.length} more weak areas &rarr;</Link></footer>
+      {(items.length > shownItems.length || threads.length > shownThreads.length) && (
+        <footer className="home-card__foot"><span /><Link href="/app/tests" className="text-button">{items.length - shownItems.length + threads.length - shownThreads.length} more &rarr;</Link></footer>
       )}
     </section>
   )

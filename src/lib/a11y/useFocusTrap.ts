@@ -64,7 +64,11 @@ export function useFocusTrap({
     target?.focus()
 
     return () => {
-      if (restoreFocus && previouslyFocused?.isConnected) previouslyFocused.focus()
+      if (!restoreFocus) return
+      if (previouslyFocused?.isConnected && previouslyFocused !== document.body) { previouslyFocused.focus(); return }
+      // Opened by a link or deep link, so nothing was focused before: land on the page's main region or its heading rather than losing focus to <body>.
+      const main = document.querySelector<HTMLElement>('main, h1')
+      if (main) { if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1'); main.focus({ preventScroll: true }) }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active])

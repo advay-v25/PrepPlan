@@ -1,6 +1,8 @@
-/** Requests for full curriculum instruction belong outside Roadmap's scope. */
+import { normalise, teachingComponent } from './interpret'
+
+/** Requests for curriculum instruction belong outside Roadmap's scope; study-method and app help do not (see interpret.ts). */
 export function isTutoringRequest(message: string): boolean {
-  return /\b(?:teach me|teach (?:this|the|a|an) (?:chapter|topic|subject)|explain (?:the entire|this entire|this whole) (?:chapter|topic|subject)|solve (?:this|the|my) (?:question|problem)|walk me through (?:this|the) (?:chapter|subject))\b/i.test(message)
+  return teachingComponent(normalise(message))
 }
 
 export const TUTORING_BOUNDARY_REPLY =

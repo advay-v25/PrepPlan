@@ -29,9 +29,11 @@ const TYPE_FACTOR: Record<string, number> = {
   recall: 0.6, definition: 0.6, recognition: 0.6,
   application: 1.0, calculation: 1.5, computation: 1.5, interpretation: 1.1, analysis: 1.3, scenario: 1.4, vignette: 1.4,
 }
+/** Canonical cognition values map exactly; older free-text labels fall back to a substring match. These are planning references, not norms. */
+const CANONICAL: Record<string, number> = { recall: 0.6, apply: 1.0, calculate: 1.5, interpret: 1.1, analyse: 1.3, analyze: 1.3 }
 export function expectedSeconds(cognitionOrForm: string | null | undefined): number {
   const key = (cognitionOrForm ?? '').toLowerCase()
-  const factor = Object.entries(TYPE_FACTOR).find(([k]) => key.includes(k))?.[1] ?? 1
+  const factor = CANONICAL[key] ?? Object.entries(TYPE_FACTOR).find(([k]) => key.includes(k))?.[1] ?? 1
   return Math.round(REFERENCE_SECONDS_PER_QUESTION * factor)
 }
 

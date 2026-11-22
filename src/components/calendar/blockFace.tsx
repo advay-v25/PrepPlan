@@ -1,3 +1,4 @@
+import { clockTime } from '../../lib/format/date'
 import {
   BookOpen, Check, ClipboardCheck, Crosshair, GraduationCap, Lock, RefreshCw, Timer, Wrench, CalendarClock,
 } from 'lucide-react'
@@ -39,19 +40,12 @@ export function sizeFor(heightPx: number): BlockSize {
   return 'lg'
 }
 
-function clock(minutes: number, withSuffix: boolean) {
-  const h = Math.floor(minutes / 60) % 24
-  const m = minutes % 60
-  const hour12 = h % 12 === 0 ? 12 : h % 12
-  const time = m === 0 ? `${hour12}` : `${hour12}:${String(m).padStart(2, '0')}`
-  return withSuffix ? `${time}${h < 12 ? 'am' : 'pm'}` : time
-}
 
 /** "5:30–6:30pm", or "11:30am–12:30pm" when the range crosses noon. */
 export function timeRange(start: number, duration: number) {
   const end = start + duration
   const sameHalf = Math.floor(start / 720) === Math.floor((end - 1) / 720) && end <= 1440
-  return sameHalf ? `${clock(start, false)}–${clock(end, true)}` : `${clock(start, true)}–${clock(end, true)}`
+  return sameHalf ? `${clockTime(start, false)}–${clockTime(end, true)}` : `${clockTime(start, true)}–${clockTime(end, true)}`
 }
 
 export function durationLabel(minutes: number) {
@@ -67,6 +61,11 @@ export function durationShort(minutes: number) {
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
   return m === 0 ? `${h}h` : `${h}h ${m}m`
+}
+
+export function entryDuration(entry: Pick<CalendarEntry, 'durationMinutes' | 'isLoggedLearning' | 'recordedMinutes'>, short = false) {
+  if (entry.isLoggedLearning) return entry.recordedMinutes == null ? 'Time not reported' : `${short ? durationShort(entry.recordedMinutes) : durationLabel(entry.recordedMinutes)} logged`
+  return short ? durationShort(entry.durationMinutes) : durationLabel(entry.durationMinutes)
 }
 
 export function statusOf(entry: Pick<CalendarEntry, 'execution'>): 'done' | 'partial' | 'active' | null {
@@ -85,15 +84,18 @@ export function blockSummary(entry: CalendarEntry) {
     LAYER_LABEL[entry.layer] ?? entry.layer,
     entry.title,
     entry.startMinutes !== null ? timeRange(entry.startMinutes, entry.durationMinutes) : 'no set time',
-    durationLabel(entry.durationMinutes),
+    entryDuration(entry),
     status ? STATUS_WORDS[status] : null,
     entry.isProtected ? 'fixed, cannot be moved' : null,
   ].filter(Boolean).join(', ')
 }
 
 /** The title as shown on a block: the icon and colour already say "Study", so the prefix is dropped. */
-export function displayTitle(entry: Pick<CalendarEntry, 'title' | 'layer'>) {
-  return entry.layer === 'study' ? entry.title.replace(/^Study:\s*/, '') : entry.title
+export function displayTitle(entry: Pick<CalendarEntry, 'title' | 'layer' | 'sittingOrdinal'>, compact = false) {
+  const title = entry.layer === 'study' ? entry.title.replace(/^Study:\s*/, '') : entry.title
+  if (!compact || !entry.sittingOrdinal) return title
+  const split = /\s+·\s+sitting (\d+) of (\d+)$/i.exec(title)
+  return split ? `${split[1]}/${split[2]} · ${title.slice(0, split.index)}` : `${entry.sittingOrdinal} · ${title}`
 }
 
 /** Contents of a timed block. Layout per size lives in CSS (`[data-size]`). The enclosing button carries `aria-label={blockSummary(entry)}`. */
@@ -103,7 +105,7 @@ export function BlockFace({ entry }: { entry: CalendarEntry }) {
     <>
       <LayerIcon layer={entry.layer} />
       <span className="cb-kind">{LAYER_LABEL[entry.layer] ?? entry.layer}</span>
-      <span className="cb-title calendar-event__title">{displayTitle(entry)}</span>
+      <span className="cb-title calendar-event__title" title={entry.title}>{displayTitle(entry, true)}</span>
       {status === 'done' && <span className="cb-badge" aria-hidden><Check size={10} strokeWidth={3.5} /></span>}
       {entry.isProtected && status !== 'done' && <Lock size={11} strokeWidth={2.25} aria-hidden className="cb-lock" />}
       {entry.startMinutes !== null && (

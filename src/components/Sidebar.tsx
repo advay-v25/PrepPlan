@@ -1,10 +1,11 @@
 'use client'
 
 import { BookOpen, CalendarDays, ClipboardCheck, Home, LogOut, MessageCircle, PanelLeftClose, Settings } from 'lucide-react'
-import { createClient } from '../lib/supabase/client'
+import { ThemeSwitch } from './ThemeSwitch'
+import { signOutThisDevice } from '../lib/auth/signOutThisDevice'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   isNavigationItemActive,
   PRIMARY_NAVIGATION,
@@ -29,31 +30,24 @@ if (!SETTINGS_NAVIGATION) throw new Error('Settings must be present in primary n
 type SidebarProps = {
   compact?: boolean
   onClose?: () => void
+  displayName?: string | null
 }
 
-export function Sidebar({ compact = false, onClose }: SidebarProps) {
-  const [name, setName] = useState('Your account')
-  useEffect(() => {
-    let active = true
-    // There is no display-name column on profiles — the only place a name
-    // exists is auth metadata, set at signup (email) or by the provider
-    // (Google). This used to read a `context.name` field that lived in the
-    // pre-rebuild onboarding blob table, which nothing writes to any more, so
-    // the sidebar always showed the "Your account" fallback for every user.
-    createClient().auth.getUser().then(({ data }) => {
-      if (!active) return
-      const fullName = data.user?.user_metadata?.full_name || data.user?.user_metadata?.name
-      if (typeof fullName === 'string' && fullName.trim()) setName(fullName.trim())
-    }).catch(() => {})
-    return () => { active = false }
-  }, [])
+export function Sidebar({ compact = false, onClose, displayName }: SidebarProps) {
+  const name = displayName?.trim() || 'Your account'
   const pathname = usePathname()
-  
-  const signOut = async () => { 
-    await createClient().auth.signOut(); 
-    window.location.assign('/login') 
+  const [signingOut,setSigningOut] = useState(false)
+  const [signOutFailure,setSignOutFailure] = useState<{ message:string; sessionUnavailable:boolean } | null>(null)
+  const signInRef = useRef<HTMLAnchorElement>(null)
+  useEffect(()=>{if(signOutFailure?.sessionUnavailable)signInRef.current?.focus()},[signOutFailure])
+  const signOut = async () => {
+    if(signingOut)return
+    setSigningOut(true); setSignOutFailure(null)
+    const result=await signOutThisDevice()
+    if(!result.ok){setSignOutFailure(result);setSigningOut(false);return}
+    window.location.assign('/login')
   }
-  
+
   return (
     <aside className={`sidebar ${compact ? 'sidebar--compact' : ''}`} aria-label="Primary navigation">
       <div className="brand-row">
@@ -61,7 +55,7 @@ export function Sidebar({ compact = false, onClose }: SidebarProps) {
           <span className="brand-mark"><span /></span>
           <span>Roadmap</span>
         </Link>
-        {onClose ? <button className="icon-button mobile-close" onClick={onClose} aria-label="Close navigation"><PanelLeftClose size={20} /></button> : null}
+        {onClose ? <button type="button" className="icon-button mobile-close" onClick={onClose} aria-label="Close navigation"><PanelLeftClose size={20} /></button> : null}
       </div>
       <nav className="nav-list">
         {MAIN_NAVIGATION.map((item) => {
@@ -82,9 +76,10 @@ export function Sidebar({ compact = false, onClose }: SidebarProps) {
         })}
       </nav>
       <div className="sidebar-footer">
+        <ThemeSwitch />
         <Link href={ROUTES.app.settings} className="profile-row" onClick={() => onClose?.()} aria-label="Open account settings">
           <span className="avatar">{name.trim().charAt(0).toUpperCase() || 'C'}</span>
-          <span><strong>{name}</strong><small>Level I Candidate</small></span>
+          <span><strong title={name}>{name}</strong><small>Level I Candidate</small></span>
         </Link>
         <Link
           href={SETTINGS_NAVIGATION.href}
@@ -95,7 +90,8 @@ export function Sidebar({ compact = false, onClose }: SidebarProps) {
           <Settings size={20} strokeWidth={1.7} />
           <span>{SETTINGS_NAVIGATION.label}</span>
         </Link>
-        <button className="nav-item sign-out-button" onClick={signOut}><LogOut size={20} strokeWidth={1.7} /><span>Sign out</span></button>
+        {signOutFailure && <p className="fine-print" role="alert">{signOutFailure.message}</p>}
+        {signOutFailure?.sessionUnavailable ? <Link ref={signInRef} href="/login?next=%2Faccount" className="nav-item">Sign in again</Link> : <button type="button" className="nav-item sign-out-button" onClick={signOut} disabled={signingOut} aria-label={signingOut ? 'Signing out…' : 'Sign out of this device'} title="Sign out of this device"><LogOut size={18} strokeWidth={1.7} /><span>{signingOut ? 'Signing out…' : 'Sign out'}</span></button>}
       </div>
     </aside>
   )

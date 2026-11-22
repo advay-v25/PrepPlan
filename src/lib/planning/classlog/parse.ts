@@ -1,9 +1,10 @@
-import { CLASS_KINDS, type ClassKind, type LogInput, type LogItemInput } from './service'
+import { CLASS_KINDS, OCCURRENCE_KEY, type ClassKind, type LogInput, type LogItemInput } from './service'
+import { parseLocalDate } from '../studyWeek'
 
 /** Validates an untrusted request body into a LogInput (or null). */
 export function parseLogInput(body: any): LogInput | null {
   if (!body || typeof body !== 'object') return null
-  if (typeof body.classDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(body.classDate)) return null
+  if (!parseLocalDate(body.classDate)) return null
   if (!CLASS_KINDS.includes(body.kind as ClassKind)) return null
   if (!Array.isArray(body.items) || body.items.length > 60) return null
   const items: LogItemInput[] = []
@@ -17,5 +18,7 @@ export function parseLogInput(body: any): LogInput | null {
     })
   }
   if (new Set(items.map(i => i.outcomeId)).size !== items.length) return null
-  return { classDate: body.classDate, kind: body.kind, note: typeof body.note === 'string' ? body.note.slice(0, 500) : undefined, items }
+  if (body.occurrenceKey !== undefined && (typeof body.occurrenceKey !== 'string' || !OCCURRENCE_KEY.test(body.occurrenceKey))) return null
+  if (body.sessionId !== undefined && (typeof body.sessionId !== 'string' || !/^[0-9a-f-]{36}$/.test(body.sessionId))) return null
+  return { sessionId: body.sessionId, occurrenceKey: body.occurrenceKey, classDate: body.classDate, kind: body.kind, note: typeof body.note === 'string' ? body.note.slice(0, 500) : undefined, items }
 }

@@ -29,10 +29,10 @@ export function UndoToast({
   return (
     <div className={`undo-toast ${leaving ? 'is-leaving' : ''}`} role="status" aria-live="polite">
       <span>{message}</span>
-      <button className="undo-toast__action" onClick={() => onUndo()}>
+      <button type="button" className="undo-toast__action" onClick={() => onUndo()}>
         <Undo2 size={14} aria-hidden /> Undo
       </button>
-      <button className="icon-button" onClick={onDismiss} aria-label="Dismiss"><X size={15} /></button>
+      <button type="button" className="icon-button" onClick={onDismiss} aria-label="Dismiss"><X size={15} /></button>
     </div>
   )
 }

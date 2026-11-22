@@ -9,15 +9,17 @@
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local', quiet: true } as any)
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
+import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from './lib/e2eIdentity'
 import { createSession, completeOnboarding, makeCheck } from './lib/e2eSession'
 
 const { check, finish } = makeCheck()
+import { declareBank } from './lib/bankMode'
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
 const addDays = (d: string, n: number) => new Date(new Date(`${d}T12:00:00Z`).getTime() + n * 86_400_000).toISOString().slice(0, 10)
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 
 async function main() {
+  await declareBank(admin, 'e2e-taking-flow', ['r028'])
   console.log('\nTaking flow\n')
   const s = createSession(admin, getE2EEmail())
   check('signed in', await s.signIn())
@@ -56,15 +58,17 @@ async function main() {
   check('a thin bank is refused honestly and nothing is started', thin.status === 409 && thin.body?.code === 'bank_insufficient' && /at least 5/.test(thin.body?.message ?? ''), JSON.stringify(thin.body).slice(0, 200))
   check('no attempt, form or snapshot was created by the refusal', (await cnt('assessment_attempts')) === attempts0 && (await cnt('paper_scope_snapshots')) === 0)
   const mock = await s.post('/api/tests/start', { kind: 'mock' })
-  check('a mock is refused with the real bank size, not faked', mock.status === 409 && mock.body?.code === 'bank_insufficient' && /90/.test(mock.body?.message ?? ''), JSON.stringify(mock.body).slice(0, 200))
+  check('the single-paper mock is retired and points to the rehearsal (two linked 90-question sessions)', mock.status === 410 && mock.body?.code === 'retired' && /90-question sessions/.test(mock.body?.message ?? ''), JSON.stringify(mock.body).slice(0, 200))
   check('a reading with nothing completed is refused with a reason', (await s.post('/api/tests/start', { kind: 'reading', readingId: 'r027' })).body?.code === 'no_scope')
   const repair0 = await s.post('/api/tests/start', { kind: 'repair' })
-  check('repair with nothing to repair says so', repair0.body?.code === 'no_scope')
+  check('a repair paper cannot be started without naming its Calendar re-check (there is no account-wide repair paper)', repair0.body?.code === 'bad_request' && /Calendar/.test(repair0.body?.message ?? ''))
+  const noTask = await s.post('/api/tests/start', { kind: 'repair', checkTaskId: 'does-not-exist' })
+  check('a re-check that does not exist is refused, not faked', noTask.body?.ok === false)
 
   // --- Tests tab before starting
   const noPaperHtml = await (await s.req('/app/tests')).text()
   check('the Tests tab leads with this week\'s paper', noPaperHtml.indexOf('This week') > -1 && noPaperHtml.includes('weekly-h'))
-  check('it shows the mock as unavailable with the reason', /Not available yet: the bank has/.test(noPaperHtml))
+  check('mocks are their own view, not a block ahead of this week\'s paper', noPaperHtml.indexOf('weekly-h') > -1 && !noPaperHtml.includes('id="mock-h"') && (await (await s.req('/app/tests?view=mocks')).text()).includes('mock-h'))
   const isReviewer = ((await admin.from('user_roles').select('role').eq('user_id', uid).eq('role', 'diagnostic_reviewer')).data ?? []).length > 0
   check('the staff-only Item review link appears only for reviewers', noPaperHtml.includes('/app/tests/review') === isReviewer)
 
@@ -74,8 +78,8 @@ async function main() {
   const preview = (await s.json('/api/tests/scope')).body.preview
   const rev = preview.scope.revision as string
   const beforeHtml = await (await s.req('/app/tests')).text()
-  check('the weekly card offers Review scope and Start with proper buttons', beforeHtml.includes('Start weekly paper') && beforeHtml.includes('Review scope'))
-  check('it says what changed since Calendar planned the paper', /What changed since this paper was planned/.test(beforeHtml) && /Planned but not completed/.test(beforeHtml))
+  check('the weekly card offers ONE primary action: Review and start (the shared preview), and scope detail sits behind a disclosure', beforeHtml.includes('Review and start') && beforeHtml.includes('Scope detail') && !beforeHtml.includes('Start weekly paper</button>'))
+  check('it says what changed since Calendar planned the paper (inside the disclosure)', /What this paper covers/.test(beforeHtml) && /Planned but not completed/.test(beforeHtml))
   check('it links the scheduled paper to Calendar', beforeHtml.includes('href="/app/calendar"'))
 
   const stale = await s.post('/api/tests/start', { kind: 'weekly', expectedRevision: 'stale-revision' })
@@ -168,7 +172,7 @@ async function main() {
 
   const midState = await s.req('/app/tests')
   const midHtml = await midState.text()
-  check('mid-attempt the Tests tab offers Resume for the weekly paper', midHtml.includes('Resume weekly paper') && midHtml.includes(`/app/tests/${attemptId}`))
+  check('mid-attempt the Tests tab offers Resume for the weekly paper', midHtml.includes('Resume paper') && midHtml.includes(`/app/tests/${attemptId}`))
 
   // --- idempotent submission
   const evBefore = await cnt('evidence_events')
@@ -179,8 +183,14 @@ async function main() {
   const sub2 = await Promise.all([1, 2, 3].map(() => s.post(`/api/tests/attempt/${attemptId}/submit`, {})))
   check('a repeated or concurrent submit returns the same scored attempt', sub2.every(r => r.body?.ok === true && r.body?.alreadyScored === true))
   check('the retry created no duplicate evidence', (await cnt('evidence_events')) === evAfter)
-  const closed = await s.post(`/api/tests/attempt/${attemptId}/answer`, { itemId: items[0].id, selectedOptionIndex: 0, confidence: 'high' })
-  check('a scored attempt accepts no more answers', closed.status === 409 && closed.body?.code === 'closed')
+  // The invariant is two-sided: the endpoint refuses, AND the stored responses do not change. A 503 means the access check itself could not
+  // reach the database (a transient infrastructure fault, not an answer being accepted): it is inconclusive, so ask once more rather than guess.
+  const respHash = async () => JSON.stringify((await admin.from('assessment_responses').select('item_id, selected_option_index, self_reported_confidence').eq('attempt_id', attemptId).order('item_id')).data)
+  const hashBefore = await respHash()
+  let closed = await s.post(`/api/tests/attempt/${attemptId}/answer`, { itemId: items[0].id, selectedOptionIndex: 0, confidence: 'high' })
+  if (closed.status === 503) { console.log('  (503 from the access check: inconclusive, asking once more)'); closed = await s.post(`/api/tests/attempt/${attemptId}/answer`, { itemId: items[0].id, selectedOptionIndex: 0, confidence: 'high' }) }
+  check('a scored attempt accepts no more answers', closed.status === 409 && closed.body?.code === 'closed', `${closed.status} ${JSON.stringify(closed.body).slice(0, 160)}`)
+  check('and its stored responses are unchanged', (await respHash()) === hashBefore)
   check('submission time is recorded', !!(await admin.from('assessment_attempts').select('submitted_at').eq('id', attemptId).single()).data?.submitted_at)
 
   // --- after scoring
@@ -190,12 +200,7 @@ async function main() {
   const resultPage = await s.req(`/app/tests/${attemptId}/result`)
   check('the result page renders', resultPage.status === 200)
   const doneRepair = await s.post('/api/tests/start', { kind: 'repair' })
-  check('repair re-check is offered or honestly refused (never a fake paper)', doneRepair.body?.ok === true || ['bank_insufficient', 'no_scope'].includes(doneRepair.body?.code), JSON.stringify(doneRepair.body).slice(0, 160))
-  if (doneRepair.body?.ok) {
-    const rItems = (await s.json(`/api/tests/attempt/${doneRepair.body.attemptId}`)).body.items.map((i: any) => i.id)
-    const answered = new Set(((await admin.from('assessment_responses').select('item_id').eq('attempt_id', attemptId)).data ?? []).map(r => r.item_id))
-    check('a repair re-check uses independent, unseen questions', rItems.length > 0 && rItems.every((i: string) => !answered.has(i)))
-  }
+  check('after scoring there is still no account-wide repair paper', doneRepair.body?.code === 'bad_request')
 
   await admin.from('paper_scope_snapshots').delete().eq('user_id', uid)
   await admin.from('plan_blocks').delete().eq('user_id', uid).like('id', 'tf-%')

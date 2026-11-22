@@ -41,9 +41,10 @@ async function snapshot(userId: string): Promise<Snapshot> {
 async function scheduledMinutesByDate(userId: string, dates: string[]): Promise<Record<string, number>> {
   if (dates.length === 0) return {}
   const admin = createAdminClient()
-  const { data } = await admin.from('plan_blocks')
+  const { data, error } = await admin.from('plan_blocks')
     .select('local_date, duration_minutes, execution')
     .eq('user_id', userId).in('local_date', dates)
+  if (error) throw new Error(`scheduled minutes unreadable: ${error.message}`)   // never an authoritative "nothing scheduled"
   const out: Record<string, number> = {}
   for (const d of dates) out[d] = 0
   for (const row of data ?? []) {
@@ -80,14 +81,30 @@ function diff(before: Snapshot, after: Snapshot, scheduled: Record<string, numbe
  * snapshots after and diffs. Only meaningful for a student who already has committed days ahead — a student
  * still completing onboarding for the first time has nothing yet to impact.
  */
-export async function saveWithPlanImpact(userId: string, save: () => Promise<void>): Promise<PlanImpact | null> {
+/** `{ unavailable: true }`: the setup COMMITTED but its impact could not be read afterwards. That is "saved, impact unavailable", never a failed save. */
+export type ImpactUnavailable = { unavailable: true }
+export async function saveWithPlanImpact(userId: string, save: () => Promise<void>, receipt: { version?: number } = {}): Promise<PlanImpact | ImpactUnavailable | null> {
   const admin = createAdminClient()
+  const version = async () => { const r = await admin.from('profiles').select('onboarding_context_version').eq('id', userId).maybeSingle(); if (r.error) throw new Error(r.error.message); return Number(r.data?.onboarding_context_version ?? NaN) }
   const { data: profile } = await admin.from('profiles').select('onboarding_status').eq('id', userId).maybeSingle()
   if (profile?.onboarding_status !== 'complete') { await save(); return null }
+  // An accepted week with nothing planned has no committed days for a change to disturb: saving study times is just setup,
+  // and the student goes straight back to Calendar, where a plan can be reviewed.
+  const planned = await admin.from('plan_blocks').select('id', { count: 'exact', head: true }).eq('user_id', userId).is('cancelled_at', null).is('learning_activity_id', null).neq('execution', 'cancelled')
+  if (!planned.error && !planned.count) { await save(); return null }
 
-  const before = await snapshot(userId)
+  // The comparison is BOUND to this save's version: the before-snapshot must belong to the version just before the commit, and the after-snapshot to the committed one.
+  // Another edit in between (before the commit or after it) makes this save's "impact" someone else's, so it is reported unavailable rather than misattributed.
+  let before: Snapshot | null = null, v0 = NaN
+  try { if (!planned.error) { v0 = await version(); before = await snapshot(userId) } } catch (e) { console.error('[setup] impact read before save failed', (e as Error).message); before = null }
   await save()
-  const after = await snapshot(userId)
-  const scheduled = await scheduledMinutesByDate(userId, after.week.days)
-  return diff(before, after, scheduled)
+  try {
+    if (!before) return { unavailable: true }
+    const committed = receipt.version
+    if (committed === undefined || v0 !== committed - 1) return { unavailable: true }   // an edit landed between the read and this commit
+    const after = await snapshot(userId)
+    const scheduled = await scheduledMinutesByDate(userId, after.week.days)
+    if ((await version()) !== committed) return { unavailable: true }                    // an edit landed after this commit
+    return diff(before, after, scheduled)
+  } catch (e) { console.error('[setup] impact read after commit failed', (e as Error).message); return { unavailable: true } }
 }

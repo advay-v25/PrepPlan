@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../../../lib/supabase/server'
 import { getAttemptResult } from '../../../../../../lib/tests/resultService'
+import { requireApplicationAccess } from '../../../../../../lib/auth/applicationAccess'
 
 export const dynamic = 'force-dynamic'
 
 /** The scored attempt's full analysis (owner only; never available before scoring). Read-only. */
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
   const { id } = await params
   try {
     const result = await getAttemptResult(user.id, id)

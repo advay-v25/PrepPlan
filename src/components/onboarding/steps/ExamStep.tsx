@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { Notice } from '../../ui/Notice'
+import { bookedDateProblem } from '../../../lib/onboarding/examWindows'
+import { todayInZone } from '../../../lib/planning/studyWeek'
 import type { OnboardingState, WindowInfo } from '../OnboardingShell'
 
 const SITTING_ORDER = ['february', 'may', 'august', 'november']
@@ -32,7 +34,10 @@ export function ExamStep({
   const timezone = state.profile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
 
   const sitting = windows.find(w => w.id === selected) ?? null
-  const dateInSitting = !!(examDate && sitting?.opens && examDate.slice(0, 7) === sitting.opens.slice(0, 7))
+  const today = todayInZone(timezone)
+  const dateProblem = examDate && sitting ? bookedDateProblem({ window_opens: sitting.opens, window_closes: sitting.closes, sitting: sitting.sitting, year: sitting.year }, examDate, today) : null
+  const dateInSitting = !!examDate && !dateProblem
+  const openNow = (w: WindowInfo) => !!w.opens && w.opens.slice(0, 10) <= today
 
   // Switching to "not yet" drops the exact date, in the UI and (server-side) in what is stored.
   function chooseRegistered(value: 'yes' | 'not_yet') {
@@ -45,13 +50,13 @@ export function ExamStep({
     let reason: string | null = selected ? null : 'Choose the sitting you are aiming for.'
     if (selected && registered === 'yes') {
       if (!examDate) { canContinue = false; reason = 'Enter your exact booked exam date.' }
-      else if (!dateInSitting) { canContinue = false; reason = `That date is not in the ${sitting ? cap(sitting.sitting) : 'chosen'} sitting.` }
+      else if (dateProblem) { canContinue = false; reason = dateProblem }
     }
     onChange({
       examWindowId: selected, registered: registered === 'yes', timezone,
       examDate: registered === 'yes' ? (examDate || null) : null,
     }, canContinue, reason)
-  }, [selected, registered, examDate, timezone, dateInSitting, sitting, onChange])
+  }, [selected, registered, examDate, timezone, dateProblem, onChange])
 
   const sorted = [...windows].sort((a, b) => SITTING_ORDER.indexOf(a.sitting) - SITTING_ORDER.indexOf(b.sitting))
   const year = sorted[0]?.year
@@ -63,9 +68,9 @@ export function ExamStep({
         <div className="ob-tilegrid ob-tilegrid--4">
           {sorted.map(w => (
             <button key={w.id} type="button" className={`ob-tile ${selected === w.id ? 'is-selected' : ''}`}
-              aria-pressed={selected === w.id} onClick={() => setSelected(selected === w.id ? null : w.id)}>
+              aria-pressed={selected === w.id} onClick={() => setSelected(w.id)}>
               <strong>{cap(w.sitting)}</strong>
-              <small>from {formatWindow(w.opens)}</small>
+              <small>{openNow(w) ? 'open now' : `from ${formatWindow(w.opens)}`}</small>
               {!w.confirmed && <em className="ob-tile__flag">indicative</em>}
             </button>
           ))}
@@ -82,7 +87,7 @@ export function ExamStep({
             </button>
           ))}
         </div>
-        <p className="fine-print">You can replace the target month with your exact booked date later.</p>
+        <p className="fine-print">{registered === 'yes' ? 'Your booked date is saved as your exam date. The sitting is only the month you aimed for.' : 'The sitting is your target month, not a booked date. Add the exact date once you register, in Settings.'}</p>
       </section>
 
       {registered === 'yes' && (
@@ -91,8 +96,9 @@ export function ExamStep({
           <div className="ob-field">
             <input type="date" value={examDate} onChange={e => setExamDate(e.target.value)} className="ob-input"
               required aria-label="Exact booked exam date" aria-invalid={!!examDate && !dateInSitting}
-              min={sitting?.opens?.slice(0, 7) ? `${sitting.opens.slice(0, 7)}-01` : undefined} />
+              min={sitting?.opens?.slice(0, 7) ? (`${sitting.opens.slice(0, 7)}-01` > today ? `${sitting.opens.slice(0, 7)}-01` : today) : today} />
           </div>
+          {dateProblem && <Notice tone="warn" role="alert" className="mt-4">{dateProblem}</Notice>}
         </section>
       )}
 

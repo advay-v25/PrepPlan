@@ -37,7 +37,7 @@ function when(iso: string | null) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
 
-function Row({ row }: { row: TrackerRow }) {
+function Row({ row, repairHref, readingHref }: { row: TrackerRow; repairHref?: string; readingHref: string }) {
   return (
     <details className={`los-row los-row--${row.band}`}>
       <summary>
@@ -58,31 +58,40 @@ function Row({ row }: { row: TrackerRow }) {
           <dd>{row.sample === 0 ? 'None yet' : `${row.sample} valid observation${row.sample === 1 ? '' : 's'}, last checked ${when(row.lastCheckedAt)}`}
             {row.confidenceMismatch && ' · confidence and accuracy disagreed'}</dd>
         </dl>
-        <Link href="/app/tests" className="los-row__action">
-          <ClipboardCheck size={15} aria-hidden /> {row.band === 'untested' ? 'Take a first check' : 'Check this in Tests'}
+        {repairHref && (
+          <p><Link href={repairHref} className="los-row__action"><Wrench size={15} aria-hidden /> Open your repair for this</Link></p>
+        )}
+        <Link href={repairHref ? readingHref : '/app/tests'} className="los-row__action">
+          <ClipboardCheck size={15} aria-hidden /> {repairHref ? 'Open the reading' : row.band === 'untested' ? 'Take a first check' : 'Check this in Tests'}
         </Link>
       </div>
     </details>
   )
 }
 
-function ModuleBlock({ mod, band, topicId }: { mod: TrackerModule; band: LosBand | 'all'; topicId: string }) {
+function ModuleBlock({ mod, band, topicId, repairLinks }: { mod: TrackerModule; band: LosBand | 'all'; topicId: string; repairLinks: Record<string, string> }) {
   const rows = band === 'all' ? mod.rows : mod.rows.filter(r => r.band === band)
   if (band !== 'all' && rows.length === 0) return null
   return (
     <div className="los-module">
       <div className="los-module__head">
         <h4><Link href={`/app/curriculum/${topicId}/${mod.id}`}>Reading {mod.readingNo}: {mod.name}</Link></h4>
-        <span className="los-module__cov">{COVERAGE_LABEL[mod.coverage] ?? mod.coverage}</span>
+        <span className="los-module__cov">{mod.coverage === 'not_started' && mod.learning?.confirmedOutcomes > 0 ? 'Partly covered' : COVERAGE_LABEL[mod.coverage] ?? mod.coverage}</span>
       </div>
+      {mod.learning && (mod.learning.recordedSittings > 0 || mod.learning.awaitingConfirmation > 0) && (
+        <p className="fine-print">
+          {mod.learning.recordedSittings} recorded sitting{mod.learning.recordedSittings === 1 ? '' : 's'} · {mod.learning.confirmedOutcomes} of {mod.rows.length} outcomes recorded as covered. This is activity, not test evidence.
+          {mod.learning.awaitingConfirmation > 0 && <> <Link href="/app/tests#scope-h">Confirm what you covered</Link>.</>}
+        </p>
+      )}
       {mod.tracked
-        ? rows.map(r => <Row key={r.outcomeId} row={r} />)
+        ? rows.map(r => <Row key={r.outcomeId} row={r} repairHref={repairLinks[r.outcomeId]} readingHref={`/app/curriculum/${topicId}/${mod.id}`} />)
         : <p className="los-module__none">The outcome structure for this reading is still being defined.</p>}
     </div>
   )
 }
 
-export function ReadinessTracker({ tracker, band }: { tracker: LosTracker; band: LosBand | 'all' }) {
+export function ReadinessTracker({ tracker, band, repairLinks = {} }: { tracker: LosTracker; band: LosBand | 'all'; repairLinks?: Record<string, string> }) {
   const { totals, topics, studyOrder, depth } = tracker
   const evidenceless = totals.repair + totals.verify + totals.maintain === 0
 
@@ -142,7 +151,7 @@ export function ReadinessTracker({ tracker, band }: { tracker: LosTracker; band:
                 {t.counts.total === 0 && <span className="los-count">Structure to come</span>}
               </span>
             </summary>
-            {visible.map(m => <ModuleBlock key={m.id} mod={m} band={band} topicId={t.id} />)}
+            {visible.map(m => <ModuleBlock key={m.id} mod={m} band={band} topicId={t.id} repairLinks={repairLinks} />)}
           </details>
         )
       })}

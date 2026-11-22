@@ -5,44 +5,71 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
 
-# next.js
+# next.js & production builds
 /.next/
+/.next-*/
 /out/
+/build/
+/dist/
 
-# production
-/build
-
-# misc
+# misc & OS files
 .DS_Store
-*.pem
+Thumbs.db
 
-# debug
+# debug & process logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
+# local environment & secrets
 .env
+.env.*
 .env*.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+*.env
+!.env.example
+
+# security credentials, keys, certificates
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+service-account*.json
+serviceAccount*.json
+credentials.json
+client_secret*.json
 
 # vercel
 .vercel
 
-# visual review snapshots (scripts/visual-snap.ts) — local review artifacts, not source
+# visual review snapshots & local evidence artifacts
 /scripts/.visual-snap-out/
+/docs/evidence/*.json
+/docs/evidence/screens/
+/docs/evidence/phase6-final/*.json
 
-# superpowers scratch workspace (ledgers, briefs, review packages)
+# agent & AI tool local workspaces
 /.superpowers/
-
-# local tool output — not source
 /.codex-artifacts/
 /.playwright-mcp/
-/playwright-report/
-/test-results/
-/dist/
-.claude/settings.local.json
+/.claude/
+/.agent/skills/ponytail
+
+# typescript incremental build cache
+*.tsbuildinfo
+
+# local database dumps & sqlite
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.bak
+/supabase/.temp/
+
+# Internal reference extracts: recorded rights state, never committed
+content/source-packs/private/

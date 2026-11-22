@@ -12,6 +12,11 @@ export type OnboardingProfile = {
   max_session_minutes?: number | null
   onboarding_status?: 'not_started' | 'in_progress' | 'review_ready' | 'complete' | null
   week_availability_mode?: 'windows' | 'varies' | 'none_this_week' | null
+  mock_date?: string | null
+  mock_kind?: string | null
+  mock_label?: string | null
+  mock_start_time?: string | null
+  mock_duration_minutes?: number | null
   [key: string]: unknown
 }
 
@@ -56,6 +61,13 @@ export type OnboardingState = {
   availability: OnboardingAvailability[]
   /** user_topic_exposure rows: self-reported topic recency. */
   coverage: OnboardingExposure[]
+  /** Reported starting position beyond topic coverage. Empty/absent means "not answered", never "none". */
+  entry?: {
+    uncertainty: { topic_id: string; level: string; lm_ids: string[] }[]
+    /** Self-reported reading-level coverage (user_module_state, source 'self_report'). */
+    readingClaims: { lm_id: string; state: 'partly' | 'covered' }[]
+    mock: { date: string; kind: string; label?: string | null; startTime?: string | null; durationMinutes?: number | null } | null
+  }
   /** Which steps have persisted, validated state behind them. */
   completed: Record<Exclude<Step, 'plan'>, boolean>
   firstIncompleteStep: Step

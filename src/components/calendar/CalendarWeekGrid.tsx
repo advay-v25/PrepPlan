@@ -1,9 +1,10 @@
 'use client'
 
+import { clockTime as timeLabel } from '../../lib/format/date'
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ClipboardCheck, Plus } from 'lucide-react'
+import { CalendarClock, ClipboardCheck, Plus } from 'lucide-react'
 import { CalendarEntry } from '../../lib/planning/calendarData'
 import { WEEKDAY_SHORT, Weekday } from '../../lib/planning/studyWeek'
 import { TaskDetailDrawer } from './TaskDetailDrawer'
@@ -14,8 +15,8 @@ import { UndoToast } from './UndoToast'
 import { NewTaskDialog } from './NewTaskDialog'
 import { CommitmentDialog } from './CommitmentDialog'
 import { NextClassDialog } from './NextClassDialog'
-import { calendarSelectionHref, findCalendarTask } from '../../lib/routing/calendar'
-import { BlockFace, LayerIcon, LAYER_LABEL, blockSummary, durationLabel, durationShort, displayTitle, sizeFor, statusOf } from './blockFace'
+import { calendarClassSelectionHref, calendarSelectionHref, findCalendarTask } from '../../lib/routing/calendar'
+import { BlockFace, LayerIcon, LAYER_LABEL, blockSummary, durationLabel, durationShort, entryDuration, displayTitle, sizeFor, statusOf } from './blockFace'
 
 /**
  * A real seven-day time grid, editable.
@@ -27,14 +28,6 @@ import { BlockFace, LayerIcon, LAYER_LABEL, blockSummary, durationLabel, duratio
 
 const PX_PER_MINUTE = 1.0
 
-function timeLabel(minutes: number) {
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  const suffix = h < 12 ? 'am' : 'pm'
-  const hour12 = h % 12 === 0 ? 12 : h % 12
-  return m === 0 ? `${hour12}${suffix}` : `${hour12}:${String(m).padStart(2, '0')}${suffix}`
-}
-
 function dayLabel(dateStr: string) {
   const [y, m, d] = dateStr.split('-').map(Number)
   const date = new Date(Date.UTC(y, m - 1, d))
@@ -42,9 +35,11 @@ function dayLabel(dateStr: string) {
 }
 
 export function CalendarWeekGrid({
-  days, today, byDate, floating, earliestMinute, latestMinute, timezone, defaultView, classPattern = null, openNextClass = false, paperDate,
+  days, today, byDate, floating, earliestMinute, latestMinute, timezone, defaultView, classPattern = null, openNextClass = false, paperDate, checkpoint, readOnly = false, allowTaskCreation = true,
 }: {
   days: string[]
+  readOnly?: boolean
+  allowTaskCreation?: boolean
   today: string
   anchorDay: Weekday
   timezone: string
@@ -59,28 +54,41 @@ export function CalendarWeekGrid({
   openNextClass?: boolean
   /** The day the weekly paper falls on; marked even before the paper task exists. */
   paperDate?: string
+  /** The student's mock, shown on its day. It is the same record the checkpoint panel edits. */
+  checkpoint?: { date: string; title: string; when: string } | null
 }) {
   const router = useRouter()
+  const lastDay = days[days.length - 1]
   const searchParams = useSearchParams()
   const [view, setView] = useState<'week' | 'agenda'>(defaultView ?? 'week')
+  const queryView = searchParams.get('view')
+  useEffect(() => { if (queryView === 'week' || queryView === 'agenda') setView(queryView) }, [queryView])
+  function chooseView(next: 'week' | 'agenda') {
+    setView(next)
+    const query = new URLSearchParams(searchParams.toString()); query.set('view', next)
+    window.history.replaceState(null, '', `/app/calendar?${query}${window.location.hash}`)
+  }
   const [selected, setSelected] = useState<CalendarEntry | null>(null)
   const [hidden, setHidden] = useState<Set<string>>(new Set())
-  const [creatingOn, setCreatingOn] = useState<{ date: string; startMinutes: number } | null>(null)
+  const [creatingOn, setCreatingOn] = useState<{ date: string; startMinutes: number; untimed?: boolean } | null>(null)
   const [addingCommitment, setAddingCommitment] = useState(false)
   const [addingNextClass, setAddingNextClass] = useState(openNextClass)
 
   // Seven 128px columns do not fit a phone; it opens on the agenda unless a view was asked for.
   useEffect(() => {
-    if (!defaultView && window.matchMedia('(max-width: 760px)').matches) setView('agenda')
+    if (!defaultView && window.matchMedia('(max-width: 760px)').matches) chooseView('agenda')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // The deep link is one-shot: once the dialog has opened from it, drop the query param so a refresh
-  // (or sharing the URL) does not reopen it every time.
+  // Consume the deep link without navigating away from the dialog that just opened.
+  const nextClassRequested = searchParams.get('action') === 'add-next-class'
   useEffect(() => {
-    if (openNextClass) router.replace('/app/calendar', { scroll: false })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (!nextClassRequested) return
+    setAddingNextClass(true)
+    const url = new URL(window.location.href)
+    url.searchParams.delete('action')
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+  }, [nextClassRequested])
 
   // Where a task has been put but the server render has not caught up yet.
   // Without this the block snaps back to its old slot on release and jumps
@@ -99,18 +107,29 @@ export function CalendarWeekGrid({
   // Task selection follows the URL and fresh server data; refresh and Back
   // cannot retain an old task snapshot. Commitments keep their local editor.
   const linkedTask = findCalendarTask(allEntries.values(), searchParams.get('task'))
-  const selectedEntry = linkedTask ?? selected
+  const linkedEntryId = searchParams.get('entry')
+  const linkedEntry = linkedEntryId ? allEntries.get(linkedEntryId) : null
+  const selectedEntry = linkedTask ?? (linkedEntry && !linkedEntry.isTask ? linkedEntry : null) ?? selected
 
   function openEntry(entry: CalendarEntry) {
     if (entry.isTask) {
       setSelected(null)
       router.push(calendarSelectionHref(searchParams.toString(), entry.id), { scroll: false })
+    } else if (!readOnly && entry.commitmentId && entry.originalDate) {
+      // A recurring session: the URL names the series and the ORIGINAL date; the server validates it and renders the editor.
+      setSelected(null)
+      router.push(calendarClassSelectionHref(searchParams.toString(), entry.commitmentId, entry.originalDate), { scroll: false })
     } else setSelected(entry)
   }
 
   function closeEntry() {
     setSelected(null)
-    if (searchParams.has('task')) router.replace(calendarSelectionHref(searchParams.toString(), null), { scroll: false })
+    if (searchParams.has('entry')) {
+      const next = new URLSearchParams(searchParams.toString()); next.delete('entry')
+      window.history.replaceState(null, '', `/app/calendar?${next}`); return
+    }
+    // Selection is presentation only. Closing must not wait on another full Calendar read.
+    if (searchParams.has('task')) window.history.replaceState(null, '', calendarSelectionHref(searchParams.toString(), null))
   }
 
   const drag = useDragPlacement({
@@ -188,20 +207,25 @@ export function CalendarWeekGrid({
   for (let m = earliestMinute; m <= latestMinute; m += 60) hourMarks.push(m)
   const gridHeight = (latestMinute - earliestMinute) * PX_PER_MINUTE
 
-  const nowMinutes = (() => {
-    try {
-      const parts = new Intl.DateTimeFormat('en-US', { timeZone: timezone, hour12: false, hour: '2-digit', minute: '2-digit' }).formatToParts(new Date())
-      const h = Number(parts.find(p => p.type === 'hour')?.value ?? 0)
-      const mi = Number(parts.find(p => p.type === 'minute')?.value ?? 0)
-      return (h === 24 ? 0 : h) * 60 + mi
-    } catch { return null }
-  })()
+  // The "now" line is client-only state: computing it during render made the server's minute differ from the client's at hydration (a style mismatch).
+  const [nowMinutes, setNowMinutes] = useState<number | null>(null)
+  useEffect(() => {
+    const read = () => {
+      try {
+        const parts = new Intl.DateTimeFormat('en-US', { timeZone: timezone, hour12: false, hour: '2-digit', minute: '2-digit' }).formatToParts(new Date())
+        const h = Number(parts.find(p => p.type === 'hour')?.value ?? 0), mi = Number(parts.find(p => p.type === 'minute')?.value ?? 0)
+        setNowMinutes((h === 24 ? 0 : h) * 60 + mi)
+      } catch { setNowMinutes(null) }
+    }
+    read(); const id = setInterval(read, 60_000); return () => clearInterval(id)
+  }, [timezone])
 
   const dayClass = (date: string) =>
     [date === today ? 'is-today' : '', date < today ? 'is-past' : '', date === paperDate ? 'is-paper' : ''].filter(Boolean).join(' ')
 
   /** Clicking empty grid offers to create a task at that time. */
   function onColumnClick(e: React.MouseEvent<HTMLDivElement>, date: string) {
+    if (readOnly || !allowTaskCreation) return
     if (drag.drag) return
     if ((e.target as HTMLElement).closest('.calendar-event')) return
     const rect = e.currentTarget.getBoundingClientRect()
@@ -211,29 +235,40 @@ export function CalendarWeekGrid({
 
   return (
     <div className="calendar">
+      {!readOnly && <p className="muted">Open a task to change its day or time.</p>}
       <div className="calendar-toolbar">
-        <div className="calendar-viewswitch" role="tablist" aria-label="Calendar view">
-          <button role="tab" aria-selected={view === 'week'} className={view === 'week' ? 'is-active' : ''} onClick={() => setView('week')}>Week</button>
-          <button role="tab" aria-selected={view === 'agenda'} className={view === 'agenda' ? 'is-active' : ''} onClick={() => setView('agenda')}>Agenda</button>
+        <div className="calendar-viewswitch" role="tablist" aria-label="Calendar view" onKeyDown={event => {
+          if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return
+          event.preventDefault()
+          const next = event.key === 'Home' ? 'week' : event.key === 'End' ? 'agenda' : view === 'week' ? 'agenda' : 'week'
+          chooseView(next); event.currentTarget.querySelector<HTMLButtonElement>(`#calendar-${next}-tab`)?.focus()
+        }}>
+          <button type="button" id="calendar-week-tab" aria-controls="calendar-week-panel" tabIndex={view === 'week' ? 0 : -1} role="tab" aria-selected={view === 'week'} className={view === 'week' ? 'is-active' : ''} onClick={() => chooseView('week')}>Week</button>
+          <button type="button" id="calendar-agenda-tab" aria-controls="calendar-agenda-panel" tabIndex={view === 'agenda' ? 0 : -1} role="tab" aria-selected={view === 'agenda'} className={view === 'agenda' ? 'is-active' : ''} onClick={() => chooseView('agenda')}>Agenda</button>
         </div>
         <div className="calendar-toolbar__right">
           {layers.length > 1 && (
             <div className="calendar-filters">
               {layers.map(l => (
-                <button key={l} className={`calendar-filter layer-${l} ${hidden.has(l) ? 'is-off' : ''}`} onClick={() => toggleLayer(l)} aria-pressed={!hidden.has(l)}>
+                <button type="button" key={l} className={`calendar-filter layer-${l} ${hidden.has(l) ? 'is-off' : ''}`} onClick={() => toggleLayer(l)} aria-pressed={!hidden.has(l)}>
                   <LayerIcon layer={l} size={13} /> {LAYER_LABEL[l] ?? l}
                 </button>
               ))}
             </div>
           )}
-          {classPattern === 'variable' && (
-            <button className="secondary-button is-sm" onClick={() => setAddingNextClass(true)}>
+          {!readOnly && allowTaskCreation && days.some(d => d >= today) && (
+            <button type="button" className="secondary-button is-sm" onClick={() => setCreatingOn({ date: days.includes(today) ? today : days[0], startMinutes: 9 * 60, untimed: true })}>
+              Add study task
+            </button>
+          )}
+          {!readOnly && classPattern === 'variable' && (
+            <button type="button" className="secondary-button is-sm" onClick={() => setAddingNextClass(true)}>
               Add next class
             </button>
           )}
-          <button className="secondary-button is-sm" onClick={() => setAddingCommitment(true)}>
+          {!readOnly && <button type="button" className="secondary-button is-sm" onClick={() => setAddingCommitment(true)}>
             <Plus size={14} aria-hidden /> Add commitment
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -242,19 +277,21 @@ export function CalendarWeekGrid({
           <span>{mutation.staleNotice} The calendar has been refreshed with the version that was saved.</span>
         </p>
       )}
-      {mutation.error && <p className="auth-error" role="alert">{mutation.error}</p>}
+      {linkedEntryId && (!linkedEntry || linkedEntry.isTask) && <p className="notice" role="status">That calendar entry is unavailable in this week.</p>}
+      {mutation.error && <p className="auth-error" role="alert">{mutation.error} {mutation.errorLink && <Link className="prose-link" href={mutation.errorLink}>Open the task and its sitting order</Link>}</p>}
 
       {view === 'week' ? (
-        <div className="calendar-grid-wrap">
+        <div className="calendar-grid-wrap" id="calendar-week-panel" role="tabpanel" aria-labelledby="calendar-week-tab">
           <div className="calendar-grid" style={{ ['--grid-height' as any]: `${gridHeight}px` }}>
             <div className="calendar-corner" aria-hidden />
             {days.map(date => {
               const { weekday, dayNumber } = dayLabel(date)
               return (
-                <div key={date} className={`calendar-dayhead ${dayClass(date)}`}>
+                <div key={date} id={date === today ? 'calendar-today' : undefined} className={`calendar-dayhead ${dayClass(date)}`}>
                   <span className="calendar-dayhead__weekday">{weekday}</span>
                   <span className="calendar-dayhead__number">{dayNumber}</span>
                   {date === paperDate && <span className="calendar-dayhead__tag">Paper day</span>}
+                  {date === checkpoint?.date && <span className="calendar-dayhead__tag">Mock</span>}
                 </div>
               )
             })}
@@ -265,6 +302,12 @@ export function CalendarWeekGrid({
               const paperMarker = date === paperDate && !(byDate[date] ?? []).some(e => e.taskType === 'diagnostic')
               return (
                 <div key={date} className={`calendar-dayband ${dayClass(date)}`}>
+                  {date === checkpoint?.date && (
+                    <a href="#checkpoint" className="calendar-chip layer-mock">
+                      <CalendarClock size={13} aria-hidden className="cb-icon" />
+                      <span className="calendar-chip__body"><span className="calendar-chip__title">{checkpoint.title}</span><small>{checkpoint.when}</small></span>
+                    </a>
+                  )}
                   {paperMarker && (
                     <Link href="/app/tests" className="calendar-chip calendar-chip--paper layer-diagnostic">
                       <ClipboardCheck size={13} aria-hidden className="cb-icon" />
@@ -272,11 +315,11 @@ export function CalendarWeekGrid({
                     </Link>
                   )}
                   {dayOnly.map(e => (
-                    <button key={e.id} className={`calendar-chip layer-${e.layer} ${e.execution === 'completed' ? 'is-done' : ''}`} onClick={() => openEntry(e)} aria-label={blockSummary(e)} title={e.title}>
+                    <button type="button" key={e.id} className={`calendar-chip layer-${e.layer} ${e.execution === 'completed' ? 'is-done' : ''}`} onClick={() => openEntry(e)} aria-label={blockSummary(e)} title={e.title}>
                       <LayerIcon layer={e.layer} size={13} />
                       <span className="calendar-chip__body">
-                        <span className="calendar-chip__title">{displayTitle(e)}</span>
-                        <small>{durationShort(e.durationMinutes)}{statusOf(e) === 'done' ? ' · Done' : statusOf(e) === 'partial' ? ' · Partly' : ''}</small>
+                        <span className="calendar-chip__title" title={e.title}>{displayTitle(e, true)}</span>
+                        <small>{entryDuration(e,true)}{statusOf(e) === 'done' ? ' · Done' : statusOf(e) === 'partial' ? ' · Partly' : ''}</small>
                       </span>
                     </button>
                   ))}
@@ -312,7 +355,7 @@ export function CalendarWeekGrid({
                 <div
                   key={date}
                   className={`calendar-column ${dayClass(date)}`}
-                  style={{ height: gridHeight }}
+                  style={{ height: gridHeight, cursor: readOnly || !allowTaskCreation ? 'default' : undefined }}
                   ref={el => drag.registerColumn(date, el)}
                   onClick={e => onColumnClick(e, date)}
                 >
@@ -328,7 +371,7 @@ export function CalendarWeekGrid({
                     const isDragging = drag.drag?.id === e.id && drag.drag.active
                     const top = ((e.startMinutes as number) - earliestMinute) * PX_PER_MINUTE
                     const height = Math.max(26, e.durationMinutes * PX_PER_MINUTE)
-                    const editable = e.isTask && !e.isProtected
+                    const editable = !readOnly && e.isTask && !e.isProtected && !e.isLoggedLearning
                     const state = statusOf(e)
 
                     return (
@@ -342,7 +385,7 @@ export function CalendarWeekGrid({
                         onPointerUp={editable ? drag.finish : undefined}
                         onPointerCancel={editable ? () => drag.cancel() : undefined}
                       >
-                        <button
+                        <button type="button"
                           className="calendar-event__open"
                           aria-label={blockSummary(e)}
                           title={e.title}
@@ -368,19 +411,25 @@ export function CalendarWeekGrid({
           </div>
         </div>
       ) : (
-        <div className="calendar-agenda">
+        <div className="calendar-agenda" id="calendar-agenda-panel" role="tabpanel" aria-labelledby="calendar-agenda-tab">
           {days.map(date => {
             const { weekday, dayNumber } = dayLabel(date)
             const entries = (byDate[date] ?? []).filter(visible)
             const paperMarker = date === paperDate && !(byDate[date] ?? []).some(e => e.taskType === 'diagnostic')
             return (
-              <section key={date} className={`agenda-day ${dayClass(date)}`} aria-label={`${weekday} ${dayNumber}`}>
+              <section key={date} id={date === today ? 'calendar-today' : undefined} className={`agenda-day ${dayClass(date)}`} aria-label={`${weekday} ${dayNumber}`}>
                 <div className="agenda-day__date">
                   <span>{weekday}</span>
                   <strong>{dayNumber}</strong>
                   {date === today && <em className="agenda-today">Today</em>}
                 </div>
                 <div className="agenda-day__items">
+                  {date === checkpoint?.date && (
+                    <a href="#checkpoint" className="agenda-item layer-mock">
+                      <span className="agenda-item__time">Mock</span>
+                      <span className="agenda-item__body"><strong><CalendarClock size={14} aria-hidden /> {checkpoint.title}</strong><small>{checkpoint.when}</small></span>
+                    </a>
+                  )}
                   {paperMarker && (
                     <Link href="/app/tests" className="agenda-item layer-diagnostic">
                       <span className="agenda-item__time">Paper day</span>
@@ -391,11 +440,11 @@ export function CalendarWeekGrid({
                     </Link>
                   )}
                   {entries.length === 0 && !paperMarker ? <p className="agenda-empty">{date < today ? 'Nothing was planned.' : 'Free'}</p> : entries.map(e => (
-                    <button key={e.id} className={`agenda-item layer-${e.layer} ${e.execution === 'completed' ? 'is-done' : ''} ${e.isProtected ? 'is-fixed' : ''}`} onClick={() => openEntry(e)} aria-label={blockSummary(e)}>
+                    <button type="button" key={e.id} className={`agenda-item layer-${e.layer} ${e.execution === 'completed' ? 'is-done' : ''} ${e.isProtected ? 'is-fixed' : ''}`} onClick={() => openEntry(e)} aria-label={blockSummary(e)}>
                       <span className="agenda-item__time">{e.startMinutes !== null ? timeLabel(e.startMinutes) : 'Any time'}</span>
                       <span className="agenda-item__body">
                         <strong><LayerIcon layer={e.layer} size={14} /> {displayTitle(e)}</strong>
-                        <small>{LAYER_LABEL[e.layer] ?? e.layer} · {durationLabel(e.durationMinutes)}{statusOf(e) === 'done' ? ' · Done' : statusOf(e) === 'partial' ? ' · Partly done' : ''}</small>
+                        <small>{LAYER_LABEL[e.layer] ?? e.layer} · {entryDuration(e)}{statusOf(e) === 'done' ? ' · Done' : statusOf(e) === 'partial' ? ' · Partly done' : ''}</small>
                       </span>
                     </button>
                   ))}
@@ -407,15 +456,15 @@ export function CalendarWeekGrid({
       )}
 
       {floating.filter(visible).length > 0 && (
-        <section className="calendar-floating">
+        <section className="calendar-floating" id="unplaced">
           <h3>Not yet placed</h3>
           <p className="fine-print">These belong to this week but have no date. Roadmap leaves work floating rather than inventing a time for it.</p>
           <div className="calendar-floating__list">
             {floating.filter(visible).map(e => (
-              <button key={e.id} className={`calendar-chip layer-${e.layer}`} onClick={() => openEntry(e)} aria-label={blockSummary(e)}>
+              <button type="button" key={e.id} className={`calendar-chip layer-${e.layer}`} onClick={() => openEntry(e)} aria-label={blockSummary(e)}>
                 <LayerIcon layer={e.layer} size={13} />
                 <span className="calendar-chip__title">{e.title}</span>
-                <small>{durationLabel(e.durationMinutes)}</small>
+                <small>{entryDuration(e)}</small>
               </button>
             ))}
           </div>
@@ -426,7 +475,9 @@ export function CalendarWeekGrid({
         <TaskDetailDrawer
           key={selectedEntry.id}
           entry={selectedEntry}
+          readOnly={readOnly}
           days={days}
+          today={today}
           onClose={closeEntry}
           mutation={mutation}
         />
@@ -443,7 +494,7 @@ export function CalendarWeekGrid({
       {mutation.warning && (
         <ConflictDialog
           info={{
-            message: 'That overlaps something already there.',
+            message: 'Review this placement before saving.',
             conflicts: mutation.warning.warnings,
             suggestions: [],
           }}
@@ -454,11 +505,11 @@ export function CalendarWeekGrid({
       )}
 
       {mutation.undo && (
-        <UndoToast message={mutation.undo.message} onUndo={mutation.runUndo} onDismiss={mutation.dismissUndo} />
+        <UndoToast message={mutation.undo.detail ?? mutation.undo.message} onUndo={mutation.runUndo} onDismiss={mutation.dismissUndo} />
       )}
 
       {addingCommitment && (
-        <CommitmentDialog defaultDate={today >= days[0] && today <= days[6] ? today : days[0]} onClose={() => setAddingCommitment(false)} />
+        <CommitmentDialog defaultDate={days.includes(today) ? today : days[0]} onClose={() => setAddingCommitment(false)} />
       )}
 
       {addingNextClass && <NextClassDialog onClose={() => setAddingNextClass(false)} />}
@@ -467,6 +518,9 @@ export function CalendarWeekGrid({
         <NewTaskDialog
           date={creatingOn.date}
           startMinutes={creatingOn.startMinutes}
+          untimed={creatingOn.untimed}
+          minDate={days[0] > today ? days[0] : today > lastDay ? lastDay : today}
+          maxDate={lastDay}
           onClose={() => setCreatingOn(null)}
         />
       )}

@@ -1,6 +1,7 @@
 import { WEEKLY_PAPER_SOFT_MAX_QUESTIONS } from '../../tests/limits'
 import { createAdminClient } from '../../supabase/admin'
 import { allowedTiers } from '../../diagnostic/blueprint'
+import { countFreshByReading } from '../../tests/itemPool'
 
 /**
  * Weekly paper planning (Decisions §3).
@@ -83,7 +84,7 @@ export type PaperPlan =
       estimatedMinutes: number
       skipped: SkippedModule[]
     }
-  | { kind: 'none'; reason: 'no_scope' | 'insufficient_bank' | 'below_minimum_paper'; skipped: SkippedModule[] }
+  | { kind: 'none'; reason: 'no_scope' | 'insufficient_bank' | 'below_minimum_paper' | 'mock_chosen'; skipped: SkippedModule[] }
 
 /** Pure: decide the paper from the week's scope and what the bank can support. */
 export function classifyWeeklyPaper(input: {
@@ -169,37 +170,16 @@ export function isPersistedPaperScope(v: unknown): v is PersistedPaperScope {
 /** The manifest papers are assembled from: the active one that can build blueprints. */
 export async function getPaperManifestId(): Promise<string | null> {
   const admin = createAdminClient()
-  const { data } = await admin.from('curriculum_manifests').select('id, capabilities').eq('is_active', true)
+  const { data } = await admin.from('curriculum_manifests').select('id, capabilities').eq('is_active', true).throwOnError()
   const usable = (data ?? []).find(m => (m.capabilities as any)?.blueprint_available)
   return (usable?.id as string | undefined) ?? null
 }
 
-/**
- * Unseen, eligible-tier items per module, scoped to the manifest's concepts —
- * the same candidate rule createBlueprintAndForm applies, counted per module.
- */
+/** Fresh, eligible questions per module — a thin view over the shared pool, so planning and reservation cannot disagree. */
 export async function countUnseenEligibleByModule(
-  userId: string, manifestId: string, moduleIds: string[], tiers: string[] = PAPER_ELIGIBLE_TIERS
+  userId: string, _manifestId: string, moduleIds: string[], _tiers: string[] = PAPER_ELIGIBLE_TIERS
 ): Promise<Map<string, number>> {
-  const counts = new Map<string, number>(moduleIds.map(id => [id, 0]))
-  if (moduleIds.length === 0) return counts
-  const admin = createAdminClient()
-
-  const [{ data: seenRows }, { data: concepts }] = await Promise.all([
-    admin.from('assessment_responses').select('item_id').eq('user_id', userId),
-    admin.from('curriculum_concepts').select('id').eq('manifest_id', manifestId),
-  ])
-  const seen = new Set((seenRows ?? []).map(r => r.item_id as string))
-  const conceptIds = (concepts ?? []).map(c => c.id as string)
-  if (conceptIds.length === 0) return counts
-
-  const { data: items } = await admin.from('assessment_items')
-    .select('id, lm_id').in('concept_id', conceptIds).in('lm_id', moduleIds).in('review_status', tiers)
-  for (const item of items ?? []) {
-    if (seen.has(item.id as string)) continue
-    counts.set(item.lm_id as string, (counts.get(item.lm_id as string) ?? 0) + 1)
-  }
-  return counts
+  return moduleIds.length ? countFreshByReading(userId, moduleIds) : new Map()
 }
 
 async function effortBands(moduleIds: string[]): Promise<Map<string, number>> {

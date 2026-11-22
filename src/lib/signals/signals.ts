@@ -14,16 +14,25 @@
  *  - the headline band needs several scopes, more than one paper, recent evidence and no critical integrity warning.
  */
 
+import type { ReadingCoverageSummary } from '../curriculum/readingCoverage'
+import { daysBetween, todayInZone } from '../planning/studyWeek'
+
+export function evidenceAgeInDays(iso: string | null, today: string, timezone = 'UTC') {
+  return iso ? Math.max(0, daysBetween(todayInZone(timezone, new Date(iso)), today)) : null
+}
+
 export const SIGNALS_VERSION = 1
 export const RECENT_DAYS = 21
 export const BAND_MIN_READINGS = 2
 export const BAND_MIN_PAPERS = 2
 
-export type OutcomeState = { outcomeId: string; readingId: string; subjectId: string; exposed: boolean; scheduled: boolean; tested: boolean; verified: boolean }
+export type OutcomeState = { outcomeId: string; readingId: string; subjectId: string; exposed: boolean; /** Whole-outcome coverage the scope engine accepts. */ whole?: boolean; /** Only part covered (or unresolved); never also whole. */ partial?: boolean; scheduled: boolean; tested: boolean; verified: boolean }
 export type BlockRow = { id: string; execution: string; taskType: string; minutes: number; localDate: string | null; title: string }
 export type EvidenceStats = {
   validEvents: number; voidedEvents: number; disputedEvents: number
   scoredPapers: number; readingsTested: number; subjectsTested: number; latestEvidenceAt: string | null
+  /** The most recent scored paper that counted as evidence; Home links its summary to this result. */
+  latestAttemptId?: string | null
   high: { n: number; correct: number }; low: { n: number; correct: number }; medium: { n: number; correct: number }
   overconfidentOutcomes: number; underconfidentOutcomes: number; markedOutcomes: number
 }
@@ -31,12 +40,14 @@ export type MovementEvent = { date: string; kind: 'paper_scored' | 'evidence_voi
 
 export type Signals = {
   version: number
-  position: { total: number; notStarted: number; scheduled: number; exposed: number; tested: number; verified: number; readingsExposed: number }
+  position: { total: number; notStarted: number; scheduled: number; exposed: number; /** Outcomes whose WHOLE coverage is explicitly established. exposed = whole + partial. */ whole: number; /** Outcomes only partly covered. */ partial: number; tested: number; verified: number; readingsExposed: number
+    /** Reading-level coverage, kept apart from outcome exposure: what the student REPORTS having covered (setup or Settings) is not logged activity or evidence. */
+    readings: ReadingCoverageSummary }
   understanding: {
     band: 'Insufficient evidence' | 'Building' | 'Developing' | 'Stable'
     reasons: string[]
     validEvents: number; scoredPapers: number; readingsTested: number; subjectsTested: number
-    latestEvidenceAt: string | null; recent: boolean; verifiedShareOfTested: number | null
+    latestEvidenceAt: string | null; latestAttemptId: string | null; recent: boolean; verifiedShareOfTested: number | null
     integrityWarning: string | null
   }
   execution: {
@@ -45,6 +56,8 @@ export type Signals = {
   }
   calibration: {
     sureAccuracy: number | null; guessAccuracy: number | null
+    /** The denominator of sureAccuracy: answers marked "sure". Five marked answers can contain only one. */
+    sureSample: number
     confidentWrong: number; guessedRight: number; overconfidentOutcomes: number; underconfidentOutcomes: number; sample: number
     reading: string
   }
@@ -53,7 +66,7 @@ export type Signals = {
 
 const pct = (a: number, b: number) => (b ? a / b : null)
 
-export function computeSignals(input: { outcomes: OutcomeState[]; blocks: BlockRow[]; evidence: EvidenceStats; movement: MovementEvent[]; today: string }): Signals {
+export function computeSignals(input: { outcomes: OutcomeState[]; blocks: BlockRow[]; evidence: EvidenceStats; movement: MovementEvent[]; today: string; timezone?: string; readings?: ReadingCoverageSummary }): Signals {
   const { outcomes, blocks, evidence: e } = input
 
   const position = {
@@ -61,9 +74,12 @@ export function computeSignals(input: { outcomes: OutcomeState[]; blocks: BlockR
     notStarted: outcomes.filter(o => !o.exposed && !o.scheduled && !o.tested).length,
     scheduled: outcomes.filter(o => o.scheduled && !o.exposed && !o.tested).length,
     exposed: outcomes.filter(o => o.exposed).length,
+    whole: outcomes.filter(o => o.whole).length,
+    partial: outcomes.filter(o => o.partial && !o.whole).length,
     tested: outcomes.filter(o => o.tested).length,
     verified: outcomes.filter(o => o.verified).length,
     readingsExposed: new Set(outcomes.filter(o => o.exposed).map(o => o.readingId)).size,
+    readings: input.readings ?? { total: 0, covered: 0, partial: 0 },
   }
 
   // Execution: unreported = due (past) and not marked anything.
@@ -81,7 +97,7 @@ export function computeSignals(input: { outcomes: OutcomeState[]; blocks: BlockR
   execution.pressure = learning.length === 0 ? 'none' : slipped / learning.length >= 0.4 ? 'high' : slipped > 0 ? 'building' : 'none'
 
   // Understanding: only test evidence counts. Blocks and self-reports are absent from this calculation by construction.
-  const daysSince = e.latestEvidenceAt ? Math.floor((new Date(input.today + 'T12:00:00Z').getTime() - new Date(e.latestEvidenceAt).getTime()) / 86_400_000) : null
+  const daysSince = evidenceAgeInDays(e.latestEvidenceAt, input.today, input.timezone)
   const recent = daysSince !== null && daysSince <= RECENT_DAYS
   const integrityWarning = e.validEvents > 0 && e.disputedEvents / (e.validEvents + e.disputedEvents) > 0.2 ? 'More than a fifth of the evidence is disputed, so no band is shown until it is resolved.' : null
   const verifiedShare = position.tested ? position.verified / position.tested : null
@@ -99,9 +115,9 @@ export function computeSignals(input: { outcomes: OutcomeState[]; blocks: BlockR
   const cal = e.high.n + e.low.n + e.medium.n
   const confidentWrong = e.high.n - e.high.correct, guessedRight = e.low.correct
   const calibration = {
-    sureAccuracy: pct(e.high.correct, e.high.n), guessAccuracy: pct(e.low.correct, e.low.n), confidentWrong, guessedRight,
+    sureAccuracy: pct(e.high.correct, e.high.n), sureSample: e.high.n, guessAccuracy: pct(e.low.correct, e.low.n), confidentWrong, guessedRight,
     overconfidentOutcomes: e.overconfidentOutcomes, underconfidentOutcomes: e.underconfidentOutcomes, sample: cal,
-    reading: cal < 5 ? 'Too few answers to say whether your confidence tracks your accuracy.'
+    reading: cal < 5 || e.high.n < 5 ? 'Too few answers to say whether your confidence tracks your accuracy.'
       : (pct(e.high.correct, e.high.n) ?? 1) >= 0.8 && confidentWrong <= 1 ? 'When you say you are sure, you are usually right.'
       : confidentWrong >= 2 ? 'You have been sure and wrong more than once — a sign of misconceptions rather than slips.'
       : 'Your confidence and accuracy roughly agree.',
@@ -109,7 +125,7 @@ export function computeSignals(input: { outcomes: OutcomeState[]; blocks: BlockR
 
   return {
     version: SIGNALS_VERSION, position,
-    understanding: { band, reasons, validEvents: e.validEvents, scoredPapers: e.scoredPapers, readingsTested: e.readingsTested, subjectsTested: e.subjectsTested, latestEvidenceAt: e.latestEvidenceAt, recent, verifiedShareOfTested: verifiedShare, integrityWarning },
+    understanding: { band, reasons, validEvents: e.validEvents, scoredPapers: e.scoredPapers, readingsTested: e.readingsTested, subjectsTested: e.subjectsTested, latestEvidenceAt: e.latestEvidenceAt, latestAttemptId: e.latestAttemptId ?? null, recent, verifiedShareOfTested: verifiedShare, integrityWarning },
     execution, calibration,
     movement: [...input.movement].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 14),
   }

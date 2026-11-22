@@ -251,5 +251,17 @@ check('feasibility is assessed over the pre-final span, not reported as zero usa
 check('a hybrid route behaves the same way once its classes are done',
   buildRoadmap(base({ route: 'hybrid', classesCompletedDate: addDays(START, -7) })).phases.every(p => p.phase !== 'first_pass'))
 
+console.log('\nEvery day up to the target belongs to a phase')
+{
+  const target = addDays(START, 59)   // 8 whole weeks + 3 days
+  const { phases } = buildPhases(START, target)
+  eq('the last phase runs to the target date, not the last whole week', phases[phases.length - 1].endDate, target)
+  const r = buildRoadmap(base({ targetDate: target }))
+  check('the trailing days resolve to the final phase', currentPhase(r, addDays(target, -1))?.phase === 'final' && currentPhase(r, addDays(START, 57))?.phase === 'final')
+  check('a date after the target has no phase', currentPhase(r, addDays(target, 1)) === null)
+  const short = buildPhases(START, addDays(START, 20)).phases
+  eq('a compressed plan also covers its trailing day', short[short.length - 1].endDate, addDays(START, 20))
+}
+
 console.log(`\n${passed} passed, ${failed} failed\n`)
 process.exit(failed === 0 ? 0 : 1)

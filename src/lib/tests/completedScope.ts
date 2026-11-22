@@ -28,10 +28,15 @@ export type ReadingRef = { id: string; subjectId: string; readingNo: number; tit
 export type BlockRow = {
   id: string; title: string; taskType: string; execution: string; localDate: string | null
   outcomeId: string | null; readingId: string | null; origin: string | null
+  revision?: number
+  loggedLearning?: boolean
+  /** True until every sitting of a split has completed, including other cycles. */
+  scopePending?: boolean
 }
-export type ClassItemRow = { sessionId: string; classDate: string; kind: 'covered' | 'revision'; outcomeId: string; extent: 'part' | 'full' | 'continued'; studiedInClass: boolean }
+/** `inCycle: false` = a session from an earlier week: it can only keep a portion pending, never add scope. */
+export type ClassItemRow = { sessionId: string; classDate: string; classLabel?: string | null; kind: 'covered' | 'revision'; outcomeId: string; extent: 'part' | 'full' | 'continued'; studiedInClass: boolean; inCycle?: boolean }
 
-export type ScopeSource = { type: 'block' | 'class' | 'quick'; id: string; at: string | null }
+export type ScopeSource = { type: 'block' | 'class' | 'quick'; id: string; at: string | null; label?: string | null }
 
 export type ScopeTarget = {
   outcomeId: string; readingId: string; subjectId: string; kind: ScopeKind
@@ -42,11 +47,22 @@ export type ScopeTarget = {
 
 export type ExclusionReason = 'postponed' | 'missed' | 'not_completed' | 'structure_pending'
 export type ExcludedBlock = { blockId: string; title: string; reason: ExclusionReason; readingId: string | null; outcomeId: string | null }
-export type UnresolvedBlock = { blockId: string; title: string; readingId: string; reason: 'reading_level' | 'partial' }
+export type UnresolvedBlock = { blockId: string; title: string; readingId: string; reason: 'reading_level' | 'partial' | 'split' | 'class_part'; revision?: number; outcomeId?: string | null }
+
+/**
+ * Only a class item logged "All of it" (`full`) says the whole outcome was covered. "Part of it" and "Continued from before" are PROGRESS: continuing study
+ * never establishes the whole. Historical `continued` rows are read this way too (conservative; papers already reserved keep their frozen scope).
+ * A class item logged as "part of it" (a bounded portion). Which questions test only that portion is not represented (no verified concept-level
+ * confirmation exists), so the outcome is NOT testable from this log: it stays here, visibly pending, until the whole outcome is confirmed
+ * (a later class logged as all of it or continued, or a study task for the outcome that is not the class's partial consolidation).
+ * A free-text note is never evidence of which questions are in scope.
+ */
+export type PendingPortion = { outcomeId: string; readingId: string; sessionId: string; classDate: string; classLabel?: string | null; extent: 'part' | 'continued' }
 
 export type CompletedCycleScope = {
   cycle: { id: string; startsAt: string; endsAt: string } | null
   targets: ScopeTarget[]
+  pendingPortions: PendingPortion[]
   excluded: ExcludedBlock[]
   unresolved: UnresolvedBlock[]
   readings: { readingId: string; subjectId: string; pageCount: number; outcomeIds: string[]; newCount: number; revisionCount: number }[]
@@ -62,6 +78,10 @@ export type ScopeInput = {
   /** block id -> outcome ids the student confirmed. */
   confirmations: Map<string, string[]>
   classItems: ClassItemRow[]
+  /** block id -> the class session its lineage started from (the task, its split sittings and its weekly continuations; any week). */
+  classBlockSessions?: Map<string, string>
+  /** Outcomes whose WHOLE coverage was explicitly established in an earlier week (an "All of it" class, a confirmation, a separate whole-outcome task). */
+  priorWhole?: Set<string>
   outcomes: Map<string, OutcomeRef>
   readings: Map<string, ReadingRef>
   /** Outcomes / readings the student already worked BEFORE this cycle (earlier cycles, earlier classes, evidence, self-reported coverage). */
@@ -75,6 +95,9 @@ export function buildCompletedScope(input: ScopeInput): CompletedCycleScope {
   const targets = new Map<string, ScopeTarget>()
   const excluded: ExcludedBlock[] = []
   const unresolved: UnresolvedBlock[] = []
+  const pendingPortions: PendingPortion[] = []
+  const partKey = (sessionId: string, outcomeId: string) => `${sessionId}|${outcomeId}`
+  const partItems = new Set(input.classItems.filter(c => c.extent !== 'full').map(c => partKey(c.sessionId, c.outcomeId)))
 
   const add = (outcomeId: string, source: ScopeSource, opts: { revisionPurpose: boolean; weight: number }) => {
     const o = input.outcomes.get(outcomeId)
@@ -97,7 +120,7 @@ export function buildCompletedScope(input: ScopeInput): CompletedCycleScope {
 
   for (const b of input.blocks) {
     if (!SCOPE_TASK_TYPES.has(b.taskType)) continue // paper, repair, admin etc. are not learning scope
-    const readingId = b.readingId ?? (b.outcomeId ? input.outcomes.get(b.outcomeId)?.readingId ?? null : null)
+    const readingId = (b.outcomeId ? input.outcomes.get(b.outcomeId)?.readingId : null) ?? b.readingId
     if (!readingId && !b.outcomeId) continue // not mapped to the curriculum at all
     const reading = readingId ? input.readings.get(readingId) : undefined
     const at = b.localDate
@@ -111,12 +134,19 @@ export function buildCompletedScope(input: ScopeInput): CompletedCycleScope {
     if (b.execution === 'skipped') { excluded.push({ blockId: b.id, title: b.title, reason: 'missed', readingId, outcomeId: b.outcomeId }); continue }
 
     if (b.execution === 'completed' || b.execution === 'partial') {
-      const partial = b.execution === 'partial'
-      const source: ScopeSource = { type: fromQuick ? 'quick' : 'block', id: b.id, at }
+      const partial = b.execution === 'partial' || Boolean(b.scopePending)
+      const source: ScopeSource = { type: fromQuick || b.loggedLearning ? 'quick' : 'block', id: b.id, at }
+      // Consolidating "the part covered in class" is not the whole outcome, however fully that task was done.
+      // Only an explicit confirmation of the outcome (the student's own answer) makes it whole.
+      const sid = input.classBlockSessions?.get(b.id)
+      if (b.outcomeId && sid && partItems.has(partKey(sid, b.outcomeId))) {
+        if (confirmed.includes(b.outcomeId)) add(b.outcomeId, source, { revisionPurpose, weight: partial ? 0.5 : 1 })
+        else if (reading) unresolved.push({ blockId: b.id, title: b.title, readingId: reading.id, reason: b.scopePending ? 'split' : 'class_part', revision: b.revision, outcomeId: b.outcomeId })
+        continue
+      }
       if (b.outcomeId && !partial) { add(b.outcomeId, source, { revisionPurpose, weight: 1 }); continue }
       if (confirmed.length > 0) { for (const oid of confirmed) add(oid, source, { revisionPurpose, weight: partial ? 0.5 : 1 }); continue }
-      if (b.outcomeId && partial) { add(b.outcomeId, source, { revisionPurpose, weight: 0.5 }); continue }
-      if (readingId) unresolved.push({ blockId: b.id, title: b.title, readingId, reason: partial ? 'partial' : 'reading_level' })
+      if (readingId) unresolved.push({ blockId: b.id, title: b.title, readingId, reason: b.scopePending ? 'split' : partial ? 'partial' : 'reading_level', revision: b.revision, outcomeId: b.outcomeId })
       continue
     }
     // not_started / in_progress: only "not completed" once its day has passed.
@@ -125,9 +155,17 @@ export function buildCompletedScope(input: ScopeInput): CompletedCycleScope {
 
   // Actual attended class coverage (a class that was scheduled but not logged adds nothing).
   for (const c of input.classItems) {
-    add(c.outcomeId, { type: 'class', id: c.sessionId, at: c.classDate }, { revisionPurpose: c.kind === 'revision', weight: c.extent === 'full' ? 1 : 0.5 })
+    if (c.extent !== 'full') {
+      const o = input.outcomes.get(c.outcomeId)
+      if (o) pendingPortions.push({ outcomeId: c.outcomeId, readingId: o.readingId, sessionId: c.sessionId, classDate: c.classDate, classLabel: c.classLabel, extent: c.extent })
+      continue
+    }
+    if (c.inCycle === false) continue
+    add(c.outcomeId, { type: 'class', id: c.sessionId, at: c.classDate, label: c.classLabel }, { revisionPurpose: c.kind === 'revision', weight: 1 })
   }
 
+  // A portion is pending only while nothing confirms the whole outcome.
+  const pending = pendingPortions.filter(p => !targets.has(p.outcomeId) && !input.priorWhole?.has(p.outcomeId)).sort((a, b) => a.outcomeId.localeCompare(b.outcomeId) || a.sessionId.localeCompare(b.sessionId))
   const list = [...targets.values()].sort((a, b) => a.outcomeId.localeCompare(b.outcomeId))
   const byReading = new Map<string, CompletedCycleScope['readings'][number]>()
   for (const t of list) {
@@ -145,8 +183,8 @@ export function buildCompletedScope(input: ScopeInput): CompletedCycleScope {
   const revision = createHash('sha1').update(JSON.stringify({
     c: input.cycle?.id ?? null,
     t: list.map(t => [t.outcomeId, t.kind, t.weight, t.sources.map(s => `${s.type}:${s.id}`).sort()]),
-    u: unresolved.map(u => u.blockId),
+    u: unresolved.map(u => u.blockId), p: pending.map(x => `${x.outcomeId}:${x.sessionId}`),
   })).digest('hex').slice(0, 16)
 
-  return { cycle: input.cycle, targets: list, excluded, unresolved, readings, totals, revision }
+  return { cycle: input.cycle, targets: list, pendingPortions: pending, excluded, unresolved, readings, totals, revision }
 }

@@ -40,7 +40,38 @@ console.log('\nCompleted-scope contract\n')
   const s = buildCompletedScope(base([]))
   check('a class that was scheduled but not attended adds nothing', s.targets.length === 0)
   const s2 = buildCompletedScope(base([], { classItems: [{ sessionId: 's1', classDate: '2026-09-15', kind: 'covered', outcomeId: 'r1-a', extent: 'part', studiedInClass: false }] }))
-  check('attended class coverage does', s2.targets.length === 1 && s2.targets[0].weight === 0.5)
+  check('a class item logged as only PART of an outcome is NOT testable scope: no portion can be verified, so it stays visibly pending', s2.targets.length === 0 && s2.pendingPortions.length === 1 && s2.pendingPortions[0].outcomeId === 'r1-a')
+  const s2b = buildCompletedScope(base([], { classItems: [{ sessionId: 's1', classDate: '2026-09-15', kind: 'covered', outcomeId: 'r1-a', extent: 'full', studiedInClass: false }] }))
+  check('attended class coverage of the whole outcome does enter scope', s2b.targets.length === 1 && s2b.targets[0].weight === 1 && s2b.pendingPortions.length === 0)
+  const part = { sessionId: 's1', classDate: '2026-09-15', kind: 'covered' as const, outcomeId: 'r1-b', extent: 'part' as const, studiedInClass: false }
+  const s3 = buildCompletedScope(base([blk('cons', { outcomeId: 'r1-b', taskType: 'class_consolidation' })], { classItems: [part], classBlockSessions: new Map([['cons', 's1']]) }))
+  check('completing the class\'s own consolidation of the part does not make the whole outcome testable', s3.targets.length === 0 && s3.pendingPortions.length === 1)
+  const s4 = buildCompletedScope(base([blk('own', { outcomeId: 'r1-b' })], { classItems: [part] }))
+  check('a study task for the whole outcome (not the class consolidation) confirms it, and the pending portion clears', s4.targets.length === 1 && s4.pendingPortions.length === 0)
+  const s5 = buildCompletedScope(base([], { classItems: [part, { ...part, sessionId: 's2', classDate: '2026-09-17', extent: 'continued' }] }))
+  check('a later class merely CONTINUING it is progress: still pending, never a target', s5.targets.length === 0 && s5.pendingPortions.length === 2)
+  const s5b = buildCompletedScope(base([], { classItems: [{ ...part, extent: 'continued' }] }))
+  check('a lone "continued" log (no earlier log) is pending, not testable', s5b.targets.length === 0 && s5b.pendingPortions.length === 1 && s5b.pendingPortions[0].extent === 'continued')
+  const s5c = buildCompletedScope(base([], { classItems: [part, { ...part, sessionId: 's2', extent: 'continued' }, { ...part, sessionId: 's3', extent: 'continued' }] }))
+  check('repeated continued logs stay pending', s5c.targets.length === 0 && s5c.pendingPortions.length === 3)
+  const s5d = buildCompletedScope(base([], { classItems: [part, { ...part, sessionId: 's2', extent: 'continued' }, { ...part, sessionId: 's4', extent: 'full' }] }))
+  check('an explicit "All of it" log confirms the whole outcome and clears every pending portion', s5d.targets.length === 1 && s5d.targets[0].weight === 1 && s5d.pendingPortions.length === 0)
+  // Next-week successor: the class lives in an earlier cycle; the lineage map still ties the successor to it.
+  const old = { ...part, inCycle: false }
+  const succ = buildCompletedScope(base([blk('succ', { outcomeId: 'r1-b', taskType: 'class_consolidation' })], { classItems: [old], classBlockSessions: new Map([['succ', 's1']]) }))
+  check('a completed next-week continuation of the part consolidation is NOT whole coverage, and the old portion stays visible', succ.targets.length === 0 && succ.pendingPortions.length === 1 && succ.pendingPortions[0].classDate === '2026-09-15' && succ.unresolved.some(u => u.blockId === 'succ' && u.reason === 'class_part'))
+  const rv = buildCompletedScope(base([blk('succ', { outcomeId: 'r1-b', taskType: 'review' })], { classItems: [old], classBlockSessions: new Map([['succ', 's1']]) }))
+  check('a part consolidation changed from study to review is still not whole coverage', rv.targets.length === 0)
+  const sp = buildCompletedScope(base([blk('sp', { outcomeId: 'r1-b', scopePending: true })], { classItems: [old], classBlockSessions: new Map([['sp', 's1']]) }))
+  check('a split sitting of the part consolidation never completes the outcome', sp.targets.length === 0)
+  const conf = buildCompletedScope(base([blk('succ', { outcomeId: 'r1-b', taskType: 'class_consolidation' })], { classItems: [old], classBlockSessions: new Map([['succ', 's1']]), confirmations: new Map([['succ', ['r1-b']]]) }))
+  check('the student explicitly confirming the whole outcome on that task makes it eligible and clears pending', conf.targets.length === 1 && conf.pendingPortions.length === 0 && conf.unresolved.length === 0)
+  const sep = buildCompletedScope(base([blk('sep', { outcomeId: 'r1-b' })], { classItems: [old], classBlockSessions: new Map([['succ', 's1']]) }))
+  check('a separate task for the whole outcome still confirms it (a finished outcome inside a larger task stays valid)', sep.targets.length === 1 && sep.pendingPortions.length === 0)
+  const pw = buildCompletedScope(base([], { classItems: [old], priorWhole: new Set(['r1-b']) }))
+  check('whole coverage confirmed in an earlier week clears the old portion', pw.pendingPortions.length === 0 && pw.targets.length === 0)
+  check('the scope revision changes when a portion becomes whole', s5d.revision !== s5.revision)
+  check('pending portions change the scope revision (a reserved paper cannot silently outlive the change)', s3.revision !== buildCompletedScope(base([], { classItems: [] })).revision)
 }
 {
   const s = buildCompletedScope(base([blk('t', { outcomeId: 'r1-a' })], { classItems: [{ sessionId: 's1', classDate: '2026-09-15', kind: 'covered', outcomeId: 'r1-a', extent: 'full', studiedInClass: false }] }))
@@ -102,7 +133,11 @@ const all = (rid: string) => 'abcd'.split('').map(c => ({ o: `${rid}-${c}` }))
 {
   const bp = allocateWeighted({ scope: scopeOf([...all('r4'), ...all('r5')]), subjects, kinds: ['new'] })
   const q = (r: string) => bp.perReading.find(x => x.readingId === r)!.questions
-  check('equal-weight subjects tie-break: same subject, more pages wins', q('r5') > q('r4'))
+  check('same subject, same reading size: pages never reduce a reading and break only an odd extra question', q('r5') >= q('r4'))
+  const sized = allocateWeighted({ scope: scopeOf([...all('r4'), { o: 'r5-a' }, { o: 'r5-b' }]), subjects, kinds: ['new'] })
+  check('reading size (eligible outcomes) outranks page count', sized.perReading.find(x => x.readingId === 'r4')!.questions > sized.perReading.find(x => x.readingId === 'r5')!.questions)
+  const every = allocateWeighted({ scope: scopeOf([...all('r1'), ...all('r3'), ...all('r4')]), subjects, kinds: ['new'] })
+  check('breadth before depth: when the paper can afford it every eligible outcome is asked once', every.rollingCoverage.length === 0 && every.perOutcome.length === 12)
   const tie = allocateWeighted({ scope: scopeOf([...all('r3'), ...all('r4')]), subjects, kinds: ['new'] })
   const s = (id: string) => tie.perSubject.find(x => x.subjectId === id)!.questions
   check('two subjects of equal weight: the one with more completed pages gets the extra question', s('quant') >= s('econ') ? true : false, JSON.stringify(tie.perSubject))
@@ -163,6 +198,14 @@ console.log('\nTiming and interpretation\n')
 {
   const bp = allocateWeighted({ scope: scopeOf([...all('r1'), ...all('r3'), ...all('r4')]), subjects, kinds: ['new'], totalOverride: 500 })
   check('a forced size is still clamped to the 90-question ceiling', bp.totalQuestions <= 90 && bp.totalQuestions > 0)
+  // A scope larger than any paper: 40 readings x 4 outcomes = 160 completed outcomes. The ceiling holds, the remainder is NAMED (never dropped or called verified),
+  // and nothing from outside the scope is used to fill the paper.
+  const bigReadings = Array.from({ length: 40 }, (_, k) => `big${k}`)
+  for (const rid of bigReadings) { readings.set(rid, { id: rid, subjectId: 'fsa', readingNo: 100, title: rid, pageCount: 10, structurePending: false }); for (const c of 'abcd') outcomes.set(`${rid}-${c}`, { id: `${rid}-${c}`, readingId: rid, subjectId: 'fsa', code: c, title: `${rid}${c}` }) }
+  const bigScope = scopeOf(bigReadings.flatMap(all))
+  const big = allocateWeighted({ scope: bigScope, subjects, kinds: ['new'], totalOverride: 500 })
+  check('160 completed outcomes: the paper stops at 90 and the rest is a named remainder', big.totalQuestions === 90 && big.rollingCoverage.length === 160 - big.perOutcome.length && big.rollingCoverage.length >= 70)
+  check('every asked outcome is inside the completed scope; the remainder and the asked set never overlap', big.perOutcome.every(o => bigScope.targets.some(t => t.outcomeId === o.outcomeId)) && big.rollingCoverage.every(o => !big.perOutcome.some(x => x.outcomeId === o)))
   const mock = allocateWeighted({ scope: scopeOf([...all('r1'), ...all('r2'), ...all('r3'), ...all('r4'), ...all('r5')]), subjects, kinds: ['new'], totalOverride: 90 })
   check('a mock allocates exactly 90 across the syllabus, weighted by subject', mock.totalQuestions === 90 && mock.perSubject.find(x => x.subjectId === 'fsa')!.questions > mock.perSubject.find(x => x.subjectId === 'econ')!.questions)
 }

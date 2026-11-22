@@ -1,5 +1,13 @@
+import { isCalendarDate } from '../../../../lib/format/date'
+import { routeFailure } from '../../../../lib/ops/routeFailure'
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
+import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
+import { commitmentConflict, isBookingConflict } from '../../../../lib/planning/bookingConflict'
+import { createAdminClient } from '../../../../lib/supabase/admin'
+import { applyClassChange } from '../../../../lib/planning/classChange'
+
+const KINDS = ['class', 'work', 'personal', 'travel', 'other']
 
 /**
  * Editing a commitment, and editing a single occurrence of one.
@@ -10,77 +18,71 @@ import { createClient } from '../../../../lib/supabase/server'
  */
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
   const { id } = await params
-  const body = await req.json().catch(() => ({} as any))
+  const body = await req.json().catch(() => null) as Record<string, any> | null
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ ok: false, error: 'The change is incomplete.' }, { status: 400 })
 
-  const { data: commitment } = await supabase
-    .from('calendar_commitments').select('id, recurrence').eq('id', id).eq('user_id', user.id).maybeSingle()
+  // One class, or this and future classes: the previewed, keyed, atomic protocol (see classChange.ts). It is the only writer of occurrence exceptions.
+  if (body.action !== undefined) {
+    const r = await applyClassChange(user.id, id, body)
+    return NextResponse.json(r.body, { status: r.status })
+  }
+  if (body.scope === 'occurrence') {
+    return NextResponse.json({ ok: false, code: 'USE_CHANGE_PROTOCOL', error: 'Preview the change, then confirm it (action occurrence_move, occurrence_cancel or occurrence_restore).' }, { status: 400 })
+  }
+
+  const { data: commitment, error: readError } = await supabase
+    .from('calendar_commitments').select('id, kind, recurrence, start_time, end_time').eq('id', id).eq('user_id', user.id).maybeSingle()
+  if (readError) return routeFailure('commitment.load', 'Your commitment could not be loaded. Try again.', readError)
   if (!commitment) return NextResponse.json({ ok: false, error: 'Commitment not found' }, { status: 404 })
 
-  // A change to one occurrence.
-  if (body.scope === 'occurrence') {
-    if (commitment.recurrence !== 'weekly') {
-      return NextResponse.json({ ok: false, error: 'This commitment does not repeat, so it has no single occurrence to change' }, { status: 400 })
-    }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(body.occurrenceDate)) {
-      return NextResponse.json({ ok: false, error: 'Which date is being changed?' }, { status: 400 })
-    }
-    const kind = body.kind === 'moved' ? 'moved' : 'skipped'
-    if (kind === 'moved' && !/^\d{4}-\d{2}-\d{2}$/.test(body.newDate)) {
-      return NextResponse.json({ ok: false, error: 'A new date is required to move an occurrence' }, { status: 400 })
-    }
-
-    const { data, error } = await supabase.from('commitment_exceptions').upsert({
-      user_id: user.id,
-      commitment_id: id,
-      occurrence_date: body.occurrenceDate,
-      kind,
-      new_date: kind === 'moved' ? body.newDate : null,
-      new_start_time: kind === 'moved' && /^\d{2}:\d{2}$/.test(body.newStartTime ?? '') ? body.newStartTime : null,
-      new_end_time: kind === 'moved' && /^\d{2}:\d{2}$/.test(body.newEndTime ?? '') ? body.newEndTime : null,
-      note: typeof body.note === 'string' ? body.note.slice(0, 500) : null,
-    }, { onConflict: 'commitment_id,occurrence_date' }).select('*').single()
-
-    if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
-    return NextResponse.json({ ok: true, exception: data })
-  }
-
-  // A change to the whole series.
+  // A change to the whole series. A recurring class's days and times never rewrite classes that already happened: use "this and future classes".
+  const bad = (error: string) => NextResponse.json({ ok: false, error }, { status: 400 })
   const updates: Record<string, unknown> = {}
-  if (typeof body.label === 'string' && body.label.trim().length >= 2) updates.label = body.label.trim()
-  if (['class', 'work', 'personal', 'travel', 'other'].includes(body.kind)) updates.kind = body.kind
-  if (/^\d{2}:\d{2}$/.test(body.startTime ?? '')) updates.start_time = body.startTime
-  if (/^\d{2}:\d{2}$/.test(body.endTime ?? '')) updates.end_time = body.endTime
-  if (Array.isArray(body.weekdays)) {
-    updates.weekdays = [...new Set(body.weekdays.map(Number).filter((d: number) => d >= 0 && d <= 6))]
+  if (body.label !== undefined) { if (typeof body.label !== 'string' || body.label.trim().length < 2) return bad('Give the commitment a name'); updates.label = body.label.trim() }
+  if (body.kind !== undefined) { if (!KINDS.includes(body.kind)) return bad('Choose a valid kind'); updates.kind = body.kind }
+  const hhmm = /^([01]\d|2[0-3]):[0-5]\d$/
+  if (body.startTime !== undefined) { if (typeof body.startTime !== 'string' || !hhmm.test(body.startTime)) return bad('Start time must be HH:MM'); updates.start_time = body.startTime }
+  if (body.endTime !== undefined) { if (typeof body.endTime !== 'string' || !hhmm.test(body.endTime)) return bad('End time must be HH:MM'); updates.end_time = body.endTime }
+  if (body.weekdays !== undefined) {
+    if (!Array.isArray(body.weekdays) || body.weekdays.length === 0 || !body.weekdays.every((d: unknown) => Number.isInteger(d) && (d as number) >= 0 && (d as number) <= 6)) return bad('Choose at least one valid day of the week')
+    updates.weekdays = [...new Set(body.weekdays as number[])]
   }
-  if (typeof body.isProtected === 'boolean') updates.is_protected = body.isProtected
-  if (typeof body.endsOn === 'string' || body.endsOn === null) updates.ends_on = body.endsOn
+  if (body.isProtected !== undefined) { if (typeof body.isProtected !== 'boolean') return bad('isProtected must be true or false'); updates.is_protected = body.isProtected }
+  if (body.endsOn !== undefined) { if (body.endsOn !== null && !(typeof body.endsOn === 'string' && isCalendarDate(body.endsOn))) return bad('Choose a valid end date'); updates.ends_on = body.endsOn }
 
-  if (Object.keys(updates).length === 0) {
-    return NextResponse.json({ ok: false, error: 'Nothing to change' }, { status: 400 })
+  if (commitment.kind === 'class' && commitment.recurrence === 'weekly' && ['start_time', 'end_time', 'weekdays', 'ends_on'].some(k => k in updates)) {
+    return NextResponse.json({ ok: false, code: 'USE_FUTURE_EDIT', error: 'Change a class pattern from a chosen date (this and future classes) so earlier classes keep their record.' }, { status: 400 })
   }
+  const mergedStart = String(updates.start_time ?? commitment.start_time ?? '').slice(0, 5), mergedEnd = String(updates.end_time ?? commitment.end_time ?? '').slice(0, 5)
+  if ((updates.start_time || updates.end_time) && mergedStart && mergedEnd && mergedEnd <= mergedStart) return bad('It has to end after it starts')
+  if (Object.keys(updates).length === 0) return bad('Nothing to change')
 
-  const { data, error } = await supabase
+  const { data, error } = await createAdminClient()
     .from('calendar_commitments').update(updates).eq('id', id).eq('user_id', user.id).select('*').single()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error && isBookingConflict(error)) return NextResponse.json(commitmentConflict(error), { status: 409 })
+  if (error) return routeFailure('commitment', 'Could not confirm this change. Check Calendar before trying again.', error)
   return NextResponse.json({ ok: true, commitment: data })
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  const access = await requireApplicationAccess(supabase)
+  if (!access.ok) return access.response
+  const user = access.user
 
   const { id } = await params
   // Archived, not deleted: history that references it stays readable.
-  const { error } = await supabase
-    .from('calendar_commitments').update({ status: 'archived' }).eq('id', id).eq('user_id', user.id)
+  const { data, error } = await createAdminClient()
+    .from('calendar_commitments').update({ status: 'archived' }).eq('id', id).eq('user_id', user.id).select('id').maybeSingle()
 
-  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  if (error && isBookingConflict(error)) return NextResponse.json(commitmentConflict(error), { status: 409 })
+  if (error) return routeFailure('commitment', 'Could not confirm the archive. Check Calendar before trying again.', error)
+  if (!data) return NextResponse.json({ ok: false, error: 'Commitment not found' }, { status: 404 })
   return NextResponse.json({ ok: true, archived: true })
 }

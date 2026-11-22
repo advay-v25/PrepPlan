@@ -10,14 +10,16 @@
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local', quiet: true } as any)
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
+import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from './lib/e2eIdentity'
 import { createSession, completeOnboarding, makeCheck } from './lib/e2eSession'
 
 const { check, finish } = makeCheck()
+import { declareBank } from './lib/bankMode'
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
 const addDays = (d: string, n: number) => new Date(new Date(`${d}T12:00:00Z`).getTime() + n * 86_400_000).toISOString().slice(0, 10)
 
 async function main() {
+  await declareBank(admin, 'e2e-results', ['r028'])
   console.log('\nResults, SWOT and repair\n')
   const s = createSession(admin, getE2EEmail())
   check('signed in', await s.signIn())
@@ -89,7 +91,9 @@ async function main() {
 
   const o = r.analysis.overall
   check('the score matches what was answered', o.answered === items.length && o.correct === expected.correct && o.scorePercent === Math.round((expected.correct / items.length) * 100))
-  check('the score comes with a plausible range, not just a number', Array.isArray(o.interval) && o.interval[0] < o.scorePercent / 100 + 0.001 && o.interval[1] > o.scorePercent / 100 - 0.001)
+  check('the paper score comes from the ledger over delivered questions (policy paper-score.1)', r.ledger.policy === 'paper-score.1' && r.ledger.delivered === items.length && r.ledger.correct === expected.correct && r.ledger.paperScore === expected.correct / items.length && r.ledger.omitted === 0, JSON.stringify(r.ledger))
+  const stored = (await admin.from('assessment_attempts').select('score, valid_response_count, correct_response_count, omitted_count, scoreable_count, delivered_count').eq('id', attemptId).single()).data!
+  check('stored history counts agree with the result ledger after display rounding', stored.score === Math.round(r.ledger.paperScore * 100) && stored.valid_response_count === r.ledger.correct + r.ledger.incorrect && stored.correct_response_count === r.ledger.correct && stored.omitted_count === r.ledger.omitted && stored.scoreable_count === r.ledger.scoreable && stored.delivered_count === r.ledger.delivered, JSON.stringify([stored, r.ledger]))
   const conf = o.confidence
   check('the confidence distribution matches the answers given', (['low', 'medium', 'high'] as const).every(l => conf[l].n === answers.filter(a => a.level === l).length && conf[l].correct === answers.filter(a => a.level === l && a.correct).length))
   check('confident mistakes and correct guesses are counted as answered', r.analysis.patterns.confidentMistakes === expected.confidentMistakes && r.analysis.patterns.correctGuesses === expected.correctGuesses, JSON.stringify(r.analysis.patterns))
@@ -128,9 +132,11 @@ async function main() {
   check('confident misses are repaired before plain gaps', (() => { const t = sw.weaknesses; return t.length === 0 || r.repairs.length > 0 })())
   check('each repair states reason, method and an independent retest', r.repairs.every((x: any) => x.reason && x.method && x.retest.independent === true))
   for (const x of r.repairs.slice(0, 3)) {
-    const { data: bank } = await admin.from('assessment_items').select('id').eq('outcome_id', x.outcomeId).eq('review_status', 'reviewed')
-    const { data: seen } = await admin.from('assessment_responses').select('item_id').eq('user_id', uid)
-    const seenIds = new Set((seen ?? []).map(z => z.item_id)); const unseen = (bank ?? []).filter(b => !seenIds.has(b.id)).length
+    // Fresh = approved for its exact version (the eligible view), not answered, and not a variant of a family the student has answered.
+    const { data: bank } = await admin.from('student_eligible_items').select('id, family_id').eq('outcome_id', x.outcomeId)
+    const { data: seen } = await admin.from('assessment_responses').select('item_id, item:assessment_items(family_id)').eq('user_id', uid)
+    const seenIds = new Set((seen ?? []).map(z => z.item_id)); const seenFam = new Set((seen ?? []).map((z: any) => z.item?.family_id).filter(Boolean))
+    const unseen = (bank ?? []).filter(b => !seenIds.has(b.id) && !(b.family_id && seenFam.has(b.family_id))).length
     check(`the re-check for "${x.title.slice(0, 40)}" reports the real unseen bank (${unseen})`, x.retest.available === unseen)
   }
   void rank
@@ -154,7 +160,8 @@ async function main() {
     check(`the page shows ${label}`, html.includes(needle), needle)
   }
   check('the page warns that the percentage is a snapshot, not a level', /snapshot of this paper/.test(html))
-  check('the page never shows a pass probability or readiness score', !/pass probability|readiness score|you will pass|likely to pass/i.test(html))
+  // A disclaimer that says the page is NOT a pass probability is wanted copy; only an affirmative claim fails.
+  { const claim = html.replace(/not an? [^.<]*?pass probability/gi, '').match(/.{60}(pass probability|readiness score|you will pass|likely to pass).{60}/i); check('the page never shows a pass probability or readiness score', !claim, claim ? claim[0] : '') }
   const firstWrong = r.questions.find((q: any) => !q.isCorrect)
   check('the first missed question is open and links back to its reading in Curriculum', !firstWrong || !firstWrong.extra.readingHref || html.includes(firstWrong.extra.readingHref))
   check('the per-question review carries a working, reasons and tags for every question', r.questions.length === items.length && r.questions.every((q: any) => q.extra && 'solution' in q && Array.isArray(q.extra.tags)))
@@ -163,6 +170,23 @@ async function main() {
   // --- ownership: another student's attempt is not readable
   const { data: other } = await admin.from('assessment_attempts').select('id').neq('user_id', uid).eq('status', 'scored').limit(1)
   if (other?.length) check('another student\'s result is a 404', (await s.json(`/api/tests/attempt/${other[0].id}/result`)).status === 404)
+
+  // --- as-of evidence: a LATER contrary observation changes Current status, never what this paper showed
+  console.log('\nAs-of evidence')
+  const frozen = () => JSON.stringify({ swot: r.swot, f: r.findings.map((f: any) => f.title), repairs: r.repairs.map((x: any) => x.outcomeId) })
+  const beforeNow = (await s.json(`/api/tests/attempt/${attemptId}/result`)).body.result
+  // An outcome that is NOT already a miss, so a later contrary observation visibly changes Current status.
+  const outcomeId = beforeNow.currentStatus.rows.find((x: any) => !['concept_miss', 'known_gap'].includes(x.verdict))?.outcomeId as string
+  check('there is an outcome to plant a later contrary observation on (test setup)', !!outcomeId)
+  const cid = (await admin.from('assessment_items').select('concept_id').eq('outcome_id', outcomeId).not('concept_id', 'is', null).limit(1).single()).data?.concept_id as string
+  check('the result carries its revision and a labelled Current status', beforeNow.revision?.number === 1 && beforeNow.currentStatus?.available === true && typeof beforeNow.currentStatus.asOf === 'string', JSON.stringify([beforeNow.revision, beforeNow.currentStatus?.available]))
+  const planted = await admin.from('evidence_events').insert({ user_id: uid, concept_id: cid, validity: 'valid', is_correct: false, evidence_state: 'needs_repair', self_reported_confidence: 5, assessment_purpose: 'weekly', evidence_mode: 'evidence', item_trust_tier: 'reviewed', scoring_policy_version: 'paper-score.1', created_at: new Date(Date.now() + 60_000).toISOString() }).select('id').single()
+  check('a later contrary observation is recorded (test setup)', !planted.error, planted.error?.message)
+  const afterB = (await s.json(`/api/tests/attempt/${attemptId}/result`)).body.result
+  check('paper A\'s findings, SWOT and repairs are unchanged by paper B', JSON.stringify({ swot: afterB.swot, f: afterB.findings.map((f: any) => f.title), repairs: afterB.repairs.map((x: any) => x.outcomeId) }) === frozen())
+  const rowNow = afterB.currentStatus.rows.find((x: any) => x.outcomeId === outcomeId), rowBefore = beforeNow.currentStatus.rows.find((x: any) => x.outcomeId === outcomeId)
+  check('Current status reflects the later observation (a miss now outranks the earlier result)', rowNow && ['concept_miss', 'known_gap'].includes(rowNow.verdict) && rowNow.verdict !== rowBefore?.verdict, JSON.stringify([rowBefore, rowNow]))
+  if (planted.data?.id) await admin.from('evidence_events').delete().eq('id', planted.data.id as string)
 
   await admin.from('paper_scope_snapshots').delete().eq('user_id', uid)
   await admin.from('plan_blocks').delete().eq('user_id', uid).like('id', 'rs-%')

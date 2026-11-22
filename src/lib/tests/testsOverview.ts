@@ -1,18 +1,21 @@
+import { decideAssessment, type AssessmentDecision } from './assessmentDecision'
 import { createAdminClient } from '../supabase/admin'
-import { allowedTiers } from '../diagnostic/blueprint'
 import { getLosTracker } from '../curriculum/losTrackerService'
 import { isPersistedPaperScope, getPaperManifestId, countUnseenEligibleByModule } from '../planning/pulse/paper'
-import { MOCK_MINUTES, MOCK_QUESTIONS } from './limits'
 import type { PaperPreview } from './paperPreview'
 
 export type WeeklyPaperState = {
   primary:
     | { kind: 'no_scope'; reason: string }
     | { kind: 'confirm_scope'; unresolved: number }
-    | { kind: 'start'; deliverable: number; needed: number; blocked: string | null }
+    | { kind: 'start'; deliverable: number; needed: number; blocked: string | null; stale: boolean }
     | { kind: 'resume'; attemptId: string }
     | { kind: 'result'; attemptId: string; closureUrl: string }
   paperLabel: string
+  /** The shared assessment decision this card was built from (pending scope, trade-off, next action). */
+  decision: AssessmentDecision | null
+  /** After a scored paper: a further paper from the confirmed scope it left pending, if there is any and the bank can serve it. */
+  further: AssessmentDecision | null
   /** What changed since Calendar planned this paper. */
   planned: { blockTitle: string | null; date: string | null; plannedReadings: string[]; completedReadings: string[]; notCompleted: string[]; addedSincePlanned: string[] } | null
 }
@@ -37,26 +40,28 @@ export async function getWeeklyPaperState(userId: string, preview: PaperPreview)
     }
   }
 
+  const { decision } = await decideAssessment(userId, { kind: 'weekly' }, { preview })
+  const mk = (primary: WeeklyPaperState['primary'], paperLabel = label, further: AssessmentDecision | null = null): WeeklyPaperState => ({ primary, paperLabel, planned, decision, further })
   if (cycleId) {
-    const { data: attempts } = await admin.from('assessment_attempts').select('id, status').eq('user_id', userId).eq('cycle_id', cycleId).eq('attempt_kind', 'weekly').order('started_at', { ascending: false, nullsFirst: true })
+    const { data: attempts } = await admin.from('assessment_attempts').select('id, status, paper_kind').eq('user_id', userId).eq('cycle_id', cycleId).eq('attempt_kind', 'weekly').order('started_at', { ascending: false, nullsFirst: true }).throwOnError()
     const scored = (attempts ?? []).find(a => a.status === 'scored')
     const open = (attempts ?? []).find(a => ['ready', 'in_progress'].includes(a.status as string))
-    if (open) return { primary: { kind: 'resume', attemptId: open.id as string }, paperLabel: label, planned }
-    if (scored) return { primary: { kind: 'result', attemptId: scored.id as string, closureUrl: '/app/review-week' }, paperLabel: label, planned }
+    const frozenLabel = (kind: string | null) => kind === 'diagnostic' ? 'Weekly diagnostic (new material)' : kind === 'revisionary' ? 'Weekly revisionary paper (revisited material)' : kind === 'mixed' ? 'Weekly mixed paper (new + revisionary)' : label
+    if (open) return mk({ kind: 'resume', attemptId: open.id as string }, frozenLabel(open.paper_kind))
+    if (scored) {
+      const next = (await decideAssessment(userId, { kind: 'weekly', part: 2 })).decision
+      return mk({ kind: 'result', attemptId: scored.id as string, closureUrl: '/app/review-week' }, frozenLabel(scored.paper_kind), next.state === 'start' ? next : null)
+    }
   }
-  if (preview.noPaperReason) return { primary: { kind: 'no_scope', reason: preview.noPaperReason }, paperLabel: label, planned }
-  if (preview.scope.unresolved.length > 0) return { primary: { kind: 'confirm_scope', unresolved: preview.scope.unresolved.length }, paperLabel: label, planned }
-  const short = new Map(preview.blueprint.bankShortfalls.map(x => [x.readingId, x.available]))
-  const deliverable = preview.blueprint.perReading.reduce((n, r) => n + Math.min(r.questions, short.has(r.readingId) ? short.get(r.readingId)! : r.questions), 0)
-  const needed = 5
-  return { primary: { kind: 'start', deliverable, needed, blocked: deliverable < needed ? `The question bank can serve ${deliverable} unseen approved question${deliverable === 1 ? '' : 's'} for this scope; at least ${needed} are needed. Nothing will be started with fewer.` : null }, paperLabel: label, planned }
+  if (decision.state === 'confirm_scope') return mk({ kind: 'confirm_scope', unresolved: decision.pending.unresolvedBlocks })
+  if (decision.state === 'no_scope' || decision.state === 'no_cycle') return mk({ kind: 'no_scope', reason: decision.message ?? 'There is no weekly paper yet.' })
+  return mk({ kind: 'start', deliverable: decision.deliverable, needed: decision.needed, blocked: decision.state === 'start' ? null : decision.message, stale: decision.state === 'stale' })
 }
 
 export type OtherAssessments = {
   readings: { id: string; subjectId: string; name: string; outcomes: number }[]
   subjects: { id: string; name: string; outcomes: number }[]
   repair: { count: number }
-  mock: { unseenApproved: number; needed: number; eligible: boolean; questions: number; minutes: number }
 }
 
 export async function getOtherAssessments(userId: string, preview: PaperPreview): Promise<OtherAssessments> {
@@ -77,8 +82,8 @@ export async function getOtherAssessments(userId: string, preview: PaperPreview)
   let unseen = 0
   if (manifestId) {
     const all = (readings ?? []).map(r => r.id as string)
-    const counts = await countUnseenEligibleByModule(userId, manifestId, all, allowedTiers('weekly_cumulative'))
+    const counts = await countUnseenEligibleByModule(userId, manifestId, all)
     unseen = [...counts.values()].reduce((s, n) => s + n, 0)
   }
-  return { readings: readingList, subjects, repair: { count: repair }, mock: { unseenApproved: unseen, needed: MOCK_QUESTIONS, eligible: unseen >= MOCK_QUESTIONS, questions: MOCK_QUESTIONS, minutes: MOCK_MINUTES } }
+  return { readings: readingList, subjects, repair: { count: repair } }
 }

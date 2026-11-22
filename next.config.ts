@@ -1,26 +1,22 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Lets a second, isolated server run without overwriting the build another server is serving.
+  distDir: process.env.NEXT_DIST_DIR ?? '.next',
+  allowedDevOrigins: (process.env.ROADMAP_DEV_HOSTS ?? '').split(',').map(host => host.trim()).filter(host => /^[a-z\d.-]+$/i.test(host)),
+  poweredByHeader: false,
+  logging: { incomingRequests: { ignore: [/\/auth\/confirm(?:[?\s]|$)/, /\/auth\/callback(?:[?\s]|$)/] } },
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on'
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block'
-          },
+          ...(process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_SITE_URL?.startsWith('https://')
+            ? [{ key: 'Strict-Transport-Security', value: 'max-age=31536000' }]
+            : []),
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
+            value: 'DENY'
           },
           {
             key: 'Permissions-Policy',
@@ -32,7 +28,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
+            value: 'strict-origin-when-cross-origin'
           }
         ]
       }

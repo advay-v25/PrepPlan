@@ -70,7 +70,7 @@ mockState.today.blocks[0].placement = 'timed'
 mockState.today.blocks[0].startsAt = '2026-09-19T10:00:00Z'
 eq('timed action opens its exact task', selectNextAction(mockState).destination, calendarTaskHref('study-1', mockState.today.dateLocal))
 mockState.today.blocks[0].placement = 'floating'
-eq('unplaced action opens its exact task', selectNextAction(mockState).destination, calendarTaskHref('study-1', mockState.today.dateLocal))
+eq('unplaced action opens its task, at Calendar’s “Not yet placed” section', selectNextAction(mockState).destination, `${calendarTaskHref('study-1', mockState.today.dateLocal)}#unplaced`)
 
 console.log(`\n${passed} passed, ${failed} failed\n`)
 if (failed > 0) process.exit(1)

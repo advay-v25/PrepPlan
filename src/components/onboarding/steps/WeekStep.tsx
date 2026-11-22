@@ -9,6 +9,8 @@ import { Notice } from '../../ui/Notice'
 import type { OnboardingState } from '../OnboardingShell'
 
 const SESSION_LENGTHS = [20, 30, 45, 60, 90]
+/** Used when the student gives no windows: sittings are still split by a length, so the contract needs one. It is shown, never hidden. */
+const DEFAULT_SITTING = 90
 
 type Win = { id: string; weekday: number; startTime: string; endTime: string }
 type Fixed = { id: string; label: string; weekdays: number[]; startTime: string; endTime: string }
@@ -19,6 +21,7 @@ const PRESETS: { id: string; label: string; days: number[]; start: string; end: 
   { id: 'pm', label: 'Weekday evenings', days: [1, 2, 3, 4, 5], start: '18:30', end: '21:30' },
   { id: 'we', label: 'Weekends', days: [6, 0], start: '09:00', end: '13:00' },
 ]
+const SELF_STUDY_ROUTES = ['self_study', 'self_paced_course']
 
 const hhmm = (v: unknown, f: string) => (v ? String(v).slice(0, 5) : f)
 
@@ -47,6 +50,9 @@ export function WeekStep({
 
   const classes = (state.commitments ?? []).filter(c => c.kind === 'class' && (c as any).recurrence !== 'none')
   const usingWindows = mode === 'windows' || mode === null
+  // Self-study closes the week on Sunday with the paper and review, so Sunday time is not new-study time there.
+  const selfStudy = SELF_STUDY_ROUTES.includes(String(state.profile?.prep_mode ?? 'self_study'))
+  const effectiveSession = maxSession ?? (usingWindows ? null : DEFAULT_SITTING)
 
   const problem = useMemo(() => {
     if (!usingWindows) return null
@@ -60,14 +66,14 @@ export function WeekStep({
     let reason: string | null = null
     if (effective === 'windows' && windows.length === 0) { canContinue = false; reason = 'Choose at least one time for study, or say your schedule cannot be set yet.' }
     else if (problem) { canContinue = false; reason = problem }
-    else if (maxSession === null) { canContinue = false; reason = 'Choose your longest comfortable sitting.' }
+    else if (effectiveSession === null) { canContinue = false; reason = 'Choose your longest comfortable sitting.' }
     onChange({
       availabilityMode: effective,
       windows: effective === 'windows' ? windows.map(w => ({ weekday: w.weekday, startTime: w.startTime, endTime: w.endTime })) : [],
       commitments: fixed.filter(f => f.weekdays.length).map(f => ({ label: f.label.trim(), kind: 'other', weekdays: f.weekdays, startTime: f.startTime, endTime: f.endTime })),
-      maxSessionMinutes: maxSession ?? undefined,
+      maxSessionMinutes: effectiveSession ?? undefined,
     }, canContinue, reason)
-  }, [mode, windows, fixed, maxSession, problem, onChange])
+  }, [mode, windows, fixed, effectiveSession, problem, onChange])
 
   const has = (p: (typeof PRESETS)[number]) => p.days.every(d => windows.some(w => w.weekday === d && w.startTime === p.start && w.endTime === p.end))
   function togglePreset(p: (typeof PRESETS)[number]) {
@@ -90,7 +96,7 @@ export function WeekStep({
           {PRESETS.map(p => (
             <button key={p.id} type="button" className={`ob-tile ob-tile--compact ${usingWindows && has(p) ? 'is-selected' : ''}`}
               aria-pressed={usingWindows && has(p)} onClick={() => togglePreset(p)}>
-              <strong>{p.label}</strong><small>{p.start}–{p.end}</small>
+              <strong>{p.label}</strong><small>{p.id === 'we' && selfStudy ? `Sat ${p.start}–${p.end} · Sun is paper and review` : `${p.start}–${p.end}`}</small>
             </button>
           ))}
         </div>
@@ -150,6 +156,9 @@ export function WeekStep({
             </button>
           ))}
         </div>
+        {!usingWindows && maxSession === null && (
+          <p className="fine-print" role="status">{DEFAULT_SITTING} min is used for now. Roadmap still needs a sitting length to split work later; it has no study times to place yet. Choose another length any time.</p>
+        )}
       </section>
 
       <section className="mt-8">

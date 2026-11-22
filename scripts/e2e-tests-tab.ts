@@ -18,11 +18,10 @@ import * as dotenv from 'dotenv'
 
 dotenv.config({ path: '.env.local', quiet: true } as any)
 
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
+import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, E2E_BASE_URL } from './lib/e2eIdentity'
 
 const BASE = E2E_BASE_URL
 const EMAIL = getE2EEmail()
-const MANIFEST_ID = '11111111-1111-1111-1111-111111111111'
 
 let passed = 0
 let failed = 0
@@ -75,19 +74,8 @@ async function signIn() {
   const { data, error } = await admin.auth.admin.generateLink({ type: 'magiclink', email: EMAIL })
   if (error) throw new Error(`Could not generate a login link: ${error.message}`)
 
-  const token = (data.properties as any).hashed_token
-  // Follow the redirect chain by hand so every Set-Cookie is captured.
-  let path = `/auth/confirm?token_hash=${token}&type=magiclink&next=/app/tests`
-  for (let hop = 0; hop < 5; hop++) {
-    const res = await req(path)
-    const location = res.headers.get('location')
-    if (!location) break
-    const next = new URL(location, BASE)
-    if (next.origin !== new URL(BASE).origin) throw new Error(`Login redirected off-origin: ${location}`)
-    path = next.pathname + next.search
-    if (path.startsWith('/app')) break
-  }
-  check('signed in', path.startsWith('/app'), `ended at ${path}`)
+  const result = await postJson('/api/auth', { action: 'verify', type: 'magiclink', tokenHash: data.properties.hashed_token, next: '/app/tests' })
+  check('signed in', result.status === 200 && result.body?.next === '/app/tests')
 }
 
 async function main() {
@@ -121,19 +109,19 @@ async function main() {
   const indexHtml = await indexRes.text()
   check('page renders', indexRes.status === 200, `status ${indexRes.status}`)
   check('is not the unauthorized fallback', !indexHtml.includes('>Unauthorized<'))
-  check('offers a way to start', indexHtml.includes('name="purpose"'))
-  check('shows the bank breakdown', indexHtml.includes('Verifier-passed'))
+  check('shows the three views, This week first', indexHtml.includes('aria-label="Tests views"') && indexHtml.includes('This week') && indexHtml.includes('Practice and checks') && indexHtml.includes('Mocks'))
+  check('shows ONE primary weekly card with an action that works (or a precise reason)', (indexHtml.match(/class="weekly-card"/g) ?? []).length >= 1 && /Review and start|Resume paper|See result|Confirm what you covered|Open Calendar|Continue planning|Plan the week|You sat the exam|Review and start early/.test(indexHtml))
+  check('no raw global bank statistics or evidence sidebar on the first view', !indexHtml.includes('Questions left for you') && !indexHtml.includes('Human reviewed') && !indexHtml.includes('More checks (module and concept)'))
+  check('history is below, with a header link to it', indexHtml.includes('id="history"') && indexHtml.includes('href="#history"'))
+  for (const v of ['practice', 'mocks']) { const r = await req(`/app/tests?view=${v}`); check(`?view=${v} renders`, r.status === 200 && (await r.text()).includes('aria-current="page"')) }
+  check('an unknown view falls back to This week', (await (await req('/app/tests?view=nonsense')).text()).includes('This week'))
 
   console.log('\nAssembling a diagnostic')
-  const start = await postJson('/api/diagnostic/attempt', {
-    manifestId: MANIFEST_ID,
-    purpose: 'module_diagnostic',
-    constraints: { maxQuestions: 6 },
-  })
+  const start = await postJson('/api/tests/start', { kind: 'reading', readingId: 'r028', baseline: true })
   check('attempt created', start.body?.ok === true, JSON.stringify(start.body))
   const attemptId: string = start.body?.attemptId
   if (!attemptId) { console.log('\nCannot continue without an attempt.'); return finish() }
-  check('form has questions', (start.body?.itemCount ?? 0) > 0, `itemCount ${start.body?.itemCount}`)
+  check('form has questions', (start.body?.questions ?? 0) > 0, `questions ${start.body?.questions}`)
 
   console.log('\nAnswering')
   let answeredIds: string[] = []
@@ -207,13 +195,10 @@ async function main() {
   })
   check('an out-of-range option is refused', badOption.status === 409 || badOption.status === 400, `status ${badOption.status}`)
 
-  const badPurpose = await postJson('/api/diagnostic/attempt', { manifestId: MANIFEST_ID, purpose: 'nonsense' })
-  check('an unknown purpose is refused', badPurpose.status === 400, `status ${badPurpose.status}`)
-
-  const badManifest = await postJson('/api/diagnostic/attempt', {
-    manifestId: '00000000-0000-0000-0000-000000000000', purpose: 'module_diagnostic',
-  })
-  check('an unknown manifest is refused', badManifest.status === 400 && !badManifest.body.ok, JSON.stringify(badManifest.body))
+  const badKind = await postJson('/api/tests/start', { kind: 'nonsense' })
+  check('an unknown assessment type is refused', badKind.status === 400, `status ${badKind.status}`)
+  const badReading = await postJson('/api/tests/start', { kind: 'reading', readingId: 'no-such-reading', baseline: true })
+  check('an unknown reading cannot reserve a paper', badReading.status === 409 && badReading.body.code === 'no_scope', JSON.stringify(badReading.body))
 
   const emptyChallenge = await postJson('/api/diagnostic/challenge', { itemId: answeredIds[0], comment: '' })
   check('a challenge with no reason is refused', emptyChallenge.status === 400, `status ${emptyChallenge.status}`)
@@ -229,7 +214,7 @@ async function main() {
   })
   const { data: pendingItem } = await admin2
     .from('assessment_items')
-    .select('id, concept_id')
+    .select('id, concept_id, item_version')
     .eq('review_status', 'verified')
     .limit(1)
     .maybeSingle()
@@ -240,40 +225,35 @@ async function main() {
     // Force the concept back to drafted so the gate is tested from a known state.
     await admin2.from('curriculum_concepts').update({ verification_status: 'drafted' }).eq('id', pendingItem.concept_id)
 
-    const blocked = await postJson(`/api/diagnostic/items/${encodeURIComponent(pendingItem.id)}/review`, { decision: 'approve' })
-    check('promoting on an unsigned concept is refused', blocked.status === 409 && blocked.body?.code === 'CONCEPT_UNVERIFIED',
+    const blocked = await postJson(`/api/diagnostic/items/${encodeURIComponent(pendingItem.id)}/review`, { decision: 'approve', expectedVersion: pendingItem.item_version })
+    check('promoting on an unsigned concept is refused', blocked.status === 409 && blocked.body?.code === 'BLOCKED' && JSON.stringify(blocked.body?.blockers).includes('signed off'),
       `${blocked.status} ${JSON.stringify(blocked.body)}`)
 
-    const rejectNoReason = await postJson(`/api/diagnostic/items/${encodeURIComponent(pendingItem.id)}/review`, { decision: 'reject' })
+    const rejectNoReason = await postJson(`/api/diagnostic/items/${encodeURIComponent(pendingItem.id)}/review`, { decision: 'reject', expectedVersion: pendingItem.item_version })
     check('rejecting without a reason is refused', rejectNoReason.status === 400, `status ${rejectNoReason.status}`)
 
-    const badDecision = await postJson(`/api/diagnostic/items/${encodeURIComponent(pendingItem.id)}/review`, { decision: 'maybe' })
+    const badDecision = await postJson(`/api/diagnostic/items/${encodeURIComponent(pendingItem.id)}/review`, { decision: 'maybe', expectedVersion: pendingItem.item_version })
     check('an unknown decision is refused', badDecision.status === 400, `status ${badDecision.status}`)
 
-    const signOff = await postJson(`/api/curriculum/concepts/${pendingItem.concept_id}/verify`, { verified: true })
-    check('a concept with scope can be signed off', signOff.body?.ok === true, JSON.stringify(signOff.body))
+    // Negative paths only: a real concept is never signed off by a test run (sign-off is a recorded human decision; the positive path is proven on a fixture by reviewer-signoff-db-test).
+    const legacy = await postJson(`/api/curriculum/concepts/${pendingItem.concept_id}/verify`, { verified: true })
+    check('the old body shape ({verified:true}) approves nothing', legacy.status === 400, `${legacy.status} ${JSON.stringify(legacy.body)}`)
+    const empty = await postJson(`/api/curriculum/concepts/${pendingItem.concept_id}/verify`, {})
+    check('an empty body approves nothing', empty.status === 400, `${empty.status}`)
+    const noConfirm = await postJson(`/api/curriculum/concepts/${pendingItem.concept_id}/verify`, { decision: 'verify', expectedScopeHash: 'x', rationale: 'long enough reason' })
+    check('sign-off without the explicit confirmation is refused', noConfirm.status === 400, `${noConfirm.status}`)
+    const stale = await postJson(`/api/curriculum/concepts/${pendingItem.concept_id}/verify`, { decision: 'verify', expectedScopeHash: 'not-the-scope-shown', rationale: 'long enough reason', confirmScope: true })
+    check('a scope hash that is not the current scope is refused', stale.status === 409 && stale.body?.code === 'STALE_SCOPE', `${stale.status} ${JSON.stringify(stale.body)}`)
+    const stillPending = (await admin2.from('curriculum_concepts').select('verification_status').eq('id', pendingItem.concept_id).single()).data?.verification_status
+    check('none of those changed the concept', stillPending === 'drafted', String(stillPending))
 
-    // Leave the manifest exactly as it was found: promoting items to gold is a
-    // judgement call for a person, not something a test run should decide.
-    await admin2.from('curriculum_concepts').update({ verification_status: 'drafted' }).eq('id', pendingItem.concept_id)
-
-    const { data: noScope } = await admin2
-      .from('curriculum_concepts')
-      .select('id')
-      .is('scope_notes', null)
-      .limit(1)
-      .maybeSingle()
-    if (noScope) {
-      const bare = await postJson(`/api/curriculum/concepts/${noScope.id}/verify`, { verified: true })
-      check('a concept with no scope cannot be signed off', bare.status === 409, `status ${bare.status}`)
-    }
   }
 
   console.log('\nManifest page')
   const manifestRes = await req('/app/tests/manifest')
   const manifestHtml = await manifestRes.text()
   check('manifest page renders', manifestRes.status === 200, `status ${manifestRes.status}`)
-  check('shows what is blocked from gold', manifestHtml.includes('blocked from gold'))
+  check('shows what is blocked from publication', manifestHtml.includes('blocked from publication'))
 
   console.log('\nReview queue')
   const reviewRes = await req('/app/tests/review')

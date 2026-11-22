@@ -29,6 +29,7 @@ export const ROUTES = {
     curriculum: '/app/curriculum',
     tests: '/app/tests',
     coach: '/app/coach',
+    exam: '/app/exam',
     settings: '/app/settings',
     logLearning: '/app/log',
   }
@@ -68,22 +69,9 @@ export function isNavigationItemActive(
   return pathname === item.href || pathname.startsWith(`${item.href}/`)
 }
 
-/**
- * Checks if a path is an authenticated app route.
- */
-export function isAppRoute(path: string): boolean {
-  return path === ROUTES.app.root || path.startsWith(`${ROUTES.app.root}/`)
-}
 
-/**
- * Checks if a path is part of the onboarding flow.
- */
-export function isOnboardingRoute(path: string): boolean {
-  return path === ROUTES.onboarding.root || path.startsWith(`${ROUTES.onboarding.root}/`)
-}
-
-/** Where a completed student may be sent back to after editing a setup section. Nothing else is honoured. */
-const RETURN_ALLOWLIST: readonly string[] = [ROUTES.app.settings]
+/** The exact destinations an editor may return to. */
+const RETURN_ALLOWLIST: readonly string[] = [ROUTES.onboarding.plan, ROUTES.app.root, ROUTES.app.calendar, ROUTES.app.curriculum, ROUTES.app.settings, ROUTES.app.exam, `${ROUTES.app.root}/review-week`, ROUTES.app.coach]
 
 export function safeReturnTo(value: string | null | undefined): string | null {
   return value && RETURN_ALLOWLIST.includes(value) ? value : null

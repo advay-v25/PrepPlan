@@ -1,51 +1,151 @@
 "use client"
 
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, CheckCircle2, Mail } from 'lucide-react'
-import { createClient } from '../../lib/supabase/client'
+import { authRequest } from '../../lib/auth/authRequest'
+import { MIN_PASSWORD_LENGTH, passwordRule, TURNSTILE_SITE_KEY, VERIFICATION_TYPES, type VerificationType } from '../../lib/auth/authPolicy'
+import { TurnstileCheck } from './TurnstileCheck'
 
-export function ForgotPasswordForm() {
-  const [email, setEmail] = useState(''); const [sent, setSent] = useState(false); const [loading, setLoading] = useState(false); const [error, setError] = useState('')
-  const submit = async (event: FormEvent) => {
-    event.preventDefault(); setLoading(true); setError('')
-    const supabase = createClient()
-    // A missing account never errors here (Supabase's own anti-enumeration
-    // behaviour — it would otherwise let an attacker probe which emails are
-    // registered), but a real failure like rate-limiting does, and silently
-    // showing "check your inbox" for that left someone waiting for an email
-    // that was never sent, with no way to know why.
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/update-password` })
-    if (resetError) { setError('We could not send that right now. Wait a few minutes and try again.'); setLoading(false); return }
-    setSent(true); setLoading(false)
+function EmailRequest({ action }: { action: 'forgot' | 'resend' }) {
+  const reset = action === 'forgot'
+  const [email, setEmail] = useState('')
+  const [captcha, setCaptcha] = useState('')
+  const [attempt, setAttempt] = useState(0)
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState('')
+
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    if (sending || (TURNSTILE_SITE_KEY && !captcha)) return
+    setSending(true)
+    setError('')
+    try {
+      const result = await authRequest(action, { email, captchaToken: captcha || undefined })
+      if (result.ok) setSent(true)
+      else setError(result.data?.error ?? 'Roadmap could not confirm the request. Wait a moment and try again.')
+    } catch {
+      setError('Roadmap could not confirm the request. Wait a moment and try again.')
+    } finally {
+      setCaptcha('')
+      setAttempt(value => value + 1)
+      setSending(false)
+    }
   }
-  return <AuthCard>{sent ? <div className="auth-state"><CheckCircle2 size={40} /><h1>Check your inbox</h1><p>If an account exists for <strong>{email}</strong>, you&apos;ll receive a secure password-reset link. Open it on this same device.</p><button className="auth-primary" onClick={() => setSent(false)}>Send again</button><Link href="/login">Return to sign in</Link></div> : <><Link href="/login" className="auth-back"><ArrowLeft size={17} /> Back to sign in</Link><Mail size={30} className="auth-state-icon" /><h1>Reset your password</h1><p className="auth-lede">Enter your account email. We&apos;ll send a single-use recovery link.</p><form className="auth-form" onSubmit={submit}><label>Email<input type="email" required autoFocus value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" /></label>{error ? <p className="auth-error" role="alert">{error}</p> : null}<button className="auth-primary" disabled={loading}>{loading ? 'Sending…' : 'Send reset link'} <ArrowRight size={18} /></button></form></>}</AuthCard>
+
+  return <AuthCard>
+    {sent ? <div className="auth-state">
+      <CheckCircle2 size={40} aria-hidden />
+      <h1>Check your inbox</h1>
+      <p>{reset ? 'If this address can receive a password reset, you’ll get a link to choose a new password.' : 'If this address is awaiting verification, you’ll get a confirmation link.'}</p>
+      <p className="auth-fine">Check your spam folder and give the email a few minutes to arrive.</p>
+      <Link className="auth-primary" href="/login">Return to sign in</Link>
+      <button type="button" className="text-button" onClick={() => setSent(false)}>Use another email address</button>
+    </div> : <>
+      <Link href="/login" className="auth-back"><ArrowLeft size={17} /> Back to sign in</Link>
+      <Mail size={30} className="auth-state-icon" aria-hidden />
+      <h1>{reset ? 'Reset your password' : 'Verify your email'}</h1>
+      <p className="auth-lede">{reset ? 'Enter your email address to request a single-use password-reset link.' : 'If your email still needs verification, open the link in your inbox to continue. You can request a fresh link below.'}</p>
+      <form className="auth-form" onSubmit={submit}>
+        <label>Email<input type="email" required autoComplete="email" maxLength={254} value={email} onChange={event => setEmail(event.target.value)} placeholder="you@example.com" /></label>
+        <TurnstileCheck onToken={setCaptcha} attempt={attempt} />
+        {error ? <p className="auth-error" role="alert">{error}</p> : null}
+        <button type="submit" className="auth-primary" disabled={sending || !!TURNSTILE_SITE_KEY && !captcha}>
+          {sending ? 'Requesting…' : reset ? 'Send reset link' : 'Send confirmation link'} <ArrowRight size={18} />
+        </button>
+      </form>
+    </>}
+  </AuthCard>
+}
+
+export function ForgotPasswordForm() { return <EmailRequest action="forgot" /> }
+export function CheckEmail() { return <EmailRequest action="resend" /> }
+
+type EmailLink = { type: VerificationType; tokenHash: string; next?: string; intent?: string }
+
+export function VerificationForm() {
+  const [link, setLink] = useState<EmailLink | null | undefined>()
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const initialized = useRef(false)
+
+  useEffect(() => {
+    if (initialized.current) return
+    initialized.current = true
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    const type = params.get('type') as VerificationType
+    const tokenHash = params.get('token_hash')
+    const intent = params.get('intent') ?? undefined
+    setLink(VERIFICATION_TYPES.includes(type) && tokenHash && (type !== 'recovery' || intent)
+      ? { type, tokenHash, intent, next: params.get('next') ?? undefined } : null)
+    if (window.location.hash) window.history.replaceState(window.history.state, '', window.location.pathname)
+  }, [])
+
+  async function verify() {
+    if (!link || loading) return
+    setLoading(true)
+    setError('')
+    try {
+      const result = await authRequest('verify', link)
+      if (result.ok && result.data?.next) { window.location.assign(result.data.next); return }
+      setError(result.data?.error ?? 'Verification could not be confirmed. Try again or request a new link.')
+    } catch { setError('Verification could not be confirmed. Try again or request a new link.') }
+    finally { setLoading(false) }
+  }
+
+  return <AuthCard><div className="auth-state">
+    <Mail size={30} className="auth-state-icon" aria-hidden />
+    <h1>{link?.type === 'recovery' ? 'Confirm password reset' : link?.type === 'magiclink' ? 'Confirm sign-in' : 'Confirm your email'}</h1>
+    {link === undefined ? <p role="status">Checking the link…</p> : link === null ? <p>This link can’t be used. Request a fresh email link to continue.</p> : <>
+      <p>Continue when you’re ready to use this single-use link.</p>
+      <button type="button" className="auth-primary" onClick={verify} disabled={loading}>{loading ? 'Confirming…' : 'Continue'}</button>
+    </>}
+    {error ? <p className="auth-error" role="alert">{error}</p> : null}
+    {link?.type === 'recovery' ? <p><Link href="/update-password">Already confirmed? Choose your new password</Link> · <Link href="/forgot-password">Request a new reset email</Link></p> : <Link href="/check-email">Request a new confirmation email</Link>}
+    <Link href="/login">Return to sign in</Link>
+  </div></AuthCard>
 }
 
 export function UpdatePasswordForm() {
-  const router = useRouter(); const [password, setPassword] = useState(''); const [confirm, setConfirm] = useState(''); const [error, setError] = useState(''); const [loading, setLoading] = useState(false)
-  const submit = async (event: FormEvent) => { event.preventDefault(); setError(''); if (password.length < 8) { setError('Use at least 8 characters.'); return } if (password !== confirm) { setError('The passwords do not match.'); return } setLoading(true); const supabase = createClient(); const { error: updateError } = await supabase.auth.updateUser({ password }); if (updateError) { setError('This recovery link is invalid or expired. Request a new one.'); setLoading(false); return } 
-    // 'global' clears the current session too, not just other devices — a
-    // password change should always require signing back in, and /login now
-    // redirects an already-authenticated visitor straight to /app, which
-    // would otherwise skip this confirmation entirely.
-    await supabase.auth.signOut({ scope: 'global' })
-    router.replace('/login?reset=success')
-  }
-  return <AuthCard><h1>Choose a new password</h1><p className="auth-lede">Use a password you do not use for another account.</p><form className="auth-form" onSubmit={submit}><label>New password<input type="password" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label><label>Confirm password<input type="password" autoComplete="new-password" value={confirm} onChange={(event) => setConfirm(event.target.value)} required /></label>{error ? <p className="auth-error">{error}</p> : null}<button className="auth-primary" disabled={loading}>{loading ? 'Updating…' : 'Update password'} <ArrowRight size={18} /></button></form></AuthCard>
-}
+  const [password, setPassword] = useState('')
+  const [confirmation, setConfirmation] = useState('')
+  const [error, setError] = useState('')
+  const [newLinkRequired, setNewLinkRequired] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-export function CheckEmail({ email }: { email?: string }) {
-  const [resent, setResent] = useState(false); const [loading, setLoading] = useState(false)
-  const resend = async () => {
-    if (!email) return
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    if (loading || newLinkRequired) return
+    const rule = passwordRule(password)
+    if (rule) { setError(rule); return }
+    if (password !== confirmation) { setError('The passwords do not match.'); return }
     setLoading(true)
-    const supabase = createClient()
-    await supabase.auth.resend({ type: 'signup', email })
-    setResent(true); setLoading(false)
+    setError('')
+    try {
+      const result = await authRequest('update', { password })
+      if (result.ok && result.data?.next) { window.location.assign(result.data.next); return }
+      setError(result.data?.error ?? 'Roadmap could not confirm the password change.')
+      setNewLinkRequired(result.data?.code === 'RECOVERY_REQUIRED' || result.data?.code === 'RESET_OUTCOME_UNKNOWN')
+    } catch {
+      setError('Roadmap could not confirm the password change. Try signing in with the new password or request a fresh link.')
+      setNewLinkRequired(true)
+    } finally { setLoading(false) }
   }
-  return <AuthCard><div className="auth-state"><Mail size={40} /><h1>Verify your email</h1><p>We sent a confirmation link{email ? <> to <strong>{email}</strong></> : null}. Open it on this device to continue setup.</p><p className="auth-fine">The link may take a minute to arrive. Check spam before requesting another.</p>{email && (resent ? <p className="auth-fine">Sent again — check your inbox.</p> : <button type="button" className="text-button" onClick={resend} disabled={loading}>{loading ? 'Sending…' : 'Resend confirmation email'}</button>)}<Link className="auth-primary" href="/login">Return to sign in</Link></div></AuthCard>
+
+  return <AuthCard>
+    <h1>Choose a new password</h1>
+    <p className="auth-lede">Use a unique passphrase of at least {MIN_PASSWORD_LENGTH} characters.</p>
+    <form className="auth-form" onSubmit={submit}>
+      <label>New password<input type="password" autoComplete="new-password" minLength={MIN_PASSWORD_LENGTH} maxLength={72} value={password} onChange={event => setPassword(event.target.value)} required /></label>
+      <label>Confirm password<input type="password" autoComplete="new-password" maxLength={72} value={confirmation} onChange={event => setConfirmation(event.target.value)} required /></label>
+      {error ? <p className="auth-error" role="alert">{error}</p> : null}
+      {newLinkRequired ? <Link href="/forgot-password">Request a new reset email</Link> : <button type="submit" className="auth-primary" disabled={loading}>{loading ? 'Updating…' : 'Update password'} <ArrowRight size={18} /></button>}
+      <Link href="/login">Return to sign in</Link>
+    </form>
+  </AuthCard>
 }
 
-function AuthCard({ children }: { children: React.ReactNode }) { return <main className="auth-single"><Link href="/" className="auth-brand"><span className="auth-brand-mark">//</span> Roadmap</Link><section>{children}</section></main> }
+function AuthCard({ children }: { children: ReactNode }) {
+  return <main className="auth-single"><Link href="/" className="auth-brand"><span className="brand-mark"><span /></span> Roadmap</Link><section>{children}</section></main>
+}

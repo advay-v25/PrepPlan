@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { CalendarEntry, CalendarWeekData } from '../../lib/planning/calendarData'
 import type { StudyWeek } from '../../lib/planning/studyWeek'
+import { ASSESSMENT_STAGE_LABEL } from '../../lib/tests/assessmentStage'
 
 function parts(dateLocal: string) {
   const [y, m, d] = dateLocal.split('-').map(Number)
@@ -56,7 +57,7 @@ export function WeekAtAGlance({ week, today, data, accepted }: {
               <div className="week-cal__items">
                 {shown.length === 0 && !isPaper && <span className="week-cal__free">{past ? '—' : 'Free'}</span>}
                 {isPaper && !tasks.some(e => e.taskType === 'diagnostic') && (
-                  <span className="week-cal__item layer-diagnostic"><i aria-hidden /> Weekly paper</span>
+                  <span className="week-cal__item layer-diagnostic"><i aria-hidden /> {ASSESSMENT_STAGE_LABEL.weekly_checkpoint}</span>
                 )}
                 {shown.map(e => (
                   <span key={e.id} className={`week-cal__item layer-${e.layer} ${DONE.includes(e.execution ?? '') ? 'is-complete' : ''}`}>

@@ -60,5 +60,13 @@ check('self-study reserves Sunday for the paper/checkpoint', !permitsStudyPortio
 check('class-led Sunday can hold class-related work', permitsStudyPortions('coaching', 0))
 check('hybrid Sunday follows its class-defined boundary', permitsStudyPortions('hybrid', 0))
 
+{
+  const w = (nextClassDate: string | null, classWeekdays: number[] = []) => resolvePulseWeek({ classWeekdays: classWeekdays as any, nextClassDate, timezone: 'Europe/London', reference: '2026-11-16' })
+  eq('variable pattern: a confirmed next class 5 days out anchors the cycle to end the day before it', [w('2026-11-21').startDate, w('2026-11-21').endDate], ['2026-11-14', '2026-11-20'])
+  eq('variable pattern: a class tomorrow is left to the default week', w('2026-11-17').classLed, false)
+  eq('variable pattern: a class two months away is ignored', w('2027-01-20').classLed, false)
+  eq('a recurring pattern ignores any one-off confirmed class date (Tue/Thu stays Tue-Mon)', [w('2026-11-21', [2, 4]).startDate, w('2026-11-21', [2, 4]).endDate], ['2026-11-10', '2026-11-16'])
+}
+
 console.log(`\n${passed} passed, ${failed} failed\n`)
 if (failed > 0) process.exit(1)

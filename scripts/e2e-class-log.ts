@@ -1,5 +1,5 @@
 /**
- * Class log → plan, live, on the dedicated +e2e account only.
+ * Class log → plan, live, on an ORDINARY throwaway student (registered at creation, deleted in `finally`): never the shared +e2e account.
  *
  *   npm run dev
  *   npx tsx scripts/e2e-class-log.ts
@@ -7,27 +7,21 @@
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local', quiet: true } as any)
-import { getE2EEmail, verifyAndGetE2EUser, resetE2EUser, assertBlankOnboarding, E2E_BASE_URL } from '../src/lib/testing/e2eIdentity'
-import { createSession, completeOnboarding, makeCheck } from './lib/e2eSession'
+import { E2E_BASE_URL } from './lib/e2eIdentity'
+import { createStudent, makeCheck } from './lib/e2eSession'
 
 const { check, finish } = makeCheck()
+const owned: string[] = []
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
 const addDays = (d: string, n: number) => new Date(new Date(`${d}T12:00:00Z`).getTime() + n * 86_400_000).toISOString().slice(0, 10)
 const dow = (d: string) => new Date(`${d}T12:00:00Z`).getUTCDay()
 
 async function main() {
   console.log('\nClass log\n')
-  const s = createSession(admin, getE2EEmail())
-  check('signed in', await s.signIn())
-  const uid = await verifyAndGetE2EUser(admin)
-  await resetE2EUser(admin, uid)
-  await assertBlankOnboarding(admin, uid)
-  await completeOnboarding(s, admin)
-  // completeOnboarding's first confirm plants a real self-study week (bigger now that Ethics and FSA carry
-  // real structure) across the account's current calendar dates — the same dates this suite's own scenario
-  // reuses once it converts the account to class-led below. That is two unrelated scenarios competing for
-  // the same days' capacity, not something this suite means to test; it cares about class-log's own
-  // placement, so it starts from an empty calendar rather than coupling to onboarding's unrelated output.
+  const S = await createStudent(admin, 'cl', { onboard: true, register: id => owned.push(id) })
+  const s = S.s, uid = S.id
+  check('signed in as an owned throwaway student', !!uid)
+  // The onboarding week plants self-study tasks across the dates this suite reuses once it converts the student to class-led below; start from an empty calendar.
   await admin.from('plan_blocks').delete().eq('user_id', uid)
 
   const cnt = async (t: string, f: Record<string, string> = {}) => {
@@ -170,7 +164,9 @@ async function main() {
     const c2 = await s.post('/api/class-log/confirm', { ...s2, idempotencyKey: `e2e-${Date.now()}-b`, fingerprint: p2.body.fingerprint })
     check('the second class confirms', c2.body?.ok === true, JSON.stringify(c2.body))
     const { data: all } = await admin.from('plan_blocks').select('class_session_id, outcome_id, local_date').eq('user_id', uid).not('class_session_id', 'is', null)
-    check('no outcome-day is planned twice across sessions', new Set((all ?? []).map(b => `${b.class_session_id}|${b.outcome_id}|${b.local_date}`)).size === (all ?? []).length)
+    const ids = (await admin.from('plan_blocks').select('class_session_id, outcome_id, sitting_ordinal').eq('user_id', uid).not('class_session_id', 'is', null)).data ?? []
+    check('no logical sitting (session, outcome, ordinal) is planned twice across sessions', new Set(ids.map(b => `${b.class_session_id}|${b.outcome_id}|${b.sitting_ordinal}`)).size === ids.length && ids.every(b => b.sitting_ordinal))
+    void all
   }
 
   // --- a class that did not happen is recorded and adds no coverage
@@ -193,10 +189,7 @@ async function main() {
     const r = await s.post('/api/class-log/confirm', { ...log, idempotencyKey: `e2e-${Date.now()}-o`, fingerprint: 'x' })
     check('confirm never touches another student\'s data', r.status === 409 || r.status === 200)
   }
-  // Leave the shared test account as we found it for the next suite.
-  await admin.from('plan_blocks').delete().eq('user_id', uid).not('class_session_id', 'is', null)
-  await admin.from('class_sessions').delete().eq('user_id', uid)
-  await admin.from('calendar_commitments').delete().eq('user_id', uid).eq('kind', 'class')
+  for (const id of owned.splice(0)) await admin.auth.admin.deleteUser(id).catch(() => {})
   finish()
 }
-main().catch(e => { console.error(e); process.exit(1) })
+main().catch(async e => { console.error(e); for (const id of owned.splice(0)) await admin.auth.admin.deleteUser(id).catch(() => {}); process.exit(1) }).finally(async () => { for (const id of owned.splice(0)) await admin.auth.admin.deleteUser(id).catch(() => {}) })

@@ -9,26 +9,11 @@ import { resolvePulseDay } from '../../../lib/planning/pulse/weekBoundary'
 import type { Weekday } from '../../../lib/planning/studyWeek'
 import { Button, IconButton } from '../../ui/Button'
 import { Notice } from '../../ui/Notice'
+import { nextClassFrom, type NextClass } from '../../../lib/onboarding/classDisplay'
 import type { OnboardingState } from '../OnboardingShell'
 
 type DraftClass = { id: string; label: string; weekdays: number[]; startTime: string; endTime: string; endsOn: string }
-type NextClass = { label: string; date: string; startTime: string; endTime: string }
-
 const hhmm = (v: unknown, fallback: string) => (v ? String(v).slice(0, 5) : fallback)
-
-/** A stored one-off class back into the student's own timezone, for editing. */
-function nextClassFrom(state: OnboardingState): NextClass | null {
-  const row = (state.commitments ?? []).find(c => c.kind === 'class' && c.source === 'onboarding' && (c as any).recurrence === 'none')
-  if (!row || !(row as any).starts_at || !(row as any).ends_at) return null
-  const tz = state.profile?.timezone || 'UTC'
-  const part = (iso: string) => {
-    const f = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
-    const p = Object.fromEntries(f.formatToParts(new Date(iso)).map(x => [x.type, x.value]))
-    return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour}:${p.minute}` }
-  }
-  const a = part((row as any).starts_at), b = part((row as any).ends_at)
-  return { label: String(row.label ?? ''), date: a.date, startTime: a.time, endTime: b.time }
-}
 
 /**
  * How the student is preparing, and (for live classes) when the classes are.
