@@ -17,7 +17,7 @@ export function DisplayNameForm({ initial }: { initial: string }) {
     try {
       const res = await fetch('/api/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: submitted }) })
       if (res.ok) { setSaved(submitted); setState('saved'); router.refresh() } else setState({ error: (await res.json().catch(() => null))?.error ?? 'Not saved. Your edit is kept; try again.' })
-    } catch { setState({ error: 'Could not reach Roadmap. Your edit is kept; try again.' }) }
+    } catch { setState({ error: 'Could not reach PrepPlan. Your edit is kept; try again.' }) }
   }
   return (
     <form onSubmit={e => { e.preventDefault(); if (valid && trimmed !== saved && !saving && !composing.current) void save() }} data-display-name>

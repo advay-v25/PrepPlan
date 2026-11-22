@@ -20,7 +20,7 @@ export const MOCK_KINDS = ['provider_mock', 'school_checkpoint', 'other', 'inter
 export type MockKind = (typeof MOCK_KINDS)[number]
 
 export const MOCK_KIND_LABEL: Record<MockKind, string> = {
-  provider_mock: 'Mock from a course provider', school_checkpoint: 'School or class checkpoint', other: 'Other mock or checkpoint', internal_rehearsal: 'Roadmap rehearsal (two timed sessions)',
+  provider_mock: 'Mock from a course provider', school_checkpoint: 'School or class checkpoint', other: 'Other mock or checkpoint', internal_rehearsal: 'PrepPlan rehearsal (two timed sessions)',
 }
 
 export const UNCERTAINTY_LABEL: Record<UncertaintyLevel, string> = {

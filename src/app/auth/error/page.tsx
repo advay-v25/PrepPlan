@@ -32,7 +32,7 @@ export default async function AuthErrorPage({ searchParams }: { searchParams: Pr
 
   return (
     <main className="auth-single">
-      <Link href="/" className="auth-brand"><span className="brand-mark"><span /></span> Roadmap</Link>
+      <Link href="/" className="auth-brand"><span className="brand-mark" aria-hidden="true" /> PrepPlan</Link>
       <section className="auth-state">
         <h1>{copy.title}</h1>
         <p>{copy.body}</p>

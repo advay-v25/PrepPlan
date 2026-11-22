@@ -221,7 +221,7 @@ export function candidateFor(r: RevisionReading, input: Pick<SelectInput, 'phase
     const when = recency.days === 0 ? 'today' : `${recency.days} day${recency.days === 1 ? '' : 's'} ago`
     const how = recency.provenance === 'study_date' ? 'the study date you logged' : 'when you marked it done'
     reasons.push(`Last confirmed activity ${when} (${how}).${part}`)
-  } else if (recency.source === 'reported') reasons.push('You said you were working on this subject when you set up Roadmap. That gives no study date, so this reading’s last activity is unknown, not recent.')
+  } else if (recency.source === 'reported') reasons.push('You said you were working on this subject when you set up PrepPlan. That gives no study date, so this reading’s last activity is unknown, not recent.')
   else reasons.push('No revision date is recorded, so this reading is due for a look. That is unknown, not forgotten.')
   if (input.daysToCheckpoint != null && checkpoint) reasons.push(`Your mock or checkpoint is ${input.daysToCheckpoint} day${input.daysToCheckpoint === 1 ? '' : 's'} away.`)
   if (focus) reasons.push('This subject is the roadmap’s focus for this stretch.')

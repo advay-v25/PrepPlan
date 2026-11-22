@@ -11,7 +11,7 @@ const project = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!)
 const app = new URL(E2E_BASE_URL)
 if (project.hostname !== 'asylsxszdhlnzewhwtga.supabase.co' || !['localhost', '127.0.0.1'].includes(app.hostname)
   || process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
-  throw new Error('Use the confirmed disposable project and a local Roadmap server.')
+  throw new Error('Use the confirmed disposable project and a local PrepPlan server.')
 }
 
 const admin = createClient(project.origin, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
@@ -78,7 +78,7 @@ async function main() {
   check('an off-site browser request is rejected and does not sign out the student', originDenied.status === 403 && (await student.session.req('/account')).status === 200)
 
   const reset = await generated('recovery', student.email)
-  check('an email link without a Roadmap recovery intent cannot use the reset form', (await anonymous.post('/api/auth', {
+  check('an email link without a PrepPlan recovery intent cannot use the reset form', (await anonymous.post('/api/auth', {
     action: 'verify', type: 'recovery', tokenHash: reset,
   })).status === 400)
   const recovery = createSession(admin, student.email)
@@ -108,7 +108,7 @@ async function main() {
     && !(await admin.auth.admin.getUserById(student.id)).data.user && (await recovery.req('/account')).status === 307)
 
   const health = await anonymous.json('/api/health')
-  check('public liveness reveals only whether Roadmap is running', health.status === 200 && JSON.stringify(health.body) === '{"ok":true}')
+  check('public liveness reveals only whether PrepPlan is running', health.status === 200 && JSON.stringify(health.body) === '{"ok":true}')
   check('readiness requires its dedicated credential', (await anonymous.json('/api/health?ready=1')).status === 401)
   check('reminder worker requires its own credential', (await anonymous.post('/api/reminders/run')).status === 401)
   const oversized = await anonymous.req('/api/auth', { method: 'POST', headers: json, body: JSON.stringify({ action: 'signout', extra: 'a'.repeat(13_000) }) })

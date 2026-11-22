@@ -32,7 +32,7 @@ export function buildDebrief(report: MockReport, topicName: (id: string) => stri
   f.push({
     id: 'overall', kind: 'overall', source: 'your report', activity: undefined,
     fact: `${partial ? 'A partial exam' : 'A mock'}${report.provider ? ` from ${report.provider}` : ''} on ${report.takenOn}: ${describeScore(report.score, report.scale, report.scoreMax)}.`,
-    uncertainty: `An overall result does not show which concepts were weak${partial ? ', and a partial exam says nothing about the parts it did not cover' : ''}. It is not test evidence in Roadmap.`,
+    uncertainty: `An overall result does not show which concepts were weak${partial ? ', and a partial exam says nothing about the parts it did not cover' : ''}. It is not test evidence in PrepPlan.`,
     implication: report.score === null ? 'Add what you remember, or use the concerns below, so the plan has something to work from.' : 'It is context for planning. It does not create a diagnosis or close any repair.',
   })
   const withTopics = report.topics.filter(t => t.value >= 0)
@@ -48,7 +48,7 @@ export function buildDebrief(report: MockReport, topicName: (id: string) => stri
   if (d.has('ran_out_of_time') || d.has('rushed_omissions')) f.push({
     id: 'timing', kind: 'timing', source: 'your report', activity: 'pacing',
     fact: `You reported: ${[d.has('ran_out_of_time') && DIFFICULTIES.ran_out_of_time, d.has('rushed_omissions') && DIFFICULTIES.rushed_omissions].filter(Boolean).join('; ')}.`,
-    uncertainty: 'Running out of time does not mean the material was not understood. Roadmap cannot tell, from this, whether it was pacing, knowledge or both.',
+    uncertainty: 'Running out of time does not mean the material was not understood. PrepPlan cannot tell, from this, whether it was pacing, knowledge or both.',
     implication: 'A pacing and application activity: timed work on material you already know, with a note of where the time went.',
   })
   if (d.has('changed_right_to_wrong')) f.push({
@@ -67,7 +67,7 @@ export function buildDebrief(report: MockReport, topicName: (id: string) => stri
     id: 'knowledge', kind: 'knowledge', source: 'your report', activity: 'review', needsSelection: true,
     fact: 'You reported not knowing some of the material.',
     uncertainty: 'This is your own impression; it does not say which outcomes.',
-    implication: 'Choose the readings you have in mind for a targeted review. Roadmap only proposes what you select.',
+    implication: 'Choose the readings you have in mind for a targeted review. PrepPlan only proposes what you select.',
   })
   if (report.score !== null && pctLike(report.scale) && report.score >= 70 && withTopics.some(t => pctLike(t.scale) && t.scale === report.scale && t.value < report.score! - 10)) f.push({
     id: 'high_with_gaps', kind: 'high_with_gaps', source: 'your report',

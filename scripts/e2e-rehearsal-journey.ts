@@ -54,7 +54,7 @@ async function appointmentsAndDesignation(st: Student) {
   const first = await cp(st, 'PUT', { date: addDays(today, 5), kind: 'provider_mock', label: 'Coaching mock', startTime: '19:00', durationMinutes: 180 })
   check('the first appointment is saved through the existing checkpoint command', first.body?.ok === true && !!first.body.checkpoint?.checkpointId, JSON.stringify(first.body).slice(0, 200))
   const extId = first.body.checkpoint.checkpointId as string
-  const add = await cp(st, 'POST', { action: 'add', date: addDays(today, 3), kind: 'internal_rehearsal', label: 'Roadmap rehearsal 1' })
+  const add = await cp(st, 'POST', { action: 'add', date: addDays(today, 3), kind: 'internal_rehearsal', label: 'PrepPlan rehearsal 1' })
   check('a second appointment (an internal rehearsal) can be added; the first is untouched', add.body?.ok === true && add.body.checkpoint?.appointments?.length === 2, JSON.stringify(add.body).slice(0, 200))
   const rehId = add.body.checkpoint.checkpointId as string
   const prof = (await admin.from('profiles').select('mock_id, mock_date, mock_kind').eq('id', st.id).single()).data!
@@ -77,7 +77,7 @@ async function appointmentsAndDesignation(st: Student) {
   const href = view.body.checkpoint.href as string
   check('GET shows the addressed appointment, with a link that carries its id', view.body.checkpoint.checkpointId === rehId && href.includes(`appointment=${rehId}`))
   const cal = await page(st, href)
-  check('Calendar opens on exactly that appointment and lists the whole schedule', cal.status === 200 && cal.html.includes('Your mock schedule') && cal.html.includes('Roadmap rehearsal 1') && cal.html.includes('Coaching mock') && cal.html.includes('School checkpoint'))
+  check('Calendar opens on exactly that appointment and lists the whole schedule', cal.status === 200 && cal.html.includes('Your mock schedule') && cal.html.includes('PrepPlan rehearsal 1') && cal.html.includes('Coaching mock') && cal.html.includes('School checkpoint'))
   const home = await page(st, '/app')
   // Home shows the NEXT appointment (ProgressSummary); the full schedule lives in Calendar. Its link must carry the appointment id and open that appointment.
   const homeLink = [...home.html.matchAll(/href="([^"]*appointment=([0-9a-f-]{36})[^"]*)"/g)].map(m => ({ href: m[1].replace(/&amp;/g, '&'), id: m[2] }))
@@ -339,7 +339,7 @@ async function legacyTrack(st: Student) {
   console.log(`\nLEGACY-POLICY EXPIRY — reserved under 1.0, same ${bank.items.length}-question fixture bank\n`)
   await openCycle(st.id)
   await cp(st, 'PUT', { date: addDays(today, 5), kind: 'provider_mock', label: 'Coaching mock', startTime: '19:00', durationMinutes: 180 })
-  const add = await cp(st, 'POST', { action: 'add', date: addDays(today, 3), kind: 'internal_rehearsal', label: 'Roadmap rehearsal 1' })
+  const add = await cp(st, 'POST', { action: 'add', date: addDays(today, 3), kind: 'internal_rehearsal', label: 'PrepPlan rehearsal 1' })
   const rehId = add.body?.checkpoint?.checkpointId as string
   const started = await st.s.post('/api/rehearsal/start', { appointmentId: rehId })
   const rid = started.body?.rehearsalId as string

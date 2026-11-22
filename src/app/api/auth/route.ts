@@ -57,23 +57,23 @@ export async function POST(request: Request) {
   try { payload = await readBoundedJson(request, 12 * 1024) }
   catch (error) {
     if (error instanceof JsonInputError) return reply({ error: error.message }, error.status)
-    return reply({ error: 'Roadmap could not read this request.' }, 400)
+    return reply({ error: 'PrepPlan could not read this request.' }, 400)
   }
   const parsed = input.safeParse(payload)
   if (!parsed.success) return reply({ error: 'Check the details and try again.' }, 400)
   const data = parsed.data
   const origin = authOrigin(request)
-  if (!origin) return reply({ error: 'This address is not configured for Roadmap sign-in.' }, 503)
+  if (!origin) return reply({ error: 'This address is not configured for PrepPlan sign-in.' }, 503)
 
   try {
     if (data.action === 'signout') {
       try {
         const supabase = await createClient()
         const { error } = await boundedStage('sign out', 10_000, () => supabase.auth.signOut({ scope: 'local' }))
-        if (error) return reply({ error: 'This browser has been signed out. Roadmap could not confirm that its session was revoked.' }, 502)
+        if (error) return reply({ error: 'This browser has been signed out. PrepPlan could not confirm that its session was revoked.' }, 502)
         return reply({ ok: true })
       } catch {
-        return reply({ error: 'This browser has been signed out. Roadmap could not confirm that its session was revoked.' }, 502)
+        return reply({ error: 'This browser has been signed out. PrepPlan could not confirm that its session was revoked.' }, 502)
       } finally { await clearSessionCookies() }
     }
 
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
         return reply({ ok: true, next: signOutError ? '/login?reset=sessions' : '/login?reset=success' })
       } catch {
         if (saved) return reply({ ok: true, next: '/login?reset=sessions' })
-        return reply({ error: 'Roadmap could not confirm the password change. Try signing in with the new password, or request a new reset email.', code: 'RESET_OUTCOME_UNKNOWN' }, 502)
+        return reply({ error: 'PrepPlan could not confirm the password change. Try signing in with the new password, or request a new reset email.', code: 'RESET_OUTCOME_UNKNOWN' }, 502)
       } finally { await clearSessionCookies() }
     }
 
@@ -201,6 +201,6 @@ export async function POST(request: Request) {
     return reply({ ok: true }, 202)
   } catch {
     trace('auth', 'unavailable', { action: data.action })
-    return reply({ error: 'Roadmap could not confirm the request. Wait a moment and try again.' }, 503)
+    return reply({ error: 'PrepPlan could not confirm the request. Wait a moment and try again.' }, 503)
   }
 }

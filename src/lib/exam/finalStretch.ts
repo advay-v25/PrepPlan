@@ -17,7 +17,7 @@ export function examPhase(i: PhaseInput): PhaseResult {
   if (i.satOn) return { phase: 'sat', daysToExam: null, note: `You told us you sat the exam on ${i.satOn}. Study prompts are paused and your history is kept.` }
   if (!i.examDate) return { phase: 'no_date', daysToExam: null, note: 'You have not set an exam date.' }
   const days = daysBetween(i.today, i.examDate)
-  if (days < 0) return { phase: 'awaiting_status', daysToExam: days, note: `Your exam date (${i.examDate}) has passed. Roadmap cannot know whether you sat it: tell us, or move the date if it changed.` }
+  if (days < 0) return { phase: 'awaiting_status', daysToExam: days, note: `Your exam date (${i.examDate}) has passed. PrepPlan cannot know whether you sat it: tell us, or move the date if it changed.` }
   if (i.windowCloses && i.windowConfirmed === false && i.windowCloses < i.today) return { phase: 'awaiting_status', daysToExam: days, note: `The exam window you picked ended on ${i.windowCloses} and was never confirmed. Tell us whether you sat the exam, or choose a new window.` }
   if (days === 0) return { phase: 'exam_day', daysToExam: 0, note: 'Your exam is today.' }
   if (days <= FINAL_WEEK_DAYS) return { phase: 'final_week', daysToExam: days, note: `${days} day${days === 1 ? '' : 's'} to your exam.` }
@@ -73,7 +73,7 @@ export function finalStretch(i: StretchInput): StretchPlan | null {
     : { key: `maintenance-${r.href}`, kind: 'maintenance', title: `Keep ${r.name} fresh`, why: `${r.why || 'Covered material that has not been revisited recently.'} Not on your calendar yet: it is offered in your next weekly review, where you accept or change it.`, href: '/app/review-week', minutes: 30, status: 'proposal' })
   if (i.openRepairs === 0 && !i.debriefHref) items.push({ key: 'check', kind: 'check', title: 'Take a check on something you feel unsure about', why: 'With no open repair, a selected check is how you find what is still shaky.', href: '/app/tests', minutes: 30 })
   if (week) items.push(...LOGISTICS(i.daysToExam))
-  if (i.psm !== 'done') items.push({ key: 'psm', kind: 'logistics', title: 'Practical Skills Module: check its status', why: 'CFA Institute requires the Practical Skills Module before results are released. This is an administrative reminder; Roadmap does not teach it. You can ignore it if it is already done.', href: '/app/exam', minutes: 5 })
+  if (i.psm !== 'done') items.push({ key: 'psm', kind: 'logistics', title: 'Practical Skills Module: check its status', why: 'CFA Institute requires the Practical Skills Module before results are released. This is an administrative reminder; PrepPlan does not teach it. You can ignore it if it is already done.', href: '/app/exam', minutes: 5 })
   if (i.rehearsal) {
     if (week && (i.daysToExam ?? 99) < 4) waits.push({ title: 'A full rehearsal', reason: 'It takes about five hours and needs a debrief. Too close to the exam to do both well.' })
     else items.push({ key: 'rehearsal', kind: 'rehearsal', title: i.rehearsal.reserved ? 'Take your rehearsal' : 'Prepare your rehearsal', why: `Two timed sessions, planned for ${i.rehearsal.date}.`, href: i.rehearsal.href, minutes: 280 })

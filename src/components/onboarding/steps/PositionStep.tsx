@@ -149,7 +149,7 @@ export function PositionStep({
       </section>
 
       {stage === 'starting_fresh' && (
-        <p className="fine-print mt-4">Roadmap will plan your whole first pass. If you have already covered a topic, choose “Some subjects covered”.</p>
+        <p className="fine-print mt-4">PrepPlan will plan your whole first pass. If you have already covered a topic, choose “Some subjects covered”.</p>
       )}
 
       {showTopics && compact && (

@@ -138,7 +138,7 @@ async function build(userId: string, cycle: Cycle, hash: string, now: Date): Pro
   if (tasks.length === 0) {
     const nothing: CurrentWeekPlanState = {
       kind: 'no_usable_windows', reason: 'nothing_to_add', draft: null, title: 'Nothing to add this week',
-      message: 'Roadmap found no work to place in the time that remains. You can keep the week as it is.',
+      message: 'PrepPlan found no work to place in the time that remains. You can keep the week as it is.',
       action: { label: 'Edit study times', href: ADD_STUDY_TIMES_HREF, kind: 'link' },
     }
     return { state: nothing, draft: null }

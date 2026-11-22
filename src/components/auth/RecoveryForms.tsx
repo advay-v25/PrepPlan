@@ -24,9 +24,9 @@ function EmailRequest({ action }: { action: 'forgot' | 'resend' }) {
     try {
       const result = await authRequest(action, { email, captchaToken: captcha || undefined })
       if (result.ok) setSent(true)
-      else setError(result.data?.error ?? 'Roadmap could not confirm the request. Wait a moment and try again.')
+      else setError(result.data?.error ?? 'PrepPlan could not confirm the request. Wait a moment and try again.')
     } catch {
-      setError('Roadmap could not confirm the request. Wait a moment and try again.')
+      setError('PrepPlan could not confirm the request. Wait a moment and try again.')
     } finally {
       setCaptcha('')
       setAttempt(value => value + 1)
@@ -125,10 +125,10 @@ export function UpdatePasswordForm() {
     try {
       const result = await authRequest('update', { password })
       if (result.ok && result.data?.next) { window.location.assign(result.data.next); return }
-      setError(result.data?.error ?? 'Roadmap could not confirm the password change.')
+      setError(result.data?.error ?? 'PrepPlan could not confirm the password change.')
       setNewLinkRequired(result.data?.code === 'RECOVERY_REQUIRED' || result.data?.code === 'RESET_OUTCOME_UNKNOWN')
     } catch {
-      setError('Roadmap could not confirm the password change. Try signing in with the new password or request a fresh link.')
+      setError('PrepPlan could not confirm the password change. Try signing in with the new password or request a fresh link.')
       setNewLinkRequired(true)
     } finally { setLoading(false) }
   }
@@ -147,5 +147,5 @@ export function UpdatePasswordForm() {
 }
 
 function AuthCard({ children }: { children: ReactNode }) {
-  return <main className="auth-single"><Link href="/" className="auth-brand"><span className="brand-mark"><span /></span> Roadmap</Link><section>{children}</section></main>
+  return <main className="auth-single"><Link href="/" className="auth-brand"><span className="brand-mark" aria-hidden="true" /> PrepPlan</Link><section>{children}</section></main>
 }

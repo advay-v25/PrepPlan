@@ -93,7 +93,7 @@ export function CoachClient({ initialDraft = '', initialMessages = [], attemptId
           <div key={message.id} className={`coach-message coach-message--${message.role}`}>
             <span className="coach-avatar">{message.role === 'coach' ? <MessageCircle size={18} /> : 'A'}</span>
             <div>
-              <strong>{message.role === 'coach' ? 'Roadmap Coach' : 'You'}</strong>
+              <strong>{message.role === 'coach' ? 'PrepPlan Coach' : 'You'}</strong>
               <p>{message.body}</p>
 
               {message.proposals.map(p => (
@@ -127,7 +127,7 @@ export function CoachClient({ initialDraft = '', initialMessages = [], attemptId
         {loading && (
           <div className="coach-message coach-message--coach">
             <span className="coach-avatar"><MessageCircle size={18} /></span>
-            <div><strong>Roadmap Coach</strong><p>Checking your evidence…</p></div>
+            <div><strong>PrepPlan Coach</strong><p>Checking your evidence…</p></div>
           </div>
         )}
         {error && <div className="coach-error" role="alert" style={{ color: 'var(--danger)' }}>{error} {failed && <button type="button" className="text-button" onClick={() => void send(undefined, undefined, true)}>Retry</button>}</div>}

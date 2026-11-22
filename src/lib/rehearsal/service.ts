@@ -54,7 +54,7 @@ export async function decideRehearsal(userId: string, appointmentId: string | nu
   if (appointmentId) {
     const { data: appt } = await admin.from('mock_appointments').select('id, kind, status').eq('id', appointmentId).eq('user_id', userId).maybeSingle().throwOnError()
     if (!appt) return { decision: base({ state: 'no_appointment', message: 'That appointment could not be found.' }), plan: null }
-    if (appt.kind !== 'internal_rehearsal') return { decision: base({ state: 'not_internal', message: 'This is an external mock. You take it outside Roadmap and record what happened.', next: { label: 'Record it in Calendar', href: `/app/calendar?appointment=${appointmentId}#checkpoint` } }), plan: null }
+    if (appt.kind !== 'internal_rehearsal') return { decision: base({ state: 'not_internal', message: 'This is an external mock. You take it outside PrepPlan and record what happened.', next: { label: 'Record it in Calendar', href: `/app/calendar?appointment=${appointmentId}#checkpoint` } }), plan: null }
     if (appt.status !== 'planned') return { decision: base({ state: 'closed', message: `This rehearsal is ${appt.status}.` }), plan: null }
     const { data: open } = await admin.from('mock_rehearsals').select('id').eq('appointment_id', appointmentId).in('status', ['ready', 'in_progress']).maybeSingle().throwOnError()
     if (open) return { decision: base({ state: 'resume', rehearsalId: open.id as string, message: null }), plan: null }

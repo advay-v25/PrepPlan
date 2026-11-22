@@ -11,7 +11,7 @@ import { ReadinessDemo } from '../components/landing/ReadinessDemo'
 import { WeekPreview } from '../components/landing/WeekPreview'
 import { CountUpStat } from '../components/landing/CountUpStat'
 
-export const metadata = { title: { absolute: 'CFA Level I study planner · Roadmap' } }
+export const metadata = { title: { absolute: 'CFA Level I study planner · PrepPlan' } }
 
 export const dynamic = 'force-dynamic'
 
@@ -35,7 +35,7 @@ export default async function LandingPage() {
   return (
     <main className="landing-page">
       <header className="landing-header">
-        <strong>Roadmap</strong>
+        <strong><span className="brand-mark" aria-hidden="true" />PrepPlan</strong>
         <Link href="/login">Sign in</Link>
       </header>
 
@@ -67,7 +67,7 @@ export default async function LandingPage() {
         <ScrollReveal className="story-section__head">
           <p className="story-section__eyebrow">What &ldquo;telling you how to study&rdquo; looks like</p>
           <h2>Four signals, never blended into one number</h2>
-          <p className="story-section__lede">Studying isn&apos;t understanding, and confidence isn&apos;t accuracy. Roadmap tracks each on its own.</p>
+          <p className="story-section__lede">Studying isn&apos;t understanding, and confidence isn&apos;t accuracy. PrepPlan tracks each on its own.</p>
         </ScrollReveal>
         <ReadinessDemo />
       </section>
@@ -90,7 +90,7 @@ export default async function LandingPage() {
             <p>Reacts to your last mistake, but rarely checks the repair held.</p>
           </div>
           <div className="contrast-card contrast-card--accent">
-            <Badge tone="accent">Roadmap</Badge>
+            <Badge tone="accent">PrepPlan</Badge>
             <h3>Tells you what, when and how much</h3>
             <p>Orders the syllabus, sizes each week to your hours, and re-checks every repair.</p>
           </div>
@@ -147,14 +147,14 @@ export default async function LandingPage() {
       <section className="landing-cta">
         <ScrollReveal className="landing-cta__inner">
           <CheckCircle2 size={28} aria-hidden />
-          <h2>Tell Roadmap what you can commit.</h2>
+          <h2>Tell PrepPlan what you can commit.</h2>
           <p>Five short steps, every answer editable later.</p>
           <ButtonLink size="lg" href="/signup">Get started</ButtonLink>
         </ScrollReveal>
       </section>
 
       <footer className="landing-footer">
-        <span>&copy; {new Date().getFullYear()} Roadmap</span>
+        <span>&copy; {new Date().getFullYear()} PrepPlan</span>
         <span>
           <Link href="/terms">Terms</Link> &middot; <Link href="/privacy">Privacy</Link>
         </span>

@@ -458,7 +458,7 @@ export function CalendarWeekGrid({
       {floating.filter(visible).length > 0 && (
         <section className="calendar-floating" id="unplaced">
           <h3>Not yet placed</h3>
-          <p className="fine-print">These belong to this week but have no date. Roadmap leaves work floating rather than inventing a time for it.</p>
+          <p className="fine-print">These belong to this week but have no date. PrepPlan leaves work floating rather than inventing a time for it.</p>
           <div className="calendar-floating__list">
             {floating.filter(visible).map(e => (
               <button type="button" key={e.id} className={`calendar-chip layer-${e.layer}`} onClick={() => openEntry(e)} aria-label={blockSummary(e)}>

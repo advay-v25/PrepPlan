@@ -51,9 +51,9 @@ export function Sidebar({ compact = false, onClose, displayName }: SidebarProps)
   return (
     <aside className={`sidebar ${compact ? 'sidebar--compact' : ''}`} aria-label="Primary navigation">
       <div className="brand-row">
-        <Link href={ROUTES.app.root} className="brand" aria-label="Roadmap home" onClick={() => onClose?.()}>
-          <span className="brand-mark"><span /></span>
-          <span>Roadmap</span>
+        <Link href={ROUTES.app.root} className="brand" aria-label="PrepPlan home" onClick={() => onClose?.()}>
+          <span className="brand-mark" aria-hidden="true" />
+          <span>PrepPlan</span>
         </Link>
         {onClose ? <button type="button" className="icon-button mobile-close" onClick={onClose} aria-label="Close navigation"><PanelLeftClose size={20} /></button> : null}
       </div>

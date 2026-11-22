@@ -7,10 +7,10 @@ export const metadata = { title: 'Privacy' }
 export default function PrivacyPage() {
   return (
     <main className="legal-page">
-      <Link href="/signup" className="auth-brand"><span className="brand-mark"><span /></span> Roadmap</Link>
+      <Link href="/signup" className="auth-brand"><span className="brand-mark" aria-hidden="true" /> PrepPlan</Link>
       <article>
         <h1>Privacy — private beta</h1>
-        <p><strong>Draft for the private beta.</strong> It describes what Roadmap does today and will change as the product does. Contact: <SupportLink subject="Roadmap privacy" />.</p>
+        <p><strong>Draft for the private beta.</strong> It describes what PrepPlan does today and will change as the product does. Contact: <SupportLink subject="PrepPlan privacy" />.</p>
 
         <h2>What we keep</h2>
         <ul>
@@ -41,14 +41,14 @@ export default function PrivacyPage() {
         <ul>
           <li>A one-way record that a deletion happened (a hash and a time, never who).</li>
           <li>Backups kept by the database provider, which age out on the provider&rsquo;s schedule; we do not restore a deleted account from them.</li>
-          <li>Reviewer decisions about question content are Roadmap content, not student data.</li>
+          <li>Reviewer decisions about question content are PrepPlan content, not student data.</li>
         </ul>
 
         <h2>Retention</h2>
         <p>Your data is kept while your account exists. When the beta ends we will tell you before anything is removed, and you can export or delete first.</p>
 
         <h2>Questions or requests</h2>
-        <p>Write to <SupportLink subject="Roadmap privacy" />. See also the <Link href="/terms">terms of use</Link>.</p>
+        <p>Write to <SupportLink subject="PrepPlan privacy" />. See also the <Link href="/terms">terms of use</Link>.</p>
       </article>
     </main>
   )

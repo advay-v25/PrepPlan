@@ -346,7 +346,7 @@ async function CalendarContent({ searchParams }: CalendarProps) {
             Your week runs {formatWeekRange(week, locale)} and ends on {WEEKDAY_NAMES[ctx.anchorDay]}.{' '}
             {onboardingDone
               ? weekPlan?.kind === 'awaiting_class_input' ? 'Your classes guide the study order. Use the next step above to organise the follow-up work.' : weekPlan?.kind === 'intentionally_empty' ? 'You can add commitments or review a plan whenever you are ready.' : 'Use the next step above to prepare study blocks around your classes and commitments.'
-              : 'Finish your setup so Roadmap can propose work around your classes and commitments.'}
+              : 'Finish your setup so PrepPlan can propose work around your classes and commitments.'}
           </p>
           {!isHistory && <div className="calendar-empty__actions">
             <CommitmentQuickAdd openNextClass={action === 'add-next-class'} defaultDate={today >= week.startDate && today <= week.endDate ? today : week.startDate} />
@@ -386,7 +386,7 @@ async function CalendarContent({ searchParams }: CalendarProps) {
         )}
         <p>
           <Info size={13} aria-hidden />
-          <span>Timed sessions sit inside windows you confirmed. Work under &ldquo;Any time&rdquo; has a day but no hour — Roadmap won&apos;t invent one.</span>
+          <span>Timed sessions sit inside windows you confirmed. Work under &ldquo;Any time&rdquo; has a day but no hour — PrepPlan won&apos;t invent one.</span>
         </p>
       </footer>
       <details className="cal-export"><summary>Download this schedule (.ics)</summary><CalendarExport key={week.startDate} initialFrom={week.startDate} initialTo={week.endDate} /></details>

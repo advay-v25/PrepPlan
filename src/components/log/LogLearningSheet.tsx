@@ -14,7 +14,7 @@ type Kind = 'independent_study' | 'external_practice' | 'class'
 
 const KINDS: { value: Kind; label: string; hint: string; Icon: typeof BookOpen }[] = [
   { value: 'independent_study', label: 'Studied', hint: 'Read, watched or worked through it', Icon: BookOpen },
-  { value: 'external_practice', label: 'Practised', hint: 'Questions outside Roadmap', Icon: PenLine },
+  { value: 'external_practice', label: 'Practised', hint: 'Questions outside PrepPlan', Icon: PenLine },
   { value: 'class', label: 'Had a class', hint: 'It was taught to you', Icon: GraduationCap },
 ]
 const MINUTES = [15, 30, 45, 60, 90, 120]

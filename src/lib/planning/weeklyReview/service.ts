@@ -32,7 +32,7 @@ export const RESOLUTIONS: Resolution[] = ['completed', 'skipped', 'deferred', 'u
 export type ReviewGate =
   | { kind: 'paper_scored' }
   | { kind: 'external_mock'; reason: string; outcome: 'taken'; reportedResult: string | null; actualDate: string | null } // the student recorded what happened to an external mock; closes the week without a paper
-  | { kind: 'rehearsal'; reason: string; rehearsalId: string; completedOn: string } // the student's designated Roadmap rehearsal was finished (both sessions) inside this cycle; closes the week without a weekly paper
+  | { kind: 'rehearsal'; reason: string; rehearsalId: string; completedOn: string } // the student's designated PrepPlan rehearsal was finished (both sessions) inside this cycle; closes the week without a weekly paper
   | { kind: 'mock_pending'; reason: string }            // the student chose the mock as this week's assessment and has not yet recorded what happened
   | { kind: 'paper_pending'; reason: string }           // a paper exists, can still be assembled, not yet scored
   | { kind: 'no_paper_allowed'; reason: string }        // explicit no-paper closure permitted
@@ -201,7 +201,7 @@ export async function getWeeklyReviewState(userId: string, now = new Date(), mod
   if (scored) gate = { kind: 'paper_scored' }
   else if (rehearsalDone && !openWeekly) {
     gate = { kind: 'rehearsal', rehearsalId: rehearsalDone.id, completedOn: rehearsalDone.on,
-      reason: `You finished both sessions of your Roadmap rehearsal on ${rehearsalDone.on}, and you chose it as the assessment. Its scored sessions are this week’s assessment, so no weekly paper is needed.` }
+      reason: `You finished both sessions of your PrepPlan rehearsal on ${rehearsalDone.on}, and you chose it as the assessment. Its scored sessions are this week’s assessment, so no weekly paper is needed.` }
   }
   else if (counting && !openWeekly) {
     gate = { kind: 'external_mock', outcome: 'taken', reportedResult: counting.reported_result, actualDate: counting.actual_date,
@@ -384,7 +384,7 @@ export async function previewWeeklyTransition(userId: string, input: PreviewInpu
   }
   else if (state.gate.kind === 'rehearsal') {
     closureKind = 'no_paper'
-    noPaperReason = `Roadmap rehearsal (both sessions scored) finished on ${state.gate.completedOn}`
+    noPaperReason = `PrepPlan rehearsal (both sessions scored) finished on ${state.gate.completedOn}`
   }
   else if (state.gate.kind === 'no_paper_allowed' && input.acknowledgeNoPaper) { closureKind = 'no_paper'; noPaperReason = state.gate.reason }
   else {

@@ -48,7 +48,7 @@ export function NextClassDialog({ onClose }: { onClose: () => void }) {
       open
       onClose={onClose}
       title="Add your next class"
-      description="Your schedule changes week to week, so Roadmap asks each time: when is your next class? Your paper is placed the day before it."
+      description="Your schedule changes week to week, so PrepPlan asks each time: when is your next class? Your paper is placed the day before it."
       initialFocusRef={firstRef}
     >
       <form onSubmit={submit} style={{ display: 'grid', gap: 14 }}>

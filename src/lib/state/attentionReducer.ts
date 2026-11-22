@@ -13,7 +13,7 @@ export function computeAttentionQueue(state: OperatingState): AttentionItem[] {
       id: 'attention-activation-failed',
       code: 'activation_failed',
       priority: 100,
-      title: 'Roadmap Activation Failed',
+      title: 'PrepPlan Activation Failed',
       description: 'Your roadmap could not be activated successfully.',
       destination: '/app/calendar',
       actionLabel: 'Retry Activation'
@@ -89,7 +89,7 @@ export function computeAttentionQueue(state: OperatingState): AttentionItem[] {
         ? 'Add this week’s study times'
         : 'Add your study times to start this week',
       description: state.identity.weekAvailabilityMode === 'varies'
-        ? 'Your schedule changes week to week, so Roadmap asks each week rather than guessing.'
+        ? 'Your schedule changes week to week, so PrepPlan asks each week rather than guessing.'
         : 'No study time was set at setup. Add windows now so this week can be planned.',
       // Straight to the Week step, and back to Calendar afterwards (an allowed return path).
       destination: onboardingHref('week', '/app/calendar'),
@@ -106,7 +106,7 @@ export function computeAttentionQueue(state: OperatingState): AttentionItem[] {
       code: 'next_class_needed',
       priority: 55,
       title: 'Add your next class',
-      description: 'Your classes change week to week, so Roadmap is using a Monday-Sunday week until it knows your next one.',
+      description: 'Your classes change week to week, so PrepPlan is using a Monday-Sunday week until it knows your next one.',
       // Deep link: Calendar opens the dedicated next-class dialog directly, one-shot (the query param is
       // dropped once it has opened), rather than leaving the student to find the button themselves.
       destination: '/app/calendar?action=add-next-class',
@@ -140,7 +140,7 @@ export function computeAttentionQueue(state: OperatingState): AttentionItem[] {
   // Work that needs the student to decide, not just do.
   const work = state.work
   if (work && work.unplaced > 0) {
-    items.push({ id: 'attention-unplaced', code: 'unplaced', priority: 68, title: `${work.unplaced} task${work.unplaced === 1 ? '' : 's'} not placed yet`, description: 'Choose a day. Roadmap does not invent a time.', destination: '/app/calendar?view=agenda#unplaced', actionLabel: 'Place them' })
+    items.push({ id: 'attention-unplaced', code: 'unplaced', priority: 68, title: `${work.unplaced} task${work.unplaced === 1 ? '' : 's'} not placed yet`, description: 'Choose a day. PrepPlan does not invent a time.', destination: '/app/calendar?view=agenda#unplaced', actionLabel: 'Place them' })
   }
   if (work && work.overdue > 0) {
     const first = work.open.find(t => t.workStatus === 'overdue')

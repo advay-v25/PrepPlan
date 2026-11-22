@@ -102,7 +102,7 @@ export async function loadSelectedObject(userId: string, sel: Selection): Promis
     const { data: work } = await admin.from('plan_blocks').select('id, title, task_type, local_date, execution').eq('user_id', userId).eq('repair_thread_id', sel.repair).is('cancelled_at', null).neq('execution', 'cancelled').order('local_date')
     const repairs = (work ?? []).filter(w => w.task_type === 'repair'), check = (work ?? []).find(w => w.task_type === 'recheck')
     const status = t.status as string
-    const message = status === 'open' ? 'Found from a paper. Roadmap has not planned work for it yet; nothing is added until you confirm a plan.'
+    const message = status === 'open' ? 'Found from a paper. PrepPlan has not planned work for it yet; nothing is added until you confirm a plan.'
       : status === 'proposed' ? 'Repair work has been proposed. Review it, then confirm to add it to Calendar.'
       : status === 'scheduled' ? 'Repair work is on your Calendar.'
       : status === 'in_progress' ? 'You are working on it.'

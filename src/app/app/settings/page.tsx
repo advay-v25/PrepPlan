@@ -98,7 +98,7 @@ export default async function SettingsPage() {
         <div>
           <h1>Your setup</h1>
           <p>
-            Everything you told Roadmap. Change it any time.
+            Everything you told PrepPlan. Change it any time.
           </p>
         </div>
       </header>
@@ -171,7 +171,7 @@ export default async function SettingsPage() {
         <p className="fine-print">Password recovery is available through your account email.</p>
         <Link href="/forgot-password" className="text-button block mb-4">Reset your password</Link>
         <AccountActions email={user.email ?? ''} />
-        <p className="fine-print" data-support>Help, privacy questions or a problem with your account: <SupportLink subject="Roadmap beta support" />. See the <Link href="/privacy">privacy</Link> and <Link href="/terms">terms</Link> drafts.</p>
+        <p className="fine-print" data-support>Help, privacy questions or a problem with your account: <SupportLink subject="PrepPlan beta support" />. See the <Link href="/privacy">privacy</Link> and <Link href="/terms">terms</Link> drafts.</p>
       </section>
     </main>
   )

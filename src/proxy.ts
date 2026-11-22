@@ -25,4 +25,4 @@ export async function proxy(request: NextRequest) {
   ].join('; ')
   return updateSession(request, csp)
 }
-export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.svg).*)'] }
+export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.png).*)'] }

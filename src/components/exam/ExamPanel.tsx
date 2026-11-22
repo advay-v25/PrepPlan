@@ -45,17 +45,17 @@ export function ExamPanel({ status }: { status: ExamStatus }) {
     return (
       <section aria-labelledby="after-h" data-exam-phase="sat">
         <h2 id="after-h">After the exam</h2>
-        <p>{status.note} Your plan and history stay available to read; Roadmap will not nudge you to study.</p>
+        <p>{status.note} Your plan and history stay available to read; PrepPlan will not nudge you to study.</p>
         <p><button type="button" className="text-button" disabled={busy !== null} onClick={() => send('undo', { action: 'undo' }, 'Study prompts are back on.')}>I did not sit it after all</button></p>
 
         <h3>Practical Skills Module</h3>
-        <p className="muted">CFA Institute requires the Practical Skills Module before results are released. This is an optional reminder; Roadmap does not teach or track the module itself.</p>
+        <p className="muted">CFA Institute requires the Practical Skills Module before results are released. This is an optional reminder; PrepPlan does not teach or track the module itself.</p>
         <p role="group" aria-label="Practical Skills Module status">{(['done', 'not_done', 'unsure'] as const).map(v => (
           <button key={v} type="button" className={f?.psm === v ? 'primary-button' : 'secondary-button'} aria-pressed={f?.psm === v} disabled={busy !== null} onClick={() => send(`psm-${v}`, { action: 'follow_up', psm: v }, 'Saved.')}>{v === 'done' ? 'It is done' : v === 'not_done' ? 'Not yet' : 'Not sure'}</button>
         ))}</p>
 
         <h3>Your result (optional)</h3>
-        <p className="muted">Only if you want to. It is kept as your own words and never turned into a score. Roadmap never calls an internal score a pass or a fail.</p>
+        <p className="muted">Only if you want to. It is kept as your own words and never turned into a score. PrepPlan never calls an internal score a pass or a fail.</p>
         <label htmlFor="exam-result">What you were told</label>{' '}
         <input id="exam-result" className="ob-input" maxLength={80} value={result} onChange={e => setResult(e.target.value)} placeholder="e.g. passed, or a band" />{' '}
         <button type="button" className="secondary-button" disabled={busy !== null || !result.trim()} onClick={() => send('result', { action: 'follow_up', result }, 'Saved as your own report.')}>Save</button>
@@ -93,7 +93,7 @@ export function ExamPanel({ status }: { status: ExamStatus }) {
     <section aria-labelledby="exam-h" data-exam-phase={status.phase}>
       <h2 id="exam-h">{status.phase === 'awaiting_status' ? 'Did you sit the exam?' : 'Your exam'}</h2>
       <p>{status.note}</p>
-      {status.phase === 'awaiting_status' && <p className="muted">Roadmap cannot tell from a date or a window ending, so it asks. Study prompts continue until you answer.</p>}
+      {status.phase === 'awaiting_status' && <p className="muted">PrepPlan cannot tell from a date or a window ending, so it asks. Study prompts continue until you answer.</p>}
       {asks && (<>
         <label htmlFor="exam-sat-on">The day you sat it</label>{' '}
         <input id="exam-sat-on" type="date" className="ob-input" max={status.today} value={satOn} onChange={e => setSatOn(e.target.value)} />{' '}

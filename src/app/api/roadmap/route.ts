@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     const result = await generateRoadmap(user.id, { activate: body.activate === true })
     if (!result) {
       return NextResponse.json(
-        { ok: false, code: 'NO_TARGET', error: 'Choose which exam you are sitting before Roadmap can plan towards it.' },
+        { ok: false, code: 'NO_TARGET', error: 'Choose which exam you are sitting before PrepPlan can plan towards it.' },
         { status: 400 }
       )
     }

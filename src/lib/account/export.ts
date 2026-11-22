@@ -31,14 +31,14 @@ export const PARENT_OWNED: { table: string; parent: string; fk: string; key: str
 
 /** Tables that reference people or owned rows but are deliberately NOT in the personal download, each with its reason. */
 export const EXCLUDED_TABLES: Record<string, string> = {
-  assessment_forms: 'Roadmap-built paper forms (shared question content); your attempts and answers are included and name the form by id.',
+  assessment_forms: 'PrepPlan-built paper forms (shared question content); your attempts and answers are included and name the form by id.',
   beta_invitations: 'Operational admission record; holds the invited address, not study data.',
   onboarding_drafts: 'Operational one-time setup claim; your saved setup is included.',
 }
 
 const NOT_INCLUDED = [
-  'Question wording, answer keys and explanations: they are Roadmap content, not your data. Your answers, confidence and results are included and refer to questions by id.',
-  'Roadmap-built paper forms, invitation and admission records (operational, not study data).',
+  'Question wording, answer keys and explanations: they are PrepPlan content, not your data. Your answers, confidence and results are included and refer to questions by id.',
+  'PrepPlan-built paper forms, invitation and admission records (operational, not study data).',
   'Authentication secrets and tokens: never exported.',
   'Backups held by the database provider: they age out on the provider\'s schedule (see the privacy page).',
   'A one-way record that an account deletion happened, if you later delete the account.',

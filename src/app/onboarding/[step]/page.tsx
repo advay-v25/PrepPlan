@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ step: string }> }) {
   const { step } = await params
-  return { title: isStep(step) ? STEP_META[step].nav : 'Set up Roadmap' }
+  return { title: isStep(step) ? STEP_META[step].nav : 'Set up PrepPlan' }
 }
 
 export default async function OnboardingStepPage({

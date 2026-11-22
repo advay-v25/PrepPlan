@@ -41,7 +41,7 @@ export async function rateLimit(scope: LimitScope, subject: string) {
     })
   } catch {
     console.error('[auth] request quota unavailable', scope)
-    const message = 'Roadmap could not check this request. Try again shortly.'
+    const message = 'PrepPlan could not check this request. Try again shortly.'
     return Response.json({ ok: false, code: 'SECURITY_UNAVAILABLE', error: message, message }, {
       status: 503, headers: { 'Retry-After': '10', 'Cache-Control': AUTH_PRIVATE_CACHE },
     })

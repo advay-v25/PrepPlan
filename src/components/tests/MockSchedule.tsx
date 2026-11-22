@@ -27,7 +27,7 @@ export function MockSchedule({ appointments, capability }: { appointments: Appoi
           </div>
         )}
       </div>
-      <p data-testid="tests-record-past-mock">Taken a mock outside Roadmap? <Link className="prose-link" href="/app/calendar/mock-report">Record a mock already taken</Link>: no booking is needed, and it is kept as your own report, not a test result.</p>
+      <p data-testid="tests-record-past-mock">Taken a mock outside PrepPlan? <Link className="prose-link" href="/app/calendar/mock-report">Record a mock already taken</Link>: no booking is needed, and it is kept as your own report, not a test result.</p>
       {planned.length === 0 && <p>No mock is planned. <Link className="prose-link" href="/app/calendar#checkpoint">Plan a rehearsal or an external mock</Link>.</p>}
       <ul className="mock-schedule__list" style={{ listStyle: 'none', padding: 0, display: 'grid', gap: 12 }}>
         {planned.map(a => (
@@ -37,7 +37,7 @@ export function MockSchedule({ appointments, capability }: { appointments: Appoi
             {a.kind === 'internal_rehearsal' && (a.rehearsal
               ? <p>{a.rehearsal.primary ? <Link className="primary-button" href={a.rehearsal.primary.href}>{a.rehearsal.primary.label}</Link> : <Link className="secondary-button" href={`/app/tests/rehearsal/${a.rehearsal.id}`}>Open the rehearsal</Link>}</p>
               : <RehearsalAction appointmentId={a.id} compact />)}
-            {a.kind !== 'internal_rehearsal' && <p className="fine-print">Taken outside Roadmap. Record what happened in Calendar when it is done.</p>}
+            {a.kind !== 'internal_rehearsal' && <p className="fine-print">Taken outside PrepPlan. Record what happened in Calendar when it is done.</p>}
           </li>
         ))}
       </ul>

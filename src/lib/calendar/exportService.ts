@@ -57,7 +57,7 @@ export async function buildCalendarExport(userId: string, o: ExportOptions, base
     if (!e.isTask && !o.classes) { p.excludedClasses++; continue }
     if (e.isTask && (ex === 'completed' || e.isLoggedLearning) && !o.history) { p.excludedHistory++; continue }
     // Titles and short objectives only. A repair or re-check title names a weak concept, so it is exported generically.
-    const title = e.layer === 'repair' ? 'Roadmap repair session' : e.layer === 'recheck' ? 'Roadmap re-check' : e.title
+    const title = e.layer === 'repair' ? 'PrepPlan repair session' : e.layer === 'recheck' ? 'PrepPlan re-check' : e.title
     const url = baseUrl + (e.isTask ? calendarTaskHref(e.id, e.localDate) : ROUTES.app.calendar)
     const common = { id: e.exportKey ?? e.id, title: e.isTask && (ex === 'completed' || e.isLoggedLearning) ? `${title} (done)` : title, description: e.isTask && e.layer !== 'repair' && e.layer !== 'recheck' ? clip(e.learningObjective, 200) : null, url, category: e.layer }
     if (e.kind === 'timed' && e.startMinutes !== null && e.durationMinutes > 0) {

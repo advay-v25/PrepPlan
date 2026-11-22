@@ -96,7 +96,7 @@ export function ReviewWeekForm(props: {
       })
       const body = await res.json()
       if (body.ok) setPreview(body); else setMessage(body.message ?? body.error ?? 'Could not prepare the review.')
-    } catch { setMessage('Could not reach Roadmap. Nothing was changed. Try again.') }
+    } catch { setMessage('Could not reach PrepPlan. Nothing was changed. Try again.') }
     finally { setBusy(false) }
   }
 

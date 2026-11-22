@@ -22,7 +22,7 @@ export function selectNextAction(state: OperatingState): ActionableDecision {
       destination: '/app/calendar',
       permittedCommands: ['retry_activation'],
       code: 'recover_activation',
-      title: 'Roadmap activation failed',
+      title: 'PrepPlan activation failed',
       rationale: 'There was a problem starting your study week. We need to try again.',
       scope: 'Activation',
       timing: 'Immediate',
@@ -190,7 +190,7 @@ export function selectNextAction(state: OperatingState): ActionableDecision {
     return {
       id: 'place-work', revision: first.revision, availability: 'available', destination: `${calendarTaskHref(first.id, today.dateLocal)}#unplaced`, permittedCommands: ['place_task'],
       code: 'place_task', title: `Place ${work.unplaced} unplaced task${work.unplaced === 1 ? '' : 's'}`,
-      rationale: 'These belong to this week but have no day. Roadmap does not invent a time for them.', scope: 'Planning', timing: 'Soon',
+      rationale: 'These belong to this week but have no day. PrepPlan does not invent a time for them.', scope: 'Planning', timing: 'Soon',
       expectedDurationMinutes: work.open.filter(t => t.workStatus === 'unplaced').reduce((n, t) => n + t.durationMinutes, 0) || null,
     }
   }

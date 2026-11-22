@@ -49,7 +49,7 @@ export function RehearsalHub({ state }: { state: RehearsalState }) {
     try {
       const r = await (await fetch(`/api/rehearsal/${state.id}/session`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'settle' }) })).json()
       if (r.ok) router.refresh(); else setSettleError(r.message ?? 'Could not finish the session yet.')
-    } catch { setSettleError('Could not reach Roadmap. Your saved answers are safe.') }
+    } catch { setSettleError('Could not reach PrepPlan. Your saved answers are safe.') }
   }
   useEffect(() => { if (timedOut) void settle() }, [timedOut]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -58,7 +58,7 @@ export function RehearsalHub({ state }: { state: RehearsalState }) {
     try {
       const r = await (await fetch(`/api/rehearsal/${state.id}/session`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session: n }) })).json()
       if (r.ok) router.push(r.url); else { setError(r.message ?? 'Could not start the session.'); setBusy(null) }
-    } catch { setError('Could not reach Roadmap. Nothing was started; try again.'); setBusy(null) }
+    } catch { setError('Could not reach PrepPlan. Nothing was started; try again.'); setBusy(null) }
   }
 
   const [s1, s2] = state.sessions
@@ -71,8 +71,8 @@ export function RehearsalHub({ state }: { state: RehearsalState }) {
       {state.stage === 'ready' && (
         <div className="notice" role="note">
           <div>
-            <strong>Two sessions, two clocks.</strong> Each session has 90 questions and its own 135-minute clock. A clock starts only when you press Start and runs on Roadmap&rsquo;s server, so closing the tab or refreshing does not pause or extend it.
-            <br /><strong>One difference from the real exam:</strong> Roadmap asks how sure you are for every answer you give. That is extra interaction the official exam does not have, and the clock does not stop for it.
+            <strong>Two sessions, two clocks.</strong> Each session has 90 questions and its own 135-minute clock. A clock starts only when you press Start and runs on PrepPlan&rsquo;s server, so closing the tab or refreshing does not pause or extend it.
+            <br /><strong>One difference from the real exam:</strong> PrepPlan asks how sure you are for every answer you give. That is extra interaction the official exam does not have, and the clock does not stop for it.
           </div>
         </div>
       )}

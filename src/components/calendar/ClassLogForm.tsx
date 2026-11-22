@@ -114,7 +114,7 @@ export function ClassLogForm(props: {
     try {
       const r = await post('/api/class-log/preview', payload())
       if (r.ok) setPreview(r); else { setPreview(null); setMessage(r.message ?? r.error ?? 'Could not build the preview.') }
-    } catch { setPreview(null); setMessage('Could not reach Roadmap. Nothing was changed; your choices are kept. Try the preview again.') }
+    } catch { setPreview(null); setMessage('Could not reach PrepPlan. Nothing was changed; your choices are kept. Try the preview again.') }
     finally { setBusy(false) }
   }
 

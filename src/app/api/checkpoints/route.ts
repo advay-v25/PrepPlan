@@ -33,7 +33,7 @@ async function failure(userId: string | null, e: unknown) {
     return NextResponse.json({ ok: false, code: e.code, error: e.message, ...(e.extra ?? {}), ...(current !== undefined ? { checkpoint: current } : {}) }, { status: e.status })
   }
   const requestId = recordFailure('checkpoint.command', e)
-  return NextResponse.json({ ok: false, code: 'FAILED', error: 'Roadmap could not confirm the change. Retry the same request safely.', requestId }, { status: 500 })
+  return NextResponse.json({ ok: false, code: 'FAILED', error: 'PrepPlan could not confirm the change. Retry the same request safely.', requestId }, { status: 500 })
 }
 
 async function saved(userId: string, receipt: Record<string, unknown>, appointmentId: string | null = null) {

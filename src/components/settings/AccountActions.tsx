@@ -42,7 +42,7 @@ export function AccountActions({ email }: { email: string }) {
       if (!res.ok) { const b = await res.json().catch(() => null); setNotice(b?.error ?? 'The export could not be prepared. Nothing was changed.'); return }
       const a = document.createElement('a'); a.href = URL.createObjectURL(await res.blob()); a.download = `roadmap-export-${new Date().toISOString().slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(a.href)
       setNotice('Your data was downloaded. It is a copy for you, not a backup you can re-import.')
-    } catch { setNotice('Could not reach Roadmap. Nothing was downloaded.') } finally { setExporting(false) }
+    } catch { setNotice('Could not reach PrepPlan. Nothing was downloaded.') } finally { setExporting(false) }
   }
 
   const handleDeleteAccount = async () => {
@@ -64,7 +64,7 @@ export function AccountActions({ email }: { email: string }) {
       }
       router.push('/')
     } catch {
-      setError('We could not reach Roadmap, so it is not confirmed whether your account was deleted. Try signing in with your existing email and password. If you get in, the account still exists and you can retry. A failed sign-in alone does not prove deletion. Do not use "Continue with Google" to check, because that can create a new account.')
+      setError('We could not reach PrepPlan, so it is not confirmed whether your account was deleted. Try signing in with your existing email and password. If you get in, the account still exists and you can retry. A failed sign-in alone does not prove deletion. Do not use "Continue with Google" to check, because that can create a new account.')
       setLoading(false)
     }
   }

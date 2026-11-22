@@ -13,7 +13,7 @@ const ics = buildIcs('acct-1', [
   { id: 't1', title: long, description: 'Objective; with, punctuation\\ and a\nnewline', url: 'http://localhost:3141/app/calendar?task=t1', kind: 'timed', start, end: new Date(start.getTime() + 45 * 60_000), category: 'study' },
   { id: 't2', title: 'All-day reminder', kind: 'allday', date: '2026-12-31' },
   { id: 't1', title: 'Same event, different title', kind: 'allday', date: '2026-03-29' },   // same identity: exported once
-], { name: 'Roadmap schedule (snapshot)', stamp: new Date('2026-11-14T10:00:00Z') })
+], { name: 'PrepPlan schedule (snapshot)', stamp: new Date('2026-11-14T10:00:00Z') })
 
 ok('CRLF everywhere, never a bare LF', !/[^\r]\n/.test(ics) && ics.endsWith('\r\n'))
 ok('no physical line exceeds 75 octets', ics.split('\r\n').every(l => Buffer.byteLength(l, 'utf8') <= 75))

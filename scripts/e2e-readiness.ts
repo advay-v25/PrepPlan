@@ -80,7 +80,7 @@ async function main() {
   const filtered = await s.req('/app/curriculum?view=readiness&band=repair')
   check('the band filter renders', filtered.status === 200)
   const roadmapView = await s.req('/app/curriculum?view=roadmap')
-  check('the Roadmap view still renders', roadmapView.status === 200)
+  check('the PrepPlan view still renders', roadmapView.status === 200)
 
   finish()
 }

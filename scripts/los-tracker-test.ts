@@ -63,7 +63,7 @@ check('within a band, core comes before supporting', sorted[0].importance === 'c
 check('verify precedes untested, maintain is last', sorted[2].band === 'verify' && sorted[sorted.length - 1].band === 'maintain')
 const c = countBands(rows)
 check('band counts add up to the total', c.repair + c.verify + c.maintain + c.untested === c.total && c.repair === 2 && c.total === 5)
-check('repair guidance states the real closing rule (a fresh eligible check, scheduled by Roadmap) and no fixed pass mark', /fresh, eligible check/.test(BAND_METHOD.repair.proof) && !/\d+\s*%/.test(BAND_METHOD.repair.proof) && !/\d+–\d+ (fresh )?questions/.test(BAND_METHOD.repair.howToImprove('x')))
+check('repair guidance states the real closing rule (a fresh eligible check, scheduled by PrepPlan) and no fixed pass mark', /fresh, eligible check/.test(BAND_METHOD.repair.proof) && !/\d+\s*%/.test(BAND_METHOD.repair.proof) && !/\d+–\d+ (fresh )?questions/.test(BAND_METHOD.repair.howToImprove('x')))
 check('no band prescribes a fixed question count (it depends on the bank and the policy)', Object.values(BAND_METHOD).every(m => !/\d/.test(m.questionRange)))
 check('method text names the concept', BAND_METHOD.verify.howToImprove('Duration').includes('Duration'))
 check('no output promises a pass probability or an hours target',

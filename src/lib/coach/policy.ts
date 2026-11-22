@@ -6,4 +6,4 @@ export function isTutoringRequest(message: string): boolean {
 }
 
 export const TUTORING_BOUNDARY_REPLY =
-  'Roadmap does not teach chapters or solve your curriculum questions. Use your course material or instructor for the explanation, then return to Curriculum to mark what you covered and Tests to check what held. I can help you choose the next topic, identify the weak point, and plan a re-check.'
+  'PrepPlan does not teach chapters or solve your curriculum questions. Use your course material or instructor for the explanation, then return to Curriculum to mark what you covered and Tests to check what held. I can help you choose the next topic, identify the weak point, and plan a re-check.'

@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   try { body = await readBoundedJson(request, 2048) as typeof body }
   catch (error) {
     if (error instanceof JsonInputError) return NextResponse.json({ error: error.message }, { status: error.status })
-    return NextResponse.json({ error: 'Roadmap could not read this request.' }, { status: 400 })
+    return NextResponse.json({ error: 'PrepPlan could not read this request.' }, { status: 400 })
   }
   if (!user.email || !body || typeof body.confirmEmail !== 'string' || body.confirmEmail.trim().toLowerCase() !== user.email.toLowerCase()) {
     return NextResponse.json({ code: 'CONFIRMATION_REQUIRED', error: 'Type your account email address to confirm. Nothing was deleted.' }, { status: 400 })
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const session = await verifiedSession(supabase)
     fresh = !!session && session.userId === user.id && isRecentAuthClaim(session.claims.amr) && await sessionIsActive(user.id, session.id)
   } catch {
-    return NextResponse.json({ code: 'AUTH_UNAVAILABLE', error: 'Roadmap could not check your session. Try again shortly.' }, { status: 503 })
+    return NextResponse.json({ code: 'AUTH_UNAVAILABLE', error: 'PrepPlan could not check your session. Try again shortly.' }, { status: 503 })
   }
   if (!fresh) {
     return NextResponse.json({ code: 'RECENT_SIGN_IN_REQUIRED', error: `For your safety, sign in again (within the last ${RECENT_SIGN_IN_MINUTES} minutes) and then delete your account. Nothing was deleted.` }, { status: 403 })
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     catch (e) { console.error(`[account delete] audit write (${outcome}) threw:`, (e as Error).message) }
   }
   const unknown = () => NextResponse.json({ code: 'DELETE_OUTCOME_UNKNOWN', filesRemoved: files.removed,
-    error: `Roadmap could not confirm whether your account was deleted.${gone(files.removed)} If you can still sign in with your existing credentials, you can retry from Account.` }, { status: 502 })
+    error: `PrepPlan could not confirm whether your account was deleted.${gone(files.removed)} If you can still sign in with your existing credentials, you can retry from Account.` }, { status: 502 })
   const outcome = await boundedStage('delete account', 15_000, () => admin.auth.admin.deleteUser(user.id)).catch(() => null)
   if (!outcome) return unknown()
   const { error } = outcome

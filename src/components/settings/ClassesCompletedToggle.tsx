@@ -19,7 +19,7 @@ export function ClassesCompletedToggle({ classesCompletedAt }: { classesComplete
       })
       if (res.ok) router.refresh()
       else setError((await res.json().catch(() => null))?.error ?? 'Could not save this. Nothing was changed; try again.')
-    } catch { setError('Could not reach Roadmap. Nothing was changed; try again.') } finally {
+    } catch { setError('Could not reach PrepPlan. Nothing was changed; try again.') } finally {
       setBusy(false)
     }
   }

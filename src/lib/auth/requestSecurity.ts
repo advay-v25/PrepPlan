@@ -37,7 +37,7 @@ export function appRequestRefusal(request: Request) {
   const origin = request.headers.get('origin')
   const site = request.headers.get('sec-fetch-site')
   if (site === 'cross-site' || site === 'same-site' || (origin !== null && parseOrigin(origin)?.origin !== authOrigin(request))) {
-    return Response.json({ code: 'ORIGIN_REFUSED', error: 'Open Roadmap directly and try again.' }, { status: 403, headers: { 'Cache-Control': AUTH_PRIVATE_CACHE } })
+    return Response.json({ code: 'ORIGIN_REFUSED', error: 'Open PrepPlan directly and try again.' }, { status: 403, headers: { 'Cache-Control': AUTH_PRIVATE_CACHE } })
   }
   // JSON routes have stronger per-route limits where payload sizes are known.
   const size = Number(request.headers.get('content-length') ?? 0)

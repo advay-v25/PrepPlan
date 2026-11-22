@@ -203,7 +203,7 @@ export function PlanStep({
       {tasks.length === 0 ? (
         <Notice tone="warn">
           {noWindows
-            ? <>No study is scheduled because you have not given Roadmap any study windows. That is a valid way to finish setup: Calendar will open with this week accepted and empty, and one clear step to add availability. <Link className="prose-link" href={onboardingHref('week', ROUTES.onboarding.plan)}>Add windows now</Link></>
+            ? <>No study is scheduled because you have not given PrepPlan any study windows. That is a valid way to finish setup: Calendar will open with this week accepted and empty, and one clear step to add availability. <Link className="prose-link" href={onboardingHref('week', ROUTES.onboarding.plan)}>Add windows now</Link></>
             : <>Nothing fits this week’s windows yet. Widen a window, or finish setup and adjust in Calendar. <Link className="prose-link" href={onboardingHref('week', ROUTES.onboarding.plan)}>Edit windows</Link></>}
         </Notice>
       ) : (

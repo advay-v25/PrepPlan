@@ -25,7 +25,7 @@ export function ReminderPrefs() {
       const res = await fetch('/api/reminders/prefs'); const r = await res.json().catch(() => null)
       if (!res.ok || !r?.ok) { setPhase({ kind: 'load_error', message: r?.error ?? 'Your reminder choices could not be loaded.' }); return }
       setSaved(r.prefs); setDraft(r.prefs); setDelivery(r.delivery); setPhase({ kind: 'ready' })
-    } catch { setPhase({ kind: 'load_error', message: 'Could not reach Roadmap. Your choices are unchanged.' }) }
+    } catch { setPhase({ kind: 'load_error', message: 'Could not reach PrepPlan. Your choices are unchanged.' }) }
   }, [])
   useEffect(() => { void load() }, [load])
 
@@ -51,7 +51,7 @@ export function ReminderPrefs() {
 
   return (
     <div data-reminder-prefs>
-      {delivery === 'not_configured' && <p className="fine-print" role="status" data-delivery="not_configured">Reminder email is not switched on for Roadmap yet. You can save your choices now; nothing is sent until it is.</p>}
+      {delivery === 'not_configured' && <p className="fine-print" role="status" data-delivery="not_configured">Reminder email is not switched on for PrepPlan yet. You can save your choices now; nothing is sent until it is.</p>}
       <div><label className="ob-check"><input type="checkbox" checked={draft.assessmentReminders} onChange={e => set({ assessmentReminders: e.target.checked })} /> <span>Email me the evening before a mock or rehearsal</span></label></div>
       <div><label className="ob-check"><input type="checkbox" checked={draft.weeklyReviewReminders} onChange={e => set({ weeklyReviewReminders: e.target.checked })} /> <span>Email me when my weekly review is ready</span></label></div>
       <div className="quiet-hours-wrap">

@@ -53,7 +53,7 @@ async function main() {
     console.log('\n1. Testing Public & Auth Routes...')
     await page.goto('/')
     await page.waitForLoadState('networkidle')
-    check('Public', 'Landing page loads', await page.locator('text=Roadmap').first().isVisible())
+    check('Public', 'Landing page loads', await page.locator('text=PrepPlan').first().isVisible())
     await page.screenshot({ path: path.join(SNAP_DIR, '01-landing.png') })
 
     await page.goto('/login')

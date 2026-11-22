@@ -523,7 +523,7 @@ export async function createManualTask(userId: string, input: {
     if (r.code === 'OUTSIDE_CYCLE') throw new ExecutionCommandError(`That day is outside this plan (${r.start} to ${r.end}). To carry work into another week, use the weekly review.`, 400, 'OUTSIDE_CYCLE')
     if (r.code === 'BAD_TYPE') throw new ExecutionCommandError('Repairs, re-checks and mocks are created by their own steps, not added by hand.', 400, 'BAD_TYPE')
     if (r.code === 'KEY_REUSED') throw new ExecutionCommandError('That request was already used for a different task. Reload and add it again.', 409, 'KEY_REUSED')
-    if (r.code === 'NO_RECEIPT') throw new ExecutionCommandError('This task was added before Roadmap kept a record of the original request, so it cannot be confirmed as the same one. It is already on your Calendar; nothing was added.', 409, 'NO_RECEIPT')
+    if (r.code === 'NO_RECEIPT') throw new ExecutionCommandError('This task was added before PrepPlan kept a record of the original request, so it cannot be confirmed as the same one. It is already on your Calendar; nothing was added.', 409, 'NO_RECEIPT')
     throw new ExecutionCommandError('That task could not be added. Nothing was changed.', 400, r.code ?? 'REFUSED')
   }
   return { needsConfirmation: false as const, task: r.task, current: r.current ?? null, replayed: Boolean(r.replayed) }

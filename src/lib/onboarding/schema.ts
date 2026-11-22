@@ -191,7 +191,7 @@ export const WeekSetupSchema = z.preprocess(raw => {
   maxSessionMinutes: z.union([z.literal(20), z.literal(30), z.literal(45), z.literal(60), z.literal(90)]),
 }).superRefine((d, ctx) => {
   const add = (message: string, path: (string | number)[]) => ctx.addIssue({ code: 'custom', message, path })
-  if (d.availabilityMode === 'windows' && d.windows.length === 0) add('Choose at least one time when Roadmap may schedule study.', ['windows'])
+  if (d.availabilityMode === 'windows' && d.windows.length === 0) add('Choose at least one time when PrepPlan may schedule study.', ['windows'])
   if (d.availabilityMode !== 'windows' && d.windows.length > 0) add('Study windows conflict with saying your schedule cannot be set.', ['windows'])
 
   const windowProblem = findTimeProblem(d.windows.map(w => ({ weekday: w.weekday, start: w.startTime, end: w.endTime })), 'study window')

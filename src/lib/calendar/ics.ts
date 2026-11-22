@@ -32,7 +32,7 @@ export const eventUid = (accountId: string, eventId: string) => `rm-${createHash
 
 export function buildIcs(accountId: string, events: IcsEvent[], opts: { name: string; stamp?: Date }): string {
   const stamp = utc(opts.stamp ?? new Date())
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Roadmap//Calendar snapshot//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', `X-WR-CALNAME:${escapeText(opts.name)}`]
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//PrepPlan//Calendar snapshot//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', `X-WR-CALNAME:${escapeText(opts.name)}`]
   const seen = new Set<string>()
   for (const e of events) {
     const uid = eventUid(accountId, e.id)

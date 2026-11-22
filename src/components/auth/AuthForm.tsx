@@ -49,7 +49,7 @@ export function AuthForm({ mode, nextPath = '/app', reset }: { mode: 'login' | '
       }
       setError(result.data?.error ?? 'Sign-in could not be confirmed. Try again.')
     } catch {
-      setError('Roadmap could not be reached. Try again.')
+      setError('PrepPlan could not be reached. Try again.')
     } finally {
       setCaptcha(''); setCaptchaAttempt((value) => value + 1); setLoading(false)
     }
@@ -58,11 +58,11 @@ export function AuthForm({ mode, nextPath = '/app', reset }: { mode: 'login' | '
   return (
     <main className="auth-page">
       <section className="auth-panel">
-        <Link href="/" className="auth-brand"><span className="brand-mark"><span /></span> Roadmap</Link>
+        <Link href="/" className="auth-brand"><span className="brand-mark" aria-hidden="true" /> PrepPlan</Link>
         <div className="auth-form-wrap">
-          <h1>{mode === 'login' ? 'Build a study plan that responds to evidence.' : 'Create your Roadmap account.'}</h1>
+          <h1>{mode === 'login' ? 'Build a study plan that responds to evidence.' : 'Create your PrepPlan account.'}</h1>
           <p className="auth-lede">{mode === 'login' ? 'Sign in to continue your CFA Level I roadmap.' : 'Set up your exam and your week, then organise your studies one week at a time.'}</p>
-          {reset ? <Notice tone={reset === 'success' ? 'success' : 'warn'} role="status">{reset === 'success' ? 'Password updated. Sign in with your new password.' : 'Password updated. Roadmap could not confirm that every previous session was revoked.'}</Notice> : null}
+          {reset ? <Notice tone={reset === 'success' ? 'success' : 'warn'} role="status">{reset === 'success' ? 'Password updated. Sign in with your new password.' : 'Password updated. PrepPlan could not confirm that every previous session was revoked.'}</Notice> : null}
           {GOOGLE_SIGN_IN_ENABLED && mode === 'login' ? <>
             <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading}><span className="google-g">G</span> Continue with Google</button>
             <div className="auth-divider"><span>or</span></div>
@@ -90,7 +90,7 @@ export function AuthForm({ mode, nextPath = '/app', reset }: { mode: 'login' | '
         </div>
       </section>
       <aside className="auth-explainer">
-        <div><h2>How Roadmap works</h2><p>An evidence-driven cycle that continuously improves your plan.</p></div>
+        <div><h2>How PrepPlan works</h2><p>An evidence-driven cycle that continuously improves your plan.</p></div>
         <ol>
           <li><span><BookOpenCheck size={20} /></span><div><strong>Class or self-study</strong><small>Capture what was covered and what fits your real week.</small></div></li>
           <li><span><BarChart3 size={20} /></span><div><strong>Diagnostic</strong><small>Measure application, missed detail and confidence calibration.</small></div></li>

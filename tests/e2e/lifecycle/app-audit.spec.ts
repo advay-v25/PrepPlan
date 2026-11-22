@@ -43,7 +43,7 @@ async function viewPages(page: Page, routes: ReadonlyArray<readonly [string, str
     const started = performance.now()
     const response = await page.goto(path)
     expect(response?.status(), path).toBe(200)
-    await expect(page).toHaveTitle(`${title} · Roadmap`)
+    await expect(page).toHaveTitle(`${title} · PrepPlan`)
     await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
     await noHorizontalOverflow(page)
     times.push({ path, ms: Math.round(performance.now() - started) })
@@ -114,7 +114,7 @@ for (const classLed of [false, true]) {
       if (!classLed) {
         const reading = '/app/curriculum/fsa/r028'
         await page.goto(reading)
-        await expect(page).toHaveTitle(/Reading 28 · .+ · Roadmap$/)
+        await expect(page).toHaveTitle(/Reading 28 · .+ · PrepPlan$/)
         const reported = await page.request.post('/api/curriculum/coverage', { data: { readingId: 'r028', state: 'partly' } })
         expect(reported.ok()).toBe(true)
         const coverage = '0 of 102 readings recorded as covered · 1 partly'

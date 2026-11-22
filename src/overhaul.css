@@ -170,3 +170,71 @@
     min-width: 0;
   }
 }
+
+/* ── Sign-up page ── */
+.su { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); background: var(--surface-raised); }
+.su-main { display: flex; flex-direction: column; padding: 28px clamp(24px, 5vw, 72px) 24px; min-width: 0; }
+.su-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.su-top p { margin: 0; font-size: 14px; color: var(--muted); }
+.su-top p a, .su-consent a { color: var(--accent); font-weight: 650; text-decoration: none; }
+.su-top p a:hover, .su-consent a:hover { text-decoration: underline; }
+.su-card { width: min(420px, 100%); margin: auto; padding: 40px 0 28px; }
+.su-card h1 { margin: 0; font-size: clamp(30px, 3.2vw, 40px); line-height: 1.08; letter-spacing: -.035em; color: var(--ink); text-wrap: balance; }
+.su-lede { margin: 12px 0 28px; color: var(--muted); font-size: 15px; line-height: 1.55; }
+.su-form { display: grid; gap: 18px; }
+.su-field { display: grid; gap: 7px; font-size: 13.5px; font-weight: 650; color: var(--ink); }
+.su-field input { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); color: var(--ink); font: inherit; font-size: 15px; font-weight: 450; transition: border-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard); }
+.su-field input::placeholder { color: var(--muted); opacity: .8; }
+.su-field input:hover { border-color: color-mix(in srgb, var(--ink) 30%, var(--line)); }
+.su-field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.su-pass { position: relative; display: block; }
+.su-pass input { padding-right: 48px; }
+.su-pass button { position: absolute; right: 4px; top: 4px; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--muted); cursor: pointer; }
+.su-pass button:hover { color: var(--ink); background: var(--surface-sunken); }
+.su-rule { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 450; color: var(--muted); }
+.su-rule svg { opacity: .35; }
+.su-rule.is-met { color: var(--success); }
+.su-rule.is-met svg { opacity: 1; }
+.su-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); cursor: pointer; }
+.su-consent input { width: 18px; height: 18px; margin: 2px 0 0; flex: none; accent-color: var(--accent); }
+.su-submit, .su-google { width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: var(--radius-md); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform var(--dur-fast) var(--ease-standard), background var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard); }
+.su-submit { border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); box-shadow: var(--shadow-sm); }
+.su-submit:hover:not(:disabled) { background: var(--accent-dark, var(--accent)); transform: translateY(-1px); }
+.su-submit:active:not(:disabled) { transform: translateY(0) scale(.99); }
+.su-submit:disabled { opacity: .55; cursor: not-allowed; }
+.su-google { border: 1px solid var(--line); background: var(--surface-raised); color: var(--ink); }
+.su-google:hover:not(:disabled) { background: var(--surface-sunken); }
+.su-google:disabled { opacity: .5; cursor: not-allowed; }
+.su-or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 12.5px; }
+.su-or::before, .su-or::after { content: ''; flex: 1; height: 1px; background: var(--line-soft); }
+.su-foot { margin: 0; text-align: center; font-size: 12.5px; color: var(--muted); }
+
+/* The right panel is dark in every theme, so its colours are fixed. */
+.su-aside { position: relative; overflow: hidden; display: grid; align-items: center; padding: clamp(32px, 5vw, 72px); background: radial-gradient(120% 80% at 100% 0%, #16407a 0%, rgba(22, 64, 122, 0) 60%), linear-gradient(160deg, #0f2a52, #071a3b); color: #f5f7fb; }
+.su-aside__inner { width: min(460px, 100%); margin: 0 auto; }
+.su-aside h2 { margin: 0; font-size: clamp(28px, 3vw, 38px); line-height: 1.1; letter-spacing: -.035em; color: #f5f7fb; }
+.su-aside__inner > p { margin: 10px 0 28px; color: rgba(245, 247, 251, .78); font-size: 15.5px; line-height: 1.5; }
+.su-week { padding: 18px; border-radius: 18px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .16); box-shadow: 0 24px 60px rgba(0, 0, 0, .28); backdrop-filter: blur(10px); }
+.su-week__tag { display: inline-block; margin-bottom: 12px; font-size: 11.5px; font-weight: 650; letter-spacing: .02em; color: rgba(245, 247, 251, .7); }
+.su-week ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.su-week li { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .1); font-size: 13.5px; }
+.su-week li b { font-weight: 650; color: rgba(245, 247, 251, .65); }
+.su-week li span { font-weight: 600; color: #f5f7fb; }
+.su-week li em { font-style: normal; font-size: 12.5px; color: rgba(245, 247, 251, .65); font-variant-numeric: tabular-nums; }
+.su-week li.is-rest { background: transparent; border-style: dashed; }
+.su-week li.is-rest span { color: rgba(245, 247, 251, .6); font-weight: 450; }
+.su-week li.is-paper { background: rgba(255, 190, 70, .14); border-color: rgba(255, 190, 70, .4); }
+.su-steps { list-style: none; margin: 26px 0 0; padding: 0; display: grid; gap: 14px; }
+.su-steps li { display: flex; gap: 14px; align-items: center; }
+.su-steps li > span { flex: none; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .16); color: #8ec1ff; }
+.su-steps strong { display: block; font-size: 14.5px; color: #f5f7fb; }
+.su-steps small { display: block; font-size: 13px; color: rgba(245, 247, 251, .7); }
+@media (max-width: 960px) {
+  .su { grid-template-columns: 1fr; }
+  .su-aside { order: 2; padding: 36px 24px 44px; }
+  .su-card { padding-top: 28px; }
+}
+@media (max-width: 480px) {
+  .su-main { padding: 20px 20px 16px; }
+  .su-week li { grid-template-columns: 34px 1fr auto; padding: 8px 10px; }
+}

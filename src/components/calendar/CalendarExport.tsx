@@ -20,12 +20,12 @@ export function CalendarExport({ initialFrom, initialTo }: { initialFrom: string
       if (kind === 'preview') { setPreview((await res.json()).preview); return }
       const blob = await res.blob(), a = document.createElement('a')
       a.href = URL.createObjectURL(blob); a.download = `roadmap-schedule-${from}-to-${to}.ics`; a.click(); URL.revokeObjectURL(a.href)
-    } catch { setError('Could not reach Roadmap. Nothing was downloaded.') } finally { setBusy(false) }
+    } catch { setError('Could not reach PrepPlan. Nothing was downloaded.') } finally { setBusy(false) }
   }
 
   return (
     <div className="calendar-export" data-calendar-export>
-      <p className="fine-print">A snapshot of your accepted schedule as a calendar file. It does not update when Roadmap changes, and importing it again may duplicate events in some calendar apps.</p>
+      <p className="fine-print">A snapshot of your accepted schedule as a calendar file. It does not update when PrepPlan changes, and importing it again may duplicate events in some calendar apps.</p>
       <div className="calendar-export__row">
         <label>From <input type="date" disabled={busy} value={from} onChange={e => { setFrom(e.target.value); setPreview(null) }} /></label>
         <label>To <input type="date" disabled={busy} value={to} onChange={e => { setTo(e.target.value); setPreview(null) }} /></label>

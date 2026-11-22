@@ -147,7 +147,7 @@ export function OnboardingShell({
     <div className="ob-shell">
       <aside className="ob-rail" aria-label="Setup progress">
         <div className="ob-brand">
-          <span className="brand-mark"><span /></span> Roadmap
+          <span className="brand-mark" aria-hidden="true" /> PrepPlan
         </div>
 
         <ol className="ob-steps" ref={railRef}>

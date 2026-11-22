@@ -103,7 +103,7 @@ export const BAND_METHOD: Record<Exclude<LosBand, 'untested'>, {
 }> = {
   repair: {
     howToImprove: c => `Relearn the rule, write the error in your own words, then practise it before the scheduled check. Focus: ${c}.`,
-    proof: 'A repair closes when a fresh, eligible check on this outcome comes out supported. Roadmap schedules that check; practising or writing a note does not close it.',
+    proof: 'A repair closes when a fresh, eligible check on this outcome comes out supported. PrepPlan schedules that check; practising or writing a note does not close it.',
     questionRange: 'A fresh check when one is due and questions are available',
   },
   verify: {

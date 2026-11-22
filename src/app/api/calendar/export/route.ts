@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     const opts = parseExportOptions(url.searchParams, todayInZone((prof?.timezone as string) || 'UTC'))
     const { events, preview } = await buildCalendarExport(access.user.id, opts, url.origin)
     if (url.searchParams.get('preview') === '1') return NextResponse.json({ ok: true, preview }, { headers: H })
-    const body = buildIcs(access.user.id, events, { name: 'Roadmap schedule (snapshot)' })
+    const body = buildIcs(access.user.id, events, { name: 'PrepPlan schedule (snapshot)' })
     return new NextResponse(body, { headers: { ...H, 'Content-Type': 'text/calendar; charset=utf-8', 'Content-Disposition': `attachment; filename="roadmap-schedule-${opts.from}-to-${opts.to}.ics"` } })
   } catch (e) {
     if (e instanceof ExportInputError) return NextResponse.json({ ok: false, error: e.message }, { status: 400, headers: H })

@@ -68,7 +68,7 @@ export function ScopePanel({ preview, catalog }: { preview: PaperPreview; catalo
             const rd = readingName.get(p.readingId), o = rd?.outcomes.find(x => x.id === p.outcomeId)
             return <li key={`${p.sessionId}-${p.outcomeId}`}>{rd ? `Reading ${rd.no}` : 'A reading'}{o ? `, ${o.code}. ${o.title}` : ''} · {p.extent === 'continued' ? 'Continued' : 'Partly covered'} in <Link href={classLogHref({ sessionId: p.sessionId })}>{p.classLabel ?? 'saved class'} on {p.classDate}</Link></li>
           })}</ul>
-          <p className="muted">Roadmap cannot tell which questions test only that part, so it asks nothing about it yet. Continuing it is progress, not completion. Log it as “All of it” in a later class, or finish its continuation task and confirm that you covered the whole outcome, and it joins the paper.</p>
+          <p className="muted">PrepPlan cannot tell which questions test only that part, so it asks nothing about it yet. Continuing it is progress, not completion. Log it as “All of it” in a later class, or finish its continuation task and confirm that you covered the whole outcome, and it joins the paper.</p>
         </div>
       )}
 

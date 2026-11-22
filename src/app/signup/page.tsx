@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '../../lib/supabase/server'
-import { AuthForm } from '../../components/auth/AuthForm'
+import { SignupForm } from '../../components/auth/SignupForm'
 
 export const metadata = { title: 'Create account' }
 
@@ -10,5 +10,5 @@ export default async function SignupPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (user) redirect('/app')
-  return <AuthForm mode="signup" />
+  return <SignupForm />
 }

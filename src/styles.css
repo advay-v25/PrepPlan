@@ -364,19 +364,9 @@ h3 {
 .brand-mark {
   width: 30px;
   height: 30px;
-  border: 2px solid var(--accent);
-  border-radius: 5px;
-  display: grid;
-  place-items: center;
-  position: relative;
-}
-
-.brand-mark span {
-  width: 14px;
-  height: 7px;
-  border-left: 2px solid var(--accent);
-  border-bottom: 2px solid var(--accent);
-  transform: rotate(-45deg) translate(1px, -1px);
+  flex: none;
+  display: inline-block;
+  background: url('./assets/prepplan-mark.webp') center / contain no-repeat;
 }
 
 .nav-list {
@@ -2994,6 +2984,9 @@ button:not(:disabled):active {
 }
 
 .landing-header strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-size: 19px;
   font-weight: 700;
   letter-spacing: -.03em;
@@ -14840,10 +14833,6 @@ a.attempt-row:hover {
 
   .ob-brand {
     padding-left: 0;
-    flex: none;
-  }
-
-  .ob-brand .brand-mark {
     flex: none;
   }
 

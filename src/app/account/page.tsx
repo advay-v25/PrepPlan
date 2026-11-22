@@ -16,7 +16,7 @@ export default async function AccountPage() {
       <h1>Your account</h1>
       <p className="fine-print">Signed in as {user.email}. You can download or delete your data here even if your setup is unfinished.</p>
       <AccountActions email={user.email ?? ''} />
-      <p><Link href="/" className="text-button">Back to Roadmap</Link></p>
+      <p><Link href="/" className="text-button">Back to PrepPlan</Link></p>
     </main>
   )
 }

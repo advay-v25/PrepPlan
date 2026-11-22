@@ -133,7 +133,7 @@ export function WeekStep({
           </div>
           {problem && <Notice tone="warn" role="alert" className="mt-4">{problem}</Notice>}
           {classes.length > 0 && (
-            <p className="fine-print mt-4">Your classes from the last step are blocked automatically. Roadmap never schedules study over them.</p>
+            <p className="fine-print mt-4">Your classes from the last step are blocked automatically. PrepPlan never schedules study over them.</p>
           )}
         </section>
       )}
@@ -141,7 +141,7 @@ export function WeekStep({
       {!usingWindows && (
         <Notice tone="info" className="mt-6">
           {mode === 'varies'
-            ? 'Understood. Roadmap will ask for your availability at the start of each week, and will not invent study times before then.'
+            ? 'Understood. PrepPlan will ask for your availability at the start of each week, and will not invent study times before then.'
             : 'Understood. You can finish setup now. Calendar will open with one next step: add this week’s availability.'}
         </Notice>
       )}
@@ -157,7 +157,7 @@ export function WeekStep({
           ))}
         </div>
         {!usingWindows && maxSession === null && (
-          <p className="fine-print" role="status">{DEFAULT_SITTING} min is used for now. Roadmap still needs a sitting length to split work later; it has no study times to place yet. Choose another length any time.</p>
+          <p className="fine-print" role="status">{DEFAULT_SITTING} min is used for now. PrepPlan still needs a sitting length to split work later; it has no study times to place yet. Choose another length any time.</p>
         )}
       </section>
 

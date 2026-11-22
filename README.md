@@ -1,4 +1,4 @@
-# Roadmap — CFA Level I study-planning and accountability system
+# PrepPlan — CFA Level I study-planning and accountability system
 
 A competitive-exam study planner: it plans each week around the student's real life, tests what they have actually completed, shows what the evidence says, and re-cuts the next week. It does not teach the curriculum.
 

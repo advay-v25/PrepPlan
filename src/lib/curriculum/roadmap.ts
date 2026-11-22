@@ -644,7 +644,7 @@ export function assessFeasibility(
       totalWeeks, usableWeeks, remainingEffort: Number(remainingEffortTotal.toFixed(1)),
       effortPerWeek: Number(effortPerWeek.toFixed(2)),
       weeklyCapacityMinutes: null, requiredMinutesPerWeek: null, rateIsObserved,
-      message: `The shape of this plan is set, but how much pressure it puts on your week is not yet known — Roadmap needs your real study windows before it can say.`,
+      message: `The shape of this plan is set, but how much pressure it puts on your week is not yet known — PrepPlan needs your real study windows before it can say.`,
       options: ['Confirm the times you can actually study, in Settings'],
     }
   }

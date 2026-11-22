@@ -127,7 +127,7 @@ export async function saveExam(userId: string, payload: unknown, expectedVersion
   ])
   if (!window) throw new SetupError('That exam sitting does not exist.', 'examWindowId')
   if (manifest && window.year !== manifest.year) {
-    throw new SetupError(`Roadmap currently supports the ${manifest.year} exam only.`, 'examWindowId')
+    throw new SetupError(`PrepPlan currently supports the ${manifest.year} exam only.`, 'examWindowId')
   }
   if (!isSelectableSitting(window, new Date().toISOString())) throw new SetupError('That sitting has already finished. Choose a later one.', 'examWindowId')
   if (data.registered && data.examDate) {
@@ -230,7 +230,7 @@ export async function savePosition(userId: string, payload: unknown, expectedVer
   }, 'save position', expectedVersion, receipt)
   } catch (e: any) {
     // A started rehearsal keeps its restrictions on this path too: nothing was saved, and the student is told why.
-    if (/REHEARSAL_STARTED/.test(e?.message ?? '')) throw new SetupError('Your Roadmap rehearsal has started, so it cannot be removed here. Finish it, or manage it in Calendar.', 'mock')
+    if (/REHEARSAL_STARTED/.test(e?.message ?? '')) throw new SetupError('Your PrepPlan rehearsal has started, so it cannot be removed here. Finish it, or manage it in Calendar.', 'mock')
     throw e
   }
   await markInProgress(userId)

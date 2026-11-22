@@ -1,0 +1,16 @@
+name: Study Reminders Worker
+
+on:
+  schedule:
+    # Runs every 15 minutes on GitHub free tier
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger reminders worker
+        run: |
+          curl -f -X POST "https://www.prepplan.si/api/reminders/run" \
+            -H "Authorization: Bearer 1adaa8656e91993250a5c3773baff46aba6ef71c7997c232448fb33b0179b9b2"

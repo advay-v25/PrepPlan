@@ -20,7 +20,7 @@ export const STEP_META: Record<Step, { index: number; nav: string; title: string
   route: {
     index: 2, nav: 'How you study',
     title: 'How are you preparing?',
-    blurb: 'This decides one thing: whether your classes set the order of topics, or Roadmap does.',
+    blurb: 'This decides one thing: whether your classes set the order of topics, or PrepPlan does.',
   },
   position: {
     index: 3, nav: 'Where you are',
@@ -29,13 +29,13 @@ export const STEP_META: Record<Step, { index: number; nav: string; title: string
   },
   week: {
     index: 4, nav: 'Your week',
-    title: 'When may Roadmap schedule study?',
+    title: 'When may PrepPlan schedule study?',
     blurb: 'Only inside the times you choose. Everything else is treated as unavailable.',
   },
   plan: {
     index: 5, nav: 'Review',
     title: 'Review and start.',
-    blurb: 'Check what Roadmap assumed. Every answer stays editable in Settings.',
+    blurb: 'Check what PrepPlan assumed. Every answer stays editable in Settings.',
   },
 }
 
@@ -69,10 +69,10 @@ import type {
 export type { ExamSetup, PreparationSetup, PositionSetup, WeekSetup, PrepRoute, ClassPattern }
 
 export const ROUTE_OPTIONS: { value: PrepRoute; label: string; detail: string; anchors: boolean }[] = [
-  { value: 'self_study', label: 'On my own', detail: 'Your materials, Roadmap sets the order.', anchors: false },
-  { value: 'self_paced_course', label: 'Self-paced course', detail: 'Recorded or online; Roadmap sets the order.', anchors: false },
-  { value: 'instructor_led', label: 'Live classes', detail: 'Your teacher sets the order; Roadmap follows.', anchors: true },
-  { value: 'hybrid', label: 'Classes plus my own study', detail: 'Classes lead; Roadmap fills the gaps.', anchors: true },
+  { value: 'self_study', label: 'On my own', detail: 'Your materials, PrepPlan sets the order.', anchors: false },
+  { value: 'self_paced_course', label: 'Self-paced course', detail: 'Recorded or online; PrepPlan sets the order.', anchors: false },
+  { value: 'instructor_led', label: 'Live classes', detail: 'Your teacher sets the order; PrepPlan follows.', anchors: true },
+  { value: 'hybrid', label: 'Classes plus my own study', detail: 'Classes lead; PrepPlan fills the gaps.', anchors: true },
 ]
 
 export const CLASS_PATTERN_OPTIONS: { value: ClassPattern; label: string }[] = [

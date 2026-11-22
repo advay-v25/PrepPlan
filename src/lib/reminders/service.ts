@@ -171,10 +171,10 @@ async function stillWanted(userId: string, jobKey: string, now: Date): Promise<b
 async function describe(j: any): Promise<{ subject: string; body: string }> {
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? ''
   const admin = createAdminClient()
-  let subject = j.kind === 'weekly_review_ready' ? 'Your weekly review is ready' : 'Coming up in Roadmap', line = ''
+  let subject = j.kind === 'weekly_review_ready' ? 'Your weekly review is ready' : 'Coming up in PrepPlan', line = ''
   if (j.kind === 'assessment_upcoming') {
     const { data: a } = await admin.from('mock_appointments').select('label, kind, planned_date').eq('id', j.ref_id).maybeSingle()
-    if (a) { subject = `Coming up: ${a.label ?? (a.kind === 'internal_rehearsal' ? 'Roadmap rehearsal' : 'your mock')} on ${a.planned_date}`; line = `${a.label ?? 'Your mock'} is planned for ${a.planned_date}.` }
+    if (a) { subject = `Coming up: ${a.label ?? (a.kind === 'internal_rehearsal' ? 'PrepPlan rehearsal' : 'your mock')} on ${a.planned_date}`; line = `${a.label ?? 'Your mock'} is planned for ${a.planned_date}.` }
   } else line = 'Your week has ended and the review is ready. It takes a few minutes and sets up next week.'
   return { subject, body: `${line}\n\nOpen it: ${base}${j.link}\n\nYou are getting this because you turned reminders on. Turn them off any time in Settings.` }
 }

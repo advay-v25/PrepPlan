@@ -146,7 +146,7 @@ export function CheckpointPanel({ view, review, defaultDate, today }: { view: Ch
   if (!view) {
     return (
       <section id="checkpoint" className="cal-checkpoint cal-checkpoint--empty" aria-label="Mock or checkpoint">
-        <p><CalendarClock size={16} aria-hidden /> Have a mock or checkpoint coming up? Add it and Roadmap will plan around it. You can add several, including a Roadmap rehearsal.</p>
+        <p><CalendarClock size={16} aria-hidden /> Have a mock or checkpoint coming up? Add it and PrepPlan will plan around it. You can add several, including a PrepPlan rehearsal.</p>
         <button type="button" ref={editButton} className="secondary-button" onClick={() => setDialog('edit')}>Add a mock</button>
         {reviewList(review)}
         {dialog === 'edit' && <EditDialog view={null} defaultDate={defaultDate} onClose={() => { setDialog(null); editButton.current?.focus() }} send={send} busy={busy === 'save'} serverError={error} onSaved={() => setInfo('Mock added.')} />}
@@ -165,7 +165,7 @@ export function CheckpointPanel({ view, review, defaultDate, today }: { view: Ch
       <p><button type="button" className="secondary-button" onClick={() => setDialog('add')}>Add another mock or rehearsal</button></p>
       <header className="cal-checkpoint__head">
         <div>
-          <p className="cal-summary__label">{internal ? 'Roadmap rehearsal' : 'Mock or checkpoint'}</p>
+          <p className="cal-summary__label">{internal ? 'PrepPlan rehearsal' : 'Mock or checkpoint'}</p>
           <h2 id="cp-h">{checkpointTitle(c)}</h2>
           <p className="cal-checkpoint__when">{longDate(c.date)} · {describeTiming(c)}</p>
           <p className="fine-print">{MOCK_KIND_LABEL[c.kind]}. Your own entry, not a second exam date.</p>

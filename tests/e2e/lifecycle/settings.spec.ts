@@ -210,7 +210,7 @@ test('Account controls outside the study gate, and deletion: Cancel, Escape, wro
     // Sign-out runs server-side (POST /api/auth), so the failure is injected there, not at the provider.
     await page.route('**/api/auth',async r=>{
       if (r.request().postDataJSON()?.action !== 'signout') return r.continue()
-      await r.fulfill({status:502,contentType:'application/json',body:JSON.stringify({error:'This browser has been signed out. Roadmap could not confirm that its session was revoked.'})})
+      await r.fulfill({status:502,contentType:'application/json',body:JSON.stringify({error:'This browser has been signed out. PrepPlan could not confirm that its session was revoked.'})})
     })
     await page.getByRole('button',{name:'Sign out of this device',exact:true}).click()
     await expect(page.getByRole('alert').filter({hasText:'could not confirm that its session was revoked'})).toBeVisible()
@@ -253,7 +253,7 @@ test('Sidebar account controls: the saved name reaches both navigation views; si
     // Sign-out runs server-side (POST /api/auth), so the refusal is injected there.
     await page.route('**/api/auth',async r=>{
       if (r.request().postDataJSON()?.action !== 'signout') return r.continue()
-      await r.fulfill({status:502,contentType:'application/json',body:JSON.stringify({error:'This browser has been signed out. Roadmap could not confirm that its session was revoked.'})})
+      await r.fulfill({status:502,contentType:'application/json',body:JSON.stringify({error:'This browser has been signed out. PrepPlan could not confirm that its session was revoked.'})})
     })
     await nav().getByRole('button',{name:'Sign out of this device',exact:true}).click()
     await expect(nav().getByRole('alert')).toContainText('could not confirm that its session was revoked')

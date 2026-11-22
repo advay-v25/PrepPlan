@@ -166,7 +166,7 @@ async function main() {
       check('legacy callers still work with an ACTIVE module id', (await cov({ lmId: ids[4], state: 'taught' })).body?.ok === true)
     }
 
-    console.log('\n10. Roadmap replacement is atomic and replay-safe')
+    console.log('\n10. PrepPlan replacement is atomic and replay-safe')
     {
       const act = await st.s.post('/api/roadmap', { activate: true })
       check('a roadmap can be built', act.body?.ok === true, JSON.stringify(act.body).slice(0, 140))

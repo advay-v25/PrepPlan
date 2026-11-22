@@ -14,7 +14,7 @@ export default function GlobalError({ error, retry }: { error: Error & { digest?
   return <html lang="en"><body>
     <style>{CSS}</style>
     <main>
-      <h1>Roadmap could not load</h1>
+      <h1>PrepPlan could not load</h1>
       <p role="alert">Try again in a moment.</p>
       {error.digest && <p>Support reference <code>{error.digest}</code></p>}
       <button type="button" onClick={retry}>Try again</button>

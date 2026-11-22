@@ -86,7 +86,7 @@ const STATUS: Record<string, [number, string]> = {
   NOT_RELATED: [404, 'That task is not part of your mock preparation.'],
   KIND_LOCKED: [409, 'A rehearsal has already been prepared for this appointment, so its type cannot change. Cancel the rehearsal first.'],
   REHEARSAL_STARTED: [409, 'A rehearsal session has started, so this appointment cannot be cancelled. Finish or leave the rehearsal from Tests.'],
-  INTERNAL_RESULT: [400, 'A Roadmap rehearsal is completed by finishing its two sessions, not by typing a result.'],
+  INTERNAL_RESULT: [400, 'A PrepPlan rehearsal is completed by finishing its two sessions, not by typing a result.'],
 }
 
 /** A previous successful result for this key, if any. Checked BEFORE validation so a replay never depends on today's state. */

@@ -35,7 +35,7 @@ export function RepairFollowUp({ attemptId, alsoAttemptIds = [], limit }: { atte
     try {
       const r = await (await fetch('/api/diagnostic/repair/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ attemptId, overrides: next, alsoAttemptIds, limit }) })).json()
       if (r.ok) { setPreview(r); setSaved(null) } else setError(r.message ?? 'Could not prepare the follow-up.')
-    } catch { setError('Could not reach Roadmap. Nothing was changed.') } finally { setBusy(false) }
+    } catch { setError('Could not reach PrepPlan. Nothing was changed.') } finally { setBusy(false) }
   }
   async function confirm() {
     if (!preview) return

@@ -52,7 +52,7 @@ export function deriveCurrentWeekPlanState(f: CurrentWeekFacts): CurrentWeekPlan
     : S('not_applicable', '', '', null)
   if (f.cycleEnded) return S('cycle_ended', 'This cycle has ended', 'Plan the next week in your weekly review.', { label: 'Review the week', href: '/app/review-week', kind: 'link' })
   if (f.availabilityMode !== 'windows' || !f.hasWindows) {
-    return S('no_study_times', 'No study times yet', 'Nothing is planned because Roadmap has no study times to plan around. Add them and you can review a plan for this week.', { label: 'Add study times', href: ADD_STUDY_TIMES_HREF, kind: 'link' })
+    return S('no_study_times', 'No study times yet', 'Nothing is planned because PrepPlan has no study times to plan around. Add them and you can review a plan for this week.', { label: 'Add study times', href: ADD_STUDY_TIMES_HREF, kind: 'link' })
   }
   if (f.remaining.minutes <= 0) {
     const why = f.remaining.assessmentDayOnly ? 'assessment_day_only' : f.remaining.windowsLater ? 'later_week' : 'time_used'
@@ -63,8 +63,8 @@ export function deriveCurrentWeekPlanState(f: CurrentWeekFacts): CurrentWeekPlan
   }
   if (f.classGuidance) {
     const choices = {
-      log_class: { title: 'Log what your class covered', message: 'Your class has happened. Record its readings and outcomes so Roadmap can propose the follow-up work.', label: 'Log the class', href: '/app/calendar/log-class' },
-      add_class: { title: 'Add your next class', message: 'Your classes guide the study order. Add the next class so Roadmap can organise the week around it.', label: 'Add next class', href: '/app/calendar?action=add-next-class' },
+      log_class: { title: 'Log what your class covered', message: 'Your class has happened. Record its readings and outcomes so PrepPlan can propose the follow-up work.', label: 'Log the class', href: '/app/calendar/log-class' },
+      add_class: { title: 'Add your next class', message: 'Your classes guide the study order. Add the next class so PrepPlan can organise the week around it.', label: 'Add next class', href: '/app/calendar?action=add-next-class' },
       upcoming_class: { title: 'Your next class leads the plan', message: 'Your study times are saved. After class, log what was covered to prepare its follow-up work.', label: 'See your classes', href: '/app/calendar?view=agenda' },
     }[f.classGuidance]
     return S('awaiting_class_input', choices.title, choices.message, { label: choices.label, href: choices.href, kind: 'link' })
@@ -78,5 +78,5 @@ export function deriveCurrentWeekPlanState(f: CurrentWeekFacts): CurrentWeekPlan
   if (f.acceptedBy === 'weekly_review' || (f.discardedFingerprint && f.discardedFingerprint === f.currentHash)) {
     return S('intentionally_empty', 'This week is empty on purpose', 'You kept this week empty. You can still review a plan for the rest of it whenever you like.', { label: 'Review a plan for this week', href: REVIEW_PLAN_HREF, kind: 'preview' })
   }
-  return S('ready_to_plan', 'Review a plan for this week', 'Your study times are saved. Roadmap can propose work for the rest of this week; nothing is added until you accept it.', { label: 'Review a plan for this week', href: REVIEW_PLAN_HREF, kind: 'preview' })
+  return S('ready_to_plan', 'Review a plan for this week', 'Your study times are saved. PrepPlan can propose work for the rest of this week; nothing is added until you accept it.', { label: 'Review a plan for this week', href: REVIEW_PLAN_HREF, kind: 'preview' })
 }

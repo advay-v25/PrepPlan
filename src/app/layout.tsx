@@ -10,7 +10,7 @@ const geist = Geist({ subsets: ['latin'], display: 'swap', variable: '--font-gei
 const geistMono = Geist_Mono({ subsets: ['latin'], display: 'swap', variable: '--font-geist-mono' })
 
 export const metadata: Metadata = {
-  title: { default: 'Roadmap', template: '%s · Roadmap' },
+  title: { default: 'PrepPlan', template: '%s · PrepPlan' },
   description: 'CFA Level I Learning Control System',
 }
 

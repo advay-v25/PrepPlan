@@ -39,7 +39,7 @@ export function ActivationPrompt() {
       <span className="activation-prompt__icon"><CalendarPlus size={20} aria-hidden /></span>
       <div className="activation-prompt__text">
         <strong>This week isn’t planned yet</strong>
-        <p>Roadmap can draft it from your setup — you review it before anything is placed.</p>
+        <p>PrepPlan can draft it from your setup — you review it before anything is placed.</p>
       </div>
       <button type="button" className="primary-button" onClick={build} disabled={busy}>
         <CalendarPlus size={16} aria-hidden /> {busy ? 'Preparing…' : 'Prepare this week'}

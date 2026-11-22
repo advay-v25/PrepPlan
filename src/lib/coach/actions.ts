@@ -113,7 +113,7 @@ export function planProposals(s: CoachSituation): { proposals: Proposal[]; notes
   if (s.examSat) return { proposals: [], notes: [] }
   const proposals: Proposal[] = []
   const notes: string[] = []
-  if (s.preparation) notes.push('Thanks, that helps me plan. I have not changed your coverage, revision status or calendar from what you said here; if it should be recorded, update it where you reported your position and Roadmap re-plans from there. What you report is your own account, not test evidence.')
+  if (s.preparation) notes.push('Thanks, that helps me plan. I have not changed your coverage, revision status or calendar from what you said here; if it should be recorded, update it where you reported your position and PrepPlan re-plans from there. What you report is your own account, not test evidence.')
 
   if (s.intent === 'day_was_bad') {
     // Only work that has not started can move. Started or part-done work stays due: it is evidence of effort and the student's to finish.
@@ -168,7 +168,7 @@ export function planProposals(s: CoachSituation): { proposals: Proposal[]; notes
       ? `Your next accepted task is “${s.nextTask.title}”${s.nextTask.date === s.today ? ' today' : ` on ${s.nextTask.date}`} (${s.nextTask.minutes} min). Open it to see what it covers and what done means.`
       : 'Nothing accepted is open today. Check Calendar for the week, or ask me what to focus on.')
   }
-  if (s.intent === 'availability') notes.push('Change your availability in your setup, and you return here afterwards. Roadmap then re-plans what is still ahead; work you already did stays as it is. I cannot change your hours for you.')
+  if (s.intent === 'availability') notes.push('Change your availability in your setup, and you return here afterwards. PrepPlan then re-plans what is still ahead; work you already did stays as it is. I cannot change your hours for you.')
   if (s.intent === 'lighter') {
     notes.push(s.adaptation
       ? `${s.adaptation.headline}${s.adaptation.lighter ? ' You asked for a lighter draft.' : ''}${s.adaptation.waiting ? ` ${s.adaptation.waiting} reading${s.adaptation.waiting === 1 ? '' : 's'} wait for a later week and stay due.` : ''} This is a planning decision from your weekly review, not a judgement of what you understand.`
@@ -195,8 +195,8 @@ export function planProposals(s: CoachSituation): { proposals: Proposal[]; notes
     else if (mr) notes.push(`Your latest saved mock report is ${mr.scope === 'partial' ? 'a partial exam' : 'a mock'}${mr.provider ? ` from ${mr.provider}` : ''} on ${mr.takenOn}: ${mr.scoreText}. That is your own report, not test evidence; the report page shows what it does and does not tell us and lets you choose what to work on. Nothing changes in your week until you review and confirm a plan there.`)
     if (m) notes.push(`Your latest completed mock is “${m.title}” on ${m.date}${m.reportedResult ? `, recorded as “${m.reportedResult}”` : ', recorded without a score'}. That is your own report: it can inform how we plan, but it is not test evidence, it does not show which concepts were weak, and it closes no repair.`)
     if (!s.mockReportUnavailable && (!mr?.selected || s.checkpoint)) notes.push(s.checkpoint
-      ? `${m ? 'Next, your' : 'Your'} ${s.checkpoint.title} is on ${s.checkpoint.date}.${s.checkpoint.choiceUnresolved ? ' You have not decided how it fits with this week’s paper; that choice is in Calendar.' : ''} Preparation is the revision and repair work already in your plan. Anything you report about a mock is your own report, not test evidence.${s.checkpoint.appointments && s.checkpoint.appointments > 1 ? ` You have ${s.checkpoint.appointments} mock appointments; this is the next one.` : ''}${s.checkpoint.rehearsal?.state === 'insufficient' ? ` A full Roadmap rehearsal cannot be built yet: ${s.checkpoint.rehearsal.reasons[0] ?? 'there are not enough approved held-out questions'}` : ''}`
-      : m ? 'No further mock is booked, and that is separate from the result you recorded. Add the next one in Calendar and Roadmap plans around it.'
+      ? `${m ? 'Next, your' : 'Your'} ${s.checkpoint.title} is on ${s.checkpoint.date}.${s.checkpoint.choiceUnresolved ? ' You have not decided how it fits with this week’s paper; that choice is in Calendar.' : ''} Preparation is the revision and repair work already in your plan. Anything you report about a mock is your own report, not test evidence.${s.checkpoint.appointments && s.checkpoint.appointments > 1 ? ` You have ${s.checkpoint.appointments} mock appointments; this is the next one.` : ''}${s.checkpoint.rehearsal?.state === 'insufficient' ? ` A full PrepPlan rehearsal cannot be built yet: ${s.checkpoint.rehearsal.reasons[0] ?? 'there are not enough approved held-out questions'}` : ''}`
+      : m ? 'No further mock is booked, and that is separate from the result you recorded. Add the next one in Calendar and PrepPlan plans around it.'
       : mr ? 'No further mock is booked, and that is separate from the report you saved.'
       : 'I cannot see a mock or checkpoint in your Calendar. If you have already taken one, record it with “Record a mock already taken” in Calendar; if one is coming up, add it there. What you tell me here is not saved as a result.')
   }
