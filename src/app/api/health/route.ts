@@ -23,6 +23,7 @@ export async function GET(request: Request) {
         hasTurnstileSecretKey: !!process.env.TURNSTILE_SECRET_KEY,
         hasResendApiKey: !!process.env.RESEND_API_KEY,
         hasResendFromEmail: !!process.env.RESEND_FROM_EMAIL,
+        googleSignIn: process.env.NEXT_PUBLIC_GOOGLE_SIGN_IN === '1',
         siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? null,
       }
     }, { headers: { 'Cache-Control': 'no-store' } })
