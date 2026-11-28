@@ -1,14 +1,20 @@
 /**
  * Day-by-day generation: priority order and the new-content absorption cap.
  */
-import { allocateDay, selectUnstableConcepts, siblingLink, type GeneratedPortion } from '../src/lib/planning/pulse/generateWeek'
+import { allocateDay, insidePlanningHorizon, lastStudyDate, selectUnstableConcepts, siblingLink, waitingFirstPassWork, type GeneratedPortion } from '../src/lib/planning/pulse/generateWeek'
 import { splitIntoSittings } from '../src/lib/planning/pulse/sittings'
+import { busyFromTimed, fitTimedStart, gapsFromRanges, subtractBusy, reserveFlexible, packSittings, gapsAfterAccepted } from '../src/lib/planning/pulse/gaps'
 
 let passed = 0, failed = 0
 const check = (n: string, ok: boolean, d = '') => { ok ? (passed++, console.log(`  ✓ ${n}`)) : (failed++, console.log(`  ✗ ${n}${d ? ` — ${d}` : ''}`)) }
 const eq = (n: string, a: unknown, b: unknown) => check(n, JSON.stringify(a) === JSON.stringify(b), `got ${JSON.stringify(a)}, wanted ${JSON.stringify(b)}`)
 
 console.log('\nDay allocation\n')
+
+const bookedCutoff = lastStudyDate({ targetDate: '2027-02-17', targetKind: 'booked' })
+check('the last study day before a booked exam is usable', insidePlanningHorizon('2027-02-16', '2027-02-15', bookedCutoff))
+check('the booked exam and later days of a partial week are outside the horizon', ['2027-02-17', '2027-02-21'].every(date => !insidePlanningHorizon(date, '2027-02-15', bookedCutoff)))
+check('an indicative target remains usable and past days stay excluded', insidePlanningHorizon('2027-02-17', '2027-02-15', lastStudyDate({ targetDate: '2027-02-17', targetKind: 'sitting' })) && !insidePlanningHorizon('2027-02-14', '2027-02-15', bookedCutoff))
 
 const module = (id: string, effortBand: number) => ({ id, topic: 't1', name: id, effortBand, difficulty: 3, sequence: 1, coverage: 'not_started' as const })
 
@@ -85,6 +91,44 @@ console.log('\nWeekly splits carry explicit sibling identity and declared order\
   check('a sibling of ANOTHER portion on the same day is never a predecessor', link(3).after.length === 0 && link(4).after[0] === 'id3')
   check('an unsplit portion carries no group and no order', siblingLink({ ...portion, durationMinutes: 30 }, []).group_key === '' && siblingLink({ ...portion, durationMinutes: 30 }, []).after.length === 0)
   check('the minutes of the split add back up exactly', parts.reduce((n, p) => n + p.durationMinutes, 0) === 130)
+}
+
+console.log('\nFit against real gaps\n')
+{
+  const two30 = gapsFromRanges([{ start: '09:00', end: '09:30' }, { start: '11:00', end: '11:30' }])
+  const study = (id: string, band: number) => ({ id, topic: 't1', name: id, effortBand: band, difficulty: 3, sequence: 1, coverage: 'not_started' as const })
+  const two = allocateDay({ capacityMinutes: 60, minutesPerEffortUnit: 30, repairs: [], unstableConcepts: [], pendingModules: [study('a', 1), study('b', 1)], phase: 'first_pass', gaps: two30 })
+  eq('two 30-minute gaps hold two ordered 30-minute portions', two.portions.map(p => p.durationMinutes), [30, 30])
+  const one45 = allocateDay({ capacityMinutes: 60, minutesPerEffortUnit: 45, repairs: [], unstableConcepts: [], pendingModules: [study('a', 1)], phase: 'first_pass', gaps: two30 })
+  eq('45 minutes of study over two 30-minute gaps become two ordered sittings 30 + 15', one45.portions.map(p => p.durationMinutes), [30, 15])
+  const oneGap = allocateDay({ capacityMinutes: 30, minutesPerEffortUnit: 45, repairs: [], unstableConcepts: [], pendingModules: [study('a', 1)], phase: 'first_pass', gaps: gapsFromRanges([{ start: '09:00', end: '09:30' }]) })
+  eq('with one 30-minute gap only 30 are promised; the rest waits', oneGap.portions.map(p => p.durationMinutes), [30])
+  eq('partly placed readings retain their unallocated minutes', waitingFirstPassWork([study('a', 1), study('b', 1)], [oneGap], 45), [
+    { id: 'a', name: 'a', minutes: 15 }, { id: 'b', name: 'b', minutes: 45 },
+  ])
+  eq('fully placed readings leave no remainder', waitingFirstPassWork([study('a', 1)], [one45], 45), [])
+  const split = allocateDay({ capacityMinutes: 60, minutesPerEffortUnit: 60, repairs: [], unstableConcepts: [], pendingModules: [study('a', 1)], phase: 'first_pass', maxSittingMinutes: 60, gaps: two30 })
+  eq('a 60-minute portion becomes two sittings that follow the gaps, not one 60-minute sitting', split.portions.map(p => p.durationMinutes), [30, 30])
+  check('those sittings stay one ordered group', split.portions.length === 2 && split.portions[0].split?.key === split.portions[1].split?.key && split.portions[1].split?.index === 2)
+  const noRepairRoom = allocateDay({ capacityMinutes: 60, minutesPerEffortUnit: 60, repairs: [{ id: 'r', title: 'Repair: x', durationMinutes: 45 }], unstableConcepts: [], pendingModules: [], phase: 'first_pass', gaps: two30 })
+  eq('a 45-minute repair is not promised across two 30-minute gaps', noRepairRoom.portions, [])
+  eq('a 45-minute paper cannot use two fragmented 30-minute openings', fitTimedStart(two30, 45, 540, []), null)
+  eq('a paper can move to the next available slot and leave room for study', fitTimedStart([{ start: 550, end: 580 }, { start: 660, end: 720 }], 45, 540, [30]), 660)
+  eq('a paper cannot consume the only slot that holds existing study', fitTimedStart([{ start: 540, end: 600 }], 45, 540, [30]), null)
+  eq('exact adjacency keeps both sides: busy 09:30-10:00 leaves 09:00-09:30 and 10:00-12:00', subtractBusy(gapsFromRanges([{ start: '09:00', end: '12:00' }]), [{ start: 570, end: 600 }]), [{ start: 540, end: 570 }, { start: 600, end: 720 }])
+  eq('represented flexible work is taken off earliest first, never counted twice', reserveFlexible(two30, 40), [{ start: 11 * 60 + 10, end: 11 * 60 + 30 }])
+  eq('a sitting shorter than the minimum is not offered', packSittings([{ start: 0, end: 4 }], 30, 60).sittings, [])
+  eq('a timed paper at 10:00 BST (09:00Z) holds 10:00-11:30 on the local clock', busyFromTimed([{ local_date: '2027-06-10', starts_at: '2027-06-10T09:00:00Z', duration_minutes: 90 }], 'Europe/London'), { '2027-06-10': [{ start: 600, end: 690 }] })
+  eq('the repeated autumn hour: 01:30Z on 31 Oct is 01:30 GMT, not BST', busyFromTimed([{ local_date: '2027-10-31', starts_at: '2027-10-31T01:30:00Z', duration_minutes: 30 }], 'Europe/London'), { '2027-10-31': [{ start: 90, end: 120 }] })
+  eq('an instant on another local date than the task is not placed', busyFromTimed([{ local_date: '2027-06-10', starts_at: '2027-06-10T23:30:00Z', duration_minutes: 30 }], 'Europe/London'), {})
+  eq('an interval is clipped at local midnight', busyFromTimed([{ local_date: '2027-06-10', starts_at: '2027-06-10T22:30:00Z', duration_minutes: 120 }], 'Europe/London')['2027-06-10'], [{ start: 1410, end: 1440 }])
+  const timedGaps = subtractBusy(gapsFromRanges([{ start: '09:00', end: '12:00' }]), busyFromTimed([{ local_date: '2027-06-10', starts_at: '2027-06-10T09:00:00Z', duration_minutes: 60 }], 'Europe/London')['2027-06-10'])
+  eq('accepted timed work is taken off once, leaving 09:00-10:00 and 11:00-12:00', timedGaps, [{ start: 540, end: 600 }, { start: 660, end: 720 }])
+  const ninety = [{ start: 540, end: 630 }]
+  eq('an accepted 30-minute sitting leaves 60 contiguous minutes of a 90-minute window, so a 60 fits and a 90 does not', gapsAfterAccepted(ninety, [], [30]), [{ start: 570, end: 630 }])
+  eq('accepted sittings are packed whole, largest first: 60 then 30 fills 90 exactly', gapsAfterAccepted(ninety, [], [30, 60]), [])
+  eq('an accepted sitting that fits no gap leaves no room at all', gapsAfterAccepted([{ start: 540, end: 570 }], [], [45]), [])
+  eq('no windows gives an empty day', allocateDay({ capacityMinutes: 0, minutesPerEffortUnit: 60, repairs: [], unstableConcepts: [], pendingModules: [study('a', 1)], phase: 'first_pass', gaps: [] }).portions, [])
 }
 
 console.log(`\n${passed} passed, ${failed} failed\n`)

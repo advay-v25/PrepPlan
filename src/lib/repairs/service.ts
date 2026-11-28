@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { createAdminClient } from '../supabase/admin'
 import { addDays, todayInZone, type StudyWeek } from '../planning/studyWeek'
 import { loadPlacementContext } from '../planning/pulse/generateWeek'
+import { busyFromTimed, gapsAfterAccepted } from '../planning/pulse/gaps'
 import { planRepairFollowUp, REPAIR_POLICY_VERSION, type PlanThread, type PlanResult } from './plan'
 
 const ACTIVE = ['open', 'proposed', 'scheduled', 'in_progress', 'awaiting_recheck']
@@ -101,12 +102,18 @@ export async function previewRepairFollowUp(userId: string, input: PreviewInput)
 
   const week = { startDate: start, endDate: end, days, timezone: tz, anchorDay: 0, classLed: false } as StudyWeek
   const ctx = await loadPlacementContext(userId, week)
-  const { data: planned } = await admin.from('plan_blocks').select('local_date, duration_minutes, execution').eq('user_id', userId).eq('cycle_id', cycle.id as string).is('cancelled_at', null).not('local_date', 'is', null)
+  const { data: planned } = await admin.from('plan_blocks').select('local_date, duration_minutes, execution, placement, starts_at').eq('user_id', userId).eq('cycle_id', cycle.id as string).is('cancelled_at', null).not('local_date', 'is', null)
+  const openBlocks = (planned ?? []).filter(b => !['completed', 'skipped', 'deferred', 'cancelled'].includes(b.execution as string)) // same set class_day_packs packs
   const used: Record<string, number> = {}
-  for (const b of planned ?? []) if (b.execution !== 'skipped') used[b.local_date as string] = (used[b.local_date as string] ?? 0) + Number(b.duration_minutes ?? 0)
+  for (const b of openBlocks) used[b.local_date as string] = (used[b.local_date as string] ?? 0) + Number(b.duration_minutes ?? 0)
   const capacity = Object.fromEntries(days.map(d => [d, Math.max(0, (ctx.capacity[d] ?? 0) - (used[d] ?? 0))]))
+  // Fit is decided against contiguous gaps: accepted timed work takes its interval, accepted flexible sittings pack whole (see class_day_packs).
+  const isTimed = (b: { placement: unknown; starts_at: unknown }) => b.placement === 'timed' && Boolean(b.starts_at)
+  const timedBusy = busyFromTimed(openBlocks.filter(isTimed) as { local_date: string; starts_at: string; duration_minutes: number | null }[], tz)
+  const gapsByDate = Object.fromEntries(days.map(d => [d, gapsAfterAccepted(ctx.gapsByDate[d] ?? [], timedBusy[d] ?? [],
+    openBlocks.filter(b => b.local_date === d && !isTimed(b)).map(b => Number(b.duration_minutes ?? 0)))]))
 
-  const plan = planRepairFollowUp({ attemptId: input.attemptId, today, cycle: { start, end }, weekDates: days, studyDates: ctx.studyDates, capacity,
+  const plan = planRepairFollowUp({ attemptId: input.attemptId, today, cycle: { start, end }, weekDates: days, studyDates: ctx.studyDates, capacity, gapsByDate,
     maxSittingMinutes: ctx.maxSittingMinutes, threads, overrides: input.overrides, keepForLater: [...(input.keepForLater ?? []), ...capped], newId: () => `task-${randomUUID()}` })
 
   if ((await version(userId, cycle.id as string, threadIds, input.attemptId)) !== before) return { ok: false, code: 'changed', message: 'Your week changed while this was being prepared. Nothing was saved; try again.' }

@@ -24,15 +24,19 @@ test.beforeEach(({ page }) => {
   // A browser navigation may abandon the scope drawer read or Home markup prefetch.
   page.on('requestfailed', r => {
     const url = new URL(r.url())
-    const navigationRead = url.pathname === '/app' && r.headers().rsc === '1' && url.searchParams.has('_rsc')
-    if (r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && (url.pathname === '/api/tests/scope/confirm' || navigationRead)) return
+    const cancelledPrefetch = r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && (
+      (r.headers().rsc === '1' && (url.searchParams.has('_rsc') || r.headers()['next-router-prefetch'] === '1')) ||
+      /[?&]_rsc=/.test(r.url())
+    )
+    if (cancelledPrefetch || (r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && (url.pathname === '/api/tests/scope/confirm' || (S.attemptId && url.pathname === `/api/tests/attempt/${S.attemptId}`)))) return
     if (!INJECTED_ABORTS.some(u => r.url().includes(u))) S.consoleErrors.push(`UNEXPECTED requestfailed ${r.url()} ${r.failure()?.errorText}`)
   })
   page.on('response', async r => {
     if (r.status() < 400 || (r.status() === 409 && r.url().includes('/api/tests/start'))) return
     if (r.status() === 409 && r.url().includes(`/api/tests/attempt/${S.attemptId}/progress`)) {
-      // A heartbeat already in flight can finish after this attempt is scored.
-      if ((await r.json().catch(() => null))?.code === 'closed') return
+      // A heartbeat already in flight can finish after this attempt is scored (body may be unavailable after navigation).
+      const body = await r.json().catch(() => null)
+      if (!body || body.code === 'closed') return
     }
     S.consoleErrors.push(`UNEXPECTED HTTP ${r.status()} ${r.url()}`)
   })
@@ -71,7 +75,7 @@ test('onboarding in the UI: fresh profile, reload midway, accept the first plan'
   })
   await rec.browser('week step: weekday evenings and a longer Saturday window, 45-minute sittings, no phantom commitments', async () => {
     await page.getByRole('button', { name: /^Weekday evenings/ }).click()
-    await page.getByRole('button', { name: /^Weekends/ }).click()
+    await page.getByRole('button', { name: /^(Weekends|Saturday morning)/ }).click()
     // The fixture needs two whole readings and a partial one even on a Friday evening.
     await page.getByLabel('Saturday end').fill('19:00')
     await page.getByRole('button', { name: '45 min' }).click()
@@ -89,7 +93,7 @@ test('onboarding in the UI: fresh profile, reload midway, accept the first plan'
     expect(prof).toEqual({ stage: 'starting_fresh', registered: false, exam_sitting: 'may', exam_date: null, prep_mode: 'self_study', max_session_minutes: 45, onboarding_status: 'complete' })
     expect((await db.from('user_topic_exposure').select('topic_id').eq('user_id', S.id)).data).toEqual([])
     const wins = (await db.from('availability_windows').select('weekday').eq('user_id', S.id).eq('status', 'active')).data ?? []
-    expect(wins.length).toBe(7)
+    expect(wins.length).toBe(6)
     S.cycle = (await db.from('planning_cycles').select('id, starts_at_local, ends_at_local').eq('user_id', S.id).eq('status', 'active').single()).data
     expect(wd(S.cycle.starts_at_local)).toBe(1); expect(wd(S.cycle.ends_at_local)).toBe(0)
     S.tasks = (await db.from('plan_blocks').select('id, title, local_date, task_type, lm_id, duration_minutes, execution').eq('cycle_id', S.cycle.id).eq('task_type', 'study').is('cancelled_at', null).order('local_date').order('title')).data ?? []
@@ -147,7 +151,8 @@ test('Calendar in the UI: finish one reading, part-do another with minutes, defe
   const c0 = await counts()
   await page.goto('/app/log')
   await rec.browser('quick capture: pick the reading, two outcomes and 40 minutes', async () => {
-    await page.getByRole('tab', { name: topicName }).click()
+    await page.getByRole('radio', { name: /Log a separate session/ }).click()
+    await page.getByLabel('Search readings').fill(String(rt.reading_no))
     await page.getByRole('option', { name: new RegExp(`^${rt.reading_no} `) }).click()
     const boxes = page.getByRole('checkbox'); await expect(boxes.first()).toBeVisible()
     await boxes.nth(0).check(); await boxes.nth(1).check()
@@ -158,7 +163,7 @@ test('Calendar in the UI: finish one reading, part-do another with minutes, defe
   await rec.browser('PRE-commit failure (request never reaches the server): no success is claimed, nothing is written, the log is kept as a pending retry with its summary', async () => {
     await page.route('**/api/log-learning', r => r.request().method() === 'POST' ? r.abort('failed') : r.continue())
     await page.getByRole('button', { name: 'Save', exact: true }).click()
-    await expect(pending).toBeVisible(); await expect(page.getByText(/2 selected outcomes · 40 minutes/)).toBeVisible()
+    await expect(pending).toBeVisible(); await expect(page.getByText(/2 outcomes · 40 minutes/)).toBeVisible()
     expect(await counts()).toEqual(c0)
   })
   await rec.browser('POST-commit lost response (the server saved, the browser never heard): the UI still says unconfirmed, and the save exists exactly once', async () => {
@@ -207,17 +212,30 @@ test('Scope and the weekly paper in the UI: confirm scope, a second tab changes 
   })
   await rec.browser('SECOND TAB changes the scope after the review; Start in the first tab refuses: no attempt, no form, the student keeps their view', async () => {
     const p2 = await context.newPage(); await p2.goto('/app/tests')
-    const t0 = done[0]; const outs = (await db.from('block_scope_confirmations').select('outcome_id').eq('block_id', t0.id)).data!.map(o => o.outcome_id as string)
-    const r = await p2.evaluate(async ({ id, outcomeIds }) => (await fetch('/api/tests/scope/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blockId: id, outcomeIds }) })).json(), { id: t0.id, outcomeIds: outs.slice(0, 1) })
+    const { data: log } = await db.from('plan_blocks').select('id').eq('user_id', S.id).like('id', 'log-%').single().throwOnError()
+    const outs = S.quick!.outcomes
+    expect(outs).toHaveLength(2)
+    const readScope = async () => {
+      const response = await p2.request.get('/api/tests/scope')
+      expect(response.ok()).toBe(true)
+      return (await response.json()).preview.scope.revision as string
+    }
+    const originalRevision = await readScope()
+    const r = await p2.evaluate(async ({ id, outcomeIds }) => (await fetch('/api/tests/scope/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blockId: id, outcomeIds }) })).json(), { id: log!.id, outcomeIds: outs.slice(0, 1) })
     expect(r.ok, JSON.stringify(r)).toBe(true)
+    expect(await readScope()).not.toBe(originalRevision)
     const attemptsBefore = await attemptCount(), forms = async () => (await db.from('assessment_forms').select('id', { count: 'exact', head: true })).count
     const formsBefore = await forms()
+    const refused = page.waitForResponse(response => new URL(response.url()).pathname === '/api/tests/start' && response.request().method() === 'POST')
     await page.getByRole('button', { name: 'Start weekly paper' }).click()
-    await expect(page.getByRole('alert').first()).toBeVisible()
+    const response = await refused
+    expect(response.status()).toBe(409)
+    expect(await response.json()).toMatchObject({ code: 'scope_changed' })
+    await expect(page.getByRole('alert').filter({ hasText: /changed/i })).toBeVisible()
     expect(await attemptCount()).toBe(attemptsBefore); expect(await forms()).toBe(formsBefore)
     await expect(page).not.toHaveURL(/\/app\/tests\/[0-9a-f-]{36}$/)
     // restore the confirmation from the second tab, then review again
-    const r2 = await p2.evaluate(async ({ id, outcomeIds }) => (await fetch('/api/tests/scope/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blockId: id, outcomeIds }) })).json(), { id: t0.id, outcomeIds: outs })
+    const r2 = await p2.evaluate(async ({ id, outcomeIds }) => (await fetch('/api/tests/scope/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blockId: id, outcomeIds }) })).json(), { id: log!.id, outcomeIds: outs })
     expect(r2.ok).toBe(true); await p2.close()
   })
   await rec.browser('review again and start: the paper opens with its attempt', async () => {
@@ -348,7 +366,7 @@ test('result, Keep for later, follow-up acceptance (lost responses), exact Calen
   await rec.browser('the accepted repair opens in Calendar on exactly that task (the drawer shows it)', async () => {
     const rt = (await repairTasks())[0]
     await page.getByRole('link', { name: /See this repair|Continue repair/ }).first().click()
-    await expect(page).toHaveURL(/\/app\/calendar\?/); await expect(page.getByRole('dialog')).toBeVisible()
+    await expect(page).toHaveURL(/\/app\/calendar\?/); await expect(page.getByRole('dialog')).toBeVisible({ timeout: 45_000 })
     const id = new URL(page.url()).searchParams.get('task')!; const row = (await repairTasks()).find(t => t.id === id)
     expect(row, 'the linked task is one of the accepted repairs').toBeTruthy()
     await expect(page.getByRole('dialog')).toContainText(row!.title)

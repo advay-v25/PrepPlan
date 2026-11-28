@@ -6,9 +6,11 @@ import {
   todayInZone, zonedTimeToUtc,
 } from './studyWeek'
 import { cycleStartClassDay, resolvePulseWeek } from './pulse/weekBoundary'
-import { decideInitialCycle, type InitialCycle } from './pulse/firstCycle'
-import { dailyCapacityMinutes } from './pulse/capacity'
+import { decideInitialCycle, REVIEW_BUFFER_MINUTES, USABLE_GAP_MINUTES, type InitialCycle } from './pulse/firstCycle'
+import { freeRangesForDates, minutesBetween } from './pulse/capacity'
 import { perRequest, minuteOf } from '../ops/perRequest'
+import { profileRow } from '../ops/sharedReads'
+import { weeklySeries } from '../ops/sharedReads'
 
 /**
  * The bridge between diagnostics and the calendar.
@@ -43,9 +45,8 @@ export type StudyWeekContext = {
 type ClassSeries = { weekdays: Weekday[]; starts_on: string | null; ends_on: string | null }
 /** Every active weekly class series, with its own effective dates. */
 async function classSeries(userId: string): Promise<ClassSeries[]> {
-  const { data } = await createAdminClient().from('calendar_commitments').select('weekdays, starts_on, ends_on')
-    .eq('user_id', userId).eq('kind', 'class').eq('status', 'active').eq('recurrence', 'weekly').throwOnError()
-  return ((data ?? []) as { weekdays: number[] | null; starts_on: string | null; ends_on: string | null }[]).map(r => ({ weekdays: (r.weekdays ?? []) as Weekday[], starts_on: r.starts_on, ends_on: r.ends_on }))
+  const data = (await weeklySeries(userId)).filter(r => r.kind === 'class' && r.status === 'active')
+  return data.map(r => ({ weekdays: (r.weekdays ?? []) as Weekday[], starts_on: r.starts_on, ends_on: r.ends_on }))
 }
 /** The class weekdays in force on one local date: only series whose own dates include it. */
 export function effectiveWeekdays(series: ClassSeries[], date: string): Weekday[] {
@@ -84,7 +85,7 @@ async function getStudyWeekContextUncached(
   const admin = createAdminClient()
   const now = typeof reference === 'string' ? null : (reference ?? new Date())
   const [{ data: profile }, series, { data: nextClass }] = await Promise.all([
-    admin.from('profiles').select('timezone, reminder_at, class_pattern').eq('id', userId).maybeSingle(),
+    profileRow(userId).then(data => ({ data })),
     classSeries(userId),
     // A variable pattern's confirmed next class — see resolvePulseWeek's anchor rule. Ignored once a
     // recurring pattern exists (the query above already found one), so it is always safe to fetch.
@@ -116,10 +117,16 @@ async function getStudyWeekContextUncached(
       const [{ data: prof2 }] = await Promise.all([admin.from('profiles').select('prep_mode').eq('id', userId).maybeSingle()])
       const route = prof2?.prep_mode === 'instructor_led' ? 'coaching' : prof2?.prep_mode === 'hybrid' ? 'hybrid' : 'self_study'
       const next = shiftStudyWeek(week, 1)
+      // The same instant the first plan is fitted from (see REVIEW_BUFFER_MINUTES); the date stays the student's actual one.
+      const from = new Date(now.getTime() + REVIEW_BUFFER_MINUTES * 60_000)
+      const lastDay = profile?.registered && profile.exam_date ? addDays(String(profile.exam_date), -1) : null
       const capacity: Record<string, number> = {}
-      await Promise.all([...week.days, ...next.days].filter(d => d >= today0).map(async d => {
-        capacity[d] = await dailyCapacityMinutes(userId, weekdayOf(d), d, timezone, now)
-      }))
+      const dates = [...week.days, ...next.days].filter(d => d >= today0 && (!lastDay || d <= lastDay))
+      const { ranges } = await freeRangesForDates(userId, dates, timezone, from)
+      for (const d of dates) {
+        // Only stretches a sitting fits in count: ten free minutes tonight do not make tonight a study day.
+        capacity[d] = (ranges[d] ?? []).map(r => minutesBetween(r.start, r.end)).filter(m => m >= USABLE_GAP_MINUTES).reduce((a, b) => a + b, 0)
+      }
       initialCycle = decideInitialCycle({ current: week, today: today0, route, capacity })
       week = initialCycle.week
     }
@@ -161,7 +168,8 @@ export function nextWeekOf(ctx: StudyWeekContext): StudyWeek {
  * variable-pattern student's confirmed next-class anchor; only for dates beyond both does the recurring-class pattern (or the
  * Monday–Sunday default) extend forward. The anchor is deliberately not applied to a far date: it describes one week only.
  */
-export async function weekForDate(userId: string, date: string): Promise<StudyWeek> {
+export const weekForDate = perRequest((userId: string, date: string) => readWeekForDate(userId, date), (userId: string, date: string) => `${userId}|${date}`)
+async function readWeekForDate(userId: string, date: string): Promise<StudyWeek> {
   const admin = createAdminClient()
   const { data: cycle } = await admin.from('planning_cycles').select('starts_at_local, ends_at_local, timezone')
     .eq('user_id', userId).lte('starts_at_local', date).gte('ends_at_local', date).order('starts_at_local', { ascending: false }).limit(1).maybeSingle()

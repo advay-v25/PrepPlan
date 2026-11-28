@@ -20,7 +20,7 @@ const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SU
 const add = (d: string, n: number) => new Date(new Date(`${d}T12:00:00Z`).getTime() + n * 86_400_000).toISOString().slice(0, 10)
 const today = new Date().toISOString().slice(0, 10)
 const J = { 'Content-Type': 'application/json' }
-const TARGET = 'asylsxszdhlnzewhwtga'
+const TARGET = 'mnlezctdqkdfgvmipmcj'
 const made: string[] = []
 type Student = Awaited<ReturnType<typeof createStudent>>
 const strip = (h: string) => h.replace(/<!-- -->/g, '')

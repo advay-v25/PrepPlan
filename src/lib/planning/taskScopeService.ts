@@ -3,8 +3,9 @@ import { createAdminClient } from '../supabase/admin'
 import { summarizeScopeGroups } from './taskScope'
 import { readAll } from '../supabase/readAll'
 import { terminalIds } from './taskLineage'
+import type { OwnedBlock } from '../ops/sharedReads'
 
-async function loadScopeGroups(userId: string, ids: string[]) {
+async function loadScopeGroups(userId: string, ids: string[], known?: OwnedBlock[]) {
   const unique = [...new Set(ids)]
   if (!unique.length) return summarizeScopeGroups([], [])
   const admin = createAdminClient()
@@ -13,9 +14,12 @@ async function loadScopeGroups(userId: string, ids: string[]) {
   // Bound URL size as the student's sitting history grows, and read every page.
   for (let i = 0; i < unique.length; i += 100) {
     const ids = unique.slice(i, i + 100)
+    const wanted = new Set(ids)
     const [g, p] = await Promise.all([
       readAll<typeof groups[number]>((a, z) => admin.from('task_scope_groups').select('id, expected_parts, original_scope').eq('user_id', userId).in('id', ids).order('id').range(a, z)),
-      readAll<typeof parts[number]>((a, z) => admin.from('plan_blocks').select('id, scope_group_id, execution, cancelled_at, cycle_id, continued_from_task_id').eq('user_id', userId).in('scope_group_id', ids).order('id').range(a, z)),
+      // A caller that already holds the student's whole block history passes it: the rows are the same ones this select would return.
+      known ? Promise.resolve(known.filter(b => b.scope_group_id && wanted.has(b.scope_group_id)) as unknown as typeof parts)
+        : readAll<typeof parts[number]>((a, z) => admin.from('plan_blocks').select('id, scope_group_id, execution, cancelled_at, cycle_id, continued_from_task_id').eq('user_id', userId).in('scope_group_id', ids).order('id').range(a, z)),
     ])
     groups.push(...g); parts.push(...p)
   }
@@ -32,7 +36,8 @@ async function loadScopeGroups(userId: string, ids: string[]) {
       const batch = sessions.slice(offset, offset + 100)
       const [pl, al] = await Promise.all([
         readAll((a, z) => admin.from('class_session_items').select('session_id, outcome_id, planned_minutes').in('session_id', batch).order('session_id').order('outcome_id').range(a, z)),
-        readAll((a, z) => admin.from('plan_blocks').select('class_session_id, outcome_id, duration_minutes, cancelled_at, execution').eq('user_id', userId).in('class_session_id', batch).order('id').range(a, z)),
+        known ? Promise.resolve(known.filter(b => b.class_session_id && batch.includes(b.class_session_id)) as unknown as typeof allocatedRows)
+          : readAll((a, z) => admin.from('plan_blocks').select('class_session_id, outcome_id, duration_minutes, cancelled_at, execution').eq('user_id', userId).in('class_session_id', batch).order('id').range(a, z)),
       ])
       plannedRows.push(...pl); allocatedRows.push(...al)
     }
@@ -55,4 +60,4 @@ async function loadScopeGroups(userId: string, ids: string[]) {
 }
 
 /** One read per distinct (student, set of groups) within a request: Home and Calendar both ask for the same groups. */
-export const getScopeGroups = perRequest(loadScopeGroups, (userId, ids) => `${userId}|${[...new Set(ids)].sort().join(',')}`)
+export const getScopeGroups = perRequest(loadScopeGroups, (userId: string, ids: string[], _known?: OwnedBlock[]) => `${userId}|${[...new Set(ids)].sort().join(',')}`)

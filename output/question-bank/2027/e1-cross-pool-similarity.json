@@ -1,0 +1,105 @@
+{
+  "phase": "E",
+  "threshold": 0.45,
+  "crossPoolHighSimilarityPairs": 16,
+  "maxSimilarity": 0.59,
+  "pairs": [
+    {
+      "heldOutId": "pp-mock1-r073-b-medium-1",
+      "routineId": "pp-2027-c5-r073-b-hard",
+      "outcomeId": "r073-b",
+      "similarity": 0.59
+    },
+    {
+      "heldOutId": "pp-mock1-r008-a-medium-1",
+      "routineId": "pp-2027-c5-r008-a-hard",
+      "outcomeId": "r008-a",
+      "similarity": 0.58
+    },
+    {
+      "heldOutId": "pp-mock1-r006-a-easy-1",
+      "routineId": "pp-ref2027-r006-a-easy",
+      "outcomeId": "r006-a",
+      "similarity": 0.56
+    },
+    {
+      "heldOutId": "pp-mock1-r019-b-hard-1",
+      "routineId": "pp-2027-c5-r019-b-medium",
+      "outcomeId": "r019-b",
+      "similarity": 0.55
+    },
+    {
+      "heldOutId": "pp-mock1-r056-a-medium-1",
+      "routineId": "pp-2027-c5-r056-a-easy",
+      "outcomeId": "r056-a",
+      "similarity": 0.53
+    },
+    {
+      "heldOutId": "pp-mock1-r005-c-medium-1",
+      "routineId": "pp-ref2027-r005-c-medium",
+      "outcomeId": "r005-c",
+      "similarity": 0.5
+    },
+    {
+      "heldOutId": "pp-mock1-r037-d-medium-1",
+      "routineId": "pp-ref2027-r037-d-easy",
+      "outcomeId": "r037-d",
+      "similarity": 0.5
+    },
+    {
+      "heldOutId": "pp-mock1-r044-d-hard-1",
+      "routineId": "pp-2027-c5-r044-d-medium",
+      "outcomeId": "r044-d",
+      "similarity": 0.5
+    },
+    {
+      "heldOutId": "pp-mock1-r061-a-medium-1",
+      "routineId": "pp-2027-c5-r061-a-easy",
+      "outcomeId": "r061-a",
+      "similarity": 0.5
+    },
+    {
+      "heldOutId": "pp-mock1-r062-b-hard-1",
+      "routineId": "pp-2027-c5-r062-b-medium",
+      "outcomeId": "r062-b",
+      "similarity": 0.5
+    },
+    {
+      "heldOutId": "pp-mock1-r088-i-medium-1",
+      "routineId": "pp-2027-c5-r088-i-easy",
+      "outcomeId": "r088-i",
+      "similarity": 0.5
+    },
+    {
+      "heldOutId": "pp-mock1-r062-b-hard-1",
+      "routineId": "pp-2027-c5-r062-b-easy",
+      "outcomeId": "r062-b",
+      "similarity": 0.47
+    },
+    {
+      "heldOutId": "pp-mock1-r043-b-medium-1",
+      "routineId": "pp-2027-c5-r043-b-hard",
+      "outcomeId": "r043-b",
+      "similarity": 0.46
+    },
+    {
+      "heldOutId": "pp-mock1-r066-b-easy-1",
+      "routineId": "pp-2027-c5-r066-b-hard",
+      "outcomeId": "r066-b",
+      "similarity": 0.46
+    },
+    {
+      "heldOutId": "pp-mock1-r008-a-medium-1",
+      "routineId": "pp-ref2027-r008-a-medium",
+      "outcomeId": "r008-a",
+      "similarity": 0.45
+    },
+    {
+      "heldOutId": "pp-mock1-r071-b-medium-1",
+      "routineId": "pp-2027-c5-r071-b-easy",
+      "outcomeId": "r071-b",
+      "similarity": 0.45
+    }
+  ],
+  "note": "Pairs >= 0.45 share outcome vocabulary/scenario framing and are flagged for human construction-independence verification."
+}

@@ -234,6 +234,21 @@ test('6 cards: edit with a stale second tab, delete, Again delay, competing rati
     const [x, y] = await Promise.all(['again', 'easy'].map(rating => sess.json('/api/curriculum/flashcards', { method: 'POST', headers: J, body: JSON.stringify({ action: 'review', cardId: c.id, rating, expectedRevision: c.revision, requestKey: crypto.randomUUID() }) })))
     expect([x, y].filter(r => r.status === 200).length).toBe(1); expect([x, y].filter(r => r.status === 409 && r.body?.code === 'STALE_CARD').length).toBe(1)
   })
+  await rec.browser('a competing rating parks the stale card until its newly saved due time', () => se.expecting([{ label: 'the deliberate stale rating conflict (409)', url: /\/api\/curriculum\/flashcards$/, statuses: [409], min: 1, max: 1 }], async () => {
+    const { data: card, error } = await db.from('flashcards').insert({ user_id: S.id, scope_type: 'reading', scope_id: S.third.id, front: 'Competing review', back: 'Answer' }).select('id, revision').single()
+    expect(error).toBeNull()
+    await page.reload()
+    await page.getByRole('button', { name: /Review 1 due/ }).click()
+    await page.getByRole('button', { name: 'Show the answer' }).click()
+    const sess = (await import('../../../scripts/lib/e2eSession')).createSession(db, S.email)
+    expect(await sess.signIn()).toBe(true)
+    const reply = await sess.json('/api/curriculum/flashcards', { method: 'POST', headers: J, body: JSON.stringify({ action: 'review', cardId: card!.id, rating: 'again', expectedRevision: card!.revision, requestKey: crypto.randomUUID() }) })
+    expect(reply.status).toBe(200)
+    await page.getByRole('button', { name: 'Good' }).click()
+    await expect(page.getByText(/was rescheduled elsewhere/)).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Show the answer' })).toHaveCount(0)
+    expect((await db.from('flashcards').select('revision').eq('id', card!.id).single()).data?.revision).toBe(card!.revision + 1)
+  }))
   await rec.browser('delete asks first; a failed delete is NOT a deletion; a real delete removes it once', () => se.expecting([{ label: 'the injected delete failure', url: /\/api\/curriculum\/flashcards$/, failed: true, min: 1, max: 2 }], async () => {
     await page.reload(); const total = (await cards(S.third.id)).length
     const row = page.locator('li', { hasText: 'Card A front (edited)' }); await row.getByRole('button', { name: 'Delete' }).click(); await expect(row.getByText('Delete this card?')).toBeVisible()
@@ -292,7 +307,14 @@ test('7b a deck beyond 1,000 cards: exact counts, pagination, search, filters, a
   }))
   await rec.browser('search and the due filter narrow the list from the server, with true match counts', async () => {
     await page.getByLabel('Search cards').fill('Bulk card 1199'); await page.getByRole('button', { name: 'Search', exact: true }).click(); await expect(page.locator('.flashcards__list > li')).toHaveCount(1)
+    // The unfiltered reply that Clear search asks for is held back, so it lands after the newer "due" reply: the newer choice must stay on screen.
+    const slowAll = /\/api\/curriculum\/flashcards\?.*offset=0&filter=all$/
+    await page.route(slowAll, async r => { await new Promise(x => setTimeout(x, 1500)); await r.continue() })
+    const late = page.waitForResponse(slowAll)
     await page.getByRole('button', { name: 'Clear search' }).click(); await page.getByLabel('Show').selectOption('due'); await expect(page.locator('.flashcards__list > li')).toHaveCount(30)
+    await (await late).finished(); await page.waitForTimeout(500)
+    await expect(page.locator('.flashcards__list > li')).toHaveCount(30); await expect(page.getByLabel('Show')).toHaveValue('due')
+    await page.unroute(slowAll)
   })
   await rec.browser('the cross-scope due page counts exactly and reviews the first page while saying how many follow', async () => {
     const dueNow = ((await db.from('flashcards').select('id', { count: 'exact', head: true }).eq('user_id', S.id).eq('suspended', false).lte('due_at', new Date().toISOString())).count) ?? -1; expect(dueNow).toBeGreaterThanOrEqual(30)

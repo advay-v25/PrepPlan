@@ -1,0 +1,13 @@
+== reh-db
+14 checks passed
+== reh-install
+runner dry-run after install: 0 pending (checkout has 161 migrations)
+ledger rows: 161; checksum mismatches: 0; migrations without a ledger row: 0
+== reh-upgrade
+runner dry-run after install: 0 pending (checkout has 161 migrations)
+ledger rows: 161; checksum mismatches: 0; migrations without a ledger row: 0
+== reh-restore
+32 checks passed (nothing persisted)
+== reference bank, current importer: unchanged, still rejects format .2
+== reference bank, proposed patch
+33

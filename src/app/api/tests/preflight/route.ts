@@ -3,6 +3,7 @@ import { createClient } from '../../../../lib/supabase/server'
 import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
 import { decideAssessment, type DecisionKind } from '../../../../lib/tests/assessmentDecision'
 import { previewAdaptive } from '../../../../lib/tests/adaptivePractice'
+import { previewAdaptiveItem } from '../../../../lib/tests/adaptiveItemPractice'
 import { rateLimit } from '../../../../lib/auth/securityServer'
 
 export const dynamic = 'force-dynamic'
@@ -22,6 +23,16 @@ export async function POST(request: Request) {
   if (limited) return limited
   const str = (v: unknown) => typeof v === 'string' ? v : undefined
   try {
+    if (body.kind === 'practice' && body.mode === 'adaptive_item') {
+      if (typeof body.readingId !== 'string') return NextResponse.json({ ok: false, error: 'Choose a reading.' }, { status: 400 })
+      return NextResponse.json({
+        ok: true,
+        adaptiveItem: await previewAdaptiveItem(access.user.id, {
+          readingId: body.readingId,
+          outcomeIds: Array.isArray(body.outcomeIds) ? body.outcomeIds.filter((x: unknown) => typeof x === 'string').slice(0, 40) : undefined,
+        }),
+      })
+    }
     if (body.kind === 'practice' && body.mode === 'adaptive') {
       if (typeof body.readingId !== 'string') return NextResponse.json({ ok: false, error: 'Choose a reading.' }, { status: 400 })
       // Read-only: no run, form, reservation or exposure is written.

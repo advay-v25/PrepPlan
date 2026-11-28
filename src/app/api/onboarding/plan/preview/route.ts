@@ -2,8 +2,6 @@ import { isAdmitted } from '../../../../../lib/beta/admission'
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../../lib/supabase/server'
 import { getOrCreateReadyDraft } from '../../../../../lib/planning/activation/draftService'
-import { getStudyWeekContext } from '../../../../../lib/planning/schedule'
-import { initialCycleNote } from '../../../../../lib/planning/pulse/firstCycle'
 
 export async function POST() {
   const supabase = await createClient()
@@ -13,12 +11,11 @@ export async function POST() {
 
   try {
     // Idempotent: the same setup and week always resolve to the same draft.
-    const { draftId, revision, tasks, paper } = await getOrCreateReadyDraft(user.id)
-    // deriveWeekClosing is this same context's anchor and class flag; asking it separately recomputed the whole context.
-    const ctx = await getStudyWeekContext(user.id)
+    const { draftId, revision, tasks, paper, cycle } = await getOrCreateReadyDraft(user.id)
     return NextResponse.json({
       ok: true,
-      data: { draftId, tasks, revision, paper, cycle: { start: ctx.week.startDate, end: ctx.week.endDate }, timezone: ctx.timezone, closingDay: ctx.anchorDay, classLed: ctx.classLed, initialCycle: ctx.initialCycle ? { advanced: ctx.initialCycle.advanced, reason: ctx.initialCycle.reason, note: initialCycleNote(ctx.initialCycle) } : null },
+      // Everything about the week comes from the draft itself: a context computed now could already describe a different one.
+      data: { draftId, tasks, revision, paper, cycle: { start: cycle.start, end: cycle.end }, timezone: cycle.timezone, closingDay: cycle.closingDay, classLed: cycle.classLed, initialCycle: cycle.initialCycle, reviewNote: cycle.reviewNote },
     })
   } catch (error: any) {
     // The cause is logged; the student gets a sentence they can act on, never database text.

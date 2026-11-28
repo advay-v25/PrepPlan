@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { classLedPersona, createStudent, FRESH_STUDENT_ONBOARDING } from '../../../scripts/lib/e2eSession'
-import { admin, login, noHorizontalOverflow, TARGET } from './helpers'
+import { admin, login, noHorizontalOverflow, TARGET_HOST } from './helpers'
 
 const BASE_TITLES = [
   ['/', 'CFA Level I study planner'],
@@ -80,7 +80,7 @@ test('public pages, protection redirects and search indexing', async ({ page, re
 
 for (const classLed of [false, true]) {
   test(`${classLed ? 'Class-led' : 'Self-study'} workspace and connected actions`, async ({ page, baseURL }, info) => {
-    expect(new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname).toBe(`${TARGET}.supabase.co`)
+    expect(new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname).toBe(TARGET_HOST)
     expect(['localhost', '127.0.0.1']).toContain(new URL(baseURL!).hostname)
     const db = admin()
     const errors = watchPage(page)
@@ -93,6 +93,19 @@ for (const classLed of [false, true]) {
       await login(page, db, student.email)
       const timings = await viewPages(page, APP_TITLES)
       await info.attach('workspace-navigation-times', { body: JSON.stringify(timings), contentType: 'application/json' })
+
+      if (!classLed) {
+        await page.goto('/app/tests?view=mocks')
+        const launcher = page.getByRole('link', { name: 'Ask the Coach', exact: true })
+        if (page.viewportSize()!.width <= 900) {
+          await expect(launcher).toBeHidden()
+          await page.getByRole('navigation', { name: 'Main', exact: true }).getByRole('button', { name: 'Open navigation' }).click()
+          await page.getByRole('dialog', { name: 'Navigation' }).getByRole('link', { name: 'Coach', exact: true }).click()
+        } else {
+          await launcher.click()
+        }
+        await expect(page).toHaveURL(/\/app\/coach$/)
+      }
 
       await page.goto('/app/coach')
       await expect(page.getByRole('button', { name: 'Send', exact: true })).toBeDisabled()
@@ -121,7 +134,8 @@ for (const classLed of [false, true]) {
         await page.goto('/app/curriculum')
         await expect(page.getByText(coverage, { exact: false }).first()).toBeVisible()
         await page.goto('/app')
-        await expect(page.getByText(coverage, { exact: false }).first()).toBeVisible()
+        await expect(page.getByText('0/102').first()).toBeVisible()
+        await expect(page.getByText('1 partly', { exact: false }).first()).toBeVisible()
 
         await page.goto(reading)
         const mark = page.locator('.reading-mark')
@@ -147,9 +161,12 @@ for (const classLed of [false, true]) {
         await page.goto('/app/log?reading=r028')
         await page.locator('.log-sheet__outcomes').getByRole('checkbox').first().check()
         await page.getByRole('button', { name: 'Save', exact: true }).click()
-        await expect(page.getByRole('heading', { name: 'Logged.', exact: true })).toBeVisible()
+        await expect(page.getByRole('heading', { name: 'Session logged.', exact: true })).toBeVisible()
+        await page.waitForLoadState('networkidle')
         await page.goto('/app/log')
-        await expect(page.getByRole('option', { name: /Analyzing Income Statements/i })).toHaveAttribute('aria-selected', 'true')
+        // Nothing is preselected: a separate session starts from recent readings, and coverage is never carried over.
+        await page.getByRole('radio', { name: /Log a separate session/ }).click()
+        await expect(page.getByRole('button', { name: /Analyzing Income Statements/i })).toBeVisible()
         await expect(page.locator('.log-sheet__outcomes input:checked')).toHaveCount(0)
       }
       expect(errors).toEqual([])

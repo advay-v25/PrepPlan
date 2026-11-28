@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '../../../lib/supabase/admin'
 import { SUPPORT_EMAIL } from '../../../lib/support'
-import { hasBearer } from '../../../lib/auth/securityServer'
+import { cleanEnv, hasBearer } from '../../../lib/auth/securityServer'
 import { boundedStage } from '../../../lib/ops/requestBudget'
 
 export const dynamic = 'force-dynamic'
@@ -25,7 +25,8 @@ export async function GET(request: Request) {
       admin.from('beta_settings').select('value').eq('key', 'admission').maybeSingle(),
     ]))
     if (error || admissionError) throw error ?? admissionError
-    out.database = 'ok'; out.schemaVersion = latest?.[0]?.version ?? null; out.admission = adm?.value ?? 'unknown'
+    out.database = 'ok'; out.databaseOrigin = new URL(cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)).origin
+    out.schemaVersion = latest?.[0]?.version ?? null; out.admission = adm?.value ?? 'unknown'
     if (process.env.EXPECTED_SCHEMA_VERSION && out.schemaVersion !== process.env.EXPECTED_SCHEMA_VERSION) { out.schema = 'mismatch'; ok = false } else out.schema = 'ok'
   } catch { out.database = 'unreachable'; ok = false }
   out.config = { supportContact: !!SUPPORT_EMAIL, emailProvider: !!(process.env.RESEND_API_KEY && process.env.RESEND_FROM_EMAIL), reminderWorker: !!process.env.CRON_SECRET, siteUrl: !!process.env.NEXT_PUBLIC_SITE_URL, coachModel: !!process.env.NVIDIA_API_KEY }

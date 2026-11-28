@@ -1,0 +1,7100 @@
+{
+  "generatedAt": "2026-11-25T07:17:09.646Z",
+  "drafts": 536,
+  "newOriginalDrafts": 254,
+  "revisedLegacyDrafts": 243,
+  "carriedForwardDrafts": 39,
+  "readingCoverage": 102,
+  "outcomeCoverage": 343,
+  "counts": {
+    "quant": {
+      "outcomes": 30,
+      "drafts": 39
+    },
+    "econ": {
+      "outcomes": 30,
+      "drafts": 30
+    },
+    "ci": {
+      "outcomes": 22,
+      "drafts": 22
+    },
+    "fsa": {
+      "outcomes": 53,
+      "drafts": 162
+    },
+    "eq": {
+      "outcomes": 37,
+      "drafts": 37
+    },
+    "fi": {
+      "outcomes": 51,
+      "drafts": 51
+    },
+    "deriv": {
+      "outcomes": 22,
+      "drafts": 22
+    },
+    "alt": {
+      "outcomes": 22,
+      "drafts": 22
+    },
+    "pm": {
+      "outcomes": 40,
+      "drafts": 40
+    },
+    "eth": {
+      "outcomes": 36,
+      "drafts": 111
+    }
+  },
+  "arithmeticExecuted": 99,
+  "formatOrInputReview": 0,
+  "overlapReview": 4,
+  "nearMatchReview": 8,
+  "missingTierOutcomes": 253,
+  "confirmedIndependentFamilies": 0,
+  "approvedRoutine": 0,
+  "approvedHeldOut": 0,
+  "learnerReleaseEligible": false,
+  "coverage": [
+    {
+      "outcomeId": "r001-a",
+      "readingId": "r001",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r001-b",
+      "readingId": "r001",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r002-a",
+      "readingId": "r002",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r003-a",
+      "readingId": "r003",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r003-b",
+      "readingId": "r003",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r004-a",
+      "readingId": "r004",
+      "subjectId": "quant",
+      "candidates": 4,
+      "byTier": {
+        "foundation": 2,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 4,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r004-b",
+      "readingId": "r004",
+      "subjectId": "quant",
+      "candidates": 4,
+      "byTier": {
+        "foundation": 1,
+        "standard": 2,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 4,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r004-c",
+      "readingId": "r004",
+      "subjectId": "quant",
+      "candidates": 4,
+      "byTier": {
+        "foundation": 1,
+        "standard": 2,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 4,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r005-a",
+      "readingId": "r005",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r005-b",
+      "readingId": "r005",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r005-c",
+      "readingId": "r005",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r005-d",
+      "readingId": "r005",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r006-a",
+      "readingId": "r006",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r006-b",
+      "readingId": "r006",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r006-c",
+      "readingId": "r006",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r006-d",
+      "readingId": "r006",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 0,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "standard"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r007-a",
+      "readingId": "r007",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r007-b",
+      "readingId": "r007",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r007-c",
+      "readingId": "r007",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r008-a",
+      "readingId": "r008",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r008-b",
+      "readingId": "r008",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r008-c",
+      "readingId": "r008",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 0,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "standard"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r009-a",
+      "readingId": "r009",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r009-b",
+      "readingId": "r009",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r009-c",
+      "readingId": "r009",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r010-a",
+      "readingId": "r010",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r010-b",
+      "readingId": "r010",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r010-c",
+      "readingId": "r010",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r010-d",
+      "readingId": "r010",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r011-a",
+      "readingId": "r011",
+      "subjectId": "quant",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r012-a",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r012-b",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r012-c",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r012-d",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r012-e",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r013-a",
+      "readingId": "r013",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r013-b",
+      "readingId": "r013",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r013-c",
+      "readingId": "r013",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r014-a",
+      "readingId": "r014",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r014-b",
+      "readingId": "r014",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r014-c",
+      "readingId": "r014",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r014-d",
+      "readingId": "r014",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r015-a",
+      "readingId": "r015",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r015-b",
+      "readingId": "r015",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r015-c",
+      "readingId": "r015",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r015-d",
+      "readingId": "r015",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 0,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "standard"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r016-a",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r016-b",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r016-c",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r016-d",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r016-e",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r016-f",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r017-a",
+      "readingId": "r017",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r017-b",
+      "readingId": "r017",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r017-c",
+      "readingId": "r017",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r018-a",
+      "readingId": "r018",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r018-b",
+      "readingId": "r018",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r018-c",
+      "readingId": "r018",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r019-a",
+      "readingId": "r019",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r019-b",
+      "readingId": "r019",
+      "subjectId": "econ",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 0,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "standard"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r020-a",
+      "readingId": "r020",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r020-b",
+      "readingId": "r020",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r020-c",
+      "readingId": "r020",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r021-a",
+      "readingId": "r021",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r021-b",
+      "readingId": "r021",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r021-c",
+      "readingId": "r021",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r022-a",
+      "readingId": "r022",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r022-b",
+      "readingId": "r022",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r022-c",
+      "readingId": "r022",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r023-a",
+      "readingId": "r023",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r023-b",
+      "readingId": "r023",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r023-c",
+      "readingId": "r023",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r024-a",
+      "readingId": "r024",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r024-b",
+      "readingId": "r024",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r024-c",
+      "readingId": "r024",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r024-d",
+      "readingId": "r024",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r025-a",
+      "readingId": "r025",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r025-b",
+      "readingId": "r025",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r025-c",
+      "readingId": "r025",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r025-d",
+      "readingId": "r025",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r026-a",
+      "readingId": "r026",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r026-b",
+      "readingId": "r026",
+      "subjectId": "ci",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r027-a",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 2,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "difficult"
+      ],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r027-b",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r027-c",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r027-d",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r027-e",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r028-a",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r028-b",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r028-c",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r028-d",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r028-e",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r029-a",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r029-b",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r029-c",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r029-d",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r029-e",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r030-a",
+      "readingId": "r030",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r030-b",
+      "readingId": "r030",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r030-c",
+      "readingId": "r030",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r030-d",
+      "readingId": "r030",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r031-a",
+      "readingId": "r031",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r031-b",
+      "readingId": "r031",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r032-a",
+      "readingId": "r032",
+      "subjectId": "fsa",
+      "candidates": 6,
+      "byTier": {
+        "foundation": 2,
+        "standard": 2,
+        "difficult": 2
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 6,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "CONCEPT_SIGNOFF_PENDING"
+    },
+    {
+      "outcomeId": "r032-b",
+      "readingId": "r032",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "CONCEPT_SIGNOFF_PENDING"
+    },
+    {
+      "outcomeId": "r032-c",
+      "readingId": "r032",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "CONCEPT_SIGNOFF_PENDING"
+    },
+    {
+      "outcomeId": "r033-a",
+      "readingId": "r033",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r033-b",
+      "readingId": "r033",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r033-c",
+      "readingId": "r033",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r034-a",
+      "readingId": "r034",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r034-b",
+      "readingId": "r034",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r034-c",
+      "readingId": "r034",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r035-a",
+      "readingId": "r035",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r035-b",
+      "readingId": "r035",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r035-c",
+      "readingId": "r035",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r035-d",
+      "readingId": "r035",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r036-a",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r036-b",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r036-c",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r036-d",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r036-e",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r036-f",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r036-g",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r036-h",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r037-a",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r037-b",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r037-c",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r037-d",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r037-e",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r037-f",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r038-a",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r038-b",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r038-c",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r038-d",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r038-e",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r039-a",
+      "readingId": "r039",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r039-b",
+      "readingId": "r039",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r040-a",
+      "readingId": "r040",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r040-b",
+      "readingId": "r040",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r041-a",
+      "readingId": "r041",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r041-b",
+      "readingId": "r041",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r041-c",
+      "readingId": "r041",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r041-d",
+      "readingId": "r041",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r042-a",
+      "readingId": "r042",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r042-b",
+      "readingId": "r042",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r042-c",
+      "readingId": "r042",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r043-a",
+      "readingId": "r043",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r043-b",
+      "readingId": "r043",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r043-c",
+      "readingId": "r043",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r044-a",
+      "readingId": "r044",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r044-b",
+      "readingId": "r044",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r044-c",
+      "readingId": "r044",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r044-d",
+      "readingId": "r044",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r045-a",
+      "readingId": "r045",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r045-b",
+      "readingId": "r045",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r045-c",
+      "readingId": "r045",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r045-d",
+      "readingId": "r045",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r046-a",
+      "readingId": "r046",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r046-b",
+      "readingId": "r046",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r046-c",
+      "readingId": "r046",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r047-a",
+      "readingId": "r047",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r047-b",
+      "readingId": "r047",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r047-c",
+      "readingId": "r047",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r047-d",
+      "readingId": "r047",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r048-a",
+      "readingId": "r048",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r048-b",
+      "readingId": "r048",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r048-c",
+      "readingId": "r048",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r049-a",
+      "readingId": "r049",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r049-b",
+      "readingId": "r049",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r049-c",
+      "readingId": "r049",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r050-a",
+      "readingId": "r050",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r050-b",
+      "readingId": "r050",
+      "subjectId": "eq",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r051-a",
+      "readingId": "r051",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r051-b",
+      "readingId": "r051",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r052-a",
+      "readingId": "r052",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r052-b",
+      "readingId": "r052",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r053-a",
+      "readingId": "r053",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r053-b",
+      "readingId": "r053",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r053-c",
+      "readingId": "r053",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r054-a",
+      "readingId": "r054",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r054-b",
+      "readingId": "r054",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r054-c",
+      "readingId": "r054",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r055-a",
+      "readingId": "r055",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r055-b",
+      "readingId": "r055",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r056-a",
+      "readingId": "r056",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r056-b",
+      "readingId": "r056",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r056-c",
+      "readingId": "r056",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r057-a",
+      "readingId": "r057",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r057-b",
+      "readingId": "r057",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r058-a",
+      "readingId": "r058",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r058-b",
+      "readingId": "r058",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r059-a",
+      "readingId": "r059",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r059-b",
+      "readingId": "r059",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r059-c",
+      "readingId": "r059",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r060-a",
+      "readingId": "r060",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r060-b",
+      "readingId": "r060",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r060-c",
+      "readingId": "r060",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r061-a",
+      "readingId": "r061",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r061-b",
+      "readingId": "r061",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r062-a",
+      "readingId": "r062",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r062-b",
+      "readingId": "r062",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 0,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "standard"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r062-c",
+      "readingId": "r062",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r063-a",
+      "readingId": "r063",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r063-b",
+      "readingId": "r063",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r063-c",
+      "readingId": "r063",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r063-d",
+      "readingId": "r063",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r064-a",
+      "readingId": "r064",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r064-b",
+      "readingId": "r064",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r064-c",
+      "readingId": "r064",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r065-a",
+      "readingId": "r065",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r066-a",
+      "readingId": "r066",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r066-b",
+      "readingId": "r066",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r066-c",
+      "readingId": "r066",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r067-a",
+      "readingId": "r067",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r067-b",
+      "readingId": "r067",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r068-a",
+      "readingId": "r068",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r068-b",
+      "readingId": "r068",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r068-c",
+      "readingId": "r068",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r068-d",
+      "readingId": "r068",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r069-a",
+      "readingId": "r069",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r069-b",
+      "readingId": "r069",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r069-c",
+      "readingId": "r069",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r069-d",
+      "readingId": "r069",
+      "subjectId": "fi",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r070-a",
+      "readingId": "r070",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r070-b",
+      "readingId": "r070",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r071-a",
+      "readingId": "r071",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r071-b",
+      "readingId": "r071",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r071-c",
+      "readingId": "r071",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r072-a",
+      "readingId": "r072",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r072-b",
+      "readingId": "r072",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r073-a",
+      "readingId": "r073",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r073-b",
+      "readingId": "r073",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r074-a",
+      "readingId": "r074",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r074-b",
+      "readingId": "r074",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r075-a",
+      "readingId": "r075",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r075-b",
+      "readingId": "r075",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 0,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "standard"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r076-a",
+      "readingId": "r076",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r076-b",
+      "readingId": "r076",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r077-a",
+      "readingId": "r077",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r077-b",
+      "readingId": "r077",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r077-c",
+      "readingId": "r077",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r078-a",
+      "readingId": "r078",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 0,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "standard"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r078-b",
+      "readingId": "r078",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r079-a",
+      "readingId": "r079",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 0,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "standard"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r079-b",
+      "readingId": "r079",
+      "subjectId": "deriv",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r080-a",
+      "readingId": "r080",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r080-b",
+      "readingId": "r080",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r080-c",
+      "readingId": "r080",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r081-a",
+      "readingId": "r081",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r081-b",
+      "readingId": "r081",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r082-a",
+      "readingId": "r082",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r082-b",
+      "readingId": "r082",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r082-c",
+      "readingId": "r082",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r083-a",
+      "readingId": "r083",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r083-b",
+      "readingId": "r083",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r083-c",
+      "readingId": "r083",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r083-d",
+      "readingId": "r083",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r084-a",
+      "readingId": "r084",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r084-b",
+      "readingId": "r084",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r084-c",
+      "readingId": "r084",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r085-a",
+      "readingId": "r085",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r085-b",
+      "readingId": "r085",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r085-c",
+      "readingId": "r085",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r086-a",
+      "readingId": "r086",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r086-b",
+      "readingId": "r086",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r086-c",
+      "readingId": "r086",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r086-d",
+      "readingId": "r086",
+      "subjectId": "alt",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r087-a",
+      "readingId": "r087",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r087-b",
+      "readingId": "r087",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r087-c",
+      "readingId": "r087",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r087-d",
+      "readingId": "r087",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r087-e",
+      "readingId": "r087",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r087-f",
+      "readingId": "r087",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r087-g",
+      "readingId": "r087",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r088-a",
+      "readingId": "r088",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r088-b",
+      "readingId": "r088",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r088-c",
+      "readingId": "r088",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r088-d",
+      "readingId": "r088",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r088-e",
+      "readingId": "r088",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r088-f",
+      "readingId": "r088",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r088-g",
+      "readingId": "r088",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r088-h",
+      "readingId": "r088",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r088-i",
+      "readingId": "r088",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r089-a",
+      "readingId": "r089",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r089-b",
+      "readingId": "r089",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r089-c",
+      "readingId": "r089",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r089-d",
+      "readingId": "r089",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r089-e",
+      "readingId": "r089",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r089-f",
+      "readingId": "r089",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r090-a",
+      "readingId": "r090",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r090-b",
+      "readingId": "r090",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r090-c",
+      "readingId": "r090",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r090-d",
+      "readingId": "r090",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r090-e",
+      "readingId": "r090",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r090-f",
+      "readingId": "r090",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r090-g",
+      "readingId": "r090",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r090-h",
+      "readingId": "r090",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r091-a",
+      "readingId": "r091",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r091-b",
+      "readingId": "r091",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r091-c",
+      "readingId": "r091",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r092-a",
+      "readingId": "r092",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 1,
+        "standard": 0,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "standard",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r092-b",
+      "readingId": "r092",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r092-c",
+      "readingId": "r092",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r092-d",
+      "readingId": "r092",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r092-e",
+      "readingId": "r092",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r092-f",
+      "readingId": "r092",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r092-g",
+      "readingId": "r092",
+      "subjectId": "pm",
+      "candidates": 1,
+      "byTier": {
+        "foundation": 0,
+        "standard": 1,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "foundation",
+        "difficult"
+      ],
+      "proposedFamilyIds": 1,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r093-a",
+      "readingId": "r093",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r093-b",
+      "readingId": "r093",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r093-c",
+      "readingId": "r093",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r093-d",
+      "readingId": "r093",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 2,
+        "difficult": 0
+      },
+      "missingCandidateTiers": [
+        "difficult"
+      ],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r093-e",
+      "readingId": "r093",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r093-f",
+      "readingId": "r093",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r093-g",
+      "readingId": "r093",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r093-h",
+      "readingId": "r093",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r094-a",
+      "readingId": "r094",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r094-b",
+      "readingId": "r094",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r094-c",
+      "readingId": "r094",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r095-a",
+      "readingId": "r095",
+      "subjectId": "eth",
+      "candidates": 6,
+      "byTier": {
+        "foundation": 2,
+        "standard": 2,
+        "difficult": 2
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 6,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "CONCEPT_SIGNOFF_PENDING"
+    },
+    {
+      "outcomeId": "r095-b",
+      "readingId": "r095",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "CONCEPT_SIGNOFF_PENDING"
+    },
+    {
+      "outcomeId": "r095-c",
+      "readingId": "r095",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "CONCEPT_SIGNOFF_PENDING"
+    },
+    {
+      "outcomeId": "r095-d",
+      "readingId": "r095",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "CONCEPT_SIGNOFF_PENDING"
+    },
+    {
+      "outcomeId": "r095-e",
+      "readingId": "r095",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "CONCEPT_SIGNOFF_PENDING"
+    },
+    {
+      "outcomeId": "r096-a",
+      "readingId": "r096",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r096-b",
+      "readingId": "r096",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r097-a",
+      "readingId": "r097",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r097-b",
+      "readingId": "r097",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r097-c",
+      "readingId": "r097",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r097-d",
+      "readingId": "r097",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r097-e",
+      "readingId": "r097",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r098-a",
+      "readingId": "r098",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r098-b",
+      "readingId": "r098",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r098-c",
+      "readingId": "r098",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r099-a",
+      "readingId": "r099",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r099-b",
+      "readingId": "r099",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r099-c",
+      "readingId": "r099",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r100-a",
+      "readingId": "r100",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r100-b",
+      "readingId": "r100",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r100-c",
+      "readingId": "r100",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r101-a",
+      "readingId": "r101",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r101-b",
+      "readingId": "r101",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r102-a",
+      "readingId": "r102",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    },
+    {
+      "outcomeId": "r102-b",
+      "readingId": "r102",
+      "subjectId": "eth",
+      "candidates": 3,
+      "byTier": {
+        "foundation": 1,
+        "standard": 1,
+        "difficult": 1
+      },
+      "missingCandidateTiers": [],
+      "proposedFamilyIds": 3,
+      "confirmedIndependentFamilies": 0,
+      "approvedRoutine": 0,
+      "approvedHeldOut": 0,
+      "studentSpecificFreshCapacity": null,
+      "firstPublicationBlocker": "RIGHTS_UNCONFIRMED"
+    }
+  ],
+  "defects": [
+    {
+      "id": "pp-2027-r032-a-easy",
+      "format": [],
+      "inputDefects": [],
+      "overlap": [
+        {
+          "field": "stem",
+          "hash": "78e4dd863c7de0ef"
+        },
+        {
+          "field": "solution",
+          "hash": "d2abb368dd9d91de"
+        }
+      ]
+    },
+    {
+      "id": "pp-2027-r095-a-easy",
+      "format": [],
+      "inputDefects": [],
+      "overlap": [
+        {
+          "field": "stem",
+          "hash": "0e0b9b4ab9120317"
+        },
+        {
+          "field": "solution",
+          "hash": "189bae1fa77e635c"
+        }
+      ]
+    },
+    {
+      "id": "pp-2027-r095-b-easy",
+      "format": [],
+      "inputDefects": [],
+      "overlap": [
+        {
+          "field": "solution",
+          "hash": "0945a20bc8213d11"
+        }
+      ]
+    },
+    {
+      "id": "pp-2027-r095-e-easy",
+      "format": [],
+      "inputDefects": [],
+      "overlap": [
+        {
+          "field": "solution",
+          "hash": "09e332908dbc5933"
+        }
+      ]
+    }
+  ],
+  "sourceFiles": [
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V1_Quants_ONLINE.pdf",
+      "sha256": "5c89433fef139bb9663e25694c72c5ab2003e77e8c6a7ddd7959002061e6e6ba",
+      "pages": 631
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V2_Econ_ONLINE.pdf",
+      "sha256": "449867afc9159e7aa3bc8c882c27207bffb0a48097fcf124c3163b63646ba583",
+      "pages": 278
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V3_CorpFin_ONLINE.pdf",
+      "sha256": "2bd17910ac94bf13ef81c23c838c1c20f7bb0d2ba27e9a56004c4673ca7e4aa3",
+      "pages": 255
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V4_FSA_ONLINE.pdf",
+      "sha256": "b84e7a955d951b7fe77bb8719bd1d1181a9a223e96913ba89ca18a438ca7d6e7",
+      "pages": 518
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V5_Equities_ONLINE.pdf",
+      "sha256": "d762de00aeecbcfc62b1bc7815d487b2476ab17c22cc2f43cf0a8eab1c18f1ca",
+      "pages": 522
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V6_FI_ONLINE.pdf",
+      "sha256": "a26bb009cb63e72d8643657ebc3cfb21ec9e7438e51cbde47666d63a4b663b14",
+      "pages": 553
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V7_Derivs_ONLINE.pdf",
+      "sha256": "7be3ac71afc6ffbba6872451056ba41e74942cb7ee250e4a2838d98d54131bba",
+      "pages": 253
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V8_Alts_ONLINE.pdf",
+      "sha256": "35f3a6570094485b78cd84d1ad29d6fba8d731e84c18aaad157c7d47f06a6c63",
+      "pages": 226
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V9_PortConstr_ONLINE.pdf",
+      "sha256": "8ddcb46a0224207a998ea88510648feca65e0a377321dcb3fc20fa7ff7bc5646",
+      "pages": 304
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V10_Ethics_ONLINE.pdf",
+      "sha256": "644fa6daeebb165f236b0f556b5643c3397fc0c7c0c8a6845a9da2a9893ff31e",
+      "pages": 295
+    }
+  ],
+  "bankContentHash": "721526d5ea2208470b81dba9e21fbc556dd1beaf282c05760e0a551840667726"
+}

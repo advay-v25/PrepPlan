@@ -4,7 +4,8 @@ import path from 'node:path'
  * One fixture bank at a time. A second bank for overlapping readings would contaminate the first run's delivered papers (and an "actual bank"
  * measurement), which is exactly the cross-worker contamination the lifecycle proof must not cause itself. mkdir is atomic; a dead holder is reclaimed.
  */
-const LOCK = path.resolve(process.cwd(), '.lifecycle-bank.lock')
+// The lock guards ONE database. A local-stack run has its own database, so its lock lives in the stack directory and never queues behind a run against another target.
+const LOCK = process.env.E2E_SUITE === 'local-stack' && process.env.LOCAL_STACK_DIR ? path.join(process.env.LOCAL_STACK_DIR, '.bank.lock') : path.resolve(process.cwd(), '.lifecycle-bank.lock')
 const alive = (pid: number) => { try { process.kill(pid, 0); return true } catch { return false } }
 export async function acquireBankLock(waitMs = 20 * 60_000) {
   const until = Date.now() + waitMs

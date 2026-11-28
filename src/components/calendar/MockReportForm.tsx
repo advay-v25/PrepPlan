@@ -1,5 +1,6 @@
 'use client'
 
+import { WhenReady } from '../ui/WhenReady'
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { DIFFICULTIES, type Difficulty, type MockReport, type Scale } from '../../lib/mocks/report'
@@ -32,6 +33,9 @@ export function MockReportForm({ subjects, today, initial, legacy }: { subjects:
 
   async function save(e: React.FormEvent) {
     e.preventDefault(); if (busy) return
+    // A half-typed number or date reads as empty: saving it would silently drop what the student typed (this form has no native validation).
+    const half = [...(e.currentTarget as HTMLFormElement).querySelectorAll('input')].find(i => i.validity.badInput)
+    if (half) { setError('Finish the date or number you started typing, or clear it. Nothing was saved.'); half.focus(); return }
     setBusy(true); setError(null)
     const input = {
       takenOn, scope, provider: provider || null, scale, score: score === '' ? null : Number(score), scoreMax: scale === 'marks' && scoreMax !== '' ? Number(scoreMax) : null,
@@ -49,6 +53,7 @@ export function MockReportForm({ subjects, today, initial, legacy }: { subjects:
   }
 
   return (
+    <WhenReady>
     <form onSubmit={save} className="class-log" aria-label="Record a mock already taken" noValidate>
       {legacy && <p className="note" data-testid="legacy-original">Your original note, kept as written: “{legacy.text}”. Add structured details below if you like; nothing is read out of it for you.</p>}
       <fieldset>
@@ -86,5 +91,6 @@ export function MockReportForm({ subjects, today, initial, legacy }: { subjects:
       <button type="submit" className="primary-button" disabled={busy}>{busy ? 'Saving…' : initial ? 'Save changes' : 'Save this mock'}</button>
       <p className="muted">Saving records what you report. It does not add a booking, change your week or count as a test result.</p>
     </form>
+    </WhenReady>
   )
 }

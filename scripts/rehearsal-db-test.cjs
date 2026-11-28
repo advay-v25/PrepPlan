@@ -2,15 +2,14 @@
  *  Reads a fixture-bank record made with `fixture-bank create … --rehearsal=auto` (it neither creates nor removes fixtures) and uses one throwaway student.
  *  npm run rehearsal:db:test -- --confirm-target=<project-ref> --bank=<record file> */
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict')
-const { Client } = require('pg'); const { parse } = require('dotenv')
-const { configuration } = require('./lib/migrations.cjs')
+const { Client } = require('pg')
+const { openStage } = require('./lib/stage.cjs')
 
 async function main(args = process.argv.slice(2)) {
-  const root = path.resolve(__dirname, '..'), env = parse(fs.readFileSync(path.join(root, '.env.staging.local')))
-  const cfg = configuration(['--env=staging', '--dry-run'], env)
-  if (!env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF || env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF !== cfg.identity) throw Error('Not the user-confirmed disposable project; refusing.')
-  if (!args.includes(`--confirm-target=${cfg.identity}`)) throw Error(`Pass --confirm-target=${cfg.identity}.`)
-  const bankFile = (args.find(a => a.startsWith('--bank=')) ?? '').slice(7); if (!bankFile) throw Error('--bank=<fixture record> is required')
+  const stage = await openStage(args), cfg = stage.cfg; global.__stage = stage
+  let bankFile = (args.find(a => a.startsWith('--bank=')) ?? '').slice(7)
+  if (!bankFile && stage.local) { bankFile = path.join(require('node:fs').mkdtempSync(path.join(require('node:os').tmpdir(), 'rehearsal-fixture-')), 'bank.json'); await stage.create(bankFile, ['--rehearsal=auto']) }
+  if (!bankFile) throw Error('--bank=<fixture record> is required')
   const bank = JSON.parse(fs.readFileSync(bankFile, 'utf8'))
   const c = new Client({ ...cfg.connection, connectionTimeoutMillis: 45000, keepAlive: true, query_timeout: 60000 }); await c.connect(); let n = 0
   const ok = (name, v, d = '') => { assert.ok(v, `${name} ${d}`); n++; console.log(`  ✓ ${name}`) }
@@ -60,4 +59,4 @@ async function main(args = process.argv.slice(2)) {
     await c.query('delete from public.profiles where id=$1', [u]).catch(() => {}); await c.query('delete from auth.users where id=$1', [u]).catch(() => {}); await c.end()
   }
 }
-main().catch(e => { console.error('FAILED:', e.message); process.exit(1) })
+main().then(() => global.__stage?.stop()).catch(async e => { console.error('FAILED:', e.message); await global.__stage?.stop(); process.exit(1) })

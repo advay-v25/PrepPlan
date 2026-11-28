@@ -1,17 +1,31 @@
 import { ledgerFromCounts, type Ledger } from '../../tests/scoreLedger'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createAdminClient } from '../../supabase/admin'
-import { addDays, todayInZone, zonedTimeToUtc, type StudyWeek } from '../studyWeek'
+import { addDays, todayInZone, utcToZonedParts, zonedTimeToUtc, type StudyWeek } from '../studyWeek'
 import { weekForDate } from '../schedule'
-import { buildCommitRows, buildWeekPlanWithPaper, loadPlacementContext } from '../pulse/generateWeek'
+import { buildCommitRows, buildWeekPlanWithPaper, loadOpenFlexible, loadPlacementContext, loadTimedBusy } from '../pulse/generateWeek'
+import { gapsAfterAccepted, subtractBusy } from '../pulse/gaps'
 import { getClassLogContext } from '../classlog/service'
 import { planOwedClassWork, listOwedClassWork, type OwedLine } from '../classlog/carry'
 import { isPersistedPaperScope, recheckPersistedPaper, type PaperPlan } from '../pulse/paper'
 import { selectDueTasks, type DueTask } from './dueTasks'
+import { loggedMinutesByTask } from '../loggedMinutes'
 import { displaceDuplicates, resolveDispositions } from './dispositions'
 import { toLine, type RevisionLine } from '../../curriculum/revisionQueue'
 import type { RevisionOutcome, WeekAdaptation } from '../pulse/generateWeek'
-import { explainDisplacement, placeContinuing, type ContinuingItem, type Displaced, type Placement } from './composer'
+import { explainDisplacement, inOrder, placeContinuing, SPLITTABLE, type ContinuingItem, type Displaced, type Placement, type Sitting } from './composer'
+import { activeCycleRow } from '../../ops/sharedReads'
+import { withReadSnapshot } from '../../ops/perRequest'
+import { loadMockTransition } from '../../exam/mockTransitionService'
+import { MOCK_MINUTES } from '../../tests/limits'
+import { parseEstimates } from '../../exam/mockTransition'
+import { clockOf, fillWindows, parseExtraWindows } from '../extraWindows'
+import { occupantsFor } from '../taskService'
+import type { MockTransition } from '../../exam/mockTransition'
+import { recoveryInputs } from '../recovery/service'
+import { recoveryStatus, type PathKey, type RecoveryStatus } from '../recovery/status'
+import type { MockWeekPlacement } from '../../exam/mockWeekPlacement'
+import type { ForecastWeek, PlacedWork, WorkItem } from '../../exam/runwayForecast'
 
 export type { DueTask } from './dueTasks'
 export type ReviewClassReport = { key: string; label: string; date: string; originalDate: string; sessionId: string | null }
@@ -39,18 +53,18 @@ export type ReviewGate =
   | { kind: 'not_ready'; reason: string }               // cycle has not reached its last day
 
 /** What the revision queue chose for the proposed week, what is waiting and why, and the choices that would change it. */
-export type RevisionPreview = { phase: string; limit: number; eligible: number; placed: RevisionLine[]; waiting: RevisionLine[]; elsewhere: RevisionLine[]; tradeoffs: string[] }
+export type RevisionPreview = { phase: string; limit: number; eligible: number; placed: RevisionLine[]; waiting: RevisionLine[]; elsewhere: RevisionLine[]; tradeoffs: string[]; bridge?: RevisionOutcome['bridge'] }
 
 export function describeRevision(r: RevisionOutcome | null): RevisionPreview | null {
   if (!r) return null
   const tradeoffs: string[] = []
-  const noRoom = r.waiting.filter(w => w.waitingReason?.startsWith('Chosen for this week')).length
+  const noRoom = r.waiting.filter(w => w.waitingReason?.startsWith('Due for recall.')).length
   if (noRoom > 0) {
     tradeoffs.push(`${noRoom} reading${noRoom === 1 ? ' chosen' : 's chosen'} for this week did not fit your free time. ${noRoom === 1 ? 'It stays' : 'They stay'} due and ${noRoom === 1 ? 'is' : 'are'} considered again next week.`)
-    tradeoffs.push('To fit more now: add study time in Calendar (availability), move or shorten something you have already planned, or accept the week as it is.')
+    tradeoffs.push('Keep this mix, try a lighter proposal with less new study, or open Calendar to change your available time.')
   }
   if (r.waiting.length > noRoom) tradeoffs.push('Your other covered readings stay in the rotation for later weeks. None is dropped or marked as forgotten.')
-  return { phase: r.phase, limit: r.limit, eligible: r.eligible, placed: r.placed.map(toLine), waiting: r.waiting.slice(0, 8).map(toLine), elsewhere: r.elsewhere.map(toLine), tradeoffs }
+  return { phase: r.phase, limit: r.limit, eligible: r.eligible, placed: r.placed.map(toLine), waiting: r.waiting.slice(0, 8).map(toLine), elsewhere: r.elsewhere.map(toLine), tradeoffs, ...(r.bridge ? { bridge: r.bridge } : {}) }
 }
 
 export type PreviewDay = { date: string; items: { title: string; taskType: string; minutes: number }[] }
@@ -122,13 +136,15 @@ export async function startablePaperExists(userId: string, now: Date): Promise<b
 
 /** The same canonical gate, without preparing the next week's work just to display Home's link. */
 export type WeeklyReviewGateState = Extract<WeeklyReviewState, { status:'no_active_cycle' }> | Pick<Extract<WeeklyReviewState, { status:'active' }>, 'status' | 'gate'>
+type WeeklyReviewPreviewState = Extract<WeeklyReviewState, { status: 'no_active_cycle' }>
+  | Pick<Extract<WeeklyReviewState, { status: 'active' }>, 'status' | 'cycle' | 'gate' | 'dueTasks' | 'classReports' | 'recap' | 'carryover'>
 export function getWeeklyReviewState(userId: string, now: Date, mode: 'gate'): Promise<WeeklyReviewGateState>
+export function getWeeklyReviewState(userId: string, now: Date, mode: 'preview'): Promise<WeeklyReviewPreviewState>
 export function getWeeklyReviewState(userId: string, now?: Date): Promise<WeeklyReviewState>
 /** Read-only. Only the actual review/result page needs the next-week preview. */
-export async function getWeeklyReviewState(userId: string, now = new Date(), mode?: 'gate'): Promise<WeeklyReviewState | WeeklyReviewGateState> {
+export async function getWeeklyReviewState(userId: string, now = new Date(), mode?: 'gate' | 'preview'): Promise<WeeklyReviewState | WeeklyReviewGateState | WeeklyReviewPreviewState> {
   const admin = createAdminClient()
-  const { data: cycle } = await admin.from('planning_cycles')
-    .select('id, starts_at_local, ends_at_local, timezone').eq('user_id', userId).eq('status', 'active').maybeSingle()
+  const cycle = await activeCycleRow(userId)
   if (!cycle || !cycle.ends_at_local) return { status: 'no_active_cycle' }
 
   const timezone = (cycle.timezone as string | null) ?? 'UTC'
@@ -235,16 +251,8 @@ export async function getWeeklyReviewState(userId: string, now = new Date(), mod
     durationMinutes: (b.duration_minutes ?? 30) as number, cancelled: false, isProtected: Boolean(b.is_protected_commitment),
     lmId: (b.lm_id ?? null) as string | null, outcomeId: (b.outcome_id ?? null) as string | null, repairThreadId: (b.repair_thread_id ?? null) as string | null,
   })), endsAt, (paperBlock?.id ?? null) as string | null)
-
-  const byExecution: Record<string, number> = {}
-  for (const b of all) byExecution[b.execution as string] = (byExecution[b.execution as string] ?? 0) + 1
-
-  const { data: threads } = await admin.from('repair_threads')
-    .select('id, status, concept:curriculum_concepts(name)')
-    .eq('user_id', userId).in('status', ['open', 'proposed', 'scheduled', 'in_progress', 'awaiting_recheck'])
-  const carryover = (threads ?? []).map(t => ({
-    threadId: t.id as string, status: t.status as string, concept: ((t.concept as any)?.name ?? 'concept') as string,
-  }))
+  const logged = await loggedMinutesByTask(userId, dueTasks.map(t => t.id))
+  for (const t of dueTasks) if (logged.has(t.id)) t.loggedMinutes = logged.get(t.id)
 
   const classCtx = await getClassLogContext(userId, now)
   const unloggedClassDays = classCtx.classLed && classCtx.cycle?.id === (cycle.id as string) ? classCtx.pendingDates : []
@@ -261,6 +269,22 @@ export async function getWeeklyReviewState(userId: string, now = new Date(), mod
       }
     }
   }
+
+  const byExecution: Record<string, number> = {}
+  for (const b of all) byExecution[b.execution as string] = (byExecution[b.execution as string] ?? 0) + 1
+
+  const { data: threads } = await admin.from('repair_threads')
+    .select('id, status, concept:curriculum_concepts(name)')
+    .eq('user_id', userId).in('status', ['open', 'proposed', 'scheduled', 'in_progress', 'awaiting_recheck'])
+  const carryover = (threads ?? []).map(t => ({
+    threadId: t.id as string, status: t.status as string, concept: ((t.concept as any)?.name ?? 'concept') as string,
+  }))
+  const review = {
+    status: 'active' as const, cycle: { id: cycle.id as string, startsAt: cycle.starts_at_local as string, endsAt, timezone },
+    gate, dueTasks, classReports, carryover,
+    recap: { planned: all.length, byExecution, paper: { present: Boolean(paperBlock), scored, correct, valid, ledger }, external },
+  }
+  if (mode === 'preview') return review
 
   // Preview of next week: the same generator, read-only, with this cycle treated as closing.
   const week = await nextWeekFor(userId, endsAt, timezone, now)
@@ -279,14 +303,8 @@ export async function getWeeklyReviewState(userId: string, now = new Date(), mod
   } : null
 
   return {
-    status: 'active',
-    cycle: { id: cycle.id as string, startsAt: cycle.starts_at_local as string, endsAt, timezone },
-    gate,
-    dueTasks,
-    recap: { planned: all.length, byExecution, paper: { present: Boolean(paperBlock), scored, correct, valid, ledger }, external },
-    carryover,
+    ...review,
     unloggedClassDays,
-    classReports,
     classFollowUp: await listOwedClassWork(userId, cycle.id as string),
     next: {
       week: { startDate: week.startDate, endDate: week.endDate },
@@ -311,14 +329,63 @@ export type PreviewInput = {
   acknowledgeNoPaper?: boolean
   /** Ask for a lighter draft: the new work is reduced and what waits is shown. Kept with the draft, so it survives a return visit. */
   lighter?: boolean
+  /** The student chose to keep broad revision this week instead of the recommended mock. The recommendation is still shown. */
+  declineMock?: boolean
+  /** A formal recovery path the student chose. Honoured only while recovery is actually offered. */
+  recoveryPath?: PathKey | null
+  /** The student's own debrief and follow-up estimates ({ debrief, followUp } minutes). Saved with the accepted review. */
+  mockEstimates?: unknown
+  /** One-off windows added to the proposed week only: [{ date, start: 'HH:MM', end: 'HH:MM' }]. Recurring availability is not changed. */
+  extraWindows?: unknown
+  /** Offer what is left of the added windows to eligible new study or revision, after the carried work and the mock. Default true. */
+  useLeftover?: boolean
+  /** The week being closed was a planned break: its unfinished work is still owed, but it does not count as a shortfall. */
+  plannedBreak?: boolean
   /** Class reports the student chose to leave unresolved. Does not change any attendance or learning. */
   unreportedClassKeys?: string[]
+}
+
+/** The Roadmap's mock recommendation as this proposal applies it: what was placed, what waits, and whether the student turned it off. */
+export type MockProposal = {
+  verdict: string; headline: string; why: string[]; costOfWaiting: string | null; declined: boolean; keepsBroadRevision: boolean
+  tradeoff: string; confidenceNote: string | null; externalRoute: string | null
+  estimates: { debrief: number; followUp: number }
+  work: { placed: PlacedWork[]; waiting: WorkItem[]; weeks: ForecastWeek[] }
+  gaps: { kind: string; name: string; href: string; when: string }[]
+  placed: Pick<MockWeekPlacement, 'mock' | 'debrief' | 'followUp'> | null
+  waits: { title: string; reason: string }[]
+}
+const describeMock = (t: MockTransition | null, declined: boolean, placed: MockWeekPlacement | null | undefined): MockProposal | null => !t?.available ? null : ({
+  verdict: t.verdict, headline: t.headline, why: t.why, costOfWaiting: t.costOfWaiting, declined, keepsBroadRevision: t.proposal.keepsBroadRevision,
+  tradeoff: t.tradeoff, confidenceNote: t.confidence.note, externalRoute: t.externalRoute, estimates: t.estimates,
+  work: { placed: t.broadRevision.placed.slice(0, 8), waiting: t.broadRevision.waiting.slice(0, 4), weeks: t.broadRevision.weeks },
+  gaps: t.gaps.map(g => ({ kind: g.kind, name: g.name, href: g.href, when: g.when })),
+  placed: declined || !placed ? null : { mock: placed.mock, debrief: placed.debrief, followUp: placed.followUp },
+  waits: declined ? [] : [...t.proposal.waits.filter(w => !(placed && w.title === 'Part of the mock sequence')), ...(placed?.waits ?? []).map(w => ({ title: `${w.title} (${w.minutes} min)`, reason: w.reason }))],
+})
+
+/** Catch-up and recovery as this proposal applies it: the status, what is carried, split or still waiting, and the path chosen. */
+export type RecoveryProposal = {
+  status: RecoveryStatus
+  chosenPath: PathKey | null
+  fits: { placedMinutes: number; waitingMinutes: number; carried: { title: string; minutes: number; date: string }[]; split: { title: string; minutes: number; reason: string }[]; waiting: { title: string; minutes: number; reason: string }[] }
+}
+
+/** Time added to this week only: what each window takes, what still waits and what that means for revision and mocks. */
+export type ExtraTime = {
+  windows: { date: string; start: string; end: string; items: { title: string; minutes: number; start: string; /** New study or revision offered for leftover time (optional work). */ isNew: boolean }[]; unusedMinutes: number }[]
+  /** Whether leftover time is being offered to new work. */
+  useLeftover: boolean
+  waiting: { title: string; minutes: number; reason: string }[]
+  impact: string[]
 }
 
 export type Continuing = {
   taskId: string; title: string; intent: 'continue' | 'later'; minutes: number; provisional: boolean
   /** Where it is proposed to go. `date` null means it stays unplaced, and `reason` says why. */
   placement: Placement
+  /** The ordered sittings when the task is saved as more than one; their minutes add up to `minutes`. */
+  sittings: Sitting[] | null
 }
 
 export type PreviewResult =
@@ -341,9 +408,13 @@ export type PreviewResult =
         paper: { kind: string; title: string | null; reason: string | null }
         revision: RevisionPreview | null
         adaptation: WeekAdaptation | null
+        mock: MockProposal | null
+        recovery: RecoveryProposal | null
+        extraTime: ExtraTime | null
+        plannedBreak: boolean
       }
     }
-  | { ok: false; code: 'no_active_cycle' | 'wrong_cycle' | 'gate_closed' | 'invalid_choices' | 'changed' | 'failed'; message: string; errors?: string[]; state?: WeeklyReviewState }
+  | { ok: false; code: 'no_active_cycle' | 'wrong_cycle' | 'gate_closed' | 'invalid_choices' | 'changed' | 'failed'; message: string; errors?: string[]; state?: WeeklyReviewPreviewState }
 
 async function sourceVersion(userId: string, cycleId: string): Promise<string | null> {
   const { data, error } = await createAdminClient().rpc('weekly_source_version', { p_user: userId, p_cycle: cycleId })
@@ -360,12 +431,14 @@ async function sourceVersion(userId: string, cycleId: string): Promise<string | 
  * The change token is read before anything else and checked again at the end: if the week moved while this
  * was being prepared, nothing is saved. The placements saved here are exactly what acceptance writes.
  */
-export async function previewWeeklyTransition(userId: string, input: PreviewInput, now = new Date()): Promise<PreviewResult> {
+/** One read snapshot per preview: it writes only the draft at its end, and the source-version check before and after is never cached. */
+export const previewWeeklyTransition = (userId: string, input: PreviewInput, now = new Date()): Promise<PreviewResult> => withReadSnapshot(() => prepareWeeklyTransition(userId, input, now))
+async function prepareWeeklyTransition(userId: string, input: PreviewInput, now: Date): Promise<PreviewResult> {
   const admin = createAdminClient()
   const before = await sourceVersion(userId, input.cycleId)
   if (!before) return { ok: false, code: 'failed', message: 'Could not prepare the review. Nothing was changed.' }
 
-  const state = await getWeeklyReviewState(userId, now)
+  const state = await getWeeklyReviewState(userId, now, 'preview')
   if (state.status !== 'active') return { ok: false, code: 'no_active_cycle', message: 'There is no open week to close.' }
   if (state.cycle.id !== input.cycleId) return { ok: false, code: 'wrong_cycle', message: 'That week is no longer the open one.', state }
   const classKeys = new Set(input.unreportedClassKeys ?? [])
@@ -407,22 +480,67 @@ export async function previewWeeklyTransition(userId: string, input: PreviewInpu
   })
 
   // 1. Place continuing work around what the student actually has free.
-  const context = await loadPlacementContext(userId, week, now)
+  const estimates = input.mockEstimates === undefined || input.mockEstimates === null ? null : parseEstimates(input.mockEstimates)
+  if (input.mockEstimates && !estimates) return { ok: false, code: 'invalid_choices', message: 'Estimates are whole minutes from 15 to 240.', state }
+  const [context, timedBusy, openFlexible, recommended, occupants] = await Promise.all([loadPlacementContext(userId, week, now), loadTimedBusy(userId, week), loadOpenFlexible(userId, week), loadMockTransition(userId, now, estimates).catch(() => null),
+    Array.isArray(input.extraWindows) && input.extraWindows.length ? occupantsFor(userId, week.days, week.timezone) : []])
+  const busy: Record<string, { start: number; end: number; title: string }[]> = {}
+  for (const o of occupants) (busy[o.date] ??= []).push({ start: o.start, end: o.start + o.durationMinutes, title: o.title })
+  const clockNow = utcToZonedParts(now, week.timezone)
+  ;(busy[clockNow.date] ??= []).push({ start: 0, end: clockNow.minutesOfDay, title: 'Time that has already passed' })
+  const extra = parseExtraWindows(input.extraWindows, week.days, clockNow.date, busy)
+  if (extra.errors.length) return { ok: false, code: 'invalid_choices', message: extra.errors[0], errors: extra.errors, state }
+  // The week turns mock-led when the recommendation says to start with gaps, the student keeps it, and a mock can actually go in.
+  const mockLed = !input.declineMock && recommended?.available === true && recommended.verdict === 'start_with_gaps'
+    && (recommended.feasibility.mockOpening || extra.windows.some(w => w.end - w.start >= MOCK_MINUTES))
+  // The catch-up and recovery status as it WILL stand once these answers are saved: the closing week is read as closed, its unfinished work is the carried work.
+  const closingAnswers = { cycleId: state.cycle.id, actions: actions.map(a => ({ taskId: a.taskId, setExecution: a.setExecution, cancel: a.cancel, unknown: a.unknown })) }
+  const statusWith = async (held: 'protect_core' | null) => recoveryStatus(await recoveryInputs(userId, now, { closing: closingAnswers, plannedBreak: input.plannedBreak === true, path: held, mockLed,
+    continuing: actions.flatMap(a => a.continuation ? [{ taskId: a.taskId, minutes: a.continuation.minutes, later: a.continuation.intent === 'later', estimated: a.continuation.provisional, title: byId.get(a.taskId)!.title, taskType: byId.get(a.taskId)!.taskType, readingId: items.find(i => i.taskId === a.taskId)?.lmId ?? null }] : []) }))
+  let recStatus = await statusWith(input.recoveryPath === 'protect_core' ? 'protect_core' : null)
+  // A path applies only while it is on offer; whether it is offered does not depend on the path.
+  if (input.recoveryPath === 'protect_core' && recStatus.level !== 'recovery_offered') recStatus = await statusWith(null)
+  const path: PathKey | null = recStatus.level === 'recovery_offered' && (input.recoveryPath === 'steady' || input.recoveryPath === 'protect_core') ? input.recoveryPath : null
+  // An added window is reserved for what goes into it, so it is taken out of the regular room first and nothing can be booked there twice.
+  const gapsByDate = Object.fromEntries(week.days.map(date => [date, subtractBusy(gapsAfterAccepted(context.gapsByDate[date] ?? [], timedBusy[date] ?? [], openFlexible[date] ?? []), extra.windows.filter(w => w.date === date))]))
   const overrides = Object.fromEntries(items.flatMap(i => {
     const d = (input.choices[i.taskId] as { placeDate?: string } | undefined)?.placeDate
     return d ? [[i.taskId, d]] : []
   }))
-  const placed = placeContinuing({ items, weekDates: week.days, ...context, overrides })
+  const placed = placeContinuing({ items, weekDates: week.days, ...context, gapsByDate, overrides })
+  // What regular room could not hold goes into the added windows FIRST (this is the work the student opened the proposal to recover), in its priority
+  // order. Study and revision continue across sittings; a check or repair stays whole. A re-check still waits for its repair.
+  const placementFor = new Map(placed.placements.map(p => [p.taskId, p]))
+  const owedStill = (i: ContinuingItem) => { const p = placementFor.get(i.taskId)!; return p.sittings ? p.sittings.filter(x => !x.date).reduce((n, x) => n + x.minutes, 0) : p.date ? 0 : i.minutes }
+  const waitingItems = items.filter(i => i.intent === 'continue' && overrides[i.taskId] !== 'none' && owedStill(i) > 0 && !/^Its repair/.test(placementFor.get(i.taskId)!.reason ?? ''))
+  const carriedFill = fillWindows(extra.windows, waitingItems.map(i => ({ key: i.taskId, title: i.title, minutes: owedStill(i), splittable: SPLITTABLE.includes(i.taskType), kind: SPLITTABLE.includes(i.taskType) ? 'continuing' as const : 'single' as const })), context.maxSittingMinutes)
+  for (const item of waitingItems) {
+    const filled = carriedFill.placed.filter(f => f.key === item.taskId)
+    if (!filled.length) continue
+    const p = placementFor.get(item.taskId)!
+    const kept: Sitting[] = p.sittings ? p.sittings.filter(x => x.date) : []
+    const added: Sitting[] = filled.map(f => ({ date: f.date, minutes: f.minutes, start: f.start, startsAt: zonedTimeToUtc(f.date, clockOf(f.start), week.timezone).toISOString() }))
+    const rest = carriedFill.waiting.find(w => w.key === item.taskId)
+    const list = inOrder([...kept, ...added, ...(rest ? [{ date: null, minutes: rest.minutes, reason: rest.reason }] : [])])
+    const first = list[0]
+    Object.assign(p, { date: first.date, reason: null, startsAt: first.startsAt, note: first.startsAt ? `In the window you added, ${clockOf(first.start!)}.` : null, sittings: list.length > 1 ? list : undefined })
+    if (['study', 'review', 'class_consolidation'].includes(item.taskType)) placed.reservedStudyMinutes += added.reduce((n, x) => n + x.minutes, 0)
+  }
+  /** Every sitting of every carried task, whether it is one or several. */
+  const sittingsOfTask = (taskId: string) => { const p = placementFor.get(taskId)!; return p.sittings ?? [{ date: p.date, minutes: items.find(i => i.taskId === taskId)!.minutes, startsAt: p.startsAt, reason: p.reason ?? undefined } as Sitting] }
 
   // 2. Generate new work around it, and compare with a week that had no continuing work.
-  const reserved = { byDate: placed.reservedByDate, studyMinutes: placed.reservedStudyMinutes,
+  const reserved = { byDate: placed.reservedByDate, gapsAfterContinuations: placed.gapsAfterContinuations, studyMinutes: placed.reservedStudyMinutes,
     repairThreadIds: items.filter(i => i.taskType === 'repair' && i.repairThreadId).map(i => i.repairThreadId!),
     // One entry per READING: two sittings of one reading continuing is one reading-level obligation, not two.
     revisionReadingIds: [...new Set(items.filter(i => i.taskType === 'review' && i.lmId && !i.outcomeId).map(i => i.lmId!))] }
-  const closingAnswers = { cycleId: state.cycle.id, actions: actions.map(a => ({ taskId: a.taskId, setExecution: a.setExecution, cancel: a.cancel, unknown: a.unknown })) }
+  // Protecting core coverage defers revision and lets the carried work lead; a mock still goes ahead only when waiting for it would cost the mock itself.
+  const holdMock = path === 'protect_core' && !(recommended?.available && recommended.verdict === 'start_with_gaps')
+  const planOptions = { closingCycleId: state.cycle.id, closingAnswers, now, lighter: input.lighter || path === 'protect_core', deferRevision: path === 'protect_core', mock: input.declineMock || holdMock ? null : recommended, mockWindows: carriedFill.remaining, blockedWindows: extra.windows, fillLeftover: input.useLeftover !== false }
+  const baseline = buildWeekPlanWithPaper(userId, week, planOptions)
   const [baselinePlan, reducedPlan] = await Promise.all([
-    buildWeekPlanWithPaper(userId, week, { closingCycleId: state.cycle.id, closingAnswers, now, lighter: input.lighter }),
-    buildWeekPlanWithPaper(userId, week, { closingCycleId: state.cycle.id, closingAnswers, reserved, now, lighter: input.lighter }),
+    baseline,
+    items.length ? buildWeekPlanWithPaper(userId, week, { ...planOptions, reserved }) : baseline,
   ])
   const baselineRows = await buildCommitRows(userId, week, baselinePlan.days)
   const generated = await buildCommitRows(userId, week, reducedPlan.days)
@@ -436,19 +554,28 @@ export async function previewWeeklyTransition(userId: string, input: PreviewInpu
     dates: context.studyDates.filter(d => d >= today && week.days.includes(d)),
     load: [
       ...rows.map(r => ({ date: String(r.local_date), minutes: Number(r.duration_minutes), placement: r.placement as string | null, startsAt: (r.starts_at as string | null) ?? null })),
-      ...placed.placements.flatMap(pl => pl.date ? [{ date: pl.date, minutes: items.find(i => i.taskId === pl.taskId)!.minutes }] : []),
+      ...items.flatMap(i => sittingsOfTask(i.taskId).flatMap(x => x.date ? [{ date: x.date, minutes: x.minutes }] : [])),
     ],
   })
   const allRows = [...rows, ...carried.rows] as typeof rows
 
   // 3. Fold each placement into the action the database will apply verbatim.
-  const placementOf = new Map(placed.placements.map(p => [p.taskId, p]))
-  const finalActions = actions.map(a => a.continuation
-    ? { ...a, continuation: { ...a.continuation, placement: { date: placementOf.get(a.taskId)!.date, reason: placementOf.get(a.taskId)!.reason, note: placementOf.get(a.taskId)!.note } } }
-    : a)
+  const placementOf = placementFor
+  const finalActions = actions.map(a => {
+    if (!a.continuation) return a
+    const p = placementOf.get(a.taskId)!
+    const placement = { date: p.date, reason: p.reason, note: p.note, ...(p.startsAt ? { startsAt: p.startsAt } : {}) }
+    if (!p.sittings) return { ...a, continuation: { ...a.continuation, placement } }
+    // Several ordered sittings: the first continues the task, the rest follow it. Their minutes add up to what is still owed.
+    const label = (n: number) => `${byId.get(a.taskId)!.title} · part ${n + 1} of ${p.sittings!.length}`
+    const [first, ...rest] = p.sittings
+    return { ...a, continuation: { ...a.continuation, minutes: first.minutes, title: label(0), placement: { ...placement, reason: first.reason ?? null },
+      rest: rest.map((x, n) => ({ minutes: x.minutes, title: label(n + 1), date: x.date, startsAt: x.startsAt ?? null })) } }
+  })
   const continuing: Continuing[] = finalActions.flatMap(a => a.continuation ? [{
-    taskId: a.taskId, title: byId.get(a.taskId)!.title, intent: a.continuation.intent, minutes: a.continuation.minutes,
+    taskId: a.taskId, title: byId.get(a.taskId)!.title, intent: a.continuation.intent, minutes: items.find(i => i.taskId === a.taskId)!.minutes,
     provisional: a.continuation.provisional, placement: placementOf.get(a.taskId)!,
+    sittings: placementOf.get(a.taskId)!.sittings ?? null,
   }] : [])
 
   // Anything this read has moved since the start? Then the answers and the plan could disagree.
@@ -456,16 +583,60 @@ export async function previewWeeklyTransition(userId: string, input: PreviewInpu
     return { ok: false, code: 'changed', message: 'Your week changed while this was being prepared. Nothing was saved; try again.' }
   }
 
+  const mockProposal = describeMock(recommended, Boolean(input.declineMock) || holdMock, reducedPlan.mock)
+  const allSittings = continuing.flatMap(c => sittingsOfTask(c.taskId).map(x => ({ ...x, title: c.title, taskId: c.taskId, reason: x.reason ?? c.placement.reason ?? 'Kept for later.' })))
+  const minutesOf = (l: { minutes: number }[]) => l.reduce((n, x) => n + x.minutes, 0)
+  const recovery: RecoveryProposal | null = recStatus.level === 'on_track' ? null : {
+    status: recStatus, chosenPath: path,
+    fits: {
+      placedMinutes: minutesOf(allSittings.filter(x => x.date)), waitingMinutes: minutesOf(allSittings.filter(x => !x.date)),
+      carried: allSittings.filter(x => x.date).map(x => ({ title: x.title, minutes: x.minutes, date: x.date as string })),
+      split: continuing.filter(c => c.sittings).map(c => ({ title: c.title, minutes: c.minutes, reason: `${c.sittings!.length} ordered sittings: ${c.sittings!.map(x => `${x.minutes} min ${x.date ? `on ${x.date}` : 'waiting'}`).join(', ')}.` })),
+      waiting: allSittings.filter(x => !x.date).map(x => ({ title: x.title, minutes: x.minutes, reason: x.reason })),
+    },
+  }
+  const mockSlots = reducedPlan.mock ? [
+    ...(reducedPlan.mock.mock?.window ? [{ title: 'Mock sitting', ...reducedPlan.mock.mock }] : []),
+    ...reducedPlan.mock.debrief.filter(x => x.start !== undefined).map(x => ({ title: 'Debrief the mock', date: x.date, minutes: x.minutes, start: x.start! })),
+    ...reducedPlan.mock.followUp.filter(x => x.start !== undefined).map(x => ({ title: 'Follow up on what the mock found', date: x.date, minutes: x.minutes, start: x.start! })),
+  ] : []
+  const stillWaiting = [
+    ...allSittings.filter(x => !x.date).map(x => ({ title: x.title, minutes: x.minutes, reason: x.reason, type: byId.get(x.taskId)!.taskType })),
+    ...(input.declineMock || holdMock ? [] : reducedPlan.mock?.waits ?? []).map(w => ({ title: w.title, minutes: w.minutes, reason: w.reason, type: w.kind })),
+  ]
+  const hoursOf = (m: number) => `${Math.round((m / 60) * 10) / 10} h`
+  const waitingWork = stillWaiting.filter(x => !['mock', 'debrief', 'follow_up'].includes(x.type)), waitingMock = stillWaiting.filter(x => ['mock', 'debrief', 'follow_up'].includes(x.type))
+  const waitingRevision = (reducedPlan.revision?.waiting.length ?? 0)
+  // New work offered for leftover window time, named; and the new work that still waits.
+  const offered = reducedPlan.days.flatMap(d => d.portions.filter(p => p.addedTimeNew).map(p => ({ title: p.title, minutes: p.durationMinutes, date: d.date, start: Number(p.paperStart!.slice(0, 2)) * 60 + Number(p.paperStart!.slice(3)), isNew: true })))
+  const newWaiting = [
+    ...(reducedPlan.adaptation?.waiting ?? []).slice(0, 3).map(w => ({ title: `New study: ${w.name}`, minutes: w.minutes, reason: 'Not in this week’s proposal; it stays in the Roadmap.' })),
+    ...(reducedPlan.revision?.waiting ?? []).slice(0, 3).map(r => ({ title: `Revision: ${r.name}`, minutes: 0, reason: 'Due, and waiting for room.' })),
+  ]
+  const extraTime: ExtraTime | null = !extra.windows.length && !stillWaiting.length ? null : {
+    useLeftover: input.useLeftover !== false,
+    windows: extra.windows.map(w => {
+      const items = [...carriedFill.placed.map(p => ({ ...p, isNew: false })), ...mockSlots.map(m => ({ ...m, isNew: false })), ...offered].filter(p => p.date === w.date && p.start >= w.start && p.start < w.end).sort((a, b) => a.start - b.start)
+      return { date: w.date, start: clockOf(w.start), end: clockOf(w.end), items: items.map(i => ({ title: i.title, minutes: i.minutes, start: clockOf(i.start), isNew: i.isNew })), unusedMinutes: w.end - w.start - minutesOf(items) }
+    }),
+    waiting: [...stillWaiting.map(({ title, minutes, reason }) => ({ title, minutes, reason })), ...(extra.windows.length ? newWaiting : [])],
+    impact: [
+      waitingWork.length ? `${hoursOf(minutesOf(waitingWork))} of carried work still waits. It stays owed and returns in your next review.` : 'All carried work fits.',
+      waitingRevision ? `Revision: ${waitingRevision} due reading${waitingRevision === 1 ? '' : 's'} wait${waitingRevision === 1 ? 's' : ''} for a later week.` : 'Revision: nothing due is pushed back by this.',
+      waitingMock.length ? `Mocks: ${hoursOf(minutesOf(waitingMock))} of the mock, debrief or follow-up wait${recommended?.available && recommended.verdict === 'start_with_gaps' ? ', which shortens the time left to act on what a mock finds' : ''}.` : 'Mocks: nothing in the mock sequence waits.',
+    ],
+  }
   const proposal = {
     next: { starts_at_local: week.startDate, ends_at_local: week.endDate, timezone: week.timezone, anchor_day: week.anchorDay, rows: allRows },
     actions: finalActions,
     // The receipt keeps what the proposal rested on, so a later week can read it back without guessing.
-    adaptation: { lighter: Boolean(input.lighter) },
-    recap: { ...state.recap, classReportsLeftUnreported: unreportedClasses, carryover: state.carryover.length, nextWeek: state.next.week, summary: { continuing, displaced, classFollowUp: { placed: carried.placed, waiting: carried.waiting } },
+    adaptation: { lighter: Boolean(input.lighter), mock: mockProposal },
+    recap: { ...state.recap, plannedBreak: input.plannedBreak === true, mock: mockProposal ? { verdict: mockProposal.verdict, estimates: mockProposal.estimates, declined: mockProposal.declined, led: mockLed } : estimates ? { estimates } : null, extraWindows: extra.windows, recovery: recStatus.level === 'on_track' ? null : { path, level: recStatus.level, owedMinutes: recStatus.numbers.owedMinutes, owedItems: recStatus.numbers.owedItems }, classReportsLeftUnreported: unreportedClasses, carryover: state.carryover.length, nextWeek: { startDate: week.startDate, endDate: week.endDate }, summary: { continuing, displaced, classFollowUp: { placed: carried.placed, waiting: carried.waiting } },
       adaptation: reducedPlan.adaptation && {
         mode: reducedPlan.adaptation.mode, factor: reducedPlan.adaptation.factor, usedCycles: reducedPlan.adaptation.usedCycles, lighter: Boolean(input.lighter),
         optionalMinutes: reducedPlan.adaptation.optionalMinutes, headline: reducedPlan.adaptation.headline, reasons: reducedPlan.adaptation.reasons,
-        waiting: reducedPlan.adaptation.waiting.length, ahead: reducedPlan.adaptation.reconciliation?.summary ?? null } },
+        waiting: reducedPlan.adaptation.waiting.length, waitingWork: reducedPlan.adaptation.waiting.slice(0, 8),
+        ahead: reducedPlan.adaptation.reconciliation?.summary ?? null } },
   }
   const base = {
     user_id: userId, cycle_id: state.cycle.id, closure_kind: closureKind, no_paper_reason: noPaperReason,
@@ -490,7 +661,7 @@ export async function previewWeeklyTransition(userId: string, input: PreviewInpu
     next: {
       week: { startDate: week.startDate, endDate: week.endDate, days: week.days },
       placementDates: week.days.filter(d => d >= todayInZone(week.timezone, now)),
-      days: groupByDay(allRows), taskCount: allRows.length, paper: describePaper(reducedPlan.paper, rows), revision: describeRevision(reducedPlan.revision), adaptation: reducedPlan.adaptation,
+      days: groupByDay(allRows), taskCount: allRows.length, paper: describePaper(reducedPlan.paper, rows), revision: describeRevision(reducedPlan.revision), adaptation: reducedPlan.adaptation, mock: mockProposal, recovery, extraTime, plannedBreak: input.plannedBreak === true,
     },
     classFollowUp: { placed: carried.placed, waiting: carried.waiting },
   }

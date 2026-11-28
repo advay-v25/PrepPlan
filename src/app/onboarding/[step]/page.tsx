@@ -5,6 +5,8 @@ import { isStep, STEPS, STEP_META, RETIRED_STEPS } from '../../../lib/onboarding
 import { ROUTES, safeReturnTo } from '../../../lib/routing/registry'
 import { readCanonicalState } from '../../../lib/onboarding/service'
 import { OnboardingShell } from '../../../components/onboarding/OnboardingShell'
+import { refRows } from '../../../lib/ops/refCache'
+import { todayInZone } from '../../../lib/planning/studyWeek'
 
 export const dynamic = 'force-dynamic'
 
@@ -47,23 +49,27 @@ export default async function OnboardingStepPage({
   // Only sittings the active curriculum supports (currently 2027) are offered.
   const { data: manifest } = await admin.from('curriculum_manifests').select('year').eq('is_active', true).limit(1).maybeSingle()
 
+  const needsCatalogue = step === 'position'
+  const savedReadingIds = needsCatalogue ? (state.entry?.readingClaims ?? []).map(r => r.lm_id) : []
+  const none = { data: null as null, error: null }
   const [{ data: windows }, { data: topics }, { data: modules }] = await Promise.all([
     admin.from('exam_windows')
       .select('id, year, sitting, window_opens, window_closes, is_confirmed')
       .eq('year', manifest?.year ?? 2027)
       .gt('window_closes', new Date().toISOString())
       .order('year').order('window_opens'),
-    admin.from('topics')
+    needsCatalogue ? refRows('onboarding.topics', () => admin.from('topics')
       .select('id, name, exam_weight_min, exam_weight_max, summary')
-      .order('default_sequence'),
-    // Reading names for the optional per-reading refinement; the list is only shown when a topic is opened.
-    admin.from('learning_modules').select('id, topic_id, name, sequence_hint').eq('is_active', true).order('sequence_hint'),
+      .order('default_sequence')) : none,
+    // Existing refinements need their topic until the optional lists are opened.
+    savedReadingIds.length ? admin.from('learning_modules').select('id, topic_id, name').eq('is_active', true).in('id', savedReadingIds).throwOnError() : none,
   ])
 
   return (
     <OnboardingShell
       step={step}
       state={state}
+      today={todayInZone(state.profile?.timezone ?? 'UTC')}
       returnTo={returnTo}
       windows={(windows ?? []).map(w => ({
         id: w.id as string, year: w.year as number, sitting: w.sitting as string,

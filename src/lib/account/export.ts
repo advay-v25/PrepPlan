@@ -7,6 +7,7 @@ import { readAll } from '../supabase/readAll'
  * `scripts/account-export-schema-test.ts` compares both lists, EXCLUDED_TABLES and the live schema, so new personal data cannot be forgotten.
  */
 export const OWNED_TABLES: Record<string, string[]> = {
+  adaptive_item_receipts: ['user_id', 'request_key'], adaptive_item_runs: ['id'], planned_log_commands: ['user_id', 'idempotency_key'],
   assessment_attempts: ['id'], assessment_responses: ['id'], attempt_item_progress: ['attempt_id', 'item_id'], attempt_score_adjustments: ['id'], availability_rules: ['id'],
   availability_windows: ['id'], block_scope_confirmations: ['id'], calendar_commitments: ['id'], checkpoint_commands: ['user_id', 'key'], checkpoint_suggestion_tasks: ['user_id', 'checkpoint_id', 'suggestion_id'],
   class_log_updates: ['user_id', 'idempotency_key'], class_schedules: ['id'], class_sessions: ['id'], coach_messages: ['id'], coach_model_calls: ['id'], coach_proposals: ['id'], commitment_exceptions: ['id'],
@@ -26,6 +27,7 @@ export const PARENT_OWNED: { table: string; parent: string; fk: string; key: str
   { table: 'repair_thread_events', parent: 'repair_threads', fk: 'thread_id', key: ['id'] },
   { table: 'class_session_items', parent: 'class_sessions', fk: 'session_id', key: ['id'] },
   { table: 'practice_run_sets', parent: 'practice_runs', fk: 'run_id', key: ['run_id', 'block_no'] },
+  { table: 'adaptive_item_steps', parent: 'adaptive_item_runs', fk: 'run_id', key: ['run_id', 'seq'] },
   { table: 'source_mappings', parent: 'user_sources', fk: 'user_source_id', key: ['id'] },
 ]
 
@@ -54,7 +56,7 @@ const page = (table: string, key: string[], filter: (q: any) => any) => readAll<
 
 /**
  * The student's own data as one JSON document. Read-only; reads only rows owned by `userId`. CONSISTENCY: each table is read page by page in key order,
- * one after another, while the account may still be changing, so this is NOT a single point-in-time snapshot: `startedAt`/`finishedAt` bound the reads and
+ * in small groups, while the account may still be changing, so this is NOT a single point-in-time snapshot: `startedAt`/`finishedAt` bound the reads and
  * `counts` records what each table returned. Any failed page throws, so a partial archive is never returned as complete.
  */
 export async function buildExport(userId: string, email: string | null) {
@@ -62,7 +64,12 @@ export async function buildExport(userId: string, email: string | null) {
   const admin = createAdminClient()
   const { data: profile } = await admin.from('profiles').select('*').eq('id', userId).maybeSingle().throwOnError()
   const tables: Record<string, unknown[]> = {}
-  for (const [t, key] of Object.entries(OWNED_TABLES)) tables[t] = await page(t, key, q => q.eq('user_id', userId))
+  // Eight tables at a time: ~70 sequential round trips to the database took longer than a request may last. Each table is still paged in key order.
+  const owned = Object.entries(OWNED_TABLES)
+  for (let i = 0; i < owned.length; i += 8) {
+    const group = await Promise.all(owned.slice(i, i + 8).map(([t, key]) => page(t, key, q => q.eq('user_id', userId))))
+    owned.slice(i, i + 8).forEach(([t], j) => { tables[t] = group[j] })
+  }
   for (const c of PARENT_OWNED) {
     const parents = (tables[c.parent] as { id: string }[]).map(r => r.id)
     const rows: unknown[] = []
@@ -72,7 +79,7 @@ export async function buildExport(userId: string, email: string | null) {
   const counts = Object.fromEntries(Object.entries(tables).map(([k, v]) => [k, v.length]))
   return {
     schema: 'roadmap-export-2', startedAt, finishedAt: new Date().toISOString(), account: { id: userId, email }, profile, counts,
-    consistency: 'Tables are read one after another while your account may be changing; this is not a single point-in-time snapshot.',
+    consistency: 'Tables are read in small groups while your account may be changing; this is not a single point-in-time snapshot.',
     tables, notIncluded: NOT_INCLUDED, excludedTables: EXCLUDED_TABLES,
   }
 }

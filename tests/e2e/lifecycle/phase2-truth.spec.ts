@@ -39,7 +39,7 @@ async function fitsViewport(page: Page) {
   expect(w.scroll, `horizontal overflow on ${page.url()} (${JSON.stringify(w)})`).toBeLessThanOrEqual(w.client + 1)
   expect(w.client).toBeLessThanOrEqual(page.viewportSize()!.width)
 }
-const text = async (page: Page) => (await page.locator('body').innerText()).replace(/\s+/g, ' ')
+const coverageTile = (page: Page) => page.getByRole('region', { name: 'How you are progressing' }).getByRole('link', { name: /^Covered/ })
 const lastCoach = (page: Page) => page.locator('.coach-message--coach').last()
 
 async function logClass(page: Page, classDay: string, extent: 'All of it' | 'Part of it') {
@@ -69,7 +69,8 @@ test('partial class -> Home/Tests agree -> whole confirmation -> they agree agai
   const cyc = (await db.from('planning_cycles').select('id, timezone').eq('user_id', c.id).eq('status', 'active').single()).data!
   S.cycle = cyc.id as string; S.tz = (cyc.timezone as string) || S.tz
   S.today = new Intl.DateTimeFormat('en-CA', { timeZone: S.tz }).format(new Date())
-  await db.from('planning_cycles').update({ starts_at_local: addDays(S.today, -6), ends_at_local: addDays(S.today, 9) }).eq('id', S.cycle)
+  // Seven days back, so two of this student's Tuesday/Thursday classes are always in the past, even on a class morning.
+  await db.from('planning_cycles').update({ starts_at_local: addDays(S.today, -7), ends_at_local: addDays(S.today, 9) }).eq('id', S.cycle)
   await db.from('profiles').update({ max_session_minutes: 45 }).eq('id', c.id)
   await login(page, db, c.email)
   const ctx = await page.evaluate(async () => (await fetch('/api/class-log/context')).json())
@@ -85,19 +86,24 @@ test('partial class -> Home/Tests agree -> whole confirmation -> they agree agai
   await rec.browser('log the class as only PART of an outcome (browser form, preview then confirm)', async () => { await logClass(page, days[0], 'Part of it') })
   await rec.browser('Home and Tests agree: one outcome is partly covered, none is confirmed whole, and Tests lists it as not yet testable', async () => {
     await page.goto('/app'); await fitsViewport(page)
-    const home = await text(page)
-    expect(home).toMatch(/1 only partly covered/); expect(home).not.toMatch(/1 whole outcome confirmed/); expect(home).not.toMatch(/outcomes are also confirmed from logged work/)
     const sig = await page.evaluate(async () => (await fetch('/api/signals')).json())
     expect(sig.signals.position.whole).toBe(0); expect(sig.signals.position.partial).toBe(1)
+    const { covered, total, partial } = sig.signals.position.readings
+    expect(partial).toBeGreaterThan(0)
+    await expect(coverageTile(page)).toContainText(`${covered}/${total}`)
+    await expect(coverageTile(page)).toContainText(`${partial} partly`)
     await page.goto('/app/tests'); const pending = page.getByTestId('pending-portions'); await expect(pending).toBeVisible(); await expect(pending).toContainText(S.outcome.title); await fitsViewport(page)
     await page.reload(); await expect(page.getByTestId('pending-portions')).toBeVisible()   // reload keeps it
   })
   await rec.browser('log a later class as ALL of it: Home now says one whole outcome confirmed, Tests no longer lists it as pending (same outcome, not double counted)', async () => {
     await logClass(page, days[1], 'All of it')
-    await page.goto('/app'); const home = await text(page)
-    expect(home).toMatch(/1 whole outcome confirmed/); expect(home).not.toMatch(/only partly covered/)
+    await page.goto('/app')
     const sig = await page.evaluate(async () => (await fetch('/api/signals')).json())
     expect(sig.signals.position.whole).toBe(1); expect(sig.signals.position.partial).toBe(0); expect(sig.signals.position.exposed).toBe(1)
+    const { covered, total, partial } = sig.signals.position.readings
+    await expect(coverageTile(page)).toContainText(`${covered}/${total}`)
+    if (partial) await expect(coverageTile(page)).toContainText(`${partial} partly`)
+    else await expect(coverageTile(page)).not.toContainText('partly')
     await page.goto('/app/tests'); await expect(page.getByTestId('pending-portions')).toHaveCount(0); await fitsViewport(page)
   })
 
@@ -184,8 +190,13 @@ test('partial class -> Home/Tests agree -> whole confirmation -> they agree agai
     for (let i = 0; i < 12; i++) { await page.keyboard.press('Tab'); expect(await page.evaluate(() => !!document.activeElement?.closest('[role=dialog]'))).toBe(true) }
     await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).toHaveCount(0)
     expect(await page.evaluate(() => document.activeElement && document.activeElement !== document.body)).toBe(true)
-    await page.goto('/app/coach'); let found = false
-    for (let i = 0; i < 60 && !found; i++) { await page.keyboard.press('Tab'); found = await page.evaluate(() => document.activeElement?.getAttribute('aria-label') === 'Ask the coach') }
-    expect(found).toBe(true)
+    await page.goto('/app/coach'); await page.getByLabel('Ask the coach').waitFor({ state: 'visible' }); await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur()); let found = false, tabs = 0; const stops: string[] = []
+    for (; tabs < 300 && !found; tabs++) {
+      await page.keyboard.press('Tab')
+      const at = await page.evaluate(() => { const e = document.activeElement as HTMLElement | null; return { label: e?.getAttribute('aria-label') ?? '', text: (e?.textContent ?? '').trim().slice(0, 28), where: e?.closest('[class]')?.className?.toString().slice(0, 30) ?? '' } })
+      found = at.label === 'Ask the coach'; stops.push(`${at.label || at.text}|${at.where}`)
+    }
+    expect(found, 'the Coach composer is reachable by keyboard').toBe(true)
+    expect(tabs, `the Coach composer was reached after ${tabs} Tab presses; stops 15-45: ${stops.slice(15, 45).join(' > ')}`).toBeLessThanOrEqual(60)
   })
 })

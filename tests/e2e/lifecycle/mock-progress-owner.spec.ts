@@ -7,6 +7,9 @@ import { addDays, todayInZone } from '../../../src/lib/planning/studyWeek'
 import { admin, login } from './helpers'
 
 const db = admin(), owned: string[] = []
+// The development server compiles a route on its first request, which can outlast an assertion's wait. The recovery route is asked for once
+// beforehand (unauthenticated, so nothing happens); the journey and its assertions are unchanged. A production build needs no warming.
+test.beforeAll(async ({}, info) => { await fetch(`${info.project.use.baseURL}/api/mock-reports/00000000-0000-4000-8000-000000000000/recovery`, { method: 'POST', signal: AbortSignal.timeout(120_000) }).catch(() => {}) })
 test.afterEach(async () => {
   for (const id of owned.splice(0)) {
     const r = await db.auth.admin.deleteUser(id)

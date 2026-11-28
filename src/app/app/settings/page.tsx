@@ -11,6 +11,7 @@ import { Badge } from '../../../components/ui/Badge'
 import { ReminderPrefs } from '../../../components/settings/ReminderPrefs'
 import { SupportLink } from '../../../components/legal/SupportLink'
 import { AccountActions } from '../../../components/settings/AccountActions'
+import { needsPassword } from '../../../lib/auth/passwordState'
 import { CalendarExport } from '../../../components/calendar/CalendarExport'
 import { DisplayNameForm } from '../../../components/settings/DisplayNameForm'
 import { ClassesCompletedToggle } from '../../../components/settings/ClassesCompletedToggle'
@@ -52,7 +53,7 @@ export default async function SettingsPage() {
   const reportedTopics = state.coverage.length
   const sections = [
     {
-      icon: Target, title: 'Your exam',
+      icon: Target, title: 'Exam date', action: 'Edit exam date',
       value: p.exam_sitting && p.exam_year
         ? `${String(p.exam_sitting).replace(/^./, (c: string) => c.toUpperCase())} ${p.exam_year}`
         : 'Not chosen yet',
@@ -64,7 +65,7 @@ export default async function SettingsPage() {
       examHref: '/app/exam',
     },
     {
-      icon: GraduationCap, title: 'How you study',
+      icon: GraduationCap, title: 'Study style and classes', action: 'Edit study style',
       value: route ? route.label : 'Not chosen yet',
       badge: null,
       detail: classCount
@@ -73,7 +74,7 @@ export default async function SettingsPage() {
       href: onboardingHref('route', ROUTES.app.settings),
     },
     {
-      icon: CheckCircle2, title: 'Where you are',
+      icon: CheckCircle2, title: 'Starting point', action: 'Edit starting point',
       value: reportedTopics > 0 ? `${reportedTopics} topic${reportedTopics === 1 ? '' : 's'} you reported as covered or in progress` : 'Nothing reported yet',
       badge: null,
       detail: p.mock_date
@@ -82,13 +83,14 @@ export default async function SettingsPage() {
       href: onboardingHref('position', ROUTES.app.settings),
     },
     {
-      icon: Clock, title: 'Your week',
+      icon: Clock, title: 'Study time', action: 'Edit study time',
       value: availableSlots.length > 0 ? `${availableSlots.length} study window${availableSlots.length === 1 ? '' : 's'}${p.max_session_minutes ? ` · sittings up to ${p.max_session_minutes} min` : ''}` : 'Not set',
       badge: null,
       detail: commitments === null
         ? 'Your fixed commitments could not be loaded right now. They are not gone; reload to try again.'
         : `Windows are when work MAY be placed, not a weekly target. ${otherCount ? `${otherCount} fixed commitment${otherCount === 1 ? '' : 's'} that study is never scheduled over.` : 'Study work is placed inside these windows and nowhere else.'} Changing them does not move accepted work; Calendar shows what needs a reviewed adjustment.`,
       href: onboardingHref('week', ROUTES.app.settings),
+      roadmapHref: '/app/curriculum?view=roadmap',
     },
   ]
 
@@ -123,9 +125,10 @@ export default async function SettingsPage() {
                   {section.badge && <Badge tone={section.badge.tone} className="settings-section__badge">{section.badge.label}</Badge>}
                 </p>
                 <p className="fine-print">{section.detail}</p>
+                {section.roadmapHref && <Link className="text-button" href={section.roadmapHref}>See how your time shapes the roadmap</Link>}
                 {section.examHref && <Link className="text-button" href={section.examHref}>Exam status and retake</Link>}
               </div>
-              <Link href={section.href} className="secondary-button">Change</Link>
+              <Link href={section.href} className="secondary-button">{section.action}</Link>
             </Card>
           )
         })}
@@ -169,7 +172,7 @@ export default async function SettingsPage() {
         <DisplayNameForm initial={p.display_name ?? ''} />
         <p className="fine-print">Email: {user.email} (changed through sign-in, not here).</p>
         <p className="fine-print">Password recovery is available through your account email.</p>
-        <Link href="/forgot-password" className="text-button block mb-4">Reset your password</Link>
+        <Link href="/forgot-password" className="text-button block mb-4">{needsPassword(user) ? 'Add a password by email' : 'Reset your password'}</Link>
         <AccountActions email={user.email ?? ''} />
         <p className="fine-print" data-support>Help, privacy questions or a problem with your account: <SupportLink subject="PrepPlan support" />. See the <Link href="/privacy">privacy</Link> and <Link href="/terms">terms</Link> drafts.</p>
       </section>

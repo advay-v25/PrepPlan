@@ -27,10 +27,43 @@ test.afterAll(async ({}, info) => {
   expect(consoleErrors, 'unexpected requests, console / page errors').toEqual([])
 })
 
+test('Starting point loads one topic’s readings on demand and keeps a saved refinement', async ({ page }) => {
+  const persona = await classLedPersona(db)
+  const s = await createStudent(db, `sread${RUN}`, { onboard: true, onboarding: persona.options, register: id => owned.push(id) })
+  const topic = persona.topics[0]
+  const lookup = `**/api/onboarding/position?topic=${topic}`
+  const editor = '/onboarding/position?returnTo=%2Fapp%2Fsettings'
+  const card = page.locator('.ob-topiccard').filter({ has: page.locator(`#topic-${topic}`) })
+  let calls = 0
+  await page.route(lookup, route => {
+    calls++
+    return calls === 1 ? route.fulfill({ status: 503, json: { ok: false } }) : route.continue()
+  })
+  await login(page, db, s.email, editor)
+  const disclosure = card.getByText('Individual readings', { exact: false })
+  await expect(disclosure).toBeVisible()
+  expect(calls).toBe(0)
+  await se.expecting([{ label: 'one failed optional reading lookup', url: /\/api\/onboarding\/position\?topic=/, statuses: [503], min: 1, max: 1 }], async () => {
+    await disclosure.click()
+    await expect(card.getByRole('alert')).toContainText('Readings could not be loaded')
+  })
+  await card.getByRole('button', { name: 'Retry' }).click()
+  const field = card.getByRole('combobox', { name: /^Coverage of/ }).first()
+  await field.selectOption('partly')
+  const fieldName = await field.getAttribute('aria-label')
+  await page.getByRole('button', { name: 'Save', exact: true }).click()
+  await page.waitForURL(url => url.pathname === '/app/settings')
+  await page.goto(editor)
+  await disclosure.click()
+  await expect(card.getByRole('combobox', { name: fieldName!, exact: true })).toHaveValue('partly')
+  expect(calls).toBe(3)
+  await noHorizontalOverflow(page)
+})
+
 test('Settings page: grouped controls, honest units, no overflow, name edit', async ({ page }) => {
   await login(page, db, S.email, '/app/settings')
   await rec.browser('Settings renders the groups and fits the viewport (no horizontal overflow, controls wrap)', async () => {
-    for (const h of ['Your exam', 'How you study', 'Where you are', 'Your week', 'Reminders', 'Download your calendar', 'Account']) await expect(page.getByRole('heading', { name: h, exact: true })).toBeVisible()
+    for (const h of ['Exam date', 'Study style and classes', 'Starting point', 'Study time', 'Reminders', 'Download your calendar', 'Account']) await expect(page.getByRole('heading', { name: h, exact: true })).toBeVisible()
     await expect(page.getByText(/modules marked/i)).toHaveCount(0)
     await expect(page.getByText(/roughly \d+–\d+ hours/)).toHaveCount(0)
     await noHorizontalOverflow(page)

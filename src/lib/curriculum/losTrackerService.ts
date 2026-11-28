@@ -14,6 +14,7 @@ import {
   BAND_METHOD, classifyLos, countBands, deriveProgress, sortForStudy,
   type BandCounts, type ClassCoverage, type LosBand, type LosEvidenceInput, type TrackerRow,
 } from './losTracker'
+import { ownedBlocks } from '../ops/sharedReads'
 
 /** One reading (a card on the Curriculum page), with its outcomes as rows. */
 export type TrackerModule = {
@@ -66,8 +67,8 @@ async function getLosTrackerUncached(userId: string, now = new Date()): Promise<
       .order('created_at').order('id').range(a, z)).then(data => ({ data, error: null })),
     readAll<any>((a, z) => admin.from('repair_threads').select('id, concept_id, status, occurrence_count, next_recheck_due_at')
       .eq('user_id', userId).in('status', ['open', 'proposed', 'scheduled', 'in_progress', 'awaiting_recheck']).order('id').range(a, z)).then(data => ({ data, error: null })),
-    readAll<any>((a, z) => admin.from('plan_blocks').select('id, repair_thread_id, concept_id, outcome_id, execution').eq('user_id', userId).is('cancelled_at', null)
-      .or('repair_thread_id.not.is.null,concept_id.not.is.null,outcome_id.not.is.null').order('id').range(a, z)).then(data => ({ data, error: null })),
+    // Derived from the full history getStudyActivity reads in this same call (same filter: live blocks that name a repair, concept or outcome).
+    ownedBlocks(userId).then(all => ({ data: all.filter(b => !b.cancelled_at && (b.repair_thread_id || b.concept_id || b.outcome_id)), error: null })),
     readAll<any>((a, z) => admin.from('user_module_state').select('lm_id, coverage_state').eq('user_id', userId).order('lm_id').range(a, z)).then(data => ({ data, error: null })),
     readAll<any>((a, z) => admin.from('class_session_items').select('id, outcome_id, extent, class_sessions!inner(id, user_id, kind, class_date, calendar_commitments(label))').eq('class_sessions.user_id', userId).order('id').range(a, z)).then(data => ({ data, error: null })),
     readAll<any>((a, z) => admin.from('confidence_marks').select('scope_type, scope_id, level').eq('user_id', userId).order('scope_type').order('scope_id').range(a, z)).then(data => ({ data, error: null })),
@@ -176,6 +177,9 @@ async function getLosTrackerUncached(userId: string, now = new Date()): Promise<
       los: o.code as string, name: o.title as string, importance: 'core', scopeNote: null,
       band, rationale, progress,
       sample: evidence?.validSampleSize ?? 0, lastCheckedAt: evidence?.latestAt ?? null,
+      lastCheckAttemptId: events.find(e => e.validity === 'valid' && e.created_at === evidence?.latestAt)?.attempt_id ?? null,
+      gapAttemptId: band === 'repair' ? events.findLast(e => e.validity === 'valid' && e.is_correct === false && e.attempt_id)?.attempt_id ?? null : null,
+      hasOpenRepair: threads.length > 0,
       confidenceMismatch: evidence?.confidenceMismatch ?? false,
       howToImprove: method ? method.howToImprove(o.title as string) : null,
       proof: method?.proof ?? null, questionRange: method?.questionRange ?? null,

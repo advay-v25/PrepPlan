@@ -21,54 +21,42 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const user = access.user
 
   const { id: attemptId } = await params
-  const body = await req.json().catch(() => ({} as any))
-
-  const itemId: string | undefined = body.itemId
-  const selectedOptionIndex = Number(body.selectedOptionIndex)
-
-  if (!itemId || !Number.isInteger(selectedOptionIndex) || selectedOptionIndex < 0) {
+  const body = await req.json().catch(() => null)
+  const itemId = body?.itemId
+  const selectedOptionIndex = body?.selectedOptionIndex
+  if (typeof itemId !== 'string' || !itemId || !Number.isInteger(selectedOptionIndex) || selectedOptionIndex < 0) {
     return NextResponse.json({ ok: false, error: 'Missing itemId or selectedOptionIndex' }, { status: 400 })
   }
-
-  // The RPC does not range-check the option, so an index past the end of the
-  // options array was accepted and stored. Validate before calling it.
-  const { createAdminClient } = await import('../../../../../../lib/supabase/admin')
-  const admin = createAdminClient()
-  const { data: item } = await admin
-    .from('assessment_items').select('options').eq('id', itemId).maybeSingle()
-  if (!item) return NextResponse.json({ ok: false, error: 'Unknown question' }, { status: 400 })
-  const optionCount = Array.isArray(item.options) ? item.options.length : 0
-  if (selectedOptionIndex >= optionCount) {
-    return NextResponse.json({ ok: false, error: 'That option does not exist' }, { status: 400 })
+  const rawConfidence = typeof body.confidence === 'string' ? body.confidence.toLowerCase() : ''
+  if (!Object.hasOwn(CONFIDENCE_SCALE, rawConfidence)) {
+    return NextResponse.json({ ok: false, code: 'confidence_required', error: 'Choose how sure you are before moving on.' }, { status: 400 })
   }
 
-  // Answers lock. Re-submitting the same item is a no-op that says so, rather
-  // than an overwrite or a duplicate row — a diagnostic where a student can
-  // revise an answer after seeing the next question measures nothing.
-  const { data: already } = await supabase
+  // Retain the older receipt shape. The command also checks for an existing
+  // response under the attempt lock, including when two old clients race.
+  const { data: already, error: answerReadError } = await supabase
     .from('assessment_responses').select('id')
-    .eq('attempt_id', attemptId).eq('item_id', itemId).maybeSingle()
+    .eq('user_id', user.id).eq('attempt_id', attemptId).eq('item_id', itemId).maybeSingle()
+  if (answerReadError) return routeFailure('diagnostic.answer', 'Could not check your answer. Try saving again.', answerReadError)
   if (already) return NextResponse.json({ ok: true, id: already.id, locked: true })
 
-  const rawConfidence = typeof body.confidence === 'string' ? body.confidence.toLowerCase() : null
-  const confidence = rawConfidence && rawConfidence in CONFIDENCE_SCALE ? CONFIDENCE_SCALE[rawConfidence] : null
   const elapsed = Number(body.elapsedSeconds)
-  const elapsedSeconds = Number.isFinite(elapsed) && elapsed >= 0 ? Math.round(elapsed) : null
+  const elapsedSeconds = Number.isFinite(elapsed) && elapsed >= 0 ? Math.min(2_147_483_647, Math.round(elapsed)) : null
 
   const { data: responseId, error: respErr } = await supabase.rpc('record_assessment_response', {
     p_attempt_id: attemptId,
     p_item_id: itemId,
     p_selected_option: selectedOptionIndex,
-    p_confidence: confidence,
+    p_confidence: CONFIDENCE_SCALE[rawConfidence],
     p_elapsed_seconds: elapsedSeconds
   })
 
   if (respErr) {
     // Graceful lock or conflict errors
-    if (respErr.message.includes('Attempt not found') || respErr.message.includes('Attempt is')) {
+    if (/Attempt not found|Attempt is|Time is up|Session not started/.test(respErr.message)) {
        return NextResponse.json({ ok: false, error: 'This paper is no longer accepting answers.' }, { status: 409 })
     }
-    if (respErr.message.includes('Item not in form') || respErr.message.includes('Item not found')) {
+    if (/Item not in form|Item not found|option does not exist/.test(respErr.message)) {
        return NextResponse.json({ ok: false, error: 'That question is unavailable in this paper.' }, { status: 400 })
     }
     return routeFailure('diagnostic.answer', 'Could not confirm your answer. Try saving again.', respErr)

@@ -1,0 +1,43 @@
+== start, source {"short":"6685733a38235fbf","files":1055}  [00:35:04]
+build 0
+Checked 57 browser assets. 0 findings.
+tsc 0
+lint 0
+verify 0
+contracts 0
+bank before the runs:
+student_eligible_items 0
+assessment_items 0
+routes 0
+== production build: early input, calendar save, hydration  [00:36:23]
+prod-input exit 0
+  28 passed (8.8m)
+== full suite, dev server with fixture bank  [00:45:20]
+suite exit 0
+  -   81 [desktop] › tests/e2e/lifecycle/phase6-forecast.spec.ts:162:1 › forecast · a failed catch-up read is said to have failed, never shown as nothing owed
+  -  191 [mobile-390] › tests/e2e/lifecycle/phase6-forecast.spec.ts:162:1 › forecast · a failed catch-up read is said to have failed, never shown as nothing owed
+  2 skipped
+  218 passed (38.2m)
+== fault proxy and provider stub  [01:23:41]
+faults exit 1
+  ✘  24 [mobile-390] › tests/e2e/lifecycle/phase5-workspace.spec.ts:293:1 › 7b a deck beyond 1,000 cards: exact counts, pagination, search, filters, a failed later page, due list (21.6s)
+  -  25 [mobile-390] › tests/e2e/lifecycle/phase5-workspace.spec.ts:322:1 › 4 the notes index finds a note by its FULL text (well past 160 characters), in reading and subject notes, and opens the right one
+  1 failed
+  1 did not run
+  28 passed (5.1m)
+faultread exit 0
+  2 passed (7.7s)
+== production build behind the proxy  [01:29:03]
+proxy build 0
+prodproxy exit 0
+  34 passed (1.1m)
+== fixture-key build: turnstile retry  [01:30:24]
+turnstile build 0
+turnstile exit 0
+  4 passed (5.4s)
+bank after the runs:
+student_eligible_items 0
+assessment_items 0
+== end, source {"short":"6685733a38235fbf","files":1055}  [01:30:43]
+listeners:        0
+hydration captures:        0

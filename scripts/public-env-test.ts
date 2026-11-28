@@ -35,4 +35,9 @@ ok('no secret-shaped literal is committed in source or workflows', () => {
     assert.ok(!/sb_secret_[A-Za-z0-9_-]{10,}|nvapi-[A-Za-z0-9_-]{20,}|re_[A-Za-z0-9]{20,}|Bearer [0-9a-f]{32,}/.test(text), `${f} contains a secret-shaped value`)
   }
 })
+ok('the reminders workflow loads its credential from GitHub Actions secrets', () => {
+  const workflow = fs.readFileSync('.github/workflows/reminders-cron.yml', 'utf8')
+  assert.match(workflow, /^\s*CRON_SECRET:\s*\$\{\{\s*secrets\.CRON_SECRET\s*\}\}\s*$/m)
+  assert.match(workflow, /Authorization: Bearer \$CRON_SECRET/)
+})
 console.log(`${n} passed, 0 failed`)

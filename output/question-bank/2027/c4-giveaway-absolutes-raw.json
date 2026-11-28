@@ -1,0 +1,871 @@
+[
+  {
+    "id": "pp-ref2027-r004-c-medium",
+    "subject": "quant",
+    "stem": "Two portfolios deliver identical cash flows on every date and have the same risk. Their market prices differ and trading is frictionless. What does no-arbitrage reasoning imply?",
+    "options": [
+      "The more expensive portfolio must have better future cash flows",
+      "Both prices can persist solely because their labels differ",
+      "Buy the cheaper portfolio and sell the dearer one"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r008-b-medium",
+    "subject": "quant",
+    "stem": "Among feasible portfolios with the same expected return, one has a lower standard deviation than all the others. How is it classified?",
+    "options": [
+      "An inefficient portfolio solely because it uses diversification",
+      "A guaranteed loss-free portfolio",
+      "A minimum-variance portfolio at that return"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r010-d-medium",
+    "subject": "quant",
+    "stem": "A regression of a stock’s excess return on market excess return has slope greater than one. Under the CAPM interpretation, what does that slope estimate?",
+    "options": [
+      "The stock’s total standard deviation",
+      "Above-market systematic risk exposure",
+      "A guaranteed positive abnormal return"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r014-b-medium",
+    "subject": "econ",
+    "stem": "A government borrows to raise spending when resources are already heavily utilized. Which concern is most directly associated with the borrowing?",
+    "options": [
+      "A necessary fall in private borrowing costs",
+      "Guaranteed repayment without future fiscal consequences",
+      "Possible crowding out through pressure on interest rates"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r014-d-medium",
+    "subject": "econ",
+    "stem": "Government spending rises, but taxes rise by even more. Why is the spending change alone insufficient to identify the overall fiscal stance?",
+    "options": [
+      "Any increase in spending is always expansionary overall",
+      "The net effects of spending, taxes and cyclical conditions must be considered",
+      "Tax changes have no effect on aggregate demand"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r020-b-medium",
+    "subject": "ci",
+    "stem": "A corporate shareholder sells all her shares to another investor. Which consequence is generally most accurate?",
+    "options": [
+      "The corporation must liquidate when an owner exits",
+      "All company debts become the seller’s personal debts",
+      "The corporation continues despite the ownership transfer"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r020-c-medium",
+    "subject": "ci",
+    "stem": "A private company considers a public listing. Which trade-off is most relevant?",
+    "options": [
+      "Guaranteed cheaper funding with no new obligations",
+      "Broader access to investors with greater disclosure and compliance obligations",
+      "Permanent exemption from market scrutiny"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r023-b-medium",
+    "subject": "ci",
+    "stem": "A company has a high current ratio, but most current assets are slow-moving inventories. Which assessment is most appropriate?",
+    "options": [
+      "Near-term payment capacity also depends on asset quality and cash timing",
+      "A high current ratio guarantees that every bill can be paid on time",
+      "Inventories must be valued at zero for all liquidity analysis"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r023-c-medium",
+    "subject": "ci",
+    "stem": "A treasurer reduces inventory without disrupting operations and collects receivables sooner. What is the most direct working-capital benefit?",
+    "options": [
+      "A necessary increase in financing needs",
+      "Less cash tied up in operating assets",
+      "A guaranteed increase in product selling prices"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r024-c-medium",
+    "subject": "ci",
+    "stem": "A project evaluation includes money spent last year that cannot be recovered. How should that amount enter an incremental cash-flow analysis?",
+    "options": [
+      "Include it solely because it was large",
+      "Treat it as an opportunity cost of an alternative use today",
+      "Exclude it as a sunk cost"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r025-d-medium",
+    "subject": "ci",
+    "stem": "An issuer balances interest tax benefits against expected financial-distress costs when choosing leverage. Which view is reflected?",
+    "options": [
+      "The trade-off approach to capital structure",
+      "A rule that all firms should finance entirely with debt",
+      "A claim that operating risk is irrelevant to leverage"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r029-a-easy",
+    "subject": "fsa",
+    "stem": "Under IFRS, development costs of an internally generated intangible asset are:",
+    "options": [
+      "Always expensed as incurred, together with research costs",
+      "Always capitalized, whether or not any criteria are met",
+      "Capitalized once specified criteria are met, with research costs expensed"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r031-a-medium",
+    "subject": "fsa",
+    "stem": "A company reports rising net income, but its operating cash flow is negative because receivables and inventory have grown far faster than sales. What is the most reasonable interpretation?",
+    "options": [
+      "Profit is not turning into cash, so earnings quality and collectibility need checking",
+      "Strong performance, because net income is rising and the business looks healthy",
+      "Nothing unusual, because operating cash flow is always volatile from year to year"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r034-c-hard",
+    "subject": "fsa",
+    "stem": "A company's note on share-based compensation shows that the number of stock options outstanding has risen sharply and many are in the money. What is the most relevant implication for existing shareholders?",
+    "options": [
+      "None, because options are excluded from the financial statements",
+      "A reduction in the company's reported long-term debt",
+      "Exercise would dilute their ownership, and the options carry a compensation cost"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r035-a-medium",
+    "subject": "fsa",
+    "stem": "A company uses straight-line depreciation for its financial statements and accelerated depreciation for tax. How should the resulting difference be classified?",
+    "options": [
+      "A temporary difference, because it reverses over the life of the asset",
+      "A permanent difference, because it is never reversed",
+      "No difference, because both methods use the same cost"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r036-e-hard",
+    "subject": "fsa",
+    "stem": "A regulator reviews only a small share of company filings each year. What does this imply about regulation as a disciplining mechanism?",
+    "options": [
+      "It deters through the chance of review, but limited capacity means much low-quality reporting can go unchecked",
+      "It guarantees that all misreporting is found within a year",
+      "It has no deterrent effect, since most filings are never reviewed"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r036-f-medium",
+    "subject": "fsa",
+    "stem": "A company reports \"adjusted earnings\" that exclude restructuring charges, which have occurred every year for five years. What should an analyst conclude?",
+    "options": [
+      "The charges appear recurring, so the adjusted figure may overstate sustainable earnings",
+      "The adjusted figure is more reliable than net income",
+      "The exclusion is always required by the accounting standards"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r037-e-hard",
+    "subject": "fsa",
+    "stem": "An analyst wants to compare an industry-specific measure across several companies. What is the main risk?",
+    "options": [
+      "Industry-specific measures are always identical across firms",
+      "Companies may define the measure differently, so figures need to be checked for consistency",
+      "Such measures can be compared only within a single company"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r037-f-hard",
+    "subject": "fsa",
+    "stem": "An analyst uses last year's margin to forecast earnings for a company that has just made a large acquisition. What is the main weakness?",
+    "options": [
+      "Margins can never be used for forecasting",
+      "The company's cost structure and business mix have changed, so past margins may no longer apply",
+      "Acquisitions never affect margins"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r038-c-easy",
+    "subject": "fsa",
+    "stem": "A company with a strong competitive position in its industry is most likely to be able to:",
+    "options": [
+      "Charge lower prices than every rival while raising margins",
+      "Avoid all changes in input costs",
+      "Pass cost increases on to customers and protect its margins"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r038-d-easy",
+    "subject": "fsa",
+    "stem": "In an inflationary period, a company with strong pricing power is most likely to see its operating margin:",
+    "options": [
+      "Largely preserved, because it can raise prices as its costs rise",
+      "Fall sharply, since costs always rise faster than prices",
+      "Rise automatically without any price changes"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r040-a-medium",
+    "subject": "eq",
+    "stem": "A company issues two equity classes with identical dividend rights but unequal votes per share. What can differ between their owners?",
+    "options": [
+      "Their dividend entitlement solely because votes differ",
+      "The legal identity of the corporation",
+      "Influence over corporate decisions"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r041-d-medium",
+    "subject": "eq",
+    "stem": "A benchmark includes only firms from one industry, rather than the entire domestic market. How is it best classified?",
+    "options": [
+      "A broad-market index solely because it contains several firms",
+      "A sector equity index",
+      "A fixed-income maturity index"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r042-a-medium",
+    "subject": "eq",
+    "stem": "A company completes a stock split without changing its assets or liabilities. What is the immediate mechanical effect for an owner?",
+    "options": [
+      "More shares with a proportionately adjusted price per share",
+      "A guaranteed increase in the total value of the holding",
+      "A cash distribution equal to the split ratio"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r042-b-medium",
+    "subject": "eq",
+    "stem": "A buyer purchases shares on the ex-dividend date under the usual ex-dividend convention. Who ordinarily receives the upcoming dividend?",
+    "options": [
+      "The buyer always receives it because settlement occurs later",
+      "Both parties receive the full distribution",
+      "The seller retains the upcoming dividend entitlement"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r043-a-medium",
+    "subject": "eq",
+    "stem": "An analyst’s estimated intrinsic value exceeds the observed share price. What conclusion follows within that analyst’s model?",
+    "options": [
+      "The market price must immediately equal the estimate",
+      "The share appears undervalued relative to the estimate",
+      "The estimate is guaranteed correct because it differs from price"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r046-b-medium",
+    "subject": "eq",
+    "stem": "A firm’s dividends are far below sustainable distributions because it retains excess cash. Which issue should an analyst consider in selecting a valuation model?",
+    "options": [
+      "Whether dividends represent the cash flow relevant to equity owners",
+      "Whether a dividend model is compulsory for every listed issuer",
+      "Whether retained cash is always worthless"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r047-b-medium",
+    "subject": "eq",
+    "stem": "A diversified firm sells products in several industries. Why may a single industry classification be inadequate for peer selection?",
+    "options": [
+      "It can obscure different business-segment exposures",
+      "Classification guarantees that all segments have identical economics",
+      "A legal corporate name determines every operating exposure"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r050-b-medium",
+    "subject": "eq",
+    "stem": "A return model includes separate exposures to inflation surprises and changes in industrial activity. What distinguishes it from the single-factor CAPM?",
+    "options": [
+      "It represents more than one systematic return driver",
+      "It assumes all risk is company-specific",
+      "It automatically eliminates model misspecification"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r054-c-medium",
+    "subject": "fi",
+    "stem": "A speculative-grade issuer has limited unsecured borrowing access. Compared with a strong investment-grade issuer, which feature is more likely in its debt financing?",
+    "options": [
+      "A guaranteed lower spread solely because credit risk is higher",
+      "Greater covenant protection and a higher required credit spread",
+      "No sensitivity to collateral or debt seniority"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r055-b-medium",
+    "subject": "fi",
+    "stem": "An analyst compares a benchmark sovereign bond market with the market for small corporate issues in the same currency. Which contrast is commonly relevant?",
+    "options": [
+      "Government and corporate debt always have identical default risk",
+      "Every sovereign bond is necessarily risk-free",
+      "Issue size, trading liquidity and credit-risk exposure"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r056-c-medium",
+    "subject": "fi",
+    "stem": "A bond seldom trades, so an analyst estimates its price using yields on actively traded bonds with similar maturity and credit quality. What technique is this?",
+    "options": [
+      "Pure historical-cost accounting",
+      "An assumption that all bonds have the same coupon",
+      "Comparable-bond matrix pricing"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r058-a-medium",
+    "subject": "fi",
+    "stem": "A floating-rate note’s required discount margin rises above its contractual quoted margin, with other conditions unchanged. Where is its price most likely relative to par near a reset?",
+    "options": [
+      "Below the note’s par value",
+      "Above par because required compensation rose",
+      "Always exactly at par regardless of the margins"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r059-b-medium",
+    "subject": "fi",
+    "stem": "A par yield for a given maturity is determined from the spot curve. What coupon rate does it represent?",
+    "options": [
+      "The spot rate at every cash-flow date simultaneously",
+      "The rate that makes the bond’s price equal par",
+      "A coupon guaranteed to remain the current market yield forever"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r060-a-medium",
+    "subject": "fi",
+    "stem": "A fixed-rate bond investor sells before maturity. Which combination is needed to assess total holding-period return?",
+    "options": [
+      "The original coupon rate alone",
+      "Coupon receipts, reinvestment income and the sale price",
+      "Only the final maturity principal that the investor never receives"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r062-c-medium",
+    "subject": "fi",
+    "stem": "A portfolio duration is calculated as a market-value-weighted average of constituent durations. Which limitation is especially important?",
+    "options": [
+      "It guarantees immunity to all changes in the yield curve",
+      "It makes credit spreads irrelevant to bond prices",
+      "It summarizes a parallel-shift exposure rather than every curve movement"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r063-a-medium",
+    "subject": "fi",
+    "stem": "An interest-rate change can alter whether a callable bond is redeemed early. Why is effective duration useful?",
+    "options": [
+      "It revalues cash flows that can change with the yield curve",
+      "It assumes all cash flows remain fixed regardless of exercise",
+      "It measures only the contractual coupon"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r066-c-medium",
+    "subject": "fi",
+    "stem": "A borrower defaults. One debt claim is secured by collateral and another is an unsecured subordinated claim. Which statement is generally most accurate?",
+    "options": [
+      "The secured claim has stronger priority against its collateral",
+      "All claims must receive identical recoveries",
+      "Subordination gives the junior claim first access to collateral"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r067-a-medium",
+    "subject": "fi",
+    "stem": "A lender pools loans and sells securities backed by the pool to investors. What potential benefit does this provide?",
+    "options": [
+      "A guarantee that the loans can never default",
+      "Access to funding through the pooled assets",
+      "Automatic elimination of all capital and legal requirements"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r068-b-medium",
+    "subject": "fi",
+    "stem": "A securitization issues senior and junior tranches. Which internal protection most directly supports the senior tranche?",
+    "options": [
+      "Equal loss absorption by every tranche at all times",
+      "Subordination of the junior tranche",
+      "A guarantee that collateral value never falls"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r069-b-easy",
+    "subject": "fi",
+    "stem": "A fully amortizing residential mortgage has fixed scheduled payments, and payments are made as contracted. What happens to the principal balance over time?",
+    "options": [
+      "It declines as principal is repaid",
+      "It remains unchanged until a single final bullet payment",
+      "It grows solely because the coupon rate is fixed"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r069-c-medium",
+    "subject": "fi",
+    "stem": "A residential MBS passes borrowers’ cash flows to holders after servicing charges. What feature must investors still model?",
+    "options": [
+      "Only the original stated maturity with certain cash-flow dates",
+      "The timing of prepayments and the resulting cash-flow changes",
+      "A permanent separation from all mortgage-credit exposure"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r069-d-medium",
+    "subject": "fi",
+    "stem": "A commercial mortgage pool contains loans with substantial balloon balances due at maturity. Which risk deserves particular attention?",
+    "options": [
+      "Refinancing risk at the balloon payment date",
+      "The assumption that all principal was already amortized",
+      "Only homeowners’ seasonal prepayment habits"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r071-c-medium",
+    "subject": "deriv",
+    "stem": "A buyer has the right, but no obligation, to acquire an asset at a stated exercise price. What distinguishes this claim from a forward purchase?",
+    "options": [
+      "Both parties must always exchange the asset at maturity",
+      "Exercise is optional for the buyer",
+      "The seller can cancel a valid exercise whenever it is unfavorable"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r072-a-medium",
+    "subject": "deriv",
+    "stem": "A firm uses a derivative to reduce exposure to a known future foreign-currency payment. Which benefit is most directly sought?",
+    "options": [
+      "Creating a guaranteed speculative profit",
+      "Eliminating all operating risks of the business",
+      "Reducing uncertainty in the domestic-currency payment"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r075-a-medium",
+    "subject": "deriv",
+    "stem": "A futures contract is marked to market daily while an otherwise similar forward settles at maturity. What is the key economic difference?",
+    "options": [
+      "The timing of realized cash flows",
+      "The underlying can never be the same",
+      "The futures buyer never faces gains or losses"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r075-b-hard",
+    "subject": "deriv",
+    "stem": "For the same underlying and maturity, futures price changes tend to be positively correlated with interest rates. Under the usual daily-settlement argument, how can this affect the futures price relative to the forward price?",
+    "options": [
+      "It necessarily makes both prices identical under all conditions",
+      "It must make the futures price lower",
+      "It can make the futures price higher"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r077-b-medium",
+    "subject": "deriv",
+    "stem": "Why does a call option’s nonlinear payoff require a different replication argument from a simple forward payoff?",
+    "options": [
+      "Its holder must always buy the underlying",
+      "Its exposure changes with the underlying price",
+      "Its payoff is always a fixed amount"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r079-b-medium",
+    "subject": "deriv",
+    "stem": "A binomial option valuation uses risk-neutral probabilities. Which interpretation is correct?",
+    "options": [
+      "They must be the investor’s actual subjective probabilities",
+      "They prove investors are literally indifferent to all risks",
+      "They are pricing weights consistent with traded-asset prices"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r080-b-medium",
+    "subject": "alt",
+    "stem": "An investor buys a stake alongside a private fund in a particular portfolio company. Which method best describes the stake?",
+    "options": [
+      "Co-investment alongside the sponsor",
+      "A purchase solely of the fund’s pooled units",
+      "A mandatory public-market index allocation"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r080-c-medium",
+    "subject": "alt",
+    "stem": "A private fund manager earns a recurring management fee and a share of investment profits subject to agreed conditions. What best describes the second component?",
+    "options": [
+      "A guaranteed fixed coupon paid by every portfolio company",
+      "An incentive or performance allocation",
+      "An investor’s committed but uncalled capital"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r081-a-medium",
+    "subject": "alt",
+    "stem": "A database includes only hedge funds that are still operating. What performance-measurement concern is most immediate?",
+    "options": [
+      "A guarantee that the sample represents failed funds",
+      "Survivorship bias",
+      "The elimination of all selection effects"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r083-b-medium",
+    "subject": "alt",
+    "stem": "A listed real estate vehicle is compared with a directly owned building. Which distinction is most accurate?",
+    "options": [
+      "Listing removes all real estate cash-flow risk",
+      "A listed claim is identical to owning a specific building outright",
+      "The listed claim can be liquid while retaining exposure to property economics"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r084-a-medium",
+    "subject": "alt",
+    "stem": "A timberland owner can postpone harvesting during a weak lumber market while trees continue to grow. Which feature is most relevant?",
+    "options": [
+      "A requirement to harvest all trees immediately at any price",
+      "The absence of fire, weather and operating risk",
+      "Flexibility in harvest timing coupled with biological growth"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r086-c-medium",
+    "subject": "alt",
+    "stem": "An investor gains digital-asset exposure through an exchange-traded product rather than self-custody. Which issue still requires analysis?",
+    "options": [
+      "The assumption that all operational risks vanish",
+      "The product’s custody, fees and tracking arrangements",
+      "The absence of any link to the underlying asset"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r086-d-medium",
+    "subject": "alt",
+    "stem": "A portfolio’s digital-asset allocation is justified only by one short period of low correlation with stocks. What is the main weakness?",
+    "options": [
+      "Low sample correlation proves permanent diversification",
+      "The estimate may be unstable across market regimes",
+      "All digital assets have identical liquidity and custody risk"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r087-c-medium",
+    "subject": "pm",
+    "stem": "An investor chooses the point where an indifference curve is tangent to an available capital allocation line. What is being selected?",
+    "options": [
+      "The most preferred feasible risk-return combination",
+      "The riskiest feasible portfolio regardless of preferences",
+      "A portfolio with a guaranteed realized return equal to its expectation"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r087-f-easy",
+    "subject": "pm",
+    "stem": "Two risky assets have correlation below perfect positive correlation. What is generally possible by combining them?",
+    "options": [
+      "A guaranteed elimination of all portfolio risk",
+      "A diversification benefit relative to their weighted average volatility",
+      "A requirement that expected return be zero"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r088-d-medium",
+    "subject": "pm",
+    "stem": "A model decomposes a security’s return into sensitivity to common factors and a residual unique to the security. What does the residual represent?",
+    "options": [
+      "A guaranteed positive alpha",
+      "The return component unexplained by the specified common factors",
+      "The risk-free rate by definition"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r089-a-easy",
+    "subject": "pm",
+    "stem": "An adviser evaluates a new holding by its effect on the client’s entire portfolio rather than its stand-alone volatility. Which principle is being applied?",
+    "options": [
+      "A requirement to ignore correlation",
+      "A rule to select each asset solely by its own past return",
+      "The portfolio approach"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r090-c-medium",
+    "subject": "pm",
+    "stem": "A client states a return objective after inflation and fees. What should the manager do when comparing it with a forecast before inflation and fees?",
+    "options": [
+      "Convert both measures to a consistent basis",
+      "Compare the numbers directly without adjustment",
+      "Treat all inflation assumptions as realized certainties"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r092-b-medium",
+    "subject": "pm",
+    "stem": "A firm has risk models but no clear ownership, reporting escalation or limits. What framework weakness is most apparent?",
+    "options": [
+      "Too much certainty about actual future losses",
+      "Insufficient governance and integration into decision-making",
+      "A requirement to abandon all quantitative analysis"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r092-d-medium",
+    "subject": "pm",
+    "stem": "A pension sponsor has limited ability to fund a severe asset shortfall. What should this imply for its risk tolerance assessment?",
+    "options": [
+      "A higher target return alone creates greater loss-bearing ability",
+      "Loss-bearing capacity should constrain risk taking",
+      "Risk tolerance must be inferred solely from recent market returns"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r093-a-hard",
+    "subject": "eth",
+    "stem": "An adviser says a questionable sales practice is fine because \"everyone in this market does it.\" Which criticism identifies the flaw most precisely?",
+    "options": [
+      "Being common describes what people do, not whether the practice meets principles such as honesty",
+      "Common practice can never be ethical, so anything that is widely done should be avoided",
+      "The practice must be unethical because it has not been written into the firm's formal policy"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r093-b-medium",
+    "subject": "eth",
+    "stem": "A new advisory firm prints a code of ethics and puts it on its website but never trains staff on it or discusses real cases. Which assessment is most reasonable?",
+    "options": [
+      "It helps only if people understand and apply it; publishing it alone does not ensure conduct",
+      "The firm is now an ethical firm because a written code exists and is publicly available",
+      "Codes never influence conduct, so the firm has lost nothing by leaving it unexplained"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r093-f-medium",
+    "subject": "eth",
+    "stem": "Research on ethical behavior suggests that whether a person acts ethically in a difficult moment is most influenced by which of the following?",
+    "options": [
+      "The person's own internal character traits, considered on their own",
+      "Their belief that they are honest people who would never do such a thing",
+      "External situational influences, such as what the people around them are doing"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r093-g-easy",
+    "subject": "eth",
+    "stem": "Which statement about ethical and legal standards is most accurate?",
+    "options": [
+      "Laws often codify ethical expectations, but ethics can require more than the law does",
+      "Conduct that is legal is always ethical, so a lawful act needs no further ethical scrutiny",
+      "Ethical standards and legal requirements never overlap in any area of professional life"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r096-a-easy",
+    "subject": "eth",
+    "stem": "For the purposes of Standard II(A), information is \"material\" when it:",
+    "options": [
+      "It has already been reported in a company's regulatory filings and is available to all",
+      "It would probably affect a security's price, or a reasonable investor would want it",
+      "It comes from a source inside the company rather than from public documents"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r098-a-medium",
+    "subject": "eth",
+    "stem": "An analyst plans to start her own advisory firm. While still employed she calls the firm's current clients to say she will soon be offering the same service and asks them to move their accounts. Which is the best assessment?",
+    "options": [
+      "A violation: she may prepare to leave but must not solicit clients while employed",
+      "No violation, because she has not yet formally left the firm she works for",
+      "No violation, because clients are always free to choose whichever adviser they wish"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r098-c-easy",
+    "subject": "eth",
+    "stem": "What is a supervisor required to do under Standard IV(C)?",
+    "options": [
+      "Personally review each and every trade and communication made by the people they supervise",
+      "Take reasonable steps to catch and stop breaches of law and the Code by people they oversee",
+      "Be responsible only for violations that they personally commit and never for others"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-ref2027-r099-b-hard",
+    "subject": "eth",
+    "stem": "A research note states \"Company X's shares will double next year because demand is surging.\" The analyst has no data showing the doubling. What is the main problem under V(B)?",
+    "options": [
+      "The note contains a forecast, and a forecast is never permitted in a research note",
+      "The problem exists only if the shares later fail to double as the note predicted",
+      "An opinion is presented as fact, but facts and opinions must be kept distinct"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r099-b-medium",
+    "subject": "eth",
+    "stem": "A manager moves clients' portfolios into a strategy that relies heavily on derivatives, a material change from the process described to clients. She plans to mention it in next year's annual letter. Which is the best assessment?",
+    "options": [
+      "A violation, because material changes to the investment process must be disclosed promptly",
+      "Acceptable, because the annual letter is the usual channel for telling clients things",
+      "Acceptable, because clients can always ask if they want to know about changes"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r100-a-hard",
+    "subject": "eth",
+    "stem": "A member could easily avoid a conflict by reassigning coverage of a company to a colleague. Instead she keeps the coverage and discloses the conflict in small print. What is the best assessment?",
+    "options": [
+      "Adequate, because disclosure is always an acceptable alternative to avoiding a conflict",
+      "Adequate, provided that the client signs the form containing the small-print disclosure",
+      "Not adequate: she should avoid it where reasonable, and disclosure must be prominent"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-ref2027-r100-c-hard",
+    "subject": "eth",
+    "stem": "When must referral arrangements be disclosed to a client?",
+    "options": [
+      "Before the client commits to the referred service, so she can judge any partiality",
+      "After the referral fee has actually been received by the adviser or the firm",
+      "Once a year, in the firm's general annual report to all clients"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-ref2027-r102-b-hard",
+    "subject": "eth",
+    "stem": "An adviser learns that his firm's marketing shows returns gross of fees without saying so, and it has already gone to prospects. Which response would best conform?",
+    "options": [
+      "Leave it as it is, because prospects can always ask about fees if they want to know",
+      "Label or restate the returns so fee effects are clear, and correct material already sent",
+      "Correct only the materials that are sent out from now on, and not the earlier ones"
+    ],
+    "keyIndex": 1
+  },
+  {
+    "id": "pp-2027-r095-a-easy",
+    "subject": "eth",
+    "stem": "When local securities regulations are less restrictive than the CFA Institute Code and Standards on a professional practice, Standard I(A) Knowledge of the Law requires a CFA charterholder to:",
+    "options": [
+      "Follow the CFA Institute Code and Standards because they are stricter",
+      "Follow local securities regulations because statutory law always governs",
+      "Follow local regulations after obtaining written client consent"
+    ],
+    "keyIndex": 0
+  },
+  {
+    "id": "pp-2027-r095-b-medium",
+    "subject": "eth",
+    "stem": "An executing broker invites a buy-side trader to an all-expenses-paid luxury resort weekend with no business agenda, shortly before the firm's annual broker-allocation review. To comply with Standard I(B), the trader should:",
+    "options": [
+      "Attend the weekend if the trader's employer has no written travel policy",
+      "Attend the weekend and allocate trades solely on execution quality",
+      "Decline the invitation because lavish hospitality could reasonably compromise objectivity"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-2027-r095-e-easy",
+    "subject": "eth",
+    "stem": "Under Standard I(E) Competence, a CFA charterholder who begins advising clients on newly introduced structured credit products must:",
+    "options": [
+      "Rely solely on the product issuer's marketing brochure for risk disclosures",
+      "Limit advice to clients who already hold a CFA charter",
+      "Acquire the necessary knowledge and skills before advising clients on those products"
+    ],
+    "keyIndex": 2
+  },
+  {
+    "id": "pp-2027-r095-e-hard",
+    "subject": "eth",
+    "stem": "A seasoned CFA charterholder has covered industrial equities for 12 years. Two years after major lease-accounting standards changes took effect, he continues valuing industrial firms using his legacy pre-change operating-lease adjustments because he has not updated his technical knowledge of the revised standard. Which statement best describes his obligation under Standard I(E) Competence?",
+    "options": [
+      "He complies with I(E) because extensive sector experience establishes ongoing competence",
+      "He violates I(E) because competence requires ongoing learning as standards and regulations evolve",
+      "He avoids an I(E) issue because outdated accounting inputs fall solely under diligence, not competence"
+    ],
+    "keyIndex": 1
+  }
+]

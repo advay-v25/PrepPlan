@@ -1,5 +1,6 @@
 /** Pure: how a missed sitting is absorbed. Real room only, sitting limits, earliest first, never more than was missed. */
 import { planRedistribution, MAX_TASK_MINUTES } from '../src/lib/planning/pulse/redistribute'
+import { allFitWhole, gapsFromRanges, growthRoom, roomAfterAccepted } from '../src/lib/planning/pulse/gaps'
 
 let passed = 0, failed = 0
 const check = (n: string, ok: boolean, d = '') => { ok ? (passed++, console.log(`  ✓ ${n}`)) : (failed++, console.log(`  ✗ ${n}${d ? ` — ${d}` : ''}`)) }
@@ -30,6 +31,22 @@ console.log('\nTimed sessions: the slot, not the day total')
   check('a session under way, outside its window or boxed in takes nothing (maxAdd 0)', none.placed === 0 && none.unplaced === 20)
   const spill = planRedistribution({ missedMinutes: 40, candidates: [{ ...c('t', '2026-11-06', 30), maxAdd: 10 }, c('d', '2026-11-07', 30)], dayRoom: { '2026-11-06': 200, '2026-11-07': 200 }, sittingLimit: 90 })
   check('what the slot cannot take goes to the next valid session, so partial absorption is exact', spill.changes.map(x => `${x.task_id}:${x.add_minutes}`).join() === 't:10,d:30' && spill.unplaced === 0)
+}
+
+console.log('\nRoom is a gap, not a day total')
+{
+  const two30 = gapsFromRanges([{ start: '09:00', end: '09:30' }, { start: '11:00', end: '11:30' }])
+  check('two 30-minute gaps with nothing accepted: a session can grow by 30, not by their 60 total', roomAfterAccepted(two30, [], []) === 30)
+  check('an accepted 30-minute sitting takes one gap whole; the other still holds 30', roomAfterAccepted(two30, [], [30]) === 30)
+  check('two accepted 30-minute sittings leave no room', roomAfterAccepted(two30, [], [30, 30]) === 0)
+  check('accepted timed work is removed first (09:00-12:00 free, 10:00-11:00 held): largest left is 60', roomAfterAccepted(gapsFromRanges([{ start: '09:00', end: '12:00' }]), [{ start: 600, end: 660 }], []) === 60)
+  check('an existing sitting that fits nowhere blocks further allocation', roomAfterAccepted(two30, [], [45]) === 0)
+  check('no windows: no room', roomAfterAccepted([], [], []) === 0)
+  check('plan impact: 60 minutes scheduled as one 45 + one 15 no longer fits two 30-minute gaps, though the total is 60', !allFitWhole(two30, [], [45, 15]))
+  check('plan impact: two 30s still fit; timed work in a gap makes them not fit', allFitWhole(two30, [], [30, 30]) && !allFitWhole(two30, [{ start: 540, end: 570 }], [30, 30]))
+  const r = planRedistribution({ missedMinutes: 45, candidates: [{ ...c('a', '2027-03-02', 30), maxAdd: growthRoom(two30, [], [], 30) }], dayRoom: { '2027-03-02': roomAfterAccepted(two30, [], [30]) }, sittingLimit: 180 })
+  check('a 30-minute sitting cannot grow into a separate 30-minute gap: all 45 missed minutes stay deferred', r.placed === 0 && r.unplaced === 45)
+  check('a 15-minute sitting in a 30-minute gap can grow by exactly 15', growthRoom(two30, [], [30], 15) === 15)
 }
 
 console.log(`\n${passed} passed, ${failed} failed`)

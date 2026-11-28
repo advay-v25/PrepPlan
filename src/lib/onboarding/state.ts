@@ -17,6 +17,8 @@ export type OnboardingProfile = {
   mock_label?: string | null
   mock_start_time?: string | null
   mock_duration_minutes?: number | null
+  entry_revision_completed?: boolean | null
+  entry_last_mock_feeling?: 'not_taken' | 'below_target' | 'near_target' | 'on_target' | 'unscored' | null
   [key: string]: unknown
 }
 

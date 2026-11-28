@@ -1,9 +1,10 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { Dialog } from '../ui/Dialog'
+import { useHydrated, WhenReady } from '../ui/WhenReady'
 
 /**
  * The one way to tell Roadmap "this is my next class" for a variable schedule.
@@ -22,6 +23,9 @@ export function NextClassDialog({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const firstRef = useRef<HTMLInputElement>(null)
+  const ready = useHydrated()
+  // Opened by a link, the dialog is on screen before it can take input: focus goes to the first field once it can.
+  useEffect(() => { if (ready) firstRef.current?.focus() }, [ready])
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -52,6 +56,7 @@ export function NextClassDialog({ onClose }: { onClose: () => void }) {
       initialFocusRef={firstRef}
     >
       <form onSubmit={submit} style={{ display: 'grid', gap: 14 }}>
+        <WhenReady>
         <label className="field">
           <span>Date</span>
           <input ref={firstRef} type="date" value={date} onChange={e => setDate(e.target.value)} />
@@ -79,6 +84,7 @@ export function NextClassDialog({ onClose }: { onClose: () => void }) {
             {busy ? <><Loader2 size={16} className="animate-spin" aria-hidden /> Adding…</> : 'Add class'}
           </button>
         </div>
+        </WhenReady>
       </form>
     </Dialog>
   )

@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-25",
+  "orderedContentHash": "98927ecb0bb75408eb09bfec23f7d282d197e89b5171fda4b270f5bef998620b",
+  "baseline": {
+    "drafts": 536,
+    "orderedContentHash": "721526d5ea2208470b81dba9e21fbc556dd1beaf282c05760e0a551840667726"
+  },
+  "checks": {
+    "canonicalTypes": "PASS (./node_modules/.bin/tsc --noEmit --incremental false)",
+    "c4RepairRegressionTest": "PASS (1230 itemsChecked, 77 giveawayItemsChecked)",
+    "rebuildDeterminism": "PASS (identical 98927ecb0bb75408eb09bfec23f7d282d197e89b5171fda4b270f5bef998620b across consecutive runs)",
+    "drafts": 1230,
+    "routineDrafts": 1040,
+    "heldOutMockDrafts": 190,
+    "rehearsalSession1": 90,
+    "rehearsalSession2": 90,
+    "missingTierOutcomes": 0,
+    "numericFormulasExecuted": 238,
+    "rawFormatFlags": 152,
+    "genuineFormatDefects": 0,
+    "answerLengthOutliersGe2x": 156,
+    "overlapReview": 0,
+    "strictGiveawayAbsolutesRemaining": 0,
+    "contextualAllPhrasesRemaining": 46,
+    "identicalDistractorDiagnosesRemaining": 0,
+    "crossPoolLeakage": 0,
+    "crossPoolHighSimilarityPairsGe045": 16,
+    "crossPoolMaxSimilarity": 0.59,
+    "c2ConceptsSubstantive": 344,
+    "c2BareStubsRemaining": 0,
+    "c3SupportAudited": 1230,
+    "c3SupportBreakdown": {
+      "strong": 821,
+      "moderate": 248,
+      "weak": 161
+    },
+    "learnerEligible": 0,
+    "heldOutEligible": 0,
+    "humanApprovals": 0
+  },
+  "artifacts": {
+    "b1SourceQaReconciliation": "output/question-bank/2027/b1-source-qa-reconciliation.json",
+    "b2ErrataImpactRegister": "output/question-bank/2027/b2-errata-impact-register.json",
+    "c2CurriculumManifest": "output/question-bank/2027/c2-curriculum-manifest.json",
+    "c3SupportMatrix": "output/question-bank/2027/c3-support-matrix.json",
+    "c6DemandAndCapacity": "output/question-bank/2027/c6-demand-and-capacity.json",
+    "c8EvaluationPack": "output/question-bank/2027/c8-evaluation-pack.json",
+    "d1FormatAdjudication": "output/question-bank/2027/d1-format-adjudication.json",
+    "e1CrossPoolSimilarity": "output/question-bank/2027/e1-cross-pool-similarity.json",
+    "reviewHtml": "output/question-bank/2027/review.html"
+  },
+  "unexecuted": [
+    "Authenticated desktop/390px application acceptance (software revamp agent)",
+    "Hosted draft import and disposable installation (software revamp agent)",
+    "Independent CFA-qualified blind solves for all 1,230 drafts",
+    "Human source/scope/difficulty/family/editorial approvals",
+    "Commercial input/distribution rights clearance"
+  ],
+  "releaseEligible": false,
+  "hostedWrites": false,
+  "modelCalls": false
+}

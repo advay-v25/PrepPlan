@@ -4,6 +4,7 @@ import { assembleEligiblePool } from './assembly'
 import { getCompletedCycleScope } from './completedScopeService'
 import { allocateWeighted, type WeightedBlueprint } from './weightedBlueprint'
 import type { CompletedCycleScope, ScopeKind } from './completedScope'
+import { topicWeightRows } from '../curriculum/referenceReads'
 
 export type PaperKind = 'diagnostic' | 'revisionary' | 'mixed'
 export const PAPER_SCOPE_KINDS: Record<PaperKind, ScopeKind[]> = { diagnostic: ['new'], revisionary: ['revision'], mixed: ['new', 'revision'] }
@@ -32,7 +33,7 @@ export async function getPaperPreview(userId: string, requested?: PaperKind, now
   const newCount = scope.targets.filter(t => t.kind === 'new').length, revCount = scope.targets.filter(t => t.kind === 'revision').length
   const paperKind = choosePaperKind(newCount, revCount, requested)
 
-  const { data: topics } = await admin.from('topics').select('id, exam_weight_min, exam_weight_max').throwOnError()
+  const topics = await topicWeightRows()
   const subjects = (topics ?? []).map(t => ({ id: t.id as string, min: Number(t.exam_weight_min), max: Number(t.exam_weight_max) }))
 
   const blueprint = allocateWeighted({ scope, subjects, kinds: PAPER_SCOPE_KINDS[paperKind] })

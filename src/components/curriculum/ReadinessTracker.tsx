@@ -39,7 +39,7 @@ function when(iso: string | null) {
 
 function Row({ row, repairHref, readingHref }: { row: TrackerRow; repairHref?: string; readingHref: string }) {
   return (
-    <details className={`los-row los-row--${row.band}`}>
+    <details suppressHydrationWarning className={`los-row los-row--${row.band}`}>
       <summary>
         <span className="los-row__code">{row.los.replace(/^LOS\s*/i, '')}</span>
         <span className="los-row__name">{row.name}</span>
@@ -56,7 +56,8 @@ function Row({ row, repairHref, readingHref }: { row: TrackerRow; repairHref?: s
           {row.classCoverage !== 'none' && (<><dt>In class</dt><dd>{row.classCoverage === 'full' ? 'Covered in full' : 'Partly covered'} — exposure only, it does not change the band.</dd></>)}
           <dt>Evidence</dt>
           <dd>{row.sample === 0 ? 'None yet' : `${row.sample} valid observation${row.sample === 1 ? '' : 's'}, last checked ${when(row.lastCheckedAt)}`}
-            {row.confidenceMismatch && ' · confidence and accuracy disagreed'}</dd>
+            {row.confidenceMismatch && ' · confidence and accuracy disagreed'}
+            {row.lastCheckAttemptId && <> · <Link href={`/app/tests/${row.lastCheckAttemptId}/result`}>Open last check</Link></>}</dd>
         </dl>
         {repairHref && (
           <p><Link href={repairHref} className="los-row__action"><Wrench size={15} aria-hidden /> Open your repair for this</Link></p>
@@ -141,7 +142,7 @@ export function ReadinessTracker({ tracker, band, repairLinks = {} }: { tracker:
         const visible = band === 'all' ? t.modules : t.modules.filter(m => m.rows.some(r => r.band === band))
         if (visible.length === 0) return null
         return (
-          <details key={t.id} className="los-topic" open={t.counts.repair + t.counts.verify > 0 || band !== 'all'}>
+          <details suppressHydrationWarning key={t.id} className="los-topic" open={t.counts.repair + t.counts.verify > 0 || band !== 'all'}>
             <summary>
               <h3>{t.name}</h3>
               <span className="los-topic__counts">

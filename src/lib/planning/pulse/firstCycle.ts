@@ -5,7 +5,8 @@ import { permitsStudyPortions } from './weekBoundary'
  * Which cycle a student with no cycle yet starts in. One decision for every first-week path (onboarding preview,
  * activation recovery, Calendar, roadmap start), so they cannot disagree.
  *
- * A new student is placed in the current cycle while it still has a day with real study time. When it does not
+ * A new student is placed in the current cycle while it still has a day with real study time (a free stretch long enough for a sitting, counted from
+ * the end of the review buffer, on or before the last day before a booked exam). When it does not
  * (Sunday evening in a Monday–Sunday cycle, a class-led cycle on its last day with the windows gone), the first
  * plan is the NEXT cycle and the reason is kept so the review can say so. It advances at most once: if the next
  * cycle has no availability either, the student stays where they are and sees unplaced work and an availability
@@ -14,6 +15,11 @@ import { permitsStudyPortions } from './weekBoundary'
  * This is only for a student who has never had a cycle. An existing student's accepted cycle — even a deliberately
  * empty one — is never moved by it.
  */
+/** Time kept clear after a first-week plan is prepared, so the student can read it and still accept it. A scheduling buffer, not a lifetime. */
+export const REVIEW_BUFFER_MINUTES = 15
+/** The shortest free stretch a study sitting can be planned into (the planner's own minimum). */
+export const USABLE_GAP_MINUTES = 15
+
 export type InitialCycleReason = 'current_has_time' | 'no_study_day_left' | 'no_time_left' | 'no_availability'
 
 export type InitialCycle = {
@@ -55,5 +61,5 @@ export function initialCycleNote(c: InitialCycle): string | null {
   if (c.reason === 'no_availability') return `This cycle has no study days left, so your first plan covers ${range}. You have no study windows yet: add availability in Calendar to place the work.`
   return c.reason === 'no_study_day_left'
     ? `This cycle has no study days left, so your first plan covers ${range}. You can use Calendar straight away.`
-    : `There is no study time left in this cycle, so your first plan covers ${range}. You can use Calendar straight away.`
+    : `There is not enough study time left in this cycle once ${REVIEW_BUFFER_MINUTES} minutes are kept for you to review the plan, so your first plan covers ${range}. You can use Calendar straight away.`
 }

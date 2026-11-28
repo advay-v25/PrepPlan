@@ -1,0 +1,82 @@
+== start, source {"short":"b68df3dd5776e546","files":1060}  [14:08:46]
+build 0
+Checked 57 browser assets. 0 findings.
+tsc 0
+lint 0
+verify 0
+rehearse install 0
+rehearse upgrade 0
+rehearse restore 0
+first-week service test 0
+20 passed, 0 failed
+contracts 0
+bank before the runs:
+student_eligible_items 0
+assessment_items 0
+routes 0
+== production build: first week, early input, flashcard order, recovery progress, calendar save, early disclosure  [14:10:12]
+prod-input exit 0
+  -  54 [mobile-390] › tests/e2e/lifecycle/phase6-late-confirm.spec.ts:205:1 › first week setup probe · a setup failure keeps its failing stage and response, and cleanup cannot replace it
+  1 skipped
+  53 passed (5.9m)
+== full suite, dev server with fixture bank  [14:16:17]
+suite exit 1
+  ✘   28 [desktop] › tests/e2e/lifecycle/mock-progress-owner.spec.ts:19:1 › recovery time does not imply completion; review the sitting, explicitly clear the last choice, and reload (39.5s)
+  -   88 [desktop] › tests/e2e/lifecycle/phase6-forecast.spec.ts:174:1 › forecast · a failed catch-up read is said to have failed, never shown as nothing owed
+  -  100 [desktop] › tests/e2e/lifecycle/phase6-late-confirm.spec.ts:69:3 › first week · a failed read during confirmation retires nothing, and the same press then saves once
+  -  213 [mobile-390] › tests/e2e/lifecycle/phase6-forecast.spec.ts:174:1 › forecast · a failed catch-up read is said to have failed, never shown as nothing owed
+  -  225 [mobile-390] › tests/e2e/lifecycle/phase6-late-confirm.spec.ts:69:3 › first week · a failed read during confirmation retires nothing, and the same press then saves once
+  -  226 [mobile-390] › tests/e2e/lifecycle/phase6-late-confirm.spec.ts:205:1 › first week setup probe · a setup failure keeps its failing stage and response, and cleanup cannot replace it
+  1 failed
+  5 skipped
+  244 passed (43.5m)
+== fault proxy and provider stub  [14:59:59]
+faults exit 0
+  30 passed (4.9m)
+faultread exit 0
+  4 passed (11.1s)
+== production build behind the proxy  [15:05:15]
+proxy build 0
+prodproxy exit 0
+  34 passed (1.1m)
+== fixture-key build: turnstile retry  [15:06:41]
+turnstile build 0
+turnstile exit 0
+  4 passed (5.4s)
+== performance, production build behind the proxy  [15:07:05]
+perf build 0
+debt 0
+│ (index) │ persona        │ level              │ request                           │ n  │ statuses │ reads │ rpcs │ p50ms │ p95ms │
+│ 0       │ 'on_track'     │ 'on_track'         │ 'GET /app'                        │ 15 │ '200'    │ 77    │ 4    │ 129   │ 150   │
+│ 1       │ 'on_track'     │ 'on_track'         │ 'GET /app/calendar'               │ 15 │ '200'    │ 76    │ 4    │ 117   │ 125   │
+│ 2       │ 'on_track'     │ 'on_track'         │ 'GET /app/review-week'            │ 15 │ '200'    │ 80    │ 2    │ 123   │ 127   │
+│ 3       │ 'on_track'     │ 'on_track'         │ 'POST /api/weekly-review/preview' │ 15 │ '200'    │ 90    │ 4    │ 166   │ 171   │
+│ 4       │ 'catching_up'  │ 'catching_up'      │ 'GET /app'                        │ 15 │ '200'    │ 77    │ 4    │ 124   │ 131   │
+│ 5       │ 'catching_up'  │ 'catching_up'      │ 'GET /app/calendar'               │ 15 │ '200'    │ 76    │ 4    │ 114   │ 121   │
+│ 6       │ 'catching_up'  │ 'catching_up'      │ 'GET /app/review-week'            │ 15 │ '200'    │ 80    │ 2    │ 118   │ 125   │
+│ 7       │ 'catching_up'  │ 'catching_up'      │ 'POST /api/weekly-review/preview' │ 15 │ '200'    │ 101   │ 4    │ 161   │ 170   │
+│ 8       │ 'recovery'     │ 'recovery_offered' │ 'GET /app'                        │ 15 │ '200'    │ 88    │ 4    │ 142   │ 160   │
+│ 9       │ 'recovery'     │ 'recovery_offered' │ 'GET /app/calendar'               │ 15 │ '200'    │ 87    │ 4    │ 133   │ 139   │
+│ 10      │ 'recovery'     │ 'recovery_offered' │ 'GET /app/review-week'            │ 15 │ '200'    │ 84    │ 2    │ 119   │ 123   │
+│ 11      │ 'recovery'     │ 'recovery_offered' │ 'POST /api/weekly-review/preview' │ 15 │ '200'    │ 101   │ 4    │ 158   │ 183   │
+│ 12      │ 'history_debt' │ 'recovery_offered' │ 'GET /app'                        │ 15 │ '200'    │ 89    │ 4    │ 139   │ 146   │
+│ 13      │ 'history_debt' │ 'recovery_offered' │ 'GET /app/calendar'               │ 15 │ '200'    │ 87    │ 4    │ 131   │ 136   │
+│ 14      │ 'history_debt' │ 'recovery_offered' │ 'GET /app/review-week'            │ 15 │ '200'    │ 84    │ 2    │ 120   │ 123   │
+│ 15      │ 'history_debt' │ 'recovery_offered' │ 'POST /api/weekly-review/preview' │ 15 │ '200'    │ 112   │ 4    │ 159   │ 168   │
+preview 0
+│ (index) │ request                             │ kind           │ n  │ reads │ rpcs │ p50ms │ p95ms │
+│ 0       │ 'POST /api/onboarding/plan/preview' │ 'fresh build'  │ 15 │ 255   │ 1    │ 159   │ 171   │
+│ 1       │ 'POST /api/onboarding/plan/preview' │ 'reused draft' │ 15 │ 2     │ 3    │ 42    │ 45    │
+base 0
+│ 0       │ 'fresh'   │ '/app'                           │ 200    │ 56577 │ 109     │ 101     │ 104     │ 15      │ 67         │ 3         │ [ 65, 65, 65, ... 12 more items ] │ [ 3, 3, 3, ... 12 more 
+│ 1       │ 'fresh'   │ '/app/calendar'                  │ 200    │ 83030 │ 97      │ 95      │ 99      │ 15      │ 70         │ 4         │ [ 70, 70, 70, ... 12 more items ] │ [ 4, 4, 4, ... 12 more 
+│ 7       │ 'history' │ '/app'                           │ 200    │ 54903 │ 116     │ 112     │ 123     │ 15      │ 78         │ 4         │ [ 78, 78, 78, ... 12 more items ] │ [ 4, 4, 4, ... 12 more 
+│ 8       │ 'history' │ '/app/calendar'                  │ 200    │ 83962 │ 105     │ 112     │ 121     │ 15      │ 83         │ 5         │ [ 83, 83, 83, ... 12 more items ] │ [ 5, 5, 5, ... 12 more 
+listeners:        0
+bank after the runs:
+student_eligible_items 0
+assessment_items 0
+== end, source {"short":"b68df3dd5776e546","files":1060}  [15:08:19]
+listeners:        0
+setup failures recorded: 0
+hydration captures:        0

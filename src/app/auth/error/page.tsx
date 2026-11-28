@@ -3,8 +3,12 @@ import { AuthShell } from '../../../components/auth/AuthShell'
 
 export const metadata = { title: 'Sign-in link unavailable' }
 
-export default async function AuthErrorPage({ searchParams }: { searchParams: Promise<{ reason?: string }> }) {
-  const { reason } = await searchParams
+export default async function AuthErrorPage({ searchParams }: { searchParams: Promise<{ reason?: string; flow?: string }> }) {
+  const { reason, flow } = await searchParams
+  const google = flow === 'google' || reason === 'cancelled' || reason === 'provider' || reason === 'missing_code'
+  const action = google ? { href: '/login', label: 'Back to sign in' }
+    : flow === 'signup' ? { href: '/check-email', label: 'Send a new confirmation email' }
+    : { href: '/forgot-password', label: 'Send a new reset link' }
 
   const copy = reason === 'cancelled'
     ? {
@@ -24,7 +28,8 @@ export default async function AuthErrorPage({ searchParams }: { searchParams: Pr
     : reason === 'expired'
     ? {
         title: 'This link has already been used or has expired',
-        body: 'Try signing in again. Complete Google sign-in in the same browser where you started it.',
+        body: google ? 'Start Google sign-in again and finish it in the same browser.'
+          : 'Request a fresh email link and use the most recent message.',
       }
     : {
         title: "This link can't be used",
@@ -36,8 +41,9 @@ export default async function AuthErrorPage({ searchParams }: { searchParams: Pr
       <section className="auth-state">
         <h1>{copy.title}</h1>
         <p>{copy.body}</p>
-        <Link className="auth-primary" href="/login">Try signing in</Link>
-        <p className="auth-fine">Still stuck? <Link href="/forgot-password">Reset your password</Link> or <Link href="/signup">create a new account</Link>.</p>
+        <Link className="auth-primary" href={action.href}>{action.label}</Link>
+        {!google && flow !== 'signup' ? <Link className="text-button" href="/check-email">Resend confirmation email</Link> : null}
+        {!google ? <Link className="text-button" href="/login">Back to sign in</Link> : null}
       </section>
     </AuthShell>
   )

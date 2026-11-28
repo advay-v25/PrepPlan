@@ -51,7 +51,7 @@ async function CoachContent({ searchParams }: CoachProps) {
         <p className="eyebrow">What I am working from</p>
         <p className="text-secondary">
           {signals
-            ? <>Understanding: <strong>{signals.understanding.band}</strong> · {signals.execution.completed} blocks done, {signals.execution.unreported} unreported · {signals.position.tested} of {signals.position.total} outcomes tested · {signals.position.whole} whole outcome{signals.position.whole === 1 ? '' : 's'} confirmed{signals.position.partial ? `, ${signals.position.partial} partly covered` : ''}.</>
+            ? <>{signals.execution.completed} blocks done, {signals.execution.unreported} unreported · {signals.position.tested} of {signals.position.total} outcomes with eligible test observations · {signals.position.whole} whole outcome{signals.position.whole === 1 ? '' : 's'} confirmed{signals.position.partial ? `, ${signals.position.partial} partly covered` : ''}.</>
             : 'Your evidence could not be loaded right now, so I will say so rather than guess.'}
           {checkpoint && <> Your {checkpointTitle(checkpoint.checkpoint)} is on {checkpoint.checkpoint.date} (<Link href={checkpoint.href} className="text-button">view or change it in Calendar</Link>).</>}
           {lastMock && <span data-testid="coach-last-mock"> Your latest completed mock, {lastMock.title} on {lastMock.takenOn}{lastMock.reportedResult ? <>, is recorded as “{lastMock.reportedResult}” (your own report, not test evidence)</> : ' is recorded without a score'}{lastMock.href && <> (<Link href={lastMock.href} className="text-button">open the saved report</Link>)</>}.</span>}

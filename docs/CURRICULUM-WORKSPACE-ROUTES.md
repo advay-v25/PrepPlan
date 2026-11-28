@@ -2,6 +2,10 @@
 
 Curriculum is the student's **study and score tracker, notes and recall-card workspace**. It is not a course reader. A page render or GET never marks learning, creates a card, calls a model, or places a task. Every API below requires verified email, admission and completed onboarding (`requireApplicationAccess`), and reads/writes only the signed-in student's rows.
 
+November 25 verification: the existing workspace is retained. Card command and schedule suites also support `--local` through the shared disposable Postgres installer; this exercises SQL ownership, receipts, concurrency and scheduling without hosted credentials. Current desktop/390px authenticated acceptance remains open pending the disposable Auth/server keys. See `docs/PHASE-1-5-STATUS-2026-11-25.md`; historical browser evidence below has not been relabelled as current proof.
+
+Final November 25 closeout: held revision-bridge readings now display **Waiting for broader revision**, rather than claiming an existing task. The review projection preserves bridge counts and queue state, separates reported concerns from checked concerns, and links held readings to their exact Curriculum scope. This changes no scheduling/evidence writes. Eight Chromium component checks cover card review at 1280/390px with controlled replies; authenticated app acceptance is still open. See `docs/PHASE-1-5-FINAL-CLOSEOUT-2026-11-25.md` for the final verdict and environment guard.
+
 ## Pages
 
 | Route | Query (validated) | Read owner | Writes | Notes |

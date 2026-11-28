@@ -1,0 +1,2670 @@
+{
+  "changes": [
+    {
+      "id": "pp-mock1-r001-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r002-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r003-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r004-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r005-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r005-c-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r006-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r006-d-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r007-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r007-c-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Distinguish the sign test from the additional assumptions of a signed-rank test."
+      ]
+    },
+    {
+      "id": "pp-mock1-r008-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r009-b-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r010-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r010-b-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Remove ambiguous RSS notation: distinguish explained from residual sum of squares."
+      ]
+    },
+    {
+      "id": "pp-mock1-r010-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r010-d-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r010-d-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r011-a-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r011-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r012-b-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r012-e-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem.",
+        "Use comparable percentage choices and distinguish CR3 from the squared-share concentration measure."
+      ]
+    },
+    {
+      "id": "pp-mock1-r013-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r013-a-medium",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r013-c-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r013-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r014-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r014-b-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r014-d-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r014-d-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r015-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r015-d-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r016-d-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r016-e-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r017-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r017-b-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r017-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r018-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r019-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": []
+    },
+    {
+      "id": "pp-mock1-r019-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r019-b-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r020-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r020-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r021-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r021-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r022-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r023-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r023-b-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r023-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r024-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r024-c-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r024-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r024-d-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r025-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r025-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r025-d-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r026-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r027-b-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r027-b-hard",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r028-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r028-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r029-a-easy",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r029-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r029-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r030-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r030-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r031-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r032-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r032-b-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r032-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r033-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r033-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r034-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r034-b-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r035-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r035-b-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r036-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r036-d-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r037-d-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r037-e-hard",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r037-f-hard",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r038-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r038-c-easy",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r039-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r040-a-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r040-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r040-b-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r041-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r041-b-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r041-c-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r042-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r042-a-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r042-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r043-a-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r043-b-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r043-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r043-c-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r044-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r044-c-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r044-d-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r045-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r045-b-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r045-b-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r045-c-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r045-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r046-a-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r046-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r046-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r047-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r047-b-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r047-c-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r047-d-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r048-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r048-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r048-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r049-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r049-b-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Replace unsupported statistical universal with a bounded incentive scenario."
+      ]
+    },
+    {
+      "id": "pp-mock1-r050-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r050-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r050-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r051-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r051-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r051-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r052-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Correct equal-principal claim for level-payment amortization."
+      ]
+    },
+    {
+      "id": "pp-mock1-r052-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r052-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r053-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r053-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r053-c-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r054-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r054-b-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r054-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r055-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r056-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r056-b-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r056-c-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r056-c-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r057-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r058-b-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r058-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r059-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r060-a-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r060-c-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r061-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r061-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r062-b-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r063-a-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r063-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r064-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r065-a-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r065-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r065-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r066-b-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r067-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r067-a-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r068-b-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r068-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r068-c-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r069-a-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r069-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r069-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r069-b-easy",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r069-b-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r069-c-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r070-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r070-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r071-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r072-a-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r072-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r073-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r074-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r075-b-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r076-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r076-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r077-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r077-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem.",
+        "Specify ordinary dividends and no strike adjustment; avoid special-dividend contract ambiguity."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r078-a-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r078-a-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r079-a-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r079-b-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r080-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r080-b-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r080-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r081-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r082-a-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r082-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r082-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r083-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r083-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r083-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r084-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r084-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r085-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r085-c-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r085-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r086-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r086-b-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r086-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r086-c-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r086-d-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r087-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r087-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r087-e-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r087-f-easy",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r087-f-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r088-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r088-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r088-d-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r088-d-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r088-e-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r088-f-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Remove unsupported empirical SML consequence from a CAPM assumption question."
+      ]
+    },
+    {
+      "id": "pp-mock1-r088-g-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r088-h-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r088-i-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r089-a-easy",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r089-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r089-b-medium",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r089-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r089-e-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r089-e-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r089-e-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r089-f-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r089-f-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r090-a-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r090-c-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r090-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r090-d-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r090-f-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r090-g-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r091-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r091-c-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r092-b-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r092-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r092-e-easy",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-2027-c5-r092-f-hard",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue."
+      ]
+    },
+    {
+      "id": "pp-mock1-r092-g-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r093-a-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r093-a-hard",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r093-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r093-e-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r093-f-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r093-g-easy",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r093-g-hard",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r094-a-hard",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion.",
+        "Replace incoherent negative lead-in with a supported, self-contained inquiry-source question; proposed hard label still needs reviewer reassessment."
+      ]
+    },
+    {
+      "id": "pp-mock1-r094-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r094-b-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r094-c-easy",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r094-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r095-a-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r095-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r095-c-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r095-d-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r095-e-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r096-a-easy",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r096-a-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r096-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r097-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r097-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r097-c-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r097-d-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r097-e-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r098-a-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r098-a-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r098-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r098-c-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r099-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r099-b-hard-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r099-b-medium",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r099-c-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r100-a-hard",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    },
+    {
+      "id": "pp-mock1-r100-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r100-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r100-c-easy-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Separate the concise answer choice from its worked explanation; remove answer-length cue.",
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r101-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r101-b-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-mock1-r102-a-medium-1",
+      "priorVersion": 1,
+      "itemVersion": 2,
+      "changes": [
+        "Keep pool/session routing in metadata rather than in the question stem."
+      ]
+    },
+    {
+      "id": "pp-ref2027-r102-b-hard",
+      "priorVersion": 2,
+      "itemVersion": 3,
+      "changes": [
+        "Apply earlier C4 option-index patches against their original 536-item baseline order; preserve correct answer meaning after seeded expansion."
+      ]
+    }
+  ],
+  "passDEChanges": [
+    {
+      "id": "pp-2027-c5-r006-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r006-c-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r009-a-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r011-a-easy",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r014-b-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r015-a-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r015-c-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r016-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r016-c-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r017-a-hard",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r018-a-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r020-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-mock1-r023-b-medium-1",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r024-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r043-a-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-ref2027-r043-a-medium",
+      "version": 4,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r045-c-hard",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r046-a-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r049-b-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r052-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r053-c-easy",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r054-c-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-mock1-r058-b-medium-1",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r059-b-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r060-a-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r063-d-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r064-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r065-a-easy",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r066-a-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r069-d-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r072-a-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r072-b-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r075-b-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r076-a-hard",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r077-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r079-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r082-a-easy",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r083-b-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r083-c-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r083-d-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r084-a-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r084-b-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r085-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r085-c-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r086-b-easy",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r086-d-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r088-b-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r088-c-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r089-a-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r089-f-hard",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r090-d-easy",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-mock1-r090-d-medium-1",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r092-a-hard",
+      "version": 2,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r092-f-hard",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-mock1-r093-a-easy-1",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-mock1-r093-c-medium-1",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-mock1-r097-c-hard-1",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-mock1-r098-c-hard-1",
+      "version": 3,
+      "reason": "D1: Replaced giveaway-absolute distractor wording with nuanced domain misconception."
+    },
+    {
+      "id": "pp-2027-c5-r005-d-easy",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r007-b-easy",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r030-b-medium-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r034-b-easy-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r044-b-hard",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r052-a-medium-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r053-a-medium",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r068-a-easy",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r076-a-easy",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r076-a-medium-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r078-b-easy",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r079-a-easy",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r079-a-medium",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r087-g-easy",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r088-g-medium",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r089-b-hard",
+      "version": 2,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r094-b-easy-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r094-c-medium-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r097-e-medium-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r099-b-hard-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r101-a-medium-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-mock1-r101-b-medium-1",
+      "version": 3,
+      "reason": "D1: Rewrote 8-gram phrase to original phrasing while preserving technical meaning."
+    },
+    {
+      "id": "pp-2027-c5-r023-a-hard",
+      "version": 2,
+      "reason": "D3: Upgraded r023-a-hard from interpret to integrate scenario on negative-CCC contraction risk."
+    },
+    {
+      "id": "pp-ref2027-r094-a-hard",
+      "version": 4,
+      "reason": "D3: Upgraded r094-a-hard to genuine difficult diagnose scenario on PCP inquiry authority."
+    },
+    {
+      "id": "pp-mock1-r019-a-medium-1",
+      "version": 3,
+      "reason": "Pass E: Replaced high-similarity mock item with genuinely independent construction."
+    },
+    {
+      "id": "pp-mock1-r087-e-medium-1",
+      "version": 3,
+      "reason": "Pass E: Replaced high-similarity mock item with genuinely independent construction."
+    },
+    {
+      "id": "pp-mock1-r025-a-medium-1",
+      "version": 3,
+      "reason": "Pass E: Replaced high-similarity mock item with genuinely independent construction."
+    },
+    {
+      "id": "pp-mock1-r071-b-medium-1",
+      "version": 3,
+      "reason": "Pass E: Replaced high-similarity mock item with genuinely independent construction."
+    }
+  ],
+  "allHumanApprovals": 0,
+  "priorSnapshot": "closeout-baseline-1220/draft-bank.json"
+}

@@ -9,6 +9,8 @@ import { getCoachEvidencePack } from '../signals/coachPack'
 import { getLosTracker } from '../curriculum/losTrackerService'
 import { getStudyWeekContext } from '../planning/schedule'
 import { getCheckpointView, getLatestMockReport } from '../planning/checkpointService'
+import { loadMockTransition } from '../exam/mockTransitionService'
+import { loadRecoveryStatus } from '../planning/recovery/service'
 import { getReport, listReports } from '../mocks/reportService'
 import { describeScore } from '../mocks/report'
 import { decideAssessment } from '../tests/assessmentDecision'
@@ -25,6 +27,7 @@ import { occupantsFor } from '../planning/taskService'
 import { addDays, todayInZone, utcToZonedParts, weekdayOf, zonedTimeToUtc } from '../planning/studyWeek'
 import { calendarTaskHref } from '../routing/calendar'
 import { getClassLogContext } from '../planning/classlog/service'
+import { withReadSnapshot } from '../ops/perRequest'
 
 export type CoachWorld = {
   situation: CoachSituation
@@ -58,17 +61,19 @@ async function findNextTask(userId: string, today: string, openToday: { id: stri
 }
 
 /** The latest scored paper (not practice) and what it found, from the same result service the Results page uses. */
-async function loadLatestResult(userId: string, now: Date, attemptId?: string): Promise<CoachSituation['latestResult']> {
+async function loadLatestResult(userId: string, now: Date, gaps: CoachSituation['repairs'], intent: CoachIntent, attemptId?: string): Promise<CoachSituation['latestResult']> {
   // A selected paper must be the student's own, scored one; otherwise (or with none selected) the latest scored paper is used.
   const q = createAdminClient().from('assessment_attempts').select('id').eq('user_id', userId).eq('status', 'scored')
   const { data: att } = await (attemptId ? q.eq('id', attemptId) : q.neq('attempt_kind', 'practice').order('submitted_at', { ascending: false, nullsFirst: false }).limit(1)).maybeSingle().throwOnError()
   if (!att) return null
-  const r = await getAttemptResult(userId, att.id as string, now).catch(() => null)
-  if (!r) return null
-  const t = r.findings.find(f => f.kind === 'timing')?.practice ?? null
+  const matching = gaps.filter(gap => gap.attemptId === att.id)
+  const timingResult = intent === 'slow' ? await getAttemptResult(userId, att.id as string, now).catch(() => null) : null
+  const t = timingResult?.findings.find(f => f.kind === 'timing')?.practice ?? null
   return {
-    attemptId: att.id as string, href: `/app/tests/${att.id}/result`, headline: `${r.nextAction.title}.`,
-    findings: r.findings.slice(0, 5).map(f => ({ kind: f.kind, title: f.title })),
+    attemptId: att.id as string, href: `/app/tests/${att.id}/result`,
+    headline: matching.length ? `Curriculum currently records a gap in “${matching[0].name}”. ${matching[0].worked ? 'Work is recorded; new scored evidence is pending.' : 'Open the outcome to see its follow-up.'}` : 'Open the scored result to see exactly what was checked. Curriculum shows the current outcome findings.',
+    findings: matching.map(gap => ({ kind: 'tracker_gap', title: gap.name })),
+    outcomeHref: matching[0]?.outcomeHref,
     timing: t ? { available: t.state === 'start' || t.state === 'resume', message: t.message, deliverable: t.deliverable, minutes: t.minutes } : null,
   }
 }
@@ -161,7 +166,7 @@ async function loadLeanWorld(userId: string, intent: CoachIntent, extra: { taskI
   }
 }
 
-export async function loadCoachWorld(userId: string, intent: CoachIntent, now = new Date(), attemptId?: string, extra: { taskId?: string; when?: string | null; readingId?: string; reportId?: string; message?: string } = {}): Promise<CoachWorld> {
+async function loadCoachWorldUncached(userId: string, intent: CoachIntent, now = new Date(), attemptId?: string, extra: { taskId?: string; when?: string | null; readingId?: string; reportId?: string; message?: string } = {}): Promise<CoachWorld> {
   if (LEAN_INTENTS.includes(intent)) return loadLeanWorld(userId, intent, extra)
   const admin = createAdminClient()
   // A selected mock report is already the scope of the answer. Even a withdrawn report must open when weekly planning or the bank is slow.
@@ -190,6 +195,9 @@ export async function loadCoachWorld(userId: string, intent: CoachIntent, now = 
   const reportP = soft('your mock reports', () => tag('mockReports', () => listReports(userId)))
   // A report the student chose is read by owner and discussed AS ITSELF (active, withdrawn or unavailable); it is never replaced by the latest one.
   const selReportP = extra.reportId ? soft('the mock report you chose', () => tag('selectedReport', () => getReport(userId, extra.reportId!))) : null
+  // The Roadmap owns when mocks should start; Coach only reads it (for mock questions) and links the action.
+  const transitionP = intent === 'mock' ? soft('the Roadmap mock recommendation', () => tag('mockTransition', () => loadMockTransition(userId, now))) : null
+  const recoveryP = ['lighter', 'next', 'day_was_bad', 'mock'].includes(intent) ? soft('your catch-up status', () => tag('recovery', () => loadRecoveryStatus(userId, now))) : null
   const revisionP = soft('your revision queue', () => tag('revision', () => getRevisionOverview(userId, now)))
   const adaptationP = soft('this week’s review record', () => tag('adaptation', () => getCurrentAdaptation(userId)))
   // One tracker load serves both the evidence pack and the repair targets.
@@ -203,13 +211,15 @@ export async function loadCoachWorld(userId: string, intent: CoachIntent, now = 
     if (!tracker) throw new Error('no tracker')
     const byReading = new Map<string, { subjectId: string; label: string }>()
     for (const t of tracker.topics) for (const m of t.modules) byReading.set(m.id, { subjectId: t.id, label: `Reading ${m.readingNo}: ${m.name}` })
-    repairs = tracker.studyOrder.filter(r => r.band === 'repair').slice(0, 3).flatMap(r => {
+    repairs = tracker.studyOrder.filter(r => r.band === 'repair' && r.sample > 0).flatMap(r => {
       const where = byReading.get(r.readingId)
-      return where ? [{ outcomeId: r.outcomeId, name: r.name, readingId: r.readingId, subjectId: where.subjectId, readingLabel: where.label }] : []
+      return where ? [{ outcomeId: r.outcomeId, name: r.name, readingId: r.readingId, subjectId: where.subjectId, readingLabel: where.label,
+        attemptId: r.gapAttemptId ?? null, worked: r.progress === 'in_progress' || r.progress === 'retest_due',
+        outcomeHref: `/app/curriculum/${where.subjectId}/${r.readingId}?los=${r.outcomeId}#los-${r.outcomeId}` }] : []
     })
   } catch { repairs = [] }
 
-  const [checkpointView, revisionOverview, adaptation, lastMock, reports, selReport] = await Promise.all([checkpointP, revisionP, adaptationP, lastMockP, reportP, selReportP])
+  const [checkpointView, revisionOverview, adaptation, lastMock, reports, selReport, transition, recovery] = await Promise.all([checkpointP, revisionP, adaptationP, lastMockP, reportP, selReportP, transitionP, recoveryP])
   const cycle = state.cycle ? { start: state.cycle.startDateLocal, end: state.cycle.endDateLocal } : null
   const load: Record<string, number> = {}
   if (cycle) {
@@ -224,7 +234,7 @@ export async function loadCoachWorld(userId: string, intent: CoachIntent, now = 
   const selectedTask = selectedFull ? { id: selectedFull.id, title: selectedFull.title, revision: selectedFull.revision, date: selectedFull.date, minutes: selectedFull.minutes, movable: selectedFull.movable } : null
   const placement = intent === 'move_block' && selectedFull?.movable ? await resolvePlacement(userId, selectedFull, extra.when ?? null, ctx, cycle) : null
   const taskChoices = intent === 'move_block' && !selectedTask ? open.filter(b => b.execution === 'not_started').slice(0, 3).map(b => ({ id: b.id, title: b.title, date: ctx.today })) : []
-  const latestResult = intent === 'result' || intent === 'slow' ? await loadLatestResult(userId, now, attemptId) : null
+  const latestResult = intent === 'result' || intent === 'slow' ? await loadLatestResult(userId, now, repairs, intent, attemptId) : null
   const resultSelected = !!attemptId && (intent === 'result' || intent === 'slow')
   // A selected result owns its follow-up. The account-wide "latest evidence" follow-up belongs to some other paper, so it is never offered beside a selected one (opened or not) unless it IS that paper's.
   const followUp = resultSelected && !repairFollowUp?.href.includes(`/tests/${encodeURIComponent(attemptId!)}/`) ? null : repairFollowUp
@@ -253,7 +263,7 @@ export async function loadCoachWorld(userId: string, intent: CoachIntent, now = 
   const rehearsal = checkpointView?.checkpoint.kind === 'internal_rehearsal' ? (await tag('rehearsal', () => decideRehearsal(userId, checkpointView.checkpointId)).catch(() => null))?.decision ?? null : null
   return {
     situation: {
-      intent, today: ctx.today, cycle, load, repairs, repairFollowUp: followUp, selectedResultUnavailable: resultSelected && !latestResult, selectedResultOpen: resultSelected && !!latestResult,
+      intent, today: ctx.today, cycle, load, repairs: repairs.slice(0, 3), repairFollowUp: followUp, selectedResultUnavailable: resultSelected && !latestResult, selectedResultOpen: resultSelected && !!latestResult,
       todayOpen: open.map(b => ({ id: b.id, title: b.title, revision: b.revision, durationMinutes: b.durationMinutes, execution: b.execution, date: ctx.today })),
       homeNext: state.nextAction ? { code: state.nextAction.code, title: state.nextAction.title, rationale: state.nextAction.rationale, destination: state.nextAction.destination ?? null } : null,
       nextTask, latestResult, selectedTask, taskChoices, when: extra.when ?? null, placement, selectedReading: await loadSelectedReading(extra.readingId),
@@ -261,6 +271,8 @@ export async function loadCoachWorld(userId: string, intent: CoachIntent, now = 
       adaptation: adaptation ? { headline: adaptation.headline, lighter: adaptation.lighter, optionalMinutes: adaptation.optionalMinutes, waiting: adaptation.waiting } : null,
       revision: revisionOverview ? { inPlan: revisionOverview.inPlan.length, eligible: revisionOverview.eligible,
         next: revisionOverview.next.slice(0, 3).map(n => ({ name: n.name, href: `/app/curriculum/${n.topic}/${n.readingId}`, why: n.why[0] ?? '' })) } : null,
+      recovery: recovery ? { level: recovery.level, headline: recovery.headline, why: recovery.why, owedHours: recovery.numbers.extraHours, weeksToClear: recovery.numbers.weeksToClear, chosen: recovery.chosen, paths: recovery.paths.map(p => p.label), tradeoff: recovery.tradeoff?.summary ?? null } : null,
+      mockTransition: transition?.available ? { headline: transition.headline, verdict: transition.verdict, why: transition.why, gaps: transition.gaps.slice(0, 3).map(g => g.name), addsMock: transition.proposal.adds.length > 0, costOfWaiting: transition.costOfWaiting } : null,
       mockReport: extra.reportId ? describeMockReport(selReport, true) : describeMockReport(reports?.[0] ?? null, false),
       mockReportUnavailable: Boolean(extra.reportId) && !selReport,
       lastMock: extra.reportId ? null : lastMock ? { title: lastMock.title, date: lastMock.takenOn, reportedResult: lastMock.reportedResult, notes: lastMock.notes, href: lastMock.href } : null,
@@ -389,6 +401,11 @@ export async function decideProposal(db: SupabaseClient, userId: string, proposa
     return { ok: false, code: 'STALE', error: `That would break the order you planned${r.orderTitle ? `: it must stay in sequence with “${r.orderTitle}”` : ''}. Nothing was moved. Open the task in Calendar to see its sittings and move the other one first, or choose a different day.`,
       ...(mv?.id && mv?.fromDate ? { nextUrl: calendarTaskHref(mv.id, mv.fromDate) } : {}) }
   }
+  if (r?.code === 'STALE' && r.reason === 'no_room') {
+    const mv = (p.proposed_changes as any)?.move
+    return { ok: false, code: 'STALE', error: 'That day no longer has one free stretch long enough for it, so nothing was moved. Pick another day, or open the task in Calendar to see what the day holds.',
+      ...(mv?.id && mv?.fromDate ? { nextUrl: calendarTaskHref(mv.id, mv.fromDate) } : {}) }
+  }
   if (r?.code === 'STALE') return { ok: false, code: 'STALE', error: p.kind === 'move_task' ? 'The task or that time changed since this was suggested, so nothing was moved. Ask again for a fresh preview.' : 'The plan changed since this was suggested, so nothing was changed. Ask again for a fresh suggestion.' }
   return { ok: false, code: 'INVALID', error: 'This kind of suggestion is not supported.' }
 }
@@ -447,3 +464,10 @@ export async function loadLastTurn(userId: string, maxAgeMs = 30 * 60_000): Prom
   if (!data || Date.now() - new Date(data.created_at as string).getTime() > maxAgeMs) return null
   return loadTurnAnswer(userId, data.id as string)
 }
+
+/**
+ * The Coach's read-only context build. A route handler has no per-render cache, so every loader here used to re-read its own copy of the same rows
+ * (a deterministic turn made ~286 database calls). Inside one read snapshot they share the per-request reads. Nothing that writes runs inside it, and the
+ * lean world used to preview a move, and every confirmation, keep their own fresh reads.
+ */
+export const loadCoachWorld: typeof loadCoachWorldUncached = (...args) => withReadSnapshot(() => loadCoachWorldUncached(...args))

@@ -10,6 +10,7 @@ import { computeSignals, type BlockRow, type EvidenceStats, type MovementEvent, 
 import { perRequest, minuteOf } from '../ops/perRequest'
 import { readAll } from '../supabase/readAll'
 import { profileTimezone, activeCycleId } from '../ops/sharedReads'
+import { ownedBlocks } from '../ops/sharedReads'
 
 /** Loads the shared inputs and computes the four signals. Read-only, scoped to the user. */
 async function getSignalsUncached(userId: string, now = new Date()): Promise<Signals> {
@@ -28,9 +29,9 @@ async function getSignalsUncached(userId: string, now = new Date()): Promise<Sig
 
   // Every history read is complete (stable unique order, all pages) and a failed page fails the section; it is never "no activity".
   const [blockRows, attempts, events] = await Promise.all([
-    cycleId ? readAll<any>((a, z) => admin.from('plan_blocks').select('id, title, execution, task_type, duration_minutes, local_date, outcome_id, cancelled_at, updated_at').eq('user_id', userId).eq('cycle_id', cycleId).is('learning_activity_id', null).order('id').range(a, z)) : Promise.resolve([] as any[]),
+    cycleId ? ownedBlocks(userId).then(all => all.filter(b => b.cycle_id === cycleId && !b.learning_activity_id)) : Promise.resolve([] as any[]),   // same rows, from the history getStudyActivity reads in this call
     readAll<any>((a, z) => admin.from('assessment_attempts').select('id, status, submitted_at, started_at, evidence_mode').eq('user_id', userId).eq('status', 'scored').order('id').range(a, z)),
-    readAll<any>((a, z) => admin.from('evidence_events').select('validity, self_reported_confidence, is_correct, created_at, evidence_mode').eq('user_id', userId).order('created_at').order('id').range(a, z)),
+    readAll<any>((a, z) => admin.from('evidence_events').select('attempt_id, validity, self_reported_confidence, is_correct, created_at, evidence_mode').eq('user_id', userId).order('created_at').order('id').range(a, z)),
   ])
 
   const blocks = blockRows.filter(b => !b.cancelled_at && b.execution !== 'cancelled')
@@ -50,7 +51,7 @@ async function getSignalsUncached(userId: string, now = new Date()): Promise<Sig
     outcomeId: r.outcomeId, readingId: r.readingId, subjectId: r.subjectId,
     exposed: wholeOutcomes.has(r.outcomeId) || partialOutcomes.has(r.outcomeId), whole: wholeOutcomes.has(r.outcomeId), partial: partialOutcomes.has(r.outcomeId),
     scheduled: scheduledOutcomes.has(r.outcomeId),
-    tested: r.band !== 'untested' || r.verdict !== 'none', verified: r.verdict === 'secure',
+    tested: r.sample > 0, verified: r.verdict === 'secure',
   }))
 
   const valid = events.filter(e => e.validity === 'valid' && e.evidence_mode === 'evidence')
@@ -72,12 +73,13 @@ async function getSignalsUncached(userId: string, now = new Date()): Promise<Sig
     for (const r of await readAll<any>((a, z) => admin.from('assessment_items').select('id, lm_id').in('id', batch).order('id').range(a, z))) readingIds.add(r.lm_id as string)
   }
   const subjectOfReading = new Map(tracker.topics.flatMap(t => t.modules.map(m => [m.id, t.id] as const)))
+  const latestValid = valid.at(-1)
   const evidence: EvidenceStats = {
     validEvents: valid.length, voidedEvents: events.filter(e => ['voided', 'void'].includes(e.validity as string)).length,
     disputedEvents: events.filter(e => e.validity === 'disputed').length,
     scoredPapers: evidenceAttempts.size, readingsTested: readingIds.size, subjectsTested: new Set([...readingIds].map(r => subjectOfReading.get(r)).filter(Boolean)).size,
-    latestEvidenceAt: valid.length ? valid.map(e => e.created_at as string).sort().at(-1)! : null,
-    latestAttemptId: [...attempts].filter(a => evidenceAttempts.has(a.id as string)).sort((a, b) => String(b.submitted_at ?? b.started_at).localeCompare(String(a.submitted_at ?? a.started_at)))[0]?.id as string | undefined ?? null,
+    latestEvidenceAt: latestValid?.created_at ?? null,
+    latestAttemptId: latestValid?.attempt_id ?? [...attempts].filter(a => evidenceAttempts.has(a.id as string)).sort((a, b) => String(b.submitted_at ?? b.started_at).localeCompare(String(a.submitted_at ?? a.started_at)))[0]?.id ?? null,
     ...tally,
     overconfidentOutcomes: rows.filter(r => r.markCheck === 'overconfident').length, underconfidentOutcomes: rows.filter(r => r.markCheck === 'underconfident').length,
     markedOutcomes: rows.filter(r => r.selfMark !== null).length,

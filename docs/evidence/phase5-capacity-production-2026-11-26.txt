@@ -1,0 +1,21 @@
+Canonical capacity report (read-only), project woboyakjtgltgekwtddo, as of 2026-11-25T23:27:29Z, command: npm run bank:capacity
+Edition 2027 v1.0
+Candidates (not published): 0 raw · 0 automatically checked · 0 of the 0 quarantined (rights not cleared or not recorded) · 0 provisional families
+Published by exact-version approval: 0 routine (0 confirmed independent families) · 0 held-out (0 families) · 0 rejected or retired
+Servable now: 0 of 102 readings can supply a paper · 0 of 0 concepts can supply a re-check · 0 full mock(s)
+Outcomes below the 3-family minimum: 343
+
+By subject: candidates raw/auto · approved routine/held-out · confirmed families routine/held-out · outcomes below depth
+  alt       0/0    · 0/0 · 0/0 · 22/22
+  ci        0/0    · 0/0 · 0/0 · 22/22
+  deriv     0/0    · 0/0 · 0/0 · 22/22
+  econ      0/0    · 0/0 · 0/0 · 30/30
+  eq        0/0    · 0/0 · 0/0 · 37/37
+  eth       0/0    · 0/0 · 0/0 · 36/36
+  fi        0/0    · 0/0 · 0/0 · 51/51
+  fsa       0/0    · 0/0 · 0/0 · 53/53
+  pm        0/0    · 0/0 · 0/0 · 40/40
+  quant     0/0    · 0/0 · 0/0 · 30/30
+
+Mock limiting topics: alt 0/13, ci 0/13, deriv 0/13, econ 0/13, eq 0/23, eth 0/22, fi 0/23, fsa 0/21, pm 0/18, quant 0/21
+exit 0

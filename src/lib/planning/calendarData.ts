@@ -5,6 +5,7 @@ import { expandCommitment, type CommitmentException, type RecurringCommitment } 
 import { getScopeGroups } from './taskScopeService'
 import { loadContinuations, type ContinuationInfo } from './taskLineageService'
 import { inDeclaredOrder } from './declaredOrder'
+import { weeklySeries } from '../ops/sharedReads'
 
 /**
  * Everything the calendar needs for one study week, in one place.
@@ -147,14 +148,8 @@ export async function loadCalendarWeek(userId: string, week: StudyWeek, opts: { 
   // Recurring commitments are expanded across the week rather than rendered
   // from their anchor row, which would show a weekly class once, on whichever
   // date the series happened to start.
-  const { data: seriesRows, error: eSeries } = await supabase
-    .from('calendar_commitments')
-    .select('id, label, kind, is_protected, recurrence, weekdays, start_time, end_time, starts_on, ends_on')
-    .eq('user_id', userId)
-    .eq('status', 'active')
-    .eq('recurrence', 'weekly')
-
-  must({ error: eSeries }, 'class series')
+  // One shared read of the few weekly series per request. A non-strict caller tolerated a failed read here, and still does; a strict one throws as before.
+  const seriesRows = (await (opts.strict === false ? weeklySeries(userId).catch(() => []) : weeklySeries(userId).catch(e => { throw new Error(`calendar read failed (class series): ${e instanceof Error ? e.message : 'unknown'}`) }))).filter(r => r.status === 'active')
   const seriesIds = (seriesRows ?? []).map(r => r.id as string)
   const { data: exceptionRows, error: eExc } = seriesIds.length
     ? await supabase.from('commitment_exceptions').select('*').in('commitment_id', seriesIds)

@@ -9,7 +9,10 @@ export function AdaptationLine({ record }: { record: AdaptationRecord | null }) 
       <details><summary>Why</summary>
         <ul>{record.reasons.map(r => <li key={r}>{r}</li>)}</ul>
         {record.ahead && <p>{record.ahead}</p>}
-        {record.waiting > 0 && <p className="fine-print">{record.waiting} reading{record.waiting === 1 ? '' : 's'} wait for a later week and stay due.</p>}
+        {record.waiting > 0 && <>
+          <p className="fine-print">When you accepted this week, work from {record.waiting} reading{record.waiting === 1 ? '' : 's'} fell outside the time set aside for new study.</p>
+          {Boolean(record.waitingWork?.length) && <ul>{record.waitingWork?.map(w => <li key={w.id}>{w.name} · about {w.minutes} min outside the draft</li>)}</ul>}
+        </>}
       </details>
     </section>
   )

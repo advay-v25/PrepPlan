@@ -75,5 +75,32 @@ console.log('\nDeclared sitting order (dependencies) is never inverted')
   const free = planClassRecovery(base([task('u1', { startsAt: at(D[0], 20, 0), lmId: 'LM9' }), task('u2', { startsAt: at(D[0], 19, 0), lmId: 'LM9' })], { overlaps: { u2: 'Class' }, blockers: [{ date: D[0], start: 19 * 60, end: 20 * 60 }] }))
   check('with NO declared order, a shared reading alone does not invent one (display/title order is not curriculum truth)', free.moves.length === 1)
 }
+console.log('\nFragmented free time')
+{
+  const windows = [1, 2, 3, 4].flatMap(weekday => [{ weekday, start: 540, end: 570 }, { weekday, start: 660, end: 690 }])
+  const r = planClassRecovery(base([task('fragmented', { placement: 'day_preferred', startsAt: null, minutes: 45 })], {
+    windows, available: Object.fromEntries(D.map(d => [d, 60])),
+  }))
+  check('a 45-minute day-only sitting cannot stay or move into two 30-minute gaps', r.moves.length === 0 && r.unplaced.length === 1)
+  const fits = planClassRecovery(base([task('whole', { placement: 'day_preferred', startsAt: null, minutes: 30 })], { windows, available: Object.fromEntries(D.map(d => [d, 60])) }))
+  check('a whole 30-minute sitting that already fits stays unchanged', fits.unchanged === 1 && fits.unplaced.length === 0)
+  const shared = planClassRecovery(base([
+    task('move', { minutes: 30 }), task('flexible', { date: D[1], placement: 'day_preferred', startsAt: null, minutes: 60 }),
+  ], { overlaps: { move: 'Class' }, studyDates: [D[1]], available: { [D[0]]: 0, [D[1]]: 90 },
+    windows: [{ weekday: 2, start: 17 * 60, end: 18 * 60 }, { weekday: 2, start: 19 * 60, end: 19 * 60 + 30 }],
+  }))
+  check('a timed move leaves the whole 60-minute gap for accepted flexible work and takes the separate 30-minute slot', shared.moves[0]?.to_starts === at(D[1], 19), JSON.stringify(shared))
+}
+console.log('\nPre-existing flexible overflow')
+{
+  // Three 120-minute flexible sittings cannot fit a 4-hour window beside a class even before anything moves. That overflow is not the timed task's doing,
+  // so it must not block the timed task from taking a free slot; moving it must simply not make the day's fit worse.
+  const overflow = ['f1', 'f2', 'f3'].map(id => task(id, { placement: 'day_preferred', startsAt: null, minutes: 120 }))
+  const r = planClassRecovery(base([task('t1', { minutes: 30, startsAt: at(D[0], 19, 15) }), ...overflow], {
+    overlaps: { t1: 'Class' }, blockers: [{ date: D[0], start: 19 * 60, end: 19 * 60 + 45 }], studyDates: [D[0]], available: { [D[0]]: 240 },
+  }))
+  check('a timed task still takes a real free slot when unrelated flexible work already overflows the day', r.moves.some(m => m.task_id === 't1'), JSON.stringify(r.moves))
+  check('the overflowing flexible work stays visible, not dropped', r.unplaced.length + r.kept.length + r.unchanged >= 3, JSON.stringify({ u: r.unplaced.length, k: r.kept.length, c: r.unchanged }))
+}
 console.log(`\n${passed} passed, ${failed} failed`)
 process.exit(failed ? 1 : 0)

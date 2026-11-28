@@ -1,0 +1,44 @@
+== start, source {"short":"a697958d23db9ebf","files":1055}  [01:38:01]
+build 0
+Checked 57 browser assets. 0 findings.
+tsc 0
+lint 0
+verify 0
+contracts 0
+bank before the runs:
+student_eligible_items 0
+assessment_items 0
+routes 0
+== production build: early input, calendar save, hydration  [01:39:14]
+prod-input exit 0
+  28 passed (8.8m)
+== full suite, dev server with fixture bank  [01:48:11]
+suite exit 1
+  -   81 [desktop] › tests/e2e/lifecycle/phase6-forecast.spec.ts:162:1 › forecast · a failed catch-up read is said to have failed, never shown as nothing owed
+  -   82 [desktop] › tests/e2e/lifecycle/phase6-home.spec.ts:29:1 › Home: one next action, report partial minutes, reload, defer, undo, stale tab
+  ✘   94 [desktop] › tests/e2e/lifecycle/phase7c-retake.spec.ts:8:1 › review a new sitting, cancel, refuse a stale date and resume the saved plan (0ms)
+  -  191 [mobile-390] › tests/e2e/lifecycle/phase6-forecast.spec.ts:162:1 › forecast · a failed catch-up read is said to have failed, never shown as nothing owed
+  -  192 [mobile-390] › tests/e2e/lifecycle/phase6-home.spec.ts:29:1 › Home: one next action, report partial minutes, reload, defer, undo, stale tab
+  ✘  196 [mobile-390] › tests/e2e/lifecycle/phase6-hydration.spec.ts:65:1 › hydration · a Calendar disclosure opened while the page is still loading stays open and raises no mismatch (7.8s)
+  2 failed
+  4 skipped
+  214 passed (37.3m)
+== fault proxy and provider stub  [02:25:39]
+faults exit 0
+  30 passed (4.9m)
+faultread exit 0
+  2 passed (7.6s)
+== production build behind the proxy  [02:30:53]
+proxy build 0
+prodproxy exit 0
+  34 passed (1.1m)
+== fixture-key build: turnstile retry  [02:32:14]
+turnstile build 0
+turnstile exit 0
+  4 passed (5.5s)
+bank after the runs:
+student_eligible_items 0
+assessment_items 0
+== end, source {"short":"a697958d23db9ebf","files":1055}  [02:32:33]
+listeners:        0
+hydration captures:        0

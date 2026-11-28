@@ -37,19 +37,18 @@ export default async function ReadingPage({ params, searchParams }: { params: Pr
   const r = await getReading(subject, readingId)
   if (!r) notFound()
   // Only the section being shown reads its own data: the rich editor and the deck are not mounted (or fetched) until chosen.
-  const noteRead = tab === 'notes' ? await supabase.from('curriculum_notes').select('doc, revision').eq('scope_type', 'reading').eq('scope_id', readingId).maybeSingle() : null
-  const note = noteRead?.data, noteError = noteRead?.error
-  const [noteCount, cardCount] = await Promise.all([
-    supabase.from('curriculum_notes').select('scope_id', { count: 'exact', head: true }).eq('scope_type', 'reading').eq('scope_id', readingId),
-    supabase.from('flashcards').select('id', { count: 'exact', head: true }).eq('scope_type', 'reading').eq('scope_id', readingId),
+  const [noteRead, overview, capability, tracker, covRead, resultCtx] = await Promise.all([
+    tab === 'notes' ? supabase.from('curriculum_notes').select('doc, revision').eq('scope_type', 'reading').eq('scope_id', readingId).maybeSingle() : null,
+    tab === 'work' ? getRevisionOverview(user.id).catch(() => null) : null,
+    tab === 'work' ? readingCheckCapability(user.id, readingId).catch(() => null) : null,
+    tab === 'work' ? getLosTracker(user.id) : null,
+    tab === 'work' ? supabase.from('user_module_state').select('coverage_state, source').eq('lm_id', readingId).maybeSingle() : null,
+    // Result context is only shown after checking ownership.
+    resultParam && /^[0-9a-f-]{36}$/i.test(resultParam)
+      ? supabase.from('assessment_attempts').select('id, status').eq('id', resultParam).eq('user_id', user.id).maybeSingle() : null,
   ])
-  const [overview, capability] = await Promise.all([getRevisionOverview(user.id).catch(() => null), readingCheckCapability(user.id, readingId).catch(() => null)])
-  const tracker = await getLosTracker(user.id)
-  const covRead = tab === 'work' ? await supabase.from('user_module_state').select('coverage_state, source').eq('lm_id', readingId).maybeSingle() : null
-  // Optional context from a result: shown only if that attempt is THIS student's (own-row read). Nothing is opened, scored or changed by it.
-  const resultCtx = resultParam && /^[0-9a-f-]{36}$/i.test(resultParam)
-    ? await supabase.from('assessment_attempts').select('id, status').eq('id', resultParam).eq('user_id', user.id).maybeSingle() : null
-  const readingStatus = tracker.topics.find(t => t.id === subject)?.modules.find(m => m.id === readingId)
+  const note = noteRead?.data, noteError = noteRead?.error
+  const readingStatus = tracker?.topics.find(t => t.id === subject)?.modules.find(m => m.id === readingId)
   // ?los=<id> opens/highlights ONE outcome of THIS reading. An id that is not one of its outcomes selects nothing and says so.
   const selectedLos = los && r.modules.some(m => m.outcomes.some(o => o.id === los)) ? los : null
   const rowByOutcome = new Map((readingStatus?.rows ?? []).map(x => [x.outcomeId, x]))
@@ -66,7 +65,7 @@ export default async function ReadingPage({ params, searchParams }: { params: Pr
           <p className="eyebrow">Reading {r.readingNo} · {r.subject.name}</p>
           <h1>{r.title}</h1>
           {r.summary && <p className="reading-summary">{r.summary}</p>}
-          {r.relevance && <details className="reading-why"><summary>Why it matters</summary><p className="relevance">{r.relevance}</p></details>}
+          {r.relevance && <details suppressHydrationWarning className="reading-why"><summary>Why it matters</summary><p className="relevance">{r.relevance}</p></details>}
           <ul className="reading-stats" aria-label="This reading">
             <li><strong>{r.outcomeCount}</strong> outcomes</li><li><strong>{r.modules.length}</strong> module{r.modules.length === 1 ? '' : 's'}</li><li><strong>{r.pageCount}</strong> pages</li>
           </ul>
@@ -83,7 +82,7 @@ export default async function ReadingPage({ params, searchParams }: { params: Pr
         : <p className="note" role="status">That result is not available to you, so nothing was linked.</p>)}
       {tab !== 'work' && selectedLos && <p className="note" role="status">About outcome: {r.modules.flatMap(m => m.outcomes).find(o => o.id === selectedLos)?.title}. <Link href={`/app/curriculum/${r.subject.id}/${r.id}?los=${selectedLos}#los-${selectedLos}`}>Show it in the reading</Link></p>}
       <nav className="reading-tabs" aria-label="Reading sections">
-        {([['work', 'Work'], ['notes', noteCount.error ? 'Notes' : `Notes${(noteCount.count ?? 0) > 0 ? ' (saved)' : ''}`], ['cards', cardCount.error ? 'Cards' : `Cards (${cardCount.count ?? 0})`]] as const).map(([k, l]) => (
+        {([['work', 'Work'], ['notes', 'Notes'], ['cards', 'Cards']] as const).map(([k, l]) => (
           <Link key={k} href={`/app/curriculum/${r.subject.id}/${r.id}?${new URLSearchParams({ ...(k !== 'work' ? { tab: k } : {}), ...(selectedLos ? { los: selectedLos } : {}), ...(resultCtx?.data ? { result: resultCtx.data.id } : {}), ...(back ? { return: back } : {}) })}`} aria-current={tab === k ? 'page' : undefined}>{l}</Link>
         ))}
       </nav>
@@ -124,7 +123,7 @@ export default async function ReadingPage({ params, searchParams }: { params: Pr
       {tab === 'work' && (r.structurePending ? (
         <p className="note">The outcome structure for this subject is still being defined.</p>
       ) : (
-        <details open={Boolean(selectedLos)} className="reading-outcomes">
+        <details suppressHydrationWarning open={Boolean(selectedLos)} className="reading-outcomes">
           <summary><h2 id="outcomes-h" style={{ display: 'inline' }}>Modules and learning outcomes</h2> <span className="muted">({r.outcomeCount})</span></summary>
           {r.modules.map(m => (
             <div key={m.id} className="reading-module">
@@ -139,7 +138,7 @@ export default async function ReadingPage({ params, searchParams }: { params: Pr
                         return (
                           <>
                           <span className={`outcome-chip outcome-chip--${row.band}`}>{BAND[row.band]}</span>
-                          <details className="outcome-more">
+                          <details suppressHydrationWarning className="outcome-more">
                             <summary>Details and your mark</summary>
                             <p className="outcome-status">
                               {row.progress !== 'not_started' ? PROGRESS[row.progress] : 'Not started'}
@@ -148,7 +147,7 @@ export default async function ReadingPage({ params, searchParams }: { params: Pr
                               {row.markCheck !== 'unmarked' && ` · ${CHECK_LABEL[row.markCheck]}`}
                               {row.needsRevision && ' · revision list'}
                             </p>
-                          {row.classReports && row.classReports.length > 0 && <details>
+                          {row.classReports && row.classReports.length > 0 && <details suppressHydrationWarning>
                             <summary>Class reports ({row.classReports.length})</summary>
                             <ul>{row.classReports.map(report => <li key={report.sessionId}>
                               <Link href={classLogHref({ sessionId: report.sessionId })}>{report.label} on {report.date}</Link> · {report.extent === 'full' ? 'Whole outcome' : 'Partly covered'}

@@ -97,8 +97,21 @@ console.log('\n4. Several covered subjects rotate over successive cycles, and hi
   const firstThree = new Set(seenByWeek.slice(0, 3).flat())
   check('twelve readings, four per week: three weeks reach every reading once', firstThree.size === 12, `${firstThree.size}`)
   check('a reading completed last week is not chosen again the following week', seenByWeek.slice(1).every((ids, i) => ids.every(id => !seenByWeek[i].includes(id))))
-  check('weeks four to six begin the second round rather than going empty', seenByWeek.slice(3).every(ids => ids.length === 4))
+  check('week four rests while the last round is still recent; rotation resumes when it is due', seenByWeek[3].length === 0 && seenByWeek.slice(4).every(ids => ids.length === 4))
   check('every subject appears in every week of the first three (no subject is starved)', seenByWeek.slice(0, 3).every(ids => new Set(ids.map(i => `t${i[1]}`)).size >= 2))
+}
+
+{
+  const narrow = reading('chapter-one', 'fsa', {
+    outcomeActivity: [day(-24), day(-10)],
+    outcomeEvidence: [{ band: 'verify', checkedAt: day(-24) }, null],
+    evidence: { repair: 0, verify: 1, maintain: 0, untested: 1, latestAt: day(-24) },
+  })
+  check('an older narrow check can prompt recall before routine first-pass spacing', select([narrow]).selected[0]?.readingId === narrow.id)
+  const recalled = { ...narrow, outcomeActivity: [day(-1), day(-1)] }
+  const rest = select([recalled])
+  check('subsequent recall postpones the next session without refreshing the check', rest.selected.length === 0
+    && rest.waiting[0]?.reasons.some(reason => reason.includes('earlier check is now old')))
 }
 
 console.log('\n5. Missed and partial work')
@@ -201,6 +214,19 @@ console.log('\n9. Phase, checkpoint and limits')
   check('everything not chosen is listed as waiting with a reason', waiting.waiting.length === 9 && waiting.waiting.every(w => !!w.waitingReason))
   const noEvidence = select(library(), 0, 3)
   check('readings with no reviewed questions are still selected (diagnostic coverage is a separate matter)', noEvidence.selected.length === 3 && noEvidence.selected.every(e => e.evidenceNote === 'No reviewed-question evidence yet, so revision is guided by activity only'))
+}
+
+console.log('\n9. Weakness-only bridge after first pass')
+{
+  const lib = library((id) => id === 'r01' ? { evidence: { repair: 0, verify: 2, maintain: 0, untested: 2, latestAt: null } } : id === 'r12' ? { uncertainty: { level: 'several', assumed: false } as RevisionReading['uncertainty'] } : {})
+  const b = selectRevision({ readings: lib, phase: 'consolidation', now: NOW, weekStart: weekStart(0), limit: 8, bridge: true })
+  check('only the tested weakness and the self-reported reading are chosen', b.selected.map(e => e.readingId).sort().join() === 'r01,r12', b.selected.map(e => e.readingId).join())
+  check('the rest are held for broader revision and not called weaknesses', b.bridge?.held === 10 && b.elsewhere.filter(e => /Held for broader revision/.test(e.waitingReason ?? '')).length === 10)
+  check('the bridge reports tested and self-reported reasons separately', b.bridge?.tested === 1 && b.bridge?.selfReported === 1)
+  const none = selectRevision({ readings: library(), phase: 'consolidation', now: NOW, weekStart: weekStart(0), limit: 8, bridge: true })
+  check('with no tested or reported reason nothing is invented: the week keeps its room', none.selected.length === 0 && none.bridge?.justified === 0 && none.bridge?.held === 12)
+  const broad = selectRevision({ readings: library(), phase: 'revision', now: NOW, weekStart: weekStart(0), limit: 3 })
+  check('outside the bridge routine rotation still applies', broad.selected.length === 3 && broad.bridge === undefined)
 }
 
 console.log(`\n${passed} passed, ${failed} failed`)

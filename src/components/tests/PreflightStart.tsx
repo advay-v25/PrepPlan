@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import type { AssessmentDecision } from '../../lib/tests/assessmentDecision'
 import { StartButton } from './StartButton'
@@ -12,29 +12,38 @@ type Phase = { kind: 'idle' } | { kind: 'loading' } | { kind: 'ready'; decision:
  * the only thing that creates a paper is the explicit Start button, which re-checks everything on the server. The selection stays
  * on screen whatever the outcome, so a refusal never costs the student their choice.
  */
-export function PreflightStart({ body, reviewLabel = 'Review and start', startLabel = 'Start', className = 'primary-button', disabled }: {
-  body: Record<string, unknown>; reviewLabel?: string; startLabel?: string; className?: string; disabled?: boolean
+export function PreflightStart({ body, reviewLabel = 'Review and start', startLabel = 'Start', resumeLabel = 'Resume your paper', className = 'primary-button', disabled, checkOnOpen = false }: {
+  body: Record<string, unknown>; reviewLabel?: string; startLabel?: string; resumeLabel?: string; className?: string; disabled?: boolean; checkOnOpen?: boolean
 }) {
-  const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
-  async function review() {
+  const [phase, setPhase] = useState<Phase>({ kind: checkOnOpen ? 'loading' : 'idle' })
+  const payload = JSON.stringify(body)
+  const review = useCallback(async (signal?: AbortSignal) => {
     setPhase({ kind: 'loading' })
     try {
-      const res = await fetch('/api/tests/preflight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      const res = await fetch('/api/tests/preflight', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, signal })
       const data = await res.json()
+      if (signal?.aborted) return
       if (data.ok) setPhase({ kind: 'ready', decision: data.decision as AssessmentDecision })
       else setPhase({ kind: 'error', message: data.error ?? 'Could not check this paper.' })
     } catch {
-      setPhase({ kind: 'error', message: 'Connection lost. Nothing was started. Try again.' })
+      if (!signal?.aborted) setPhase({ kind: 'error', message: 'Connection lost. Nothing was started. Try again.' })
     }
-  }
+  }, [payload])
+  useEffect(() => {
+    if (!checkOnOpen) return
+    const controller = new AbortController()
+    // The first Strict Mode pass cleans up before sending an unused preview.
+    queueMicrotask(() => { if (!controller.signal.aborted) void review(controller.signal) })
+    return () => controller.abort()
+  }, [checkOnOpen, review])
   const d = phase.kind === 'ready' ? phase.decision : null
   return (
     <div className="preflight" data-preflight={phase.kind}>
-      <button type="button" className={className} disabled={disabled || phase.kind === 'loading'} aria-expanded={phase.kind === 'ready'} onClick={review}>
+      <button type="button" className={className} disabled={disabled || phase.kind === 'loading'} aria-expanded={phase.kind === 'ready'} onClick={() => void review()}>
         {phase.kind === 'loading' ? 'Checking…' : phase.kind === 'ready' ? 'Check again' : reviewLabel}
       </button>
       {phase.kind === 'error' && (
-        <p role="alert" className="review-error">{phase.message} <button type="button" className="text-button" onClick={review}>Retry</button></p>
+        <p role="alert" className="review-error">{phase.message} <button type="button" className="text-button" onClick={() => void review()}>Retry</button></p>
       )}
       {d && (
         <div className="preflight__result" role="status" aria-live="polite">
@@ -59,10 +68,20 @@ export function PreflightStart({ body, reviewLabel = 'Review and start', startLa
               <StartButton label={startLabel} body={{ ...body, ...(d.difficulty ? { expectedDecision: d.difficulty.evidenceRevision } : {}) }} />
             </>
           )}
-          {d.state === 'resume' && d.attemptId && <p><Link className="primary-button" href={`/app/tests/${d.attemptId}`}>Resume your paper</Link></p>}
+          {d.state === 'resume' && d.attemptId && <p><Link className="primary-button" href={`/app/tests/${d.attemptId}`}>{resumeLabel}</Link></p>}
           {d.state !== 'start' && d.state !== 'resume' && (
             <>
-              <p>{d.message ?? 'This cannot start right now.'}</p>
+              {(() => {
+                // A bank shortfall names every short reading in one long sentence. The sentence that matters (why nothing starts, and that the scope stays pending) leads;
+                // the per-reading list stays one tap away with its exact wording. Any other message is shown whole.
+                const m = d.state === 'insufficient' ? (d.message ?? '').match(/^([\s\S]*? are needed\.)\s*Short:\s*([\s\S]*?)\.\s*(Nothing will be started[\s\S]*)$/) : null
+                return m ? (
+                  <>
+                    <p>{m[1]} {m[3]}</p>
+                    <details className="quiet-disclosure"><summary>Which readings are short</summary><p>Short: {m[2]}.</p></details>
+                  </>
+                ) : <p>{d.message ?? 'This cannot start right now.'}</p>
+              })()}
               {d.reasons.length > 0 && <ul>{d.reasons.slice(0, 3).map((r, i) => <li key={i}>{r}</li>)}</ul>}
               {d.next && <p><Link className="secondary-button" href={d.next.href}>{d.next.label}</Link></p>}
             </>

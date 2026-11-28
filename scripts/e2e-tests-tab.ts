@@ -138,6 +138,10 @@ async function main() {
       !('keyIndex' in item) && !('perOptionFeedback' in item) && !('item_card' in item),
       Object.keys(item).join(',')
     )
+    if (i === 0) {
+      const incomplete = await postJson(`/api/diagnostic/attempt/${attemptId}/response`, { itemId: item.id, selectedOptionIndex: 0 })
+      check('a legacy answer also requires confidence', incomplete.status === 400 && incomplete.body?.code === 'confidence_required')
+    }
 
     const res = await postJson(`/api/diagnostic/attempt/${attemptId}/response`, {
       itemId: item.id,
@@ -155,6 +159,7 @@ async function main() {
   const relock = await postJson(`/api/diagnostic/attempt/${attemptId}/response`, {
     itemId: answeredIds[0],
     selectedOptionIndex: 2,
+    confidence: 'medium',
   })
   check('re-answering locks instead of overwriting', relock.body?.locked === true, JSON.stringify(relock.body))
 
@@ -191,7 +196,7 @@ async function main() {
 
   console.log('\nGuard rails')
   const badOption = await postJson(`/api/diagnostic/attempt/${attemptId}/response`, {
-    itemId: answeredIds[0], selectedOptionIndex: 99,
+    itemId: answeredIds[0], selectedOptionIndex: 99, confidence: 'medium',
   })
   check('an out-of-range option is refused', badOption.status === 409 || badOption.status === 400, `status ${badOption.status}`)
 
@@ -204,7 +209,7 @@ async function main() {
   check('a challenge with no reason is refused', emptyChallenge.status === 400, `status ${emptyChallenge.status}`)
 
   const foreignItem = await postJson(`/api/diagnostic/attempt/${attemptId}/response`, {
-    itemId: 'q-does-not-exist', selectedOptionIndex: 0,
+    itemId: 'q-does-not-exist', selectedOptionIndex: 0, confidence: 'medium',
   })
   check('an item not on the form is refused', foreignItem.status === 400 || foreignItem.status === 409, `status ${foreignItem.status}`)
 

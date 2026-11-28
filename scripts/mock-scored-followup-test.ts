@@ -22,7 +22,7 @@ import { addDays, todayInZone } from '../src/lib/planning/studyWeek'
 import { saveReport, getReport } from '../src/lib/mocks/reportService'
 import { previewRecovery, acceptRecovery, loadItemStates } from '../src/lib/mocks/recovery'
 
-const TARGET = 'asylsxszdhlnzewhwtga', READING = 'r028'
+const TARGET = 'mnlezctdqkdfgvmipmcj', READING = 'r028'
 const db = createAdminClient(), { check, finish } = makeCheck()
 const owned: string[] = []
 let bankFile: string | null = null, bank: { items: string[]; families: string[] } | null = null

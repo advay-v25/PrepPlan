@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
 import { createStudent, FRESH_STUDENT_ONBOARDING } from '../../../scripts/lib/e2eSession'
-import { admin, destroyBank, login, makeBank, noHorizontalOverflow, TARGET } from './helpers'
+import { admin, destroyBank, login, makeBank, noHorizontalOverflow, TARGET_HOST } from './helpers'
 
 test('a failed paper load can retry the same reserved paper', async ({ page, baseURL }) => {
-  expect(new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname).toBe(`${TARGET}.supabase.co`)
+  expect(new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname).toBe(TARGET_HOST)
   expect(['localhost', '127.0.0.1']).toContain(new URL(baseURL!).hostname)
   const db = admin()
   const student = await createStudent(db, 'auditpaper', { onboard: true, onboarding: FRESH_STUDENT_ONBOARDING })

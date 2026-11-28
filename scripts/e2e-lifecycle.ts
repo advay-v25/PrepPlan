@@ -26,7 +26,7 @@ import { acquireBankLock, releaseBankLock } from './lib/bankLock'
 import { createStudent, preflightServer, FRESH_STUDENT_ONBOARDING, classLedPersona, type OnboardingOptions } from './lib/e2eSession'
 import { calendarTaskHref } from '../src/lib/routing/calendar'
 
-const TARGET = 'asylsxszdhlnzewhwtga'
+const TARGET = 'mnlezctdqkdfgvmipmcj'
 const arg = (k: string, d: string) => (process.argv.find(a => a.startsWith(`--${k}=`)) ?? '').split('=')[1] ?? d
 const SCENARIO = arg('scenario', 'all'), BANK = arg('bank', 'actual'), INJECT = arg('inject', '')
 // Invalid arguments fail BEFORE any remote mutation.

@@ -84,7 +84,32 @@ export function CoachClient({ initialDraft = '', initialMessages = [], attemptId
   }
 
   return (
-    <>
+    <div className="coach-client">
+      {/* The composer comes first in the DOM so a keyboard user reaches it in a few Tab presses instead of passing every message's links and buttons (139 stops with a
+          real history); CSS `order` keeps the familiar look: conversation above, composer below. */}
+      <div className="coach-composer-group">
+      <div className="coach-suggestions coach-suggestions--page">
+        {pick(Boolean(attemptId)).map(q => (
+          <button type="button" onClick={() => void send(q.text, q.intent)} disabled={loading} key={q.intent}>{q.label}</button>
+        ))}
+      </div>
+
+      <div className="glass-input-pill">
+        <textarea
+          value={draft}
+          onChange={event => setDraft(event.target.value)}
+          onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) { event.preventDefault(); void send() } }}
+          aria-label="Ask the coach"
+          maxLength={1500}
+          placeholder="Ask why you missed a topic, what to study next, or how to recover this week"
+          disabled={loading}
+        />
+        <button type="button" onClick={() => void send()} disabled={loading || !draft.trim()}><Send size={16} aria-hidden /> Send</button>
+      </div>
+      <p style={{ textAlign: 'center', fontSize: '0.8rem', opacity: 0.7, marginTop: 16 }}>
+        Suggestions change nothing until you confirm them. {messages.length > 0 && <button type="button" className="text-button" onClick={() => void clear()}>Clear conversation</button>}
+      </p>
+      </div>
       <div className="coach-thread" aria-live="polite">
         {messages.length === 0 && (
           <p className="text-secondary">I help with how and when to study: your plan, your progress and recovery. Ask what to work on, why something keeps going wrong, or how to recover from a bad day. I plan from your evidence; I do not teach the content.</p>
@@ -135,28 +160,6 @@ export function CoachClient({ initialDraft = '', initialMessages = [], attemptId
         {recoveryUrl && <Link href={recoveryUrl} className="secondary-button">{recoveryUrl.startsWith('/app/calendar') ? 'Open it in Calendar' : 'Review current follow-up'}</Link>}
         {notice && <div role="status" className="text-secondary">{notice}{placedHref && <> <Link href={placedHref} className="text-button">Open it in Calendar</Link></>}</div>}
       </div>
-
-      <div className="coach-suggestions coach-suggestions--page">
-        {pick(Boolean(attemptId)).map(q => (
-          <button type="button" onClick={() => void send(q.text, q.intent)} disabled={loading} key={q.intent}>{q.label}</button>
-        ))}
-      </div>
-
-      <div className="glass-input-pill">
-        <textarea
-          value={draft}
-          onChange={event => setDraft(event.target.value)}
-          onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) { event.preventDefault(); void send() } }}
-          aria-label="Ask the coach"
-          maxLength={1500}
-          placeholder="Ask why you missed a topic, what to study next, or how to recover this week"
-          disabled={loading}
-        />
-        <button type="button" onClick={() => void send()} disabled={loading || !draft.trim()}><Send size={16} aria-hidden /> Send</button>
-      </div>
-      <p style={{ textAlign: 'center', fontSize: '0.8rem', opacity: 0.7, marginTop: 16 }}>
-        Suggestions change nothing until you confirm them. {messages.length > 0 && <button type="button" className="text-button" onClick={() => void clear()}>Clear conversation</button>}
-      </p>
-    </>
+    </div>
   )
 }

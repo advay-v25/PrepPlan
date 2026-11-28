@@ -8,7 +8,7 @@ export function GET(request: Request) {
   const type = searchParams.get('type')
   if (type === 'recovery') redirect('/forgot-password')
   if (!tokenHash || !/^[A-Za-z0-9_-]{20,256}$/.test(tokenHash) || (type !== 'signup' && type !== 'magiclink')) {
-    redirect('/auth/error?reason=invalid')
+    redirect(type === 'signup' ? '/auth/error?reason=invalid&flow=signup' : '/auth/error?reason=invalid')
   }
   const fragment = new URLSearchParams({ token_hash: tokenHash, type, next: authDestination(searchParams.get('next')) })
   redirect('/auth/verify#' + fragment.toString())

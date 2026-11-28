@@ -38,7 +38,7 @@ export async function GET(request: Request) {
   const sc = await checkScope(scopeType, scopeId); if (sc !== 'ok') { const p = scopeProblem(sc); return NextResponse.json(p.body, { status: p.status }) }
   const filter = url.searchParams.get('filter'), q = (url.searchParams.get('q') ?? '').trim().slice(0, 100)
   let query = supabase.from('flashcards').select(CARD_COLS, { count: 'exact' }).eq('scope_type', scopeType).eq('scope_id', scopeId)
-  if (filter === 'due') query = query.lte('due_at', nowIso); else if (filter === 'later') query = query.gt('due_at', nowIso)
+  if (filter === 'due') query = query.eq('suspended', false).lte('due_at', nowIso); else if (filter === 'later') query = query.gt('due_at', nowIso)
   if (q) query = query.or(`front.ilike.%${escapeLike(q)}%,back.ilike.%${escapeLike(q)}%`)
   const [list, due, all] = await Promise.all([
     query.order('created_at').order('id').range(offset, offset + limit - 1),

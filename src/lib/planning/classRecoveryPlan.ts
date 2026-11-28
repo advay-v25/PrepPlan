@@ -1,4 +1,5 @@
 import { weekdayOf, zonedTimeToUtc } from './studyWeek'
+import { allFitWhole, subtractBusy, type Gap } from './pulse/gaps'
 
 /**
  * Pure: where existing, unfinished study tasks go after a class change made their slot unusable.
@@ -56,24 +57,32 @@ export function planClassRecovery(input: RecoveryInput): RecoveryPlan {
   const overloaded = new Set<string>() // affected only because its day lost room: it must leave that day
   for (const t of open) if (input.overlaps[t.id]) affected.set(t.id, `Overlaps ${input.overlaps[t.id]}`)
 
+  const blockers: Blocker[] = [...input.blockers]
+  for (const t of input.tasks) {
+    if (t.placement !== 'timed' || !t.startsAt || !['not_started', 'in_progress', 'partial', 'completed'].includes(t.execution)) continue
+    blockers.push({ date: t.date, start: minuteOfDay(t.startsAt, input.timezone), end: minuteOfDay(t.startsAt, input.timezone) + t.minutes })
+  }
+  const fits = (date: string, minutes: number[], extraBusy: Gap[] = []) => {
+    const free: Gap[] = []
+    for (const w of input.windows.filter(w => w.weekday === weekdayOf(date))) {
+      const start = date === input.today ? Math.max(w.start, input.earliestToday) : w.start
+      if (w.end > start) free.push(...subtractBusy([{ start, end: w.end }], free))
+    }
+    return allFitWhole(free, [...blockers.filter(b => b.date === date), ...extraBusy], minutes)
+  }
+  const remainingFits = (date: string) => fits(date, open.filter(t => t.date === date && !affected.has(t.id) && t.placement !== 'timed' && !OFF_LOAD.has(t.taskType)).map(t => t.minutes))
+
   // A day that no longer holds its load gives back its lowest-priority, latest, still-movable day-preferred work first.
   const afterMoves: Record<string, number> = { ...load }
   for (const t of open) if (affected.has(t.id) && !OFF_LOAD.has(t.taskType)) afterMoves[t.date] -= t.minutes
   for (const date of Object.keys(load).sort()) {
-    if ((afterMoves[date] ?? 0) <= (input.available[date] ?? 0)) continue
+    if ((afterMoves[date] ?? 0) <= (input.available[date] ?? 0) && remainingFits(date)) continue
     const give = open.filter(t => t.date === date && !affected.has(t.id) && !t.fixed && t.placement !== 'timed' && !OFF_LOAD.has(t.taskType) && t.execution === 'not_started')
       .sort((a, b) => (RANK[a.priority] ?? 2) - (RANK[b.priority] ?? 2) || b.minutes - a.minutes || a.id.localeCompare(b.id))
     for (const t of give) {
-      if ((afterMoves[date] ?? 0) <= (input.available[date] ?? 0)) break
+      if ((afterMoves[date] ?? 0) <= (input.available[date] ?? 0) && remainingFits(date)) break
       affected.set(t.id, 'That day no longer has enough study time'); overloaded.add(t.id); afterMoves[date] -= t.minutes
     }
-  }
-
-  const blockers: Blocker[] = [...input.blockers]
-  for (const t of input.tasks) {
-    if (t.placement !== 'timed' || !t.startsAt || !['not_started', 'in_progress', 'partial', 'completed'].includes(t.execution)) continue
-    // Where a task is now still counts, even if it is about to move: moves are applied one after another under a strict overlap check.
-    blockers.push({ date: t.date, start: minuteOfDay(t.startsAt, input.timezone), end: minuteOfDay(t.startsAt, input.timezone) + t.minutes })
   }
 
   // Declared order between sittings: where every open task is NOW, updated as proposals are made.
@@ -116,8 +125,15 @@ export function planClassRecovery(input: RecoveryInput): RecoveryPlan {
     for (const date of dates) {
       if (!OFF_LOAD.has(t.taskType) && date !== t.date && (day[date] ?? 0) + t.minutes > (input.available[date] ?? 0)) continue
       if (overloaded.has(t.id) && date === t.date) continue
-      if (t.placement !== 'timed') { if (orderOk(t, date, null)) { placed = { date, start: null }; break } continue }
-      const start = firstSlot(input, blockers.filter(b => b.date === date), date, t.minutes, s => orderOk(t, date, s))
+      if (t.placement !== 'timed') {
+        const other = open.filter(o => o.id !== t.id && o.placement !== 'timed' && !OFF_LOAD.has(o.taskType) && pos.get(o.id)?.date === date).map(o => o.minutes)
+        if (orderOk(t, date, null) && fits(date, [...other, t.minutes])) { placed = { date, start: null }; break }
+        continue
+      }
+      const flexible = open.filter(o => o.placement !== 'timed' && !OFF_LOAD.has(o.taskType) && pos.get(o.id)?.date === date).map(o => o.minutes)
+      // If the day's flexible work already cannot fit without this move, that overflow is not the timed task's doing and must not block it: it only has to not make the fit worse.
+      const alreadyFits = fits(date, flexible)
+      const start = firstSlot(input, blockers.filter(b => b.date === date), date, t.minutes, s => orderOk(t, date, s) && (!alreadyFits || fits(date, flexible, [{ start: s, end: s + t.minutes }])))
       if (start !== null) { placed = { date, start }; break }
     }
     const from = { date: t.date, starts_at: t.startsAt, placement: t.placement }

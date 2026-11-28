@@ -17,7 +17,8 @@ type Spec = { table: string; where: string; ts?: string[]; date?: string[]; extr
 const SPECS: Spec[] = [
   { table: 'planning_cycles', where: 'user_id = $1', ts: ['starts_at', 'ends_at', 'created_at'], date: ['starts_at_local', 'ends_at_local'] },
   { table: 'plan_blocks', where: 'user_id = $1', ts: ['starts_at', 'cancelled_at'], date: ['local_date'], extra: "day = case when local_date is null then day else (local_date - $2::int)::text end" },
-  { table: 'task_events', where: 'user_id = $1', ts: ['created_at'] },
+  { table: 'task_events', where: 'user_id = $1', ts: ['created_at'],
+    extra: "payload = case when payload->>'kind' = 'learning_log' and payload->>'local_date' is not null then jsonb_set(payload, '{local_date}', to_jsonb((payload->>'local_date')::date - $2::int)) else payload end" },
   { table: 'evidence_events', where: 'user_id = $1', ts: ['created_at'] },
   { table: 'assessment_attempts', where: 'user_id = $1', ts: ['started_at', 'completed_at', 'submitted_at', 'deadline_at', 'result_viewed_at'] },
   { table: 'assessment_responses', where: 'user_id = $1', ts: ['created_at', 'answered_at'] },
@@ -31,6 +32,7 @@ const SPECS: Spec[] = [
   { table: 'paper_scope_snapshots', where: 'user_id = $1', ts: ['created_at'] },
   { table: 'learning_activities', where: 'user_id = $1', ts: ['created_at'] },
   { table: 'learning_log_commands', where: 'user_id = $1', ts: ['created_at'] },
+  { table: 'planned_log_commands', where: 'user_id = $1', ts: ['created_at'] },
   { table: 'block_scope_confirmations', where: 'user_id = $1', ts: ['created_at'] },
   { table: 'task_execution_commands', where: 'user_id = $1', ts: ['created_at'] },
   // Class-led journeys: taught occurrences, recurrence bounds and exceptions move with the cycles so "which class was in which week" is preserved.

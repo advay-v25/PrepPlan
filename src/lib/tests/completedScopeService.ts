@@ -4,18 +4,21 @@ import { getStudyActivity } from '../curriculum/studyActivityService'
 import { readAll } from '../supabase/readAll'
 import { buildCompletedScope, type BlockRow, type ClassItemRow, type CompletedCycleScope, type OutcomeRef, type ReadingRef } from './completedScope'
 import { perRequest, minuteOf } from '../ops/perRequest'
-import { profileTimezone, conceptOutcomeMap } from '../ops/sharedReads'
+import { profileTimezone, conceptOutcomeMap, activeCycleRow } from '../ops/sharedReads'
+import { ownedBlocks } from '../ops/sharedReads'
+import { refRows } from '../ops/refCache'
+import { allOutcomes } from '../curriculum/referenceReads'
 
 /** Loads the rows and builds the canonical scope. Read-only, scoped to the user. */
 async function getCompletedCycleScopeUncached(userId: string, now = new Date()): Promise<CompletedCycleScope> {
   const admin = createAdminClient()
   const [{ data: cycle }, { data: profile }] = await Promise.all([
-    admin.from('planning_cycles').select('id, starts_at, starts_at_local, ends_at_local, timezone').eq('user_id', userId).eq('status', 'active').maybeSingle().throwOnError(),
+    activeCycleRow(userId).then(data => ({ data })),
     profileTimezone(userId).then(tz => ({ data: tz ? { timezone: tz } : null })),
   ])
   const [{ data: readingRows }, { data: outcomeRows }] = await Promise.all([
-    admin.from('curriculum_readings').select('id, topic_id, reading_no, title, page_count, structure_pending').eq('is_active', true).throwOnError(),
-    readAll<any>((a, z) => admin.from('reading_los').select('id, reading_id, code, title').order('id').range(a, z)).then(data => ({ data })),
+    refRows('scope.readings', () => admin.from('curriculum_readings').select('id, topic_id, reading_no, title, page_count, structure_pending').eq('is_active', true)).then(r => { if (r.error) throw r.error; return r }),
+    allOutcomes().then(data => ({ data })),
   ])
   const readings = new Map<string, ReadingRef>((readingRows ?? []).map(r => [r.id as string, {
     id: r.id as string, subjectId: r.topic_id as string, readingNo: r.reading_no as number, title: r.title as string,
@@ -40,8 +43,7 @@ async function getCompletedCycleScopeUncached(userId: string, now = new Date()):
     readAll<any>((a, z) => admin.from('user_module_state').select('lm_id, coverage_state').eq('user_id', userId).in('coverage_state', ['studied', 'verified', 'decaying']).order('lm_id').range(a, z)),
   ])
   // Class provenance follows the task's own lineage (split sittings copy it; a weekly continuation resets class_session_id but keeps continued_from_task_id).
-  const lineage = await readAll<{ id: string; class_session_id: string | null; continued_from_task_id: string | null }>((a, z) =>
-    admin.from('plan_blocks').select('id, class_session_id, continued_from_task_id').eq('user_id', userId).or('class_session_id.not.is.null,continued_from_task_id.not.is.null').order('id').range(a, z))
+  const lineage = (await ownedBlocks(userId)).filter(b => b.class_session_id || b.continued_from_task_id)   // the full history getStudyActivity reads in this same call
   const lineageById = new Map(lineage.map(l => [l.id, l]))
   const classBlockSessions = new Map<string, string>()
   for (const l of lineage) {

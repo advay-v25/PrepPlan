@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { ExamStatus } from '../../lib/exam/status'
@@ -19,12 +19,16 @@ export function ExamPanel({ status }: { status: ExamStatus }) {
   const [result, setResult] = useState(status.followUp?.reportedResult ?? '')
   const [note, setNote] = useState(status.followUp?.retakeNote ?? '')
   const [preview, setPreview] = useState<RetakePreview | null>(null)
+  // A write returns the fresh version at once; the refreshed props can arrive later, so a quick second action must not send the old one.
+  const latest = useRef(status.version)
+  if (status.version > latest.current) latest.current = status.version
 
   async function send(label: string, body: Record<string, unknown>, done: string) {
     setBusy(label); setErr(null); setMsg(null)
     try {
-      const r = await (await fetch('/api/exam', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ version: status.version, ...body }) })).json()
+      const r = await (await fetch('/api/exam', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ version: latest.current, ...body }) })).json()
       if (r.ok) {
+        if (typeof r.status?.version === 'number') latest.current = Math.max(latest.current, r.status.version)
         if (r.preview) { setPreview(r.preview); return }
         if (label === 'cancel' || label === 'activate') setPreview(null)
         setMsg(r.statusUnavailable ? `${done} Reload to see your current exam status.` : done)

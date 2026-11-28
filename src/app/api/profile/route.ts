@@ -3,8 +3,10 @@ import { z } from 'zod'
 import { createClient } from '../../../lib/supabase/server'
 import { createAdminClient } from '../../../lib/supabase/admin'
 import { requireApplicationAccess } from '../../../lib/auth/applicationAccess'
+import { NAME_ERROR, normalizePersonName } from '../../../lib/auth/personName'
+import { JsonInputError, readBoundedJson } from '../../../lib/auth/requestSecurity'
 
-const profileSchema = z.object({ name: z.string().min(1).max(100) })
+const profileSchema = z.strictObject({ name: z.string().max(300) })
 /** Planning fields moved to the canonical, versioned onboarding editors (/api/onboarding/{exam,route,week}); this route no longer writes them. */
 const RETIRED = ['examDate', 'maxSessionMinutes', 'prepMode'] as const
 
@@ -23,16 +25,22 @@ export async function PUT(request: Request) {
   if (!access.ok) return access.response
   const userId = access.user.id
 
-  const raw = await request.json().catch(() => null) as Record<string, unknown> | null
+  let raw: unknown
+  try { raw = await readBoundedJson(request, 2048) }
+  catch (error) {
+    if (error instanceof JsonInputError) return NextResponse.json({ error: error.message }, { status: error.status })
+    return NextResponse.json({ error: 'Enter a valid name.' }, { status: 400 })
+  }
   const retired = raw && typeof raw === 'object' ? RETIRED.filter(k => k in raw) : []
   if (retired.length) return NextResponse.json({ ok: false, code: 'RETIRED_FIELD', fields: retired, error: 'This route only changes your name. Change your exam, route or study time in Settings; those edits are checked against your latest setup. Nothing was changed.' }, { status: 400 })
   const parsed = profileSchema.safeParse(raw)
-  if (!parsed.success) return NextResponse.json({ error: 'Invalid profile data.' }, { status: 400 })
+  const name = parsed.success ? normalizePersonName(parsed.data.name) : null
+  if (name === null) return NextResponse.json({ error: NAME_ERROR, code: 'INVALID_NAME' }, { status: 400 })
   // A name-only patch touches nothing that affects planning (update_planning_profile does not move the setup version for it).
-  const { error } = await createAdminClient().rpc('update_planning_profile', { p_user: userId, p_patch: { display_name: parsed.data.name } })
+  const { error } = await createAdminClient().rpc('update_planning_profile', { p_user: userId, p_patch: { display_name: name } })
   if (error) {
-    console.error('Profile update error:', error)
-    return NextResponse.json({ error: 'Failed to update profile. Nothing was changed.' }, { status: 500 })
+    console.error('Profile update error:', error.code)
+    return NextResponse.json({ error: 'Could not confirm the name change. Try again.' }, { status: 500 })
   }
   return NextResponse.json({ ok: true })
 }

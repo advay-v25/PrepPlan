@@ -1,0 +1,39 @@
+{
+  "schema": "c10-human-review-package.1",
+  "generatedAt": "2026-11-25T17:04:00+05:30",
+  "queues": {
+    "rights": {
+      "status": "human_review_pending",
+      "sourcesCount": 16,
+      "packsCount": 343,
+      "currentState": "unconfirmed",
+      "artifact": "output/question-bank/2027/source-intake.json"
+    },
+    "sourceAndOcrQa": {
+      "status": "human_review_pending",
+      "schweserFormulaSuspectPages": 48,
+      "weakMachineAnchorItems": 23,
+      "errataStatus": "external_errata_not_checked_offline",
+      "artifacts": ["output/question-bank/2027/c1-extraction-qa.json", "output/question-bank/2027/c3-support-matrix.json"]
+    },
+    "curriculumScope": {
+      "status": "human_review_pending",
+      "readings": 102,
+      "outcomes": 343,
+      "decomposedConcepts": 378,
+      "prerequisiteLinks": 82,
+      "artifact": "output/question-bank/2027/c2-curriculum-manifest.json"
+    },
+    "itemReview": {
+      "status": "human_review_pending",
+      "totalDrafts": 1220,
+      "routineDrafts": 1040,
+      "heldOutMockDrafts": 180,
+      "evaluationGoldCandidates": 4,
+      "evaluationNegativeExamples": 6,
+      "humanApprovals": 0,
+      "confirmedIndependentFamilies": 0,
+      "artifacts": ["output/question-bank/2027/review.html", "output/question-bank/2027/draft-bank.json", "output/question-bank/2027/c8-evaluation-pack.json"]
+    }
+  }
+}

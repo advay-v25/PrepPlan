@@ -9,7 +9,7 @@ import { makeRecoveryIntent } from '../src/lib/auth/securityServer'
 config({ path: '.env.local', quiet: true })
 const project = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!)
 const app = new URL(E2E_BASE_URL)
-if (project.hostname !== 'asylsxszdhlnzewhwtga.supabase.co' || !['localhost', '127.0.0.1'].includes(app.hostname)
+if (project.hostname !== 'mnlezctdqkdfgvmipmcj.supabase.co' || !['localhost', '127.0.0.1'].includes(app.hostname)
   || process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
   throw new Error('Use the confirmed disposable project and a local PrepPlan server.')
 }

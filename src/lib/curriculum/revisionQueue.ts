@@ -91,6 +91,8 @@ export type Candidate = {
   /** Why it is eligible and why it ranks where it does, in plain terms. */
   reasons: string[]
   evidenceNote: string | null
+  /** Covered readings stay eligible. Only a current reason puts one up for a slot. */
+  due: boolean
 }
 
 export type QueueState = 'selected' | 'waiting' | 'in_plan' | 'repair' | 'continuing'
@@ -110,6 +112,13 @@ export type SelectInput = {
   focusTopics?: string[]
   /** Days until the one upcoming mock/checkpoint, if any. */
   daysToCheckpoint?: number | null
+  /**
+   * Weakness-only bridge: first pass is finished and broader revision has not begun. Only readings with a tested reason (outcomes that need a fresh look)
+   * or the student's own reported uncertainty (labelled as self-reported) are chosen. Nothing else is invented as a weakness; the rest is held for revision.
+   */
+  bridge?: boolean
+  /** The calendar is in mock preparation. Reserve the next draft for existing findings and flagged work. */
+  assessmentLed?: boolean
 }
 
 const DAY = 86_400_000
@@ -185,6 +194,12 @@ export function candidateFor(r: RevisionReading, input: Pick<SelectInput, 'phase
   const ev = r.evidence
   const total = ev.repair + ev.verify + ev.maintain + ev.untested
   const resting = (r.outcomeEvidence ?? []).filter(e => outcomeResting(e, input.now)).length
+  const activity = r.outcomeActivity.length ? r.outcomeActivity : [null]
+  const maintenanceDue = activity.some((at, i) =>
+    !outcomeResting(r.outcomeEvidence?.[i], input.now) && (!at || daysSinceIso(at, input.now) >= interval))
+  const agedChecks = (r.outcomeEvidence ?? []).map(e => e?.checkedAt && daysSinceIso(e.checkedAt, input.now) > A.strongEvidenceRestDays ? e.checkedAt : null)
+  const agedCheckNeedsRecall = agedChecks.some((at, i) => at && (!activity[i] || activity[i]! <= at))
+  const dueForRecall = maintenanceDue || agedCheckNeedsRecall || (targeted && targetedDue >= 1)
   // Unsteady, old or thin evidence raises priority in proportion to the outcomes it covers, not as if the whole reading were affected.
   if (ev.verify > 0 && total > 0) evidence = 0.75 * (ev.verify / total)
   const tested = ev.repair + ev.verify + ev.maintain
@@ -226,10 +241,11 @@ export function candidateFor(r: RevisionReading, input: Pick<SelectInput, 'phase
   if (input.daysToCheckpoint != null && checkpoint) reasons.push(`Your mock or checkpoint is ${input.daysToCheckpoint} day${input.daysToCheckpoint === 1 ? '' : 's'} away.`)
   if (focus) reasons.push('This subject is the roadmap’s focus for this stretch.')
   if (evidenceNote) reasons.push(evidenceNote.replace(/\.$/, '') + '.')
+  if (agedChecks.some(Boolean)) reasons.push('An earlier check is now old. It still stands for the outcomes it sampled.')
   if (declined) reasons.push('You skipped or removed this recently, so it is offered a little later.')
 
   return {
-    readingId: r.id, name: r.name, topic: r.topic, topicName: r.topicName, kind: targeted ? 'targeted' : 'maintenance', score, parts, recency, reasons, evidenceNote,
+    readingId: r.id, name: r.name, topic: r.topic, topicName: r.topicName, kind: targeted ? 'targeted' : 'maintenance', score, parts, recency, reasons, evidenceNote, due: dueForRecall,
   }
 }
 
@@ -251,6 +267,8 @@ export type Selection = {
   /** Eligible but already handled elsewhere: a live task this week, work continuing into it, or an open repair. */
   elsewhere: QueueEntry[]
   eligible: number
+  /** Present when the bridge applied: how many readings had a reason, and how many were held back for broader revision. */
+  bridge?: { justified: number; held: number; tested: number; selfReported: number }
 }
 
 /**
@@ -269,6 +287,30 @@ export function selectRevision(input: SelectInput): Selection {
     else if (r.continuing) elsewhere.push({ ...c, state: 'continuing', waitingReason: 'This is already continuing from last week, so it is not scheduled twice.' })
     else if (r.scheduled) elsewhere.push({ ...c, state: 'in_plan', waitingReason: 'A revision task for this reading is already in the week.' })
     else ranked.push({ ...c, state: 'waiting', waitingReason: null })
+  }
+  let bridge: Selection['bridge']
+  const checked = new Set(eligible.filter(r => r.evidence.verify > 0 || r.evidence.repair > 0).map(r => r.id))
+  if (input.assessmentLed) {
+    for (let i = ranked.length - 1; i >= 0; i--) {
+      const entry = ranked[i]
+      if (!checked.has(entry.readingId) && entry.kind !== 'targeted') {
+        elsewhere.push({ ...entry, waitingReason: 'This reading stays in the recall rotation. This stage focuses on findings and readings you flagged.' })
+        ranked.splice(i, 1)
+      }
+    }
+  }
+  if (input.bridge) {
+    const tested = (e: QueueEntry) => (eligible.find(r => r.id === e.readingId)?.evidence.verify ?? 0) > 0
+    const reported = (e: QueueEntry) => e.kind === 'targeted'
+    const held = ranked.filter(e => !tested(e) && !reported(e))
+    for (const e of held) elsewhere.push({ ...e, state: 'waiting', waitingReason: 'Held for broader revision: no test result and nothing you reported points here yet, so it is not treated as a weakness.' })
+    const keep = ranked.filter(e => tested(e) || reported(e))
+    ranked.length = 0; ranked.push(...keep)
+    bridge = { justified: keep.length, held: held.length, tested: keep.filter(tested).length, selfReported: keep.filter(e => !tested(e)).length }
+  }
+  const restingEntries = input.bridge ? [] : ranked.filter(e => !e.due)
+  if (!input.bridge) {
+    for (let i = ranked.length - 1; i >= 0; i--) if (!ranked[i].due) ranked.splice(i, 1)
   }
   const plannedAt = new Map(eligible.map(r => [r.id, r.history.lastPlannedAt ?? '']))
   const byRank = (a: QueueEntry, b: QueueEntry) =>
@@ -311,15 +353,21 @@ export function selectRevision(input: SelectInput): Selection {
     ordered.push(entry)
     placedBySubject.set(entry.topic, (placedBySubject.get(entry.topic) ?? 0) + 1)
   }
-  return { selected: ordered, waiting, elsewhere, eligible: eligible.length }
+  return {
+    selected: ordered,
+    waiting: [...waiting, ...restingEntries.map(e => ({ ...e, waitingReason: 'Recent activity or supporting checks give this reading time before its next recall.' }))],
+    elsewhere, eligible: eligible.length, bridge,
+  }
 }
 
 /** The compact, student-facing shape of a queue entry. */
 export type RevisionLine = {
+  state?: QueueState
   readingId: string; name: string; topic: string; topicName: string; kind: 'targeted' | 'maintenance'
   why: string[]; recency: { source: RecencySource; days: number | null; provenance: 'study_date' | 'recorded' | null }; note: string | null
 }
 export const toLine = (e: QueueEntry): RevisionLine => ({
+  state: e.state,
   readingId: e.readingId, name: e.name, topic: e.topic, topicName: e.topicName, kind: e.kind, why: e.reasons,
   recency: { source: e.recency.source, days: e.recency.days, provenance: e.recency.provenance }, note: e.waitingReason,
 })

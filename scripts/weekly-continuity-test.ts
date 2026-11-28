@@ -405,6 +405,24 @@ test('the student can choose the day; a fuller day is allowed but flagged', () =
   assert.equal(where(r, 'a').date, '2026-11-04'); assert.match(where(r, 'a').note!, /fuller/i)
 })
 
+test('review puts a whole continuation in one gap and leaves an impossible chosen date unplaced', () => {
+  const first = STUDY[0]!
+  const second = STUDY[1]!
+  const gapsByDate = { [first]: [{ start: 540, end: 570 }, { start: 660, end: 690 }], [second]: [{ start: 540, end: 590 }] }
+  const items = [item('a', { minutes: 45 }), item('b', { minutes: 30 })]
+  const proposed = place(items, { gapsByDate })
+  assert.equal(where(proposed, 'a').date, second)
+  assert.equal(where(proposed, 'b').date, first)
+  assert.deepEqual(proposed.gapsAfterContinuations?.[first], [{ start: 660, end: 690 }])
+  // A re-check is one sitting: an impossible chosen day leaves it whole and unplaced.
+  const check = place([item('a', { minutes: 45, taskType: 'recheck' })], { gapsByDate, overrides: { a: first } })
+  assert.equal(where(check, 'a').date, null)
+  assert.match(where(check, 'a').reason!, /single 45-minute opening/)
+  // Study continues across ordered sittings on the chosen day, with every owed minute kept.
+  const study = place([items[0]], { gapsByDate, overrides: { a: first } })
+  assert.deepEqual(where(study, 'a').sittings?.map(x => [x.date, x.minutes]), [[first, 30], [first, 15]])
+})
+
 test('the student can leave an item unplaced; a date outside the week is ignored', () => {
   assert.equal(where(place([item('a')], { overrides: { a: 'none' } }), 'a').date, null)
   assert.equal(where(place([item('a')], { overrides: { a: '2030-01-01' } }), 'a').date, '2026-11-02')

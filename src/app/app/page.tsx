@@ -4,6 +4,8 @@ import { Suspense } from 'react'
 import { PageLoading } from '../../components/ui/PageLoading'
 import { AdaptationLine } from '../../components/review/AdaptationLine'
 import { getCurrentAdaptation } from '../../lib/planning/weeklyReview/adaptationRecord'
+import { loadRecoveryStatus } from '../../lib/planning/recovery/service'
+import { RecoveryStatusNote } from '../../components/recovery/RecoveryStatusNote'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { CheckCircle2, MessageCircle, Map as MapIcon } from 'lucide-react'
@@ -96,6 +98,7 @@ async function HomeContent() {
   const stretch = stretchR.value, progress = progressR.value
 
   const adaptation = await getCurrentAdaptation(user.id).catch(() => null)
+  const recovery = await loadRecoveryStatus(user.id).catch(() => 'unavailable' as const)
   const name = firstName(profileRes.data?.display_name as string | null)
   const classLed = (state.roadmap?.route === 'coaching' || state.roadmap?.route === 'hybrid') && !!state.identity.classPattern && state.identity.classPattern !== 'none'
   const today = state.today.dateLocal
@@ -169,14 +172,14 @@ async function HomeContent() {
             <div className="hb hb-next">
               {state.nextAction && <NextActionCard action={state.nextAction} />}
               {stretch && (
-                <details className="home-fold" open>
+                <details suppressHydrationWarning className="home-fold" open>
                   <summary>Final stretch: what matters most now</summary>
                   <section className="home-card" aria-label="Final stretch"><FinalStretchView plan={stretch} /><p><Link href="/app/exam" className="prose-link">Exam details</Link></p></section>
                 </details>
               )}
               {stretchR.failed && <SectionFailed what="The final-stretch plan" />}
             </div>
-            <div className="hb hb-today">{ready && state.work ? <TodaySequence work={state.work} featuredId={featuredId} today={today} timezone={state.timezone} /> : <section className="home-card today"><h2>Today</h2><p className="home-card__empty">Your plan is not accepted yet, so nothing is placed for today.</p></section>}</div>
+            <div className="hb hb-today">{ready && state.work ? <TodaySequence work={state.work} featuredId={featuredId} today={today} timezone={state.timezone} quiet={state.nextAction?.code === 'honest_empty'} /> : <section className="home-card today"><h2>Today</h2><p className="home-card__empty">Your plan is not accepted yet, so nothing is placed for today.</p></section>}</div>
             <div className="hb hb-week">{weekR.failed ? <SectionFailed what="This week’s agenda" /> : week && <WeekAtAGlance week={week.ctx.week} today={today} data={week.data} accepted={ready} />}</div>
             <div className="hb hb-road">
               {roadmapR.failed || progressR.failed ? <SectionFailed what="Your roadmap" /> : roadmapResult && progress ? (
@@ -195,6 +198,7 @@ async function HomeContent() {
             <DueCardsLine />
             {signals?.movement[0] && <p className="muted"><strong>Recent</strong> · {signals.movement[0].text}</p>}
             <AdaptationLine record={adaptation} />
+            <RecoveryStatusNote status={recovery} />
           </div>
         </>
       )}

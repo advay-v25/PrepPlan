@@ -3,6 +3,7 @@ import { todayInZone } from '../planning/studyWeek'
 import { examPhase, type PhaseResult } from './finalStretch'
 import { readAll } from '../supabase/readAll'
 import { minuteOf, perRequest } from '../ops/perRequest'
+import { refRows } from '../ops/refCache'
 
 export type ExamStatus = PhaseResult & {
   examDate: string | null; today: string; satOn: string | null
@@ -18,7 +19,7 @@ async function loadExamStatusUncached(userId: string, now = new Date()): Promise
     admin.from('exam_completion').select('sat_on, reported_result, psm_status, retake_requested_at, retake_note').eq('user_id', userId).maybeSingle().throwOnError(),
   ])
   const today = todayInZone((p?.timezone as string) || 'UTC', now)
-  const { data: w } = p?.exam_window_id ? await admin.from('exam_windows').select('window_closes, is_confirmed').eq('id', p.exam_window_id as string).maybeSingle() : { data: null }
+  const { data: w } = p?.exam_window_id ? await refRows(`exam-window.status:${p.exam_window_id}`, () => admin.from('exam_windows').select('window_closes, is_confirmed').eq('id', p.exam_window_id as string).maybeSingle()) : { data: null }
   const phase = examPhase({ today, examDate: (p?.exam_date ?? null) as string | null, satOn: (c?.sat_on ?? null) as string | null, windowCloses: (w?.window_closes ?? null) as string | null, windowConfirmed: (w?.is_confirmed ?? null) as boolean | null })
   return {
     ...phase, examDate: (p?.exam_date ?? null) as string | null, today, satOn: (c?.sat_on ?? null) as string | null,

@@ -2,18 +2,13 @@
  *  pools. Uses a TEST-ONLY approved fixture bank (scripts/fixture-bank.cjs) and throwaway students; every row is removed by recorded id.
  *  npm run paper:db:test -- --confirm-target=<project-ref> */
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os'), assert = require('node:assert/strict')
-const { execFileSync } = require('node:child_process')
-const { Client } = require('pg'); const { parse } = require('dotenv')
-const { configuration } = require('./lib/migrations.cjs')
+const { Client } = require('pg')
+const { openStage } = require('./lib/stage.cjs')
 
 async function main(args = process.argv.slice(2)) {
-  const root = path.resolve(__dirname, '..'), env = parse(fs.readFileSync(path.join(root, '.env.staging.local')))
-  const cfg = configuration(['--env=staging', '--dry-run'], env)
-  if (!env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF || env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF !== cfg.identity) throw Error('Not the user-confirmed disposable project; refusing.')
-  if (!args.includes(`--confirm-target=${cfg.identity}`)) throw Error(`Pass --confirm-target=${cfg.identity}.`)
+  const stage = await openStage(args), cfg = stage.cfg
   const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'paper-fixture-')), 'bank.json')
-  const target = `--confirm-target=${cfg.identity}`
-  execFileSync('node', [path.join(__dirname, 'fixture-bank.cjs'), 'create', target, `--out=${file}`, '--readings=r028', '--per-outcome=5', '--variants=1'], { stdio: 'inherit' })
+  await stage.create(file, ['--readings=r028', '--per-outcome=5', '--variants=1'])
   const bank = JSON.parse(fs.readFileSync(file, 'utf8'))
   const mk = () => new Client({ ...cfg.connection, connectionTimeoutMillis: 45000, keepAlive: true, query_timeout: 60000 })
   const a = mk(); await a.connect(); const pool = []; let n = 0
@@ -173,10 +168,11 @@ async function main(args = process.argv.slice(2)) {
     await a.query('drop trigger if exists fx_pc_fail on public.paper_scope_snapshots').catch(() => {}); await a.query('drop function if exists public.fx_pc_fail()').catch(() => {})
     for (const c of pool) await c.end().catch(() => {})
     // Fixture rows first (the bank's destroy also removes every attempt that used its questions), then the throwaway students.
-    try { execFileSync('node', [path.join(__dirname, 'fixture-bank.cjs'), 'destroy', target, `--file=${file}`], { stdio: 'inherit' }) } catch (e) { console.error('fixture cleanup failed:', e.message) }
+    try { await stage.destroy(file) } catch (e) { console.error('fixture cleanup failed:', e.message) }
     await a.query('delete from public.assessment_attempts where user_id = any($1)', [users]).catch(e => console.error('cleanup attempts:', e.message))
     await a.query('delete from public.profiles where id = any($1)', [users]).catch(() => {}); await a.query('delete from auth.users where id = any($1)', [users]).catch(() => {})
     await a.end()
+    await stage.stop()
   }
 }
 main().catch(e => { console.error('FAILED:', e.message); process.exit(1) })

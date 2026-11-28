@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test'
-import { noHorizontalOverflow } from './helpers'
+import { captureHydration, noHorizontalOverflow } from './helpers'
 import { scopedErrors } from './scopedErrors'
+
+test.beforeEach(({ page }) => captureHydration(page))
 
 test('the public walkthrough works without an account and sends no app writes', async ({ page }) => {
   const events = scopedErrors()

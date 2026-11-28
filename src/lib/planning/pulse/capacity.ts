@@ -74,11 +74,22 @@ export async function dailyCapacityMinutes(userId: string, weekday: Weekday, dat
  */
 export async function dailyFreeRanges(userId: string, weekday: Weekday, date: string, timezone = 'UTC', notBefore?: Date): Promise<Range[]> {
   if (notBefore && date < utcToZonedParts(notBefore, timezone).date) return []
+  return freeRangesFrom(await capacityInputs(userId), weekday, date, timezone, notBefore)
+}
+
+/** The same rule for many dates with the inputs read once, wherever the caller runs (a forecast covers months, including in a route handler). */
+export async function freeRangesForDates(userId: string, dates: string[], timezone: string, notBefore?: Date): Promise<{ ranges: Record<string, Range[]>; mocks: { date: string }[] }> {
+  const inputs = await capacityInputs(userId)
+  const today = notBefore ? utcToZonedParts(notBefore, timezone).date : null
+  return { mocks: inputs.mocks.map(m => ({ date: m.planned_date })),
+    ranges: Object.fromEntries(dates.map(date => [date, today && date < today ? [] : freeRangesFrom(inputs, new Date(`${date}T12:00:00Z`).getUTCDay() as Weekday, date, timezone, notBefore)])) }
+}
+
+function freeRangesFrom(inputs: Awaited<ReturnType<typeof capacityInputs>>, weekday: Weekday, date: string, timezone: string, notBefore?: Date): Range[] {
   // The local calendar day's real UTC span, not the UTC calendar day's — a timezone offset can otherwise
   // put a genuinely same-day one-off class just outside a naive UTC-midnight window.
   const dayStart = zonedTimeToUtc(date, '00:00', timezone).toISOString()
   const dayEnd = zonedTimeToUtc(addDays(date, 1), '00:00', timezone).toISOString()
-  const inputs = await capacityInputs(userId)
   const windows = inputs.windows.filter(w => w.weekday === weekday)
   const { commitments, exceptions } = inputs
   const mockRows = inputs.mocks.filter(m => m.planned_date === date)

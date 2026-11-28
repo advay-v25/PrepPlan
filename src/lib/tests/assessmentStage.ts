@@ -30,4 +30,5 @@ export function stageFromWeeklyPrimary(p: { kind: string; blocked?: string | nul
 /** The actual reason, in one sentence, when a weekly paper cannot be built for a scope. Detail (which readings, how many questions) follows it. */
 export const PAPER_UNAVAILABLE_BANK = 'A weekly paper is unavailable for this scope because checked questions are missing.'
 export const PAPER_UNAVAILABLE_THIN = 'A weekly paper is unavailable for this scope because the work is too small to make a worthwhile paper on its own.'
+export const PAPER_UNAVAILABLE_SLOT = 'There is no single opening for the paper on your assessment day. Review your availability in Calendar.'
 export const PLAN_AVAILABILITY_HREF = '/app/calendar'

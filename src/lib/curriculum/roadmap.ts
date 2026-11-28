@@ -29,8 +29,8 @@ export const PHASE_LABEL: Record<Phase, string> = {
 }
 
 export const PHASE_PURPOSE: Record<Phase, string> = {
-  first_pass: 'Learn and verify the whole curriculum once.',
-  consolidation: 'Revisit weak links, connections between topics, and evidence that has gone stale.',
+  first_pass: 'Cover the material once and use narrow checks where available.',
+  consolidation: 'Revisit older checks, recorded weak areas and readings you flagged.',
   revision: 'Cumulative practice across topics, not one topic at a time.',
   final: 'Mocks under exam conditions, repair, and final checks. Reserved before anything else is planned.',
 }

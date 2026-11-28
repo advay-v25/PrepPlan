@@ -1,7 +1,7 @@
 'use client'
 
 import { formatStudyDate } from '../../lib/format/date'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Check, Clock, Loader2, Scissors, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -10,7 +10,7 @@ import { Dialog } from '../ui/Dialog'
 import type { useTaskMutation } from './useTaskMutation'
 import { durationLabel, entryDuration, timeRange } from './blockFace'
 import { ContinuationNotice } from './ContinuationNotice'
-import { StartButton } from '../tests/StartButton'
+import { PreflightStart } from '../tests/PreflightStart'
 import { TaskLearningScope } from './TaskLearningScope'
 import { calendarTaskHref, classLogHref } from '../../lib/routing/calendar'
 
@@ -75,6 +75,11 @@ export function TaskDetailDrawer({
   const [actual, setActual] = useState('')
   const [historyError, setHistoryError] = useState('')
   const [historyLoading, setHistoryLoading] = useState(false)
+  // The drawer is server-rendered. Until React is attached, text typed into it never reaches state and a later save would send the old value, so the
+  // controls stay disabled until then.
+  const [ready, setReady] = useState(false)
+  useEffect(() => setReady(true), [])
+  const startField = useRef<HTMLInputElement>(null)
   // The current length is always an option, so opening the drawer and pressing Apply never resizes a task.
   const durationOptions = [...new Set([15, 20, 30, 45, 60, 90, 120, 180, entry.durationMinutes])].sort((a, b) => a - b)
 
@@ -99,7 +104,12 @@ export function TaskDetailDrawer({
   const unfinishedFromToday = entry.execution !== 'completed'
 
   async function applyPlacement() {
-    const startMinutes = time ? Number(time.split(':')[0]) * 60 + Number(time.split(':')[1]) : null
+    const field = startField.current
+    // A half-typed time reads as empty; sending that would silently turn a timed choice into a day-only one.
+    if (field?.validity.badInput) { mutation.setError('Finish the start time, or clear it to keep this day-only.'); field.focus(); return }
+    // What is on screen is what gets saved.
+    const chosen = field ? field.value : time
+    const startMinutes = chosen ? Number(chosen.split(':')[0]) * 60 + Number(chosen.split(':')[1]) : null
     const ok = await mutation.call(entry.id, {
       action: 'move', date, startMinutes, durationMinutes: duration, expectedRevision: entry.revision,
     }, { undoMessage: entry.execution === 'deferred' ? 'Placed and open again' : 'Task updated' })
@@ -144,7 +154,8 @@ export function TaskDetailDrawer({
       eyebrow={<span className={`tag layer-tag layer-${entry.layer}`}>{LAYER_LABEL[entry.layer] ?? entry.layer}</span>}
       title={entry.title}
     >
-      <fieldset disabled={mutation.busy} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
+      <fieldset disabled={mutation.busy || !ready} aria-busy={!ready} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
+      {!ready && <p className="fine-print" role="status">Getting this task ready…</p>}
       {readOnly && <p className="notice" role="status">This is recorded history. Your original week and activity are kept here.</p>}
       <dl className="task-drawer__facts">
         <div>
@@ -213,6 +224,9 @@ export function TaskDetailDrawer({
                   Reopen
                 </button>
               )}
+              {!systemAssessment && !done && ['study', 'review', 'class_consolidation', 'verification'].includes(entry.taskType ?? '') && !entry.isLoggedLearning && (
+                <Link href={`/app/log?task=${encodeURIComponent(entry.id)}`} className="secondary-button">Log this session</Link>
+              )}
               {!systemAssessment && <button type="button" className="secondary-button" onClick={() => { setProgressKind('partial'); setAsking(true) }} disabled={mutation.busy || asking}>
                 <Clock size={15} aria-hidden /> Partly done
               </button>}
@@ -256,7 +270,7 @@ export function TaskDetailDrawer({
               </label>
               <label className="field">
                 <span>Start</span>
-                <input type="time" value={time} onChange={e => setTime(e.target.value)} />
+                <input ref={startField} type="time" value={time} onChange={e => setTime(e.target.value)} />
               </label>
               <label className="field">
                 <span>Length</span>
@@ -285,7 +299,7 @@ export function TaskDetailDrawer({
       <div className="task-drawer__actions">
         {isDiagnostic && !readOnly && <Link href="/app/tests" className="primary-button">Go to diagnostics</Link>}
         {!readOnly && entry.taskType === 'recheck' && entry.isTask && entry.execution !== 'completed' && (
-          <StartButton className="primary-button" label={entry.attemptId ? 'Resume re-check' : 'Start re-check'} body={{ kind: 'repair', checkTaskId: entry.id }} />
+          <PreflightStart key={entry.id} className="secondary-button" checkOnOpen reviewLabel="Check availability" startLabel="Start re-check" resumeLabel="Resume re-check" body={{ kind: 'repair', checkTaskId: entry.id }} />
         )}
         {entry.taskType === 'review' && entry.isTask && entry.reading?.topicId && entry.localDate && (
           // A revision session for this reading: the student's own recall cards for it, with the exact way back to THIS task. Practising cards is the student's own report:

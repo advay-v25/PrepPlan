@@ -4,6 +4,8 @@ import { Suspense } from 'react'
 import { PageLoading } from '../../../components/ui/PageLoading'
 import { AdaptationLine } from '../../../components/review/AdaptationLine'
 import { getCurrentAdaptation } from '../../../lib/planning/weeklyReview/adaptationRecord'
+import { loadRecoveryStatus } from '../../../lib/planning/recovery/service'
+import { RecoveryStatusNote } from '../../../components/recovery/RecoveryStatusNote'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { CalendarDays, Info } from 'lucide-react'
@@ -168,6 +170,7 @@ async function CalendarContent({ searchParams }: CalendarProps) {
   const linkedHere = task ? findCalendarTask(calendar.entries, task) : null
   const historical = task && !linkedHere ? await optionalRead(getTaskLineage(user.id, task), 'This task’s history', null) : null
   const adaptation = isCurrentWeek ? await optionalRead(getCurrentAdaptation(user.id), 'Your latest weekly review', null) : null
+  const recovery = isCurrentWeek ? await loadRecoveryStatus(user.id).catch(() => 'unavailable' as const) : null
   // A class occurrence is named by its series and ORIGINAL date. The server validates both; an unknown, foreign or no-longer-applicable link opens nothing else.
   const classSelection = commitment || occurrence ? await optionalRead(getOccurrenceSelection(user.id, commitment, occurrence), 'This class occurrence', null) : null
   const classLinkUnavailable = Boolean(commitment || occurrence) && !classSelection
@@ -220,8 +223,8 @@ async function CalendarContent({ searchParams }: CalendarProps) {
             {isHistory ? <span>Past week</span> : isFuture ? <span>Forecast</span> : <span>{ASSESSMENT_STAGE_LABEL[assessmentStage]} · {shortDay(paperDate)}</span>}
           </p>
         </div>
+        <div className="cal-head__log"><LogLearningButton classLed={Boolean(classLog?.classLed)} /></div>
         <div className="cal-head__actions">
-          <LogLearningButton classLed={Boolean(classLog?.classLed)} />
           {classLogLink && <Link prefetch={false} href={classLogLink.href} className="secondary-button">{classLogLink.label}</Link>}
           <CalendarNavigation previous={prevWeek} next={nextWeek} today={today} range={formatWeekRange(week, locale)} current={isCurrentWeek} />
         </div>
@@ -241,12 +244,14 @@ async function CalendarContent({ searchParams }: CalendarProps) {
         <Notice tone="warn" role="status"><span data-appointment-unavailable>That mock or checkpoint is not available here. It may be finished, cancelled, or not yours. <Link href="/app/calendar#checkpoint" className="prose-link">See your schedule</Link>.</span></Notice>
       )}
       {isHistory && <PeriodAppointments appointments={periodAppointments} />}
-      {savedClassLogs.length > 0 && <details className="cal-week-details">
+      {/* A student may open a disclosure before React arrives; `open` is theirs, so it is not a mismatch (suppressHydrationWarning on each). */}
+      {savedClassLogs.length > 0 && <details className="cal-week-details" suppressHydrationWarning>
         <summary>Recorded classes · {savedClassLogs.length}</summary>
         <ul>{savedClassLogs.map(log => <li key={log.id}><Link prefetch={false} href={classLogHref({ sessionId: log.id })}>{log.label} on {log.date}</Link> · {log.finished ? 'Log finished' : 'Saved and still open'}</li>)}</ul>
       </details>}
 
       {isCurrentWeek && <AdaptationLine record={adaptation} />}
+      {isCurrentWeek && <RecoveryStatusNote status={recovery} />}
       {savedReview && <ReviewSummary summary={(savedReview.recap as { summary?: Parameters<typeof ReviewSummary>[0]['summary'] } | null)?.summary ?? null} />}
       {historical && <HistoricalTask lineage={historical} />}
       {reviewChange && <ClassRecoveryPanel key={reviewChange.key} changeKey={reviewChange.key} label={reviewLabel} timezone={base.timezone} ownerId={user.id} closeHref={classCloseHref} />}
@@ -274,7 +279,7 @@ async function CalendarContent({ searchParams }: CalendarProps) {
       )}
 
       {hasAnything && (
-        <details className="cal-week-context" data-week-context>
+        <details className="cal-week-context" data-week-context suppressHydrationWarning>
           <summary>{isHistory ? 'Recorded week details' : 'Week details'} · {done} of {tasks.length} sessions done</summary>
         <section className="cal-summary" aria-label={isHistory ? 'That week' : 'This week'}>
           <div className="cal-summary__cell">
@@ -284,14 +289,13 @@ async function CalendarContent({ searchParams }: CalendarProps) {
                 <p className="cal-summary__title">{milestone.topicName}</p>
                 <p className="cal-summary__fine">
                   {milestone.startWeek === milestone.endWeek ? `Week ${milestone.startWeek}` : `Weeks ${milestone.startWeek}–${milestone.endWeek}`} of your roadmap
-                  {active?.status === 'active' && progress && progress.verdict !== 'not_started' ? ` · ${progress.message.split('.')[0]}` : ''}
                   {active?.status === 'draft' ? ' · Draft, not yet accepted' : ''}
                 </p>
               </>
             ) : (
               <>
-                <p className="cal-summary__title">Not built yet</p>
-                <p className="cal-summary__fine"><Link href="/app/curriculum?view=roadmap" className="prose-link">Build your roadmap</Link> to see what each week covers.</p>
+                <p className="cal-summary__title">{active ? 'Your exam path' : 'Not built yet'}</p>
+                <p className="cal-summary__fine"><Link href="/app/curriculum?view=roadmap" className="prose-link">{active ? 'Open the exam roadmap' : 'Build your roadmap'}</Link>.{active && active.input.route !== 'self_study' && !active.input.classesCompletedDate && ' Your classes set the order of new material.'}</p>
               </>
             )}
           </div>
@@ -303,7 +307,7 @@ async function CalendarContent({ searchParams }: CalendarProps) {
             </p>
             <div className="cal-summary__bar" role="img" aria-label={`${done} of ${tasks.length} sessions done`}><span style={{ width: `${donePct}%` }} /></div>
             <p className="cal-summary__fine">{hoursLabel(plannedMinutes)} planned</p>
-            {tasks.length > 0 && <details className="cal-summary__fine" data-placement-summary>
+            {tasks.length > 0 && <details className="cal-summary__fine" data-placement-summary suppressHydrationWarning>
               <summary>How the work is spread</summary>
               <ul>{week.days.filter(d => tasks.some(t => t.localDate === d)).map(d => <li key={d}>{d}: {tasks.filter(t => t.localDate === d).reduce((n,t) => n+t.durationMinutes,0)} min planned</li>)}</ul>
               <p>{tasks.filter(t => t.kind === 'day').length} sittings have a day but no reserved clock time. Open a sitting to move it or choose a start time; its recorded order still applies. These are estimates, not a weekly hours target.</p>
@@ -389,7 +393,7 @@ async function CalendarContent({ searchParams }: CalendarProps) {
           <span>Timed sessions sit inside windows you confirmed. Work under &ldquo;Any time&rdquo; has a day but no hour — PrepPlan won&apos;t invent one.</span>
         </p>
       </footer>
-      <details className="cal-export"><summary>Download this schedule (.ics)</summary><CalendarExport key={week.startDate} initialFrom={week.startDate} initialTo={week.endDate} /></details>
+      <details className="cal-export" suppressHydrationWarning><summary>Download this schedule (.ics)</summary><CalendarExport key={week.startDate} initialFrom={week.startDate} initialTo={week.endDate} /></details>
     </main>
   )
 }

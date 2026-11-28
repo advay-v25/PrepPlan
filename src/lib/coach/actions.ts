@@ -24,7 +24,7 @@ export function classifyIntent(message: string): CoachIntent {
 }
 
 export type OpenTask = { id: string; title: string; revision: number; durationMinutes: number; execution?: string; date?: string }
-export type RepairTarget = { outcomeId: string; name: string; readingId: string; subjectId: string; readingLabel: string }
+export type RepairTarget = { outcomeId: string; name: string; readingId: string; subjectId: string; readingLabel: string; attemptId?: string | null; worked?: boolean; outcomeHref?: string }
 
 export type CoachSituation = {
   intent: CoachIntent
@@ -47,7 +47,7 @@ export type CoachSituation = {
   homeNext?: { code: string; title: string; rationale: string; destination: string | null } | null
   nextTask?: { id: string; title: string; date: string; minutes: number; type: string } | null
   /** The latest scored result and what it found, for "what should I do about this result?" and timing questions. */
-  latestResult?: { attemptId: string; href: string; headline: string; findings: { kind: string; title: string }[]; timing?: { available: boolean; message: string | null; deliverable: number; minutes: number } | null } | null
+  latestResult?: { attemptId: string; href: string; headline: string; findings: { kind: string; title: string }[]; outcomeHref?: string; timing?: { available: boolean; message: string | null; deliverable: number; minutes: number } | null } | null
   repairFollowUp?: { label: string; href: string } | null
   /** The student selected a result that is not theirs, not scored or not found. Nothing else is substituted for it. */
   selectedResultUnavailable?: boolean
@@ -71,6 +71,10 @@ export type CoachSituation = {
   mockReport?: { id: string; takenOn: string; scoreText: string; scope: 'full' | 'partial'; provider: string | null; selected?: boolean; status?: 'active' | 'withdrawn' } | null
   /** The student chose a specific report that is missing or not theirs: said as such, never replaced by another. */
   mockReportUnavailable?: boolean
+  /** The Roadmap's recommendation for when mocks should start. Context and a link only: the Roadmap owns the judgment and Weekly Review owns the change. */
+  mockTransition?: { headline: string; verdict: string; why: string[]; gaps: string[]; addsMock: boolean; costOfWaiting: string | null } | null
+  /** The one catch-up and recovery status Home, Calendar and the Roadmap show. Context and a link only: Weekly Review owns the decision. */
+  recovery?: { level: string; headline: string; why: string[]; owedHours: number; weeksToClear: number | null; chosen: string | null; paths: string[]; tradeoff?: string | null } | null
   lastMock?: { title: string; date: string; reportedResult: string | null; notes: string | null; href: string | null } | null
   checkpoint?: { title: string; date: string; href: string; choiceUnresolved: boolean; appointments?: number; rehearsal?: { state: string; rehearsalId: string | null; reasons: string[] } | null } | null
   /** The shared revision rotation, as Curriculum shows it. Context and links only: the Coach never schedules or dates revision itself. */
@@ -169,6 +173,8 @@ export function planProposals(s: CoachSituation): { proposals: Proposal[]; notes
       : 'Nothing accepted is open today. Check Calendar for the week, or ask me what to focus on.')
   }
   if (s.intent === 'availability') notes.push('Change your availability in your setup, and you return here afterwards. PrepPlan then re-plans what is still ahead; work you already did stays as it is. I cannot change your hours for you.')
+  const rc = s.recovery
+  if (rc && rc.level !== 'on_track' && ['lighter', 'next', 'day_was_bad', 'mock'].includes(s.intent)) notes.push(`Catch-up status: ${rc.headline}. ${rc.why[0]} About ${rc.owedHours} h to catch up${rc.weeksToClear !== null ? `, which fits your usable time by week ${rc.weeksToClear || 1}` : ''}. ${rc.why.slice(1).find(w => w.startsWith('Your usable study time')) ?? ''}${rc.tradeoff ? ` ${rc.tradeoff}` : ''}${rc.level === 'recovery_offered' ? ` Recovery paths on offer: ${rc.paths.join('; ')}. You choose in Weekly Review.` : ''}${rc.chosen ? ' You chose this path in your last review.' : ''} Nothing changes until you accept a proposal.`)
   if (s.intent === 'lighter') {
     notes.push(s.adaptation
       ? `${s.adaptation.headline}${s.adaptation.lighter ? ' You asked for a lighter draft.' : ''}${s.adaptation.waiting ? ` ${s.adaptation.waiting} reading${s.adaptation.waiting === 1 ? '' : 's'} wait for a later week and stay due.` : ''} This is a planning decision from your weekly review, not a judgement of what you understand.`
@@ -187,6 +193,8 @@ export function planProposals(s: CoachSituation): { proposals: Proposal[]; notes
       : `${t?.message ?? 'Timed practice is not available right now, because there are not enough fresh reviewed questions on that reading.'} Meanwhile practise the method against the clock with your own materials.`)
   }
   if (s.intent === 'mock') {
+    const mt = s.mockTransition
+    if (mt) notes.push(`Your Roadmap says: ${mt.headline}. ${mt.why[0]}${mt.gaps.length ? ` Open: ${mt.gaps.join(', ')}.` : ''}${mt.costOfWaiting ? ` ${mt.costOfWaiting}` : ''} Nothing changes in your week until you review the proposal in Weekly Review and accept it.`)
     const m = s.lastMock
     const mr = s.mockReport
     if (s.mockReportUnavailable) notes.push('I cannot open the mock report you chose. It may have been removed, or it is not yours to open. I have not substituted another report; open the one you meant from Calendar.')
@@ -213,14 +221,15 @@ export function planLinks(s: CoachSituation): CoachLink[] {
   const homeLink = s.homeNext?.destination?.startsWith('/app') ? { label: `Open “${s.homeNext.title}”`, href: s.homeNext.destination } : null
   if (s.intent === 'today') { if (homeLink) links.push(homeLink); if (taskLink && taskLink.href !== homeLink?.href) links.push(taskLink); links.push({ label: 'Open the week', href: '/app/calendar' }); return links.slice(0, 3) }
   if (s.intent === 'availability') return [{ label: 'Change your availability', href: onboardingHref('week', '/app/coach') }, { label: 'See the week', href: '/app/calendar' }]
-  if (s.intent === 'lighter') return [{ label: 'See the week', href: '/app/calendar' }, ...(s.closing ? [{ label: 'Review the week', href: '/app/review-week' }] : [])]
+  if (s.intent === 'lighter') return [...(s.recovery && s.recovery.level !== 'on_track' ? [{ label: s.recovery.level === 'recovery_offered' ? 'Choose a recovery path' : 'Review the catch-up proposal', href: '/app/review-week' }] : []), { label: 'See the week', href: '/app/calendar' }, ...(s.closing && !(s.recovery && s.recovery.level !== 'on_track') ? [{ label: 'Review the week', href: '/app/review-week' }] : [])]
   if (s.intent === 'result' || s.intent === 'slow') {
     if (s.latestResult) links.push({ label: s.intent === 'slow' ? 'See the timing finding' : s.selectedResultOpen ? 'Open this result' : 'Open your latest result', href: s.intent === 'slow' ? `${s.latestResult.href}#findings-h` : s.latestResult.href })
+    if (s.intent === 'result' && s.latestResult?.outcomeHref) links.push({ label: 'Open the outcome in Curriculum', href: s.latestResult.outcomeHref })
     if (s.intent === 'result' && s.repairFollowUp) links.push(s.repairFollowUp)
     if (!s.latestResult) links.push({ label: 'Go to Tests', href: '/app/tests' })
     return links.slice(0, 3)
   }
-  if (s.intent === 'mock') { if (s.mockReportUnavailable) { links.push({ label: 'See your mock reports', href: '/app/calendar' }); return links }; if (s.mockReport) links.push({ label: s.mockReport.selected ? 'Open this mock report' : 'Open your saved mock report', href: `/app/calendar/mock-report/${s.mockReport.id}` }); if (s.lastMock?.href) links.push({ label: 'Open your saved mock report', href: s.lastMock.href }); if (s.checkpoint && s.checkpoint.href !== s.lastMock?.href) links.push({ label: 'See your next mock in Calendar', href: s.checkpoint.href }); else if (!links.length && s.mockReport === undefined && s.lastMock) links.push({ label: 'Open Calendar', href: '/app/calendar' }); if (!s.mockReport && !s.lastMock) links.push({ label: 'Record a mock already taken', href: '/app/calendar/mock-report' }); if (!links.length) links.push({ label: 'Open Calendar', href: '/app/calendar' });
+  if (s.intent === 'mock') { if (s.mockTransition) links.push({ label: 'See the Roadmap recommendation', href: '/app/curriculum?view=roadmap' }, { label: 'Review the proposed week', href: '/app/review-week' }); if (s.mockReportUnavailable) { links.push({ label: 'See your mock reports', href: '/app/calendar' }); return links }; if (s.mockReport) links.push({ label: s.mockReport.selected ? 'Open this mock report' : 'Open your saved mock report', href: `/app/calendar/mock-report/${s.mockReport.id}` }); if (s.lastMock?.href) links.push({ label: 'Open your saved mock report', href: s.lastMock.href }); if (s.checkpoint && s.checkpoint.href !== s.lastMock?.href) links.push({ label: 'See your next mock in Calendar', href: s.checkpoint.href }); else if (!links.length && s.mockReport === undefined && s.lastMock) links.push({ label: 'Open Calendar', href: '/app/calendar' }); if (!s.mockReport && !s.lastMock) links.push({ label: 'Record a mock already taken', href: '/app/calendar/mock-report' }); if (!links.length) links.push({ label: 'Open Calendar', href: '/app/calendar' });
     const rh = s.checkpoint?.rehearsal
     if (rh?.state === 'resume' && rh.rehearsalId) links.push({ label: 'Open your rehearsal', href: `/app/tests/rehearsal/${rh.rehearsalId}` })
     else if (rh?.state === 'start') links.push({ label: 'Prepare your rehearsal', href: s.checkpoint!.href })
@@ -244,7 +253,7 @@ export function planLinks(s: CoachSituation): CoachLink[] {
   const nextRevision = s.revision?.next[0]
   if (nextRevision && ['next', 'free'].includes(s.intent) && !s.repairs.length) links.push({ label: `See why “${nextRevision.name}” is queued`, href: nextRevision.href })
   const r = s.repairs[0]
-  if (r && (s.intent === 'struggling' || s.intent === 'redo' || s.intent === 'next')) links.push({ label: `Open ${r.readingLabel}`, href: `/app/curriculum/${r.subjectId}/${r.readingId}` })
+  if (r && (s.intent === 'struggling' || s.intent === 'redo' || s.intent === 'next')) links.unshift({ label: `Open ${r.readingLabel}`, href: r.outcomeHref ?? `/app/curriculum/${r.subjectId}/${r.readingId}` })
   if (s.intent === 'next' && homeLink) links.unshift(homeLink)
   if (s.intent === 'day_was_bad' || s.intent === 'next') links.push({ label: 'Open the week', href: '/app/calendar' })
   return links.slice(0, 3)
@@ -272,7 +281,7 @@ export function deterministicReply(s: CoachSituation, band: string, notes: strin
   } else if (s.intent === 'struggling' || s.intent === 'redo') {
     const r = s.repairs[0]
     parts.push(r
-      ? `The clearest weak point in your results is “${r.name}” (${r.readingLabel}). Re-read it from your own materials, then let a paper re-test it — a re-check is what tells us whether it held.`
+      ? `Curriculum records a gap in “${r.name}” (${r.readingLabel}). ${r.worked ? 'You have recorded work on it; the evidence changes when a valid check is scored.' : 'Open the outcome to review the recorded next step.'}`
       : 'Your results do not yet single out one weak outcome. A scored paper is what would show it.')
   } else {
     const adv = assessmentAdvice(s)
@@ -280,7 +289,7 @@ export function deterministicReply(s: CoachSituation, band: string, notes: strin
       ? (adv?.startable
         ? 'There is not enough scored evidence yet to say what is strong or weak, so the next useful step is the one that produces evidence: this week’s paper.'
         : `There is not enough scored evidence yet to say what is strong or weak. ${adv ? adv.note : 'No paper can be offered right now, so I will not send you to one.'} Keep to the study blocks in your plan.`)
-      : `Your current evidence reads “${band}”. Work the repair outcomes first, then new material.${adv && !adv.startable && s.paper !== 'none' ? ` ${adv.note}` : ''}`)
+      : `Use Curriculum’s recorded findings to choose follow-up. ${adv && !adv.startable && s.paper !== 'none' ? adv.note : 'Open the current week to see what fits.'}`)
   }
   if (s.checkpoint) parts.push(`Your ${s.checkpoint.title} is on ${s.checkpoint.date}.${s.checkpoint.choiceUnresolved ? ' You have not yet decided how it fits with your weekly paper; that choice is in Calendar.' : ''} Anything you report about a mock stays your own report, not test evidence.`)
   if (s.adaptation && (s.intent === 'next' || s.intent === 'free')) {

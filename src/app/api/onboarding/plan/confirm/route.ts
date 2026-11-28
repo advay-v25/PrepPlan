@@ -21,17 +21,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, cycleId: accepted?.cycle_id ?? null })
   } catch (error: any) {
     console.error('Plan confirmation failed:', error)
-    // Acceptance is one transaction, so nothing was committed. Retire the draft
-    // (a fresh one is regenerated on recovery) rather than writing a made-up
-    // onboarding status — profiles.onboarding_status has no 'activation_failed' value.
-    await createAdminClient().from('plan_drafts')
+    const code: string = ['STALE_PREVIEW', 'ALREADY_ACCEPTED', 'ACCEPT_REJECTED'].includes(error.code) ? error.code : 'UNCONFIRMED'
+    // The draft is retired only when the database has ruled it unusable (a fresh one is regenerated on recovery). While the outcome is unknown it is
+    // left as it is, so the same confirmation can be repeated and answered truthfully.
+    if (code === 'STALE_PREVIEW' || code === 'ACCEPT_REJECTED') await createAdminClient().from('plan_drafts')
       .update({ status: 'failed' }).eq('id', body.draftId).eq('user_id', user.id).eq('status', 'ready')
-    // Raw database text never reaches the student: a stale preview says what to do, anything else is a plain retry.
-    const stale = error.code === 'STALE_PREVIEW' || /Stale revision|not ready/i.test(error.message ?? '')
+    // Messages for these codes are written for the student; anything else never reaches them as database text.
     return NextResponse.json({
-      ok: false, code: stale ? 'STALE_PREVIEW' : 'ACCEPT_FAILED',
-      error: stale ? 'Your setup changed after this preview was prepared. Rebuild the preview to continue.' : 'We could not start your plan. Your answers are saved. Rebuild the preview and try again.',
-      recoverable: true, recoverUrl: '/api/activation/recover',
-    }, { status: stale ? 409 : 500 })
+      ok: false, code,
+      error: code === 'UNCONFIRMED' ? 'We could not confirm whether your plan was saved. Press Accept again: if it already saved, you will not get a second copy.' : error.message,
+      recoverable: true, recoverUrl: '/api/activation/recover', ...(code === 'ALREADY_ACCEPTED' ? { nextUrl: '/app/calendar' } : {}),
+    }, { status: code === 'UNCONFIRMED' ? 503 : code === 'ACCEPT_REJECTED' ? 500 : 409 })
   }
 }

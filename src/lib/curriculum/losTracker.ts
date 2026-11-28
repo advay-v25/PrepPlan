@@ -168,6 +168,9 @@ export type TrackerRow = {
   progress: LosProgress
   sample: number
   lastCheckedAt: string | null
+  lastCheckAttemptId?: string | null
+  gapAttemptId?: string | null
+  hasOpenRepair?: boolean
   confidenceMismatch: boolean
   howToImprove: string | null
   proof: string | null

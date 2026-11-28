@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Check } from 'lucide-react'
 import { Notice } from '../../ui/Notice'
 import { bookedDateProblem } from '../../../lib/onboarding/examWindows'
 import { todayInZone } from '../../../lib/planning/studyWeek'
@@ -63,47 +64,44 @@ export function ExamStep({
 
   return (
     <div className="ob-section">
-      <section>
-        {year && <h2 className="ob-subhead">{year}</h2>}
-        <div className="ob-tilegrid ob-tilegrid--4">
+      <section aria-label={year ? `${year} exam months` : 'Exam months'}>
+        <div className="fl-cards fl-cards--4">
           {sorted.map(w => (
-            <button key={w.id} type="button" className={`ob-tile ${selected === w.id ? 'is-selected' : ''}`}
+            <button key={w.id} type="button" className={`fl-card ${selected === w.id ? 'is-selected' : ''}`}
               aria-pressed={selected === w.id} onClick={() => setSelected(w.id)}>
               <strong>{cap(w.sitting)}</strong>
-              <small>{openNow(w) ? 'open now' : `from ${formatWindow(w.opens)}`}</small>
-              {!w.confirmed && <em className="ob-tile__flag">indicative</em>}
+              <small>{openNow(w) ? 'Open now' : `From ${formatWindow(w.opens)}`}</small>
+              <span className="fl-card__check" aria-hidden><Check size={13} /></span>
             </button>
           ))}
         </div>
+        {sitting && registered === 'not_yet' && (
+          <p className="fl-result">PrepPlan plans towards {cap(sitting.sitting)}. You can add your exact date later in Settings.</p>
+        )}
       </section>
 
       <section>
-        <h2 className="ob-subhead">Have you registered?</h2>
-        <div className="ob-tilegrid ob-tilegrid--2">
+        <h2 className="fl-label">Have you booked a date?</h2>
+        <div className="fl-segment" role="group" aria-label="Have you booked a date?">
           {([['yes', 'Yes, I have a date'], ['not_yet', 'Not yet']] as const).map(([value, label]) => (
-            <button key={value} type="button" className={`ob-tile ob-tile--compact ${registered === value ? 'is-selected' : ''}`}
-              aria-pressed={registered === value} onClick={() => chooseRegistered(value)}>
-              <strong>{label}</strong>
-            </button>
+            <button key={value} type="button" className={registered === value ? 'is-selected' : ''}
+              aria-pressed={registered === value} onClick={() => chooseRegistered(value)}>{label}</button>
           ))}
         </div>
-        <p className="fine-print">{registered === 'yes' ? 'Your booked date is saved as your exam date. The sitting is only the month you aimed for.' : 'The sitting is your target month, not a booked date. Add the exact date once you register, in Settings.'}</p>
       </section>
 
       {registered === 'yes' && (
         <section>
-          <h2 className="ob-subhead">Your booked exam date</h2>
-          <div className="ob-field">
-            <input type="date" value={examDate} onChange={e => setExamDate(e.target.value)} className="ob-input"
-              required aria-label="Exact booked exam date" aria-invalid={!!examDate && !dateInSitting}
-              min={sitting?.opens?.slice(0, 7) ? (`${sitting.opens.slice(0, 7)}-01` > today ? `${sitting.opens.slice(0, 7)}-01` : today) : today} />
-          </div>
+          <h2 className="fl-label">Exam date</h2>
+          <input type="date" value={examDate} onChange={e => setExamDate(e.target.value)} className="ob-input fl-date"
+            required aria-label="Exact booked exam date" aria-invalid={!!examDate && !dateInSitting}
+            min={sitting?.opens?.slice(0, 7) ? (`${sitting.opens.slice(0, 7)}-01` > today ? `${sitting.opens.slice(0, 7)}-01` : today) : today} />
           {dateProblem && <Notice tone="warn" role="alert" className="mt-4">{dateProblem}</Notice>}
         </section>
       )}
 
       {windows.length === 0 && (
-        <Notice tone="warn">No 2027 sittings are available yet, so setup cannot continue. This is a data problem, not something you did.</Notice>
+        <Notice tone="warn">No 2027 sittings are available yet, so setup cannot continue. This is on our side, not yours.</Notice>
       )}
     </div>
   )

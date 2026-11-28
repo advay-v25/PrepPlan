@@ -17,9 +17,10 @@ export function AdaptationNote({ adaptation }: { adaptation: WeekAdaptation | nu
       {reconciliation?.summary && <p>{reconciliation.summary}</p>}
       {adaptation.optionalMinutes > 0 && <p>About {adaptation.optionalMinutes} minutes of this week are optional extra, marked as such. Skipping them is not a miss.</p>}
       {waiting.length > 0 && (
-        <details><summary>Waiting for a later week ({waiting.length})</summary>
+        <details><summary>Study outside this draft ({waiting.length})</summary>
           <ul>{waiting.slice(0, 8).map(w => <li key={w.id}>{w.name} <small>· about {w.minutes} min</small></li>)}</ul>
-          <p className="fine-print">Still due. Nothing is dropped; these are offered again next week.</p>
+          {waiting.length > 8 && <p>And {waiting.length - 8} more readings.</p>}
+          <p className="fine-print">This draft stops at the time set aside for new study. The remaining work stays on your roadmap.</p>
         </details>
       )}
     </section>

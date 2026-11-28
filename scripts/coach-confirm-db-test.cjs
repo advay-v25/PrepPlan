@@ -1,14 +1,11 @@
 /** Phase 4 proof on the REAL development schema: a confirmed Coach proposal is ONE transaction. Throwaway students; every row removed by recorded id.
  *  npm run coach:db:test -- --confirm-target=<project-ref> */
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict')
-const { Client } = require('pg'); const { parse } = require('dotenv')
-const { configuration } = require('./lib/migrations.cjs')
+const { Client } = require('pg')
+const { openStage } = require('./lib/stage.cjs')
 
 async function main(args = process.argv.slice(2)) {
-  const root = path.resolve(__dirname, '..'), env = parse(fs.readFileSync(path.join(root, '.env.staging.local')))
-  const cfg = configuration(['--env=staging', '--dry-run'], env)
-  if (!env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF || env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF !== cfg.identity) throw Error('Not the user-confirmed disposable project; refusing.')
-  if (!args.includes(`--confirm-target=${cfg.identity}`)) throw Error(`Pass --confirm-target=${cfg.identity}.`)
+  const stage = await openStage(args), cfg = stage.cfg; global.__stage = stage
   setTimeout(() => { console.error('Stopped: deadline reached (fixtures may remain; re-run to clean).'); process.exit(2) }, 150000).unref()
   const mk = () => new Client({ ...cfg.connection, connectionTimeoutMillis: 45000, keepAlive: true, query_timeout: 60000 })
   const a = mk(); await a.connect(); const pool = []; let n = 0
@@ -101,4 +98,4 @@ async function main(args = process.argv.slice(2)) {
     await a.end()
   }
 }
-main().catch(e => { console.error('FAILED:', e.message); process.exit(1) })
+main().then(() => global.__stage?.stop()).catch(async e => { console.error('FAILED:', e.message); await global.__stage?.stop(); process.exit(1) })

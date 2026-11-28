@@ -1,11 +1,12 @@
 import { createAdminClient } from '../supabase/admin'
+import { profileRow } from '../ops/sharedReads'
 import { EMPTY_ENTRY, UNCERTAINTY_LEVELS, MOCK_KINDS, type EntryContext, type MockKind, type UncertaintyLevel } from './entryContext'
 
 /** The student's reported starting position beyond coverage. A student who has reported none of it gets the empty context, never an invented one. */
 export async function loadEntryContext(userId: string): Promise<EntryContext> {
   const admin = createAdminClient()
   const [{ data: profile }, { data: rows }] = await Promise.all([
-    admin.from('profiles').select('stage, mock_date, mock_kind, mock_label, mock_start_time, mock_duration_minutes, entry_reported_at').eq('id', userId).maybeSingle().throwOnError(),
+    profileRow(userId).then(data => ({ data })),
     admin.from('user_entry_uncertainty').select('topic_id, level, lm_ids').eq('user_id', userId).throwOnError(),
   ])
   if (!profile) return EMPTY_ENTRY

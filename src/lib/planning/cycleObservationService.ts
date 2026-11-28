@@ -1,6 +1,8 @@
+import { scopeConfirmations } from '../ops/sharedReads'
 import { createAdminClient } from '../supabase/admin'
 import { readAll } from '../supabase/readAll'
 import { observeCycle, type CycleObservation, type ObsBlock } from './cycleObservation'
+import { perRequest } from '../ops/perRequest'
 
 /** What the student's review answers do to the cycle being closed, applied without saving anything. */
 export type ClosingAnswers = { cycleId: string; actions: { taskId: string; setExecution: string | null; cancel: boolean; unknown: boolean }[] }
@@ -10,7 +12,7 @@ export type ClosingAnswers = { cycleId: string; actions: { taskId: string; setEx
  * receipt. When `closing` is given, the cycle being closed is read first, as it WILL be once these answers are saved: that
  * is the most recent evidence there is, and the proposal for the next week is made before the cycle is closed.
  */
-export async function loadClosedCycleObservations(userId: string, limit = 4, closing?: ClosingAnswers): Promise<CycleObservation[]> {
+async function loadClosedCycleObservationsUncached(userId: string, limit = 4, closing?: ClosingAnswers): Promise<CycleObservation[]> {
   const admin = createAdminClient()
   const { data: closed } = await admin.from('planning_cycles').select('id, starts_at_local, ends_at_local')
     .eq('user_id', userId).eq('status', 'closed').not('ends_at_local', 'is', null).order('ends_at_local', { ascending: false }).limit(limit)
@@ -24,7 +26,7 @@ export async function loadClosedCycleObservations(userId: string, limit = 4, clo
       .eq('user_id', userId).in('cycle_id', ids).throwOnError(),
     admin.from('weekly_reviews').select('cycle_id, unknown_task_ids').eq('user_id', userId).in('cycle_id', ids).throwOnError(),
     // Filtered in code rather than with a long .in() list, which would outgrow a request URL on a long-lived account.
-    readAll<{ block_id: string; outcome_id: string }>((a, z) => admin.from('block_scope_confirmations').select('block_id,outcome_id').eq('user_id', userId).order('block_id').order('outcome_id').range(a, z)),
+    scopeConfirmations(userId),
     readAll<{ reading_id: string }>((a, z) => admin.from('reading_los').select('id,reading_id').order('id').range(a, z)),
     readAll<{ task_id: string; prev: string | null }>((a, z) => admin.from('task_events').select('id,task_id,prev:previous->>duration_minutes').eq('user_id', userId).not('previous->>duration_minutes', 'is', null).order('id').range(a, z)),
   ])
@@ -60,3 +62,9 @@ export async function loadClosedCycleObservations(userId: string, limit = 4, clo
     })
   })
 }
+
+export const loadClosedCycleObservations = perRequest(
+  loadClosedCycleObservationsUncached,
+  (userId: string, limit = 4, closing?: ClosingAnswers) =>
+    `${userId}|${limit}|${closing?.cycleId ?? ''}|${(closing?.actions ?? []).map(a => `${a.taskId}:${a.setExecution ?? ''}:${a.cancel ? 1 : 0}:${a.unknown ? 1 : 0}`).join(',')}`
+)

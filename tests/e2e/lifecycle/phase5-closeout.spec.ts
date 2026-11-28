@@ -1,28 +1,24 @@
 /**
  * Phase 5 acceptance closeout, in a real browser (desktop and 390px). No question bank, no real provider.
  * SEEDED (recorded as endpoint steps): students and onboarding through the real onboarding API, readings reported "covered" through the real coverage API,
- * one mock report through the real mock-reports route, a saved note and one revision (review) task row for the recall-linkage case, a database-level read fault for the
- * failed-initial-read case (a restrictive policy on an OWNED fixture student's notes, removed in a finally block).
+ * one mock report through the real mock-reports route, a saved note, a revision task and a private upstream fault on the fixture's note read.
  * BROWSER-DRIVEN: the failed note read and recovery, the February mature-entry Curriculum, opening its next step / mock report / note / card routes, the Calendar recall
  * linkage with the exact return task, and the normalised return-link boundary.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import { randomUUID } from 'node:crypto'
-import { createRequire } from 'node:module'
-import path from 'node:path'
 import { createStudent, createSession, FRESH_STUDENT_ONBOARDING, type OnboardingOptions } from '../../../scripts/lib/e2eSession'
 import { admin, login, noHorizontalOverflow, recorder, RUN, J } from './helpers'
 import { scopedErrors } from './scopedErrors'
 
-const { connect } = createRequire(path.join(process.cwd(), 'package.json'))('./scripts/db.cjs') as { connect: () => { connect(): Promise<void>; query(q: string, p?: unknown[]): Promise<{ rows: any[] }>; end(): Promise<void> } }
 const db = admin(), rec = recorder(), owned: string[] = [], se = scopedErrors(), S: any = {}
 test.describe.configure({ mode: 'serial' })
 test.beforeEach(({ page }) => se.attach(page))
 let faultOn = false
-const dropFault = async () => { const c = connect(); await c.connect(); try { await c.query('drop policy if exists zz_p5_fail on public.curriculum_notes'); await c.query('drop function if exists public.zz_p5_fail(uuid)') } finally { await c.end() } faultOn = false }
+const dropFault = () => { if (faultOn && process.env.FAULTS_FILE) fs.writeFileSync(process.env.FAULTS_FILE, JSON.stringify({ rules: [] })); faultOn = false }
 test.afterAll(async ({}, info) => {
-  if (faultOn) await dropFault().catch(() => {})
+  dropFault()
   const cleanup: { what: string; ok: boolean; error?: string }[] = []
   for (const id of owned.splice(0)) { await db.from('flashcard_commands').delete().eq('user_id', id); const r = await db.auth.admin.deleteUser(id); cleanup.push({ what: `student ${id}`, ok: !r.error, error: r.error?.message }) }
   fs.mkdirSync('docs/evidence', { recursive: true })
@@ -33,13 +29,15 @@ const count = async (table: string, uid: string) => ((await db.from(table).selec
 const londonToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London' }).format(new Date())
 
 test('1 failed initial note read: unavailable with Retry, no empty editable note, the saved text survives and returns', async ({ page }) => {
+  const faults = process.env.FAULTS_FILE
+  expect(faults, 'the initial read failure requires the private loopback upstream harness').toBeTruthy()
   const st = await createStudent(db, `p5f${RUN}`, { onboard: true, onboarding: FRESH_STUDENT_ONBOARDING, register: id => owned.push(id) }); S.f = st
   const r = (await db.from('curriculum_readings').select('id, topic_id, title').eq('is_active', true).eq('structure_pending', false).order('sequence').limit(1).single()).data!
   await rec.api('SEEDED: a saved note with a distinctive sentence', async () => { expect((await db.from('curriculum_notes').insert({ user_id: st.id, scope_type: 'reading', scope_id: r.id, doc: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'ORIGINAL SAVED NOTE that must survive a failed read.' }] }] }, revision: 1 })).error).toBeNull() })
   await login(page, db, st.email, `/app/curriculum/${r.topic_id}/${r.id}`)
-  await rec.api('FAULT: a restrictive read policy that raises for THIS fixture student only (a real database read failure, removed afterwards)', async () => {
-    const c = connect(); await c.connect()
-    try { await c.query(`create function public.zz_p5_fail(u uuid) returns boolean language plpgsql as $$ begin if u = '${st.id}'::uuid then raise exception 'injected notes read failure'; end if; return true; end $$`); await c.query('create policy zz_p5_fail on public.curriculum_notes as restrictive for select to authenticated using (public.zz_p5_fail(user_id))'); faultOn = true } finally { await c.end() }
+  await rec.api('FAULT: a GET of the fixture reading note fails through the private loopback upstream', async () => {
+    fs.writeFileSync(faults!, JSON.stringify({ rules: [{ id: 'phase5-note-read', match: '/rest/v1/curriculum_notes?select=doc%2Crevision&scope_type=eq.reading&scope_id=eq.' + r.id, method: 'GET', mode: 'status', status: 500 }] }))
+    faultOn = true
   })
   await rec.browser('the Notes tab says it could not load, offers Retry, and mounts NO editor (an empty editable note would invite overwriting)', async () => {
     await page.goto(`/app/curriculum/${r.topic_id}/${r.id}?tab=notes`)

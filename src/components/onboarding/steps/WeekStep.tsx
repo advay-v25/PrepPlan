@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, X } from 'lucide-react'
+import { Check, Plus, X } from 'lucide-react'
 import { DISPLAY_ORDER, weekdayShort, weekdayName } from '../../../lib/planning/weekday'
 import { findTimeProblem, type AvailabilityMode } from '../../../lib/onboarding/schema'
 import { Button, IconButton } from '../../ui/Button'
@@ -26,7 +26,7 @@ const SELF_STUDY_ROUTES = ['self_study', 'self_paced_course']
 const hhmm = (v: unknown, f: string) => (v ? String(v).slice(0, 5) : f)
 
 /**
- * One question: when may Roadmap schedule study? Time outside the chosen windows is treated as unavailable,
+ * One question: when may PrepPlan schedule study? Time outside the chosen windows is treated as unavailable,
  * so nothing else about the student's week has to be described. Classes from the previous step are blocked
  * automatically. Saying "my schedule changes" or "I cannot schedule this week" is a valid answer: it records
  * the situation and Calendar raises a setup item instead of inventing a plan.
@@ -53,6 +53,8 @@ export function WeekStep({
   // Self-study closes the week on Sunday with the paper and review, so Sunday time is not new-study time there.
   const selfStudy = SELF_STUDY_ROUTES.includes(String(state.profile?.prep_mode ?? 'self_study'))
   const effectiveSession = maxSession ?? (usingWindows ? null : DEFAULT_SITTING)
+  // Self-study keeps Sunday for the paper, so its weekend preset is Saturday only, and says so.
+  const presets = PRESETS.map(p => p.id === 'we' && selfStudy ? { ...p, days: [6] } : p)
 
   const problem = useMemo(() => {
     if (!usingWindows) return null
@@ -91,20 +93,21 @@ export function WeekStep({
   return (
     <div className="ob-section">
       <section>
-        <h2 className="ob-subhead">Quick start</h2>
-        <div className="ob-tilegrid ob-tilegrid--3">
-          {PRESETS.map(p => (
-            <button key={p.id} type="button" className={`ob-tile ob-tile--compact ${usingWindows && has(p) ? 'is-selected' : ''}`}
+        <h2 className="fl-label">Pick your usual times</h2>
+        <div className="fl-cards fl-cards--3">
+          {presets.map(p => (
+            <button key={p.id} type="button" className={`fl-card ${usingWindows && has(p) ? 'is-selected' : ''}`}
               aria-pressed={usingWindows && has(p)} onClick={() => togglePreset(p)}>
-              <strong>{p.label}</strong><small>{p.id === 'we' && selfStudy ? `Sat ${p.start}–${p.end} · Sun is paper and review` : `${p.start}–${p.end}`}</small>
+              <strong>{p.id === 'we' && selfStudy ? 'Saturday morning' : p.label}</strong><small>{p.start}–{p.end}</small>
+              <span className="fl-card__check" aria-hidden><Check size={13} /></span>
             </button>
           ))}
         </div>
       </section>
 
       {usingWindows && (
-        <section className="mt-8">
-          <h2 className="ob-subhead">Your study windows</h2>
+        <section>
+          <h2 className="fl-label">Fine-tune by day</h2>
           <div className="ob-weekgrid">
             {DISPLAY_ORDER.map(d => {
               const list = windows.filter(w => w.weekday === d)
@@ -112,7 +115,7 @@ export function WeekStep({
                 <div key={d} className="ob-weekgrid__day">
                   <strong title={weekdayName(d)}>{weekdayShort(d)}</strong>
                   <div className="ob-weekgrid__slots">
-                    {list.length === 0 && <span className="fine-print">Not available</span>}
+                    {list.length === 0 && <span className="fine-print">Off</span>}
                     {list.map(w => (
                       <div key={w.id} className="ob-window-row">
                         <input type="time" className="ob-input" value={w.startTime} aria-label={`${weekdayName(d)} start`}
@@ -124,7 +127,7 @@ export function WeekStep({
                       </div>
                     ))}
                     <Button variant="text" onClick={() => { setMode('windows'); setWindows(p => [...p, { id: crypto.randomUUID(), weekday: d, startTime: '18:00', endTime: '21:00' }]) }}>
-                      <Plus size={14} aria-hidden /> Add
+                      <Plus size={14} aria-hidden /> <span aria-hidden>Add</span><span className="sr-only">Add {weekdayName(d)} window</span>
                     </Button>
                   </div>
                 </div>
@@ -132,48 +135,43 @@ export function WeekStep({
             })}
           </div>
           {problem && <Notice tone="warn" role="alert" className="mt-4">{problem}</Notice>}
-          {classes.length > 0 && (
-            <p className="fine-print mt-4">Your classes from the last step are blocked automatically. PrepPlan never schedules study over them.</p>
-          )}
+          {classes.length > 0 && <p className="fl-hint">Your classes are blocked automatically</p>}
         </section>
       )}
 
       {!usingWindows && (
-        <Notice tone="info" className="mt-6">
+        <Notice tone="info">
           {mode === 'varies'
-            ? 'Understood. PrepPlan will ask for your availability at the start of each week, and will not invent study times before then.'
-            : 'Understood. You can finish setup now. Calendar will open with one next step: add this week’s availability.'}
+            ? 'PrepPlan will ask for your availability at the start of each week'
+            : 'You can finish setup now. Calendar will ask for this week’s availability'}
         </Notice>
       )}
 
-      <section className="mt-8">
-        <h2 className="ob-subhead">Longest comfortable sitting</h2>
-        <div className="ob-tilegrid ob-tilegrid--5">
+      <section>
+        <h2 className="fl-label">Longest sitting</h2>
+        <div className="fl-segment" role="group" aria-label="Longest comfortable sitting">
           {SESSION_LENGTHS.map(m => (
-            <button key={m} type="button" className={`ob-tile ob-tile--compact ${maxSession === m ? 'is-selected' : ''}`}
-              aria-pressed={maxSession === m} onClick={() => setMaxSession(m)}>
-              <strong>{m} min</strong>
-            </button>
+            <button key={m} type="button" className={maxSession === m ? 'is-selected' : ''}
+              aria-pressed={maxSession === m} onClick={() => setMaxSession(m)}>{m} min</button>
           ))}
         </div>
         {!usingWindows && maxSession === null && (
-          <p className="fine-print" role="status">{DEFAULT_SITTING} min is used for now. PrepPlan still needs a sitting length to split work later; it has no study times to place yet. Choose another length any time.</p>
+          <p className="fl-hint" role="status">{DEFAULT_SITTING} min is used until you choose</p>
         )}
       </section>
 
-      <section className="mt-8">
+      <section>
         <div className="ob-alt">
           <span className="fine-print">Cannot set this yet?</span>
           <Button variant="text" onClick={() => chooseUnavailable('varies')} aria-pressed={mode === 'varies'}>My schedule changes every week</Button>
-          <Button variant="text" onClick={() => chooseUnavailable('none_this_week')} aria-pressed={mode === 'none_this_week'}>I cannot schedule study this week</Button>
+          <Button variant="text" onClick={() => chooseUnavailable('none_this_week')} aria-pressed={mode === 'none_this_week'}>No study this week</Button>
         </div>
         {usingWindows && (
-          <details className="ob-fixed">
-            <summary className="text-button">Show a fixed commitment on my Calendar (optional)</summary>
-            <p className="fine-print">Not needed for planning: time outside your study windows is already unavailable.</p>
+          <details suppressHydrationWarning className="fl-more ob-fixed">
+            <summary>Show a fixed commitment on Calendar <span>optional</span></summary>
             {fixed.map(f => (
               <div key={f.id} className="ob-class-row">
-                <input className="ob-input" value={f.label} maxLength={80} placeholder="What is it? (optional)" aria-label="Commitment name (optional)"
+                <input className="ob-input" value={f.label} maxLength={80} placeholder="What is it?" aria-label="Commitment name (optional)"
                   onChange={e => setFixed(p => p.map(x => x.id === f.id ? { ...x, label: e.target.value } : x))} />
                 <div className="ob-class-row__days" role="group" aria-label="Days">
                   {DISPLAY_ORDER.map(d => (
@@ -185,8 +183,8 @@ export function WeekStep({
                   <input type="time" className="ob-input" value={f.startTime} aria-label="Start" onChange={e => setFixed(p => p.map(x => x.id === f.id ? { ...x, startTime: e.target.value } : x))} />
                   <span>to</span>
                   <input type="time" className="ob-input" value={f.endTime} aria-label="End" onChange={e => setFixed(p => p.map(x => x.id === f.id ? { ...x, endTime: e.target.value } : x))} />
+                  <IconButton label="Remove commitment" onClick={() => setFixed(p => p.filter(x => x.id !== f.id))}><X size={16} /></IconButton>
                 </div>
-                <IconButton label="Remove commitment" onClick={() => setFixed(p => p.filter(x => x.id !== f.id))}><X size={16} /></IconButton>
               </div>
             ))}
             <Button variant="text" onClick={() => setFixed(p => [...p, { id: crypto.randomUUID(), label: '', weekdays: [], startTime: '09:00', endTime: '17:00' }])}>

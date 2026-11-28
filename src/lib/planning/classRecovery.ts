@@ -5,6 +5,7 @@ import { weekForDate } from './schedule'
 import { todayInZone, utcToZonedParts } from './studyWeek'
 import { occupantsFor } from './taskService'
 import { planClassRecovery, type RecoveryTask } from './classRecoveryPlan'
+import { activeCycleRow } from '../ops/sharedReads'
 
 /**
  * Reviewed recovery of EXISTING study tasks after a class change. A draft (plan_drafts, purpose below) holds old -> proposed placements and the
@@ -38,8 +39,7 @@ export async function latestClassChangeKey(userId: string): Promise<string | nul
 
 type Cycle = { id: string; starts_at_local: string; ends_at_local: string; timezone: string | null }
 async function activeCycle(userId: string): Promise<Cycle | null> {
-  const { data } = await createAdminClient().from('planning_cycles').select('id, starts_at_local, ends_at_local, timezone').eq('user_id', userId).eq('status', 'active').maybeSingle().throwOnError()
-  return data as Cycle | null
+  return await activeCycleRow(userId) as Cycle | null
 }
 
 /** How many unfinished timed study tasks in the active cycle overlap protected time or a booked mock right now (read-only). */

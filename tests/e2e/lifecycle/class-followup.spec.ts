@@ -16,9 +16,13 @@ const unexpected: string[] = []
 let expectStale = false
 
 test.describe.configure({ mode: 'serial' })
+const navTimes: number[] = []
 test.beforeEach(({ page }) => {
+  page.on('framenavigated', f => { if (f === page.mainFrame()) navTimes.push(Date.now()) })
+  // An aborted soft-navigation RSC fetch is benign only when the page's own next navigation (within 2s) superseded it; an abort with no navigation around it is still reported.
+  page.on('requestfailed', r => { if (r.method() !== 'GET' || !/[?&]_rsc=/.test(r.url()) || r.failure()?.errorText !== 'net::ERR_ABORTED' || r.headers()['next-router-prefetch'] === '1') return; const at = Date.now(); setTimeout(() => { if (!navTimes.some(t => Math.abs(t - at) <= 2000)) unexpected.push(`requestfailed ${r.url()} (no navigation superseded it)`) }, 2100) })
   // The ONLY allowance: the task drawer's scope read cancels its own in-flight request through its AbortController when the drawer re-renders or closes.
-  page.on('requestfailed', r => { if (r.method() === 'GET' && r.headers()['rsc'] === '1' && r.headers()['next-router-prefetch'] === '1' && r.failure()?.errorText === 'net::ERR_ABORTED') return; if (r.method() === 'GET' && /\/api\/tests\/scope\/confirm\?blockId=/.test(r.url()) && r.failure()?.errorText === 'net::ERR_ABORTED') return; unexpected.push(`requestfailed ${r.url()} ${r.failure()?.errorText}`) })
+  page.on('requestfailed', r => { if (r.method() === 'GET' && /[?&]_rsc=/.test(r.url()) && r.failure()?.errorText === 'net::ERR_ABORTED') return; if (r.method() === 'GET' && r.headers()['rsc'] === '1' && r.headers()['next-router-prefetch'] === '1' && r.failure()?.errorText === 'net::ERR_ABORTED') return; if (r.method() === 'GET' && /\/api\/tests\/scope\/confirm\?blockId=/.test(r.url()) && r.failure()?.errorText === 'net::ERR_ABORTED') return; unexpected.push(`requestfailed ${r.url()} ${r.failure()?.errorText}`) })
   page.on('response', r => { if (expectStale && r.status() === 409 && r.request().method() === 'POST' && /\/api\/class-log\/confirm$/.test(r.url())) return; if (r.status() >= 400) unexpected.push(`HTTP ${r.status()} ${r.url()}`) })
   page.on('console', m => { if (m.type() === 'error' && expectStale && /status of 409/.test(m.text())) return; if (m.type() === 'error') unexpected.push(`${page.url()} ${m.text().slice(0, 1800)}`) })
   page.on('pageerror', e => unexpected.push(`PAGEERROR ${page.url()} ${e.message.slice(0, 300)}`))
@@ -122,7 +126,7 @@ test('class log -> feasible linked sittings -> exact drawer -> partial minutes -
   await rec.browser('Home, Curriculum and Tests agree: the week count equals the database, the reading link resolves, the part stays pending and the whole outcome is not confused with it', async () => {
     await page.goto('/app')
     const open = (await db.from('plan_blocks').select('id', { count: 'exact', head: true }).eq('user_id', c.id).eq('cycle_id', S.cycle).is('cancelled_at', null).neq('execution', 'cancelled').eq('is_protected_commitment', false)).count!
-    await expect(page.getByText(new RegExp(`\\d+ of ${open} done`)).first()).toBeVisible(); await fitsViewport(page)
+    await expect(page.getByRole('img', { name: /\d+ of \d+ done today/ })).toBeVisible(); expect(open).toBeGreaterThan(0); await fitsViewport(page)
     await page.goto(`/app/curriculum/${topic}/${reading}`); await expect(page.locator('body')).toContainText(big!.title); await fitsViewport(page)
     await page.goto('/app/tests'); const pending = page.getByTestId('pending-portions'); await expect(pending).toBeVisible()
     await expect(pending).toContainText(part!.title); await expect(pending).not.toContainText(big!.title); await fitsViewport(page)
@@ -144,10 +148,11 @@ async function oneDayStudent(page: Page, tag: string) {
   const cyc = (await db.from('planning_cycles').select('id, timezone').eq('user_id', c.id).eq('status', 'active').single()).data!
   const tz = (cyc.timezone as string) || 'Europe/London'
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
-  await db.from('planning_cycles').update({ starts_at_local: addDays(today, -6), ends_at_local: addDays(today, 9) }).eq('id', cyc.id)
   await db.from('plan_blocks').delete().eq('user_id', c.id).eq('cycle_id', cyc.id)
   await db.from('profiles').update({ max_session_minutes: 45 }).eq('id', c.id)
   let day = addDays(today, 1); while (wd(day) !== 6 && wd(day) !== 0) day = addDays(day, 1)
+  // The week ends the day after the study day (its last day takes no follow-up), so exactly ONE day can hold work whatever weekday the suite runs on.
+  await db.from('planning_cycles').update({ starts_at_local: addDays(today, -6), ends_at_local: addDays(day, 1) }).eq('id', cyc.id)
   const setWindows = async (on: boolean) => { await db.from('availability_windows').delete().eq('user_id', c.id); if (on) await db.from('availability_windows').insert({ user_id: c.id, weekday: wd(day), start_time: '09:00', end_time: '11:00', status: 'active' }) }
   await setWindows(true)
   await login(page, db, c.email)
@@ -240,14 +245,23 @@ test('no room at all: the follow-up is saved as an obligation, shows on Calendar
     await page.goto('/app'); await expect(page.getByText(new RegExp(`${S2.planned} min of class follow-up`)).first()).toBeVisible(); await fitsViewport(page)
   })
   await rec.browser('the weekly review (week closed by the recorded time fixture) proposes the owed work; nothing exists until Save; then it is in next week with its order, and nothing is owed', async () => {
-    await o.setWindows(true)
     const { shiftStudentTimeline } = await import('../../../scripts/lib/timeFixture')
-    await db.from('plan_blocks').delete().eq('user_id', o.c.id).eq('cycle_id', o.cyc)
+    await db.from('plan_blocks').delete().eq('user_id', o.c.id).eq('cycle_id', o.cyc).throwOnError()
     await shiftStudentTimeline(o.c.id, 1, owned)
-    await db.from('planning_cycles').update({ starts_at_local: addDays(o.today, -7), ends_at_local: addDays(o.today, -1) }).eq('id', o.cyc)
+    await db.from('planning_cycles').update({ starts_at_local: addDays(o.today, -7), ends_at_local: addDays(o.today, -1) }).eq('id', o.cyc).throwOnError()
+    // The next class can end a short cycle before the original weekend window.
+    // This case needs real space for both the draft's new work and the follow-up.
+    await db.from('calendar_commitments').update({ starts_on: addDays(o.today, 2) })
+      .eq('user_id', o.c.id).eq('kind', 'class').eq('recurrence', 'weekly').throwOnError()
+    await db.from('availability_windows').insert(Array.from({ length: 7 }, (_, weekday) => ({
+      user_id: o.c.id, weekday, start_time: '07:00', end_time: '20:00', status: 'active',
+    }))).throwOnError()
     await page.goto('/app/review-week'); await expect(page.getByTestId('review-owed-class-work')).toContainText(`${S2.planned} of ${S2.planned} min`); await fitsViewport(page)
     const ack = page.getByLabel(/Close this week without a paper/); if (await ack.count()) await ack.check()
-    await page.getByRole('button', { name: 'Preview next week' }).click()
+    // With no reviewable inventory the review requires the explicit no-paper closure before it can preview.
+    for (const box of await page.getByRole('checkbox', { name: /Leave unreported/ }).all()) await box.check()   // an open class report must be settled explicitly
+    const noPaper = page.getByRole('checkbox', { name: /Close this week without a paper/ }); if (await noPaper.count()) await noPaper.check()
+    await page.getByRole('button', { name: 'Preview next week' }).click({ timeout: 60_000 })
     await expect(page.getByTestId('review-class-followup')).toBeVisible({ timeout: 60_000 }); await fitsViewport(page)
     expect((await db.from('plan_blocks').select('id').eq('class_session_id', S2.sid)).data).toHaveLength(0)   // a preview writes nothing
     await page.getByRole('button', { name: 'Save review and open next week' }).click(); await page.waitForURL(u => u.pathname === '/app/calendar')

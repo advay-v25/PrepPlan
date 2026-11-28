@@ -41,7 +41,8 @@ export function SelectedObjectCard({ object }: { object: SelectedObject }) {
     <section className="section-block" aria-label="Selected task">
       <p className="eyebrow">Task you are asking about</p>
       <h2>{object.title}</h2>
-      <p>{object.minutes} min on {object.date}. {object.movable ? 'Ask me to move it and I will show exactly what changes before anything happens.' : 'It has been started, so it stays due.'}</p>
+      {object.logSummary ? <p>{object.logSummary} Coverage is your own report. Tests track understanding separately.</p>
+        : <p>{object.minutes} min on {object.date}. {object.movable ? 'Ask me to move it and I will show exactly what changes before anything happens.' : 'Open Calendar to see its current status.'}</p>}
       <div className="stack-inline"><Link className="secondary-button" href={object.href}>Open in Calendar</Link> <Link className="text-button" href="/app/coach">Choose something else</Link></div>
     </section>
   )

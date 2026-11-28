@@ -1,6 +1,7 @@
 import { placeContinuing, type ContinuingItem } from '../planning/weeklyReview/composer'
 import { determineRepairDuration } from '../planning/repairPolicy'
 import { addDays } from '../planning/studyWeek'
+import { packWhole, type Gap } from '../planning/pulse/gaps'
 import { RECHECK_GAP_DAYS } from './recheckDate'
 import { studyGuidance, guidanceText } from '../study/guidance'
 
@@ -14,6 +15,8 @@ export type PlanInput = {
   weekDates: string[]; studyDates: string[]
   /** Free minutes per date, net of commitments AND work already planned. */
   capacity: Record<string, number>
+  /** Contiguous free gaps per date, net of timed and accepted flexible work. When present, fit is decided against these, never the day total above. */
+  gapsByDate?: Record<string, Gap[]>
   maxSittingMinutes: number | null
   threads: PlanThread[]
   /** portion key (`${threadId}:${n}`) or 'check' -> a date in the cycle, or 'none' */
@@ -46,7 +49,7 @@ export function planRepairFollowUp(i: PlanInput): PlanResult {
   const threads = i.threads.filter(t => !kept.has(t.id))
     .sort((a, b) => Number(b.severity === 'needs_repair') - Number(a.severity === 'needs_repair') || b.occurrence - a.occurrence)
   const studyDates = i.studyDates.filter(d => d >= i.today && d >= i.cycle.start && d <= i.cycle.end)
-  const place = (items: ContinuingItem[]) => placeContinuing({ items, weekDates: i.weekDates, studyDates, capacity: i.capacity, maxSittingMinutes: i.maxSittingMinutes, overrides: i.overrides })
+  const place = (items: ContinuingItem[]) => placeContinuing({ items, weekDates: i.weekDates, studyDates, capacity: i.capacity, gapsByDate: i.gapsByDate, overrideDates: i.weekDates, maxSittingMinutes: i.maxSittingMinutes, overrides: i.overrides })
 
   // A repair is placed whole or not at all: its check cannot become ready after only some of its portions.
   let accepted: ContinuingItem[] = [], placed = place([])
@@ -88,7 +91,7 @@ export function planRepairFollowUp(i: PlanInput): PlanResult {
     const earliest = addDays(last, RECHECK_GAP_DAYS)
     const minutes = covered.length <= 2 ? 15 : 30
     const choice = i.overrides?.check
-    const fits = (d: string) => (i.capacity[d] ?? 0) - (placed.reservedByDate[d] ?? 0) >= minutes
+    const fits = (d: string) => placed.gapsAfterContinuations ? packWhole(placed.gapsAfterContinuations[d] ?? [], minutes) !== null : (i.capacity[d] ?? 0) - (placed.reservedByDate[d] ?? 0) >= minutes
     const date = choice && choice !== 'none' && choice >= earliest && i.weekDates.includes(choice) ? choice
       : choice === 'none' ? undefined : studyDates.find(d => d >= earliest && fits(d))
     if (date) {

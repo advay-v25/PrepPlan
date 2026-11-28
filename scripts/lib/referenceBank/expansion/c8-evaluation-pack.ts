@@ -1,0 +1,115 @@
+/**
+ * C8.4: Locked Evaluation Pack (candidate gold anchors + defect-labelled negative examples).
+ * Strictly excluded from routine and held-out student serving pools.
+ */
+import { itemN, itemQ, type AuthoredItemV2 } from '../authorV2'
+
+export const C8_EVALUATION_GOLD_CANDIDATES: AuthoredItemV2[] = [
+  itemN('r004-a', 'M', 'calculate', 'calculation',
+    '[Eval-Gold-01] An annuity pays ${pmt} at the BEGINNING of each year for {n} years. At an effective annual discount rate of {r}%, what is the present value today?',
+    { pmt: 1000, n: 3, r: 8 },
+    'pmt*((1-(1+r/100)^(-n))/(r/100))*(1+r/100)',
+    'usd2',
+    ['pmt*((1-(1+r/100)^(-n))/(r/100))', 'T', 'Used ordinary annuity formula instead of annuity-due (1 + r) multiplier.'],
+    ['pmt*n', 'F', 'Summed undiscounted cash flows.'],
+    'PV(ordinary) = 1,000 × [1 − 1.08^(−3)] / 0.08 = $2,577.10. PV(due) = $2,577.10 × 1.08 = $2,783.26.',
+    'Tests annuity-due timing precision.', 'evaluation', 'eval-gold-01'
+  ),
+  itemQ('r032-a', 'H', 'integrate', 'scenario',
+    '[Eval-Gold-02] A distributor holds identical electronic components at year-end with historical cost of $50/unit. Under IFRS, estimated selling price is $54, completion cost is $3, and selling cost is $4. Under US GAAP (LIFO), replacement cost is $45, selling price minus selling cost is $50, and normal profit margin is $6. What carrying value per unit is reported under IFRS vs. US GAAP?',
+    'IFRS carries at $47 (NRV); US GAAP (LIFO) carries at $45 (replacement cost lies between NRV $50 and NRV − normal profit $44)',
+    ['IFRS carries at $45; US GAAP carries at $47', 'G', 'Swapped IFRS NRV rule and US GAAP LIFO lower-of-cost-or-market rule.'],
+    ['Both IFRS and US GAAP carry at $50 historical cost', 'C', 'Market/NRV below $50 triggers write-down under both frameworks.'],
+    'IFRS NRV = 54 − 3 − 4 = $47 < $50 → $47. US GAAP market = mid(replacement $45, ceiling $50, floor $44) = $45 < $50 → $45.',
+    'Tests precise IFRS NRV vs. US GAAP LIFO LCM framework distinction.', 'evaluation', 'eval-gold-02'
+  ),
+  itemQ('r095-b', 'H', 'integrate', 'scenario',
+    '[Eval-Gold-03] An investment-bank research analyst covers a biotech issuer that offers to fly her and her spouse first-class to a resort conference. Her compliance officer states she may attend if the analyst discloses the trip in her next research note. Under Standard I(B) Independence and Objectivity, what is the proper conclusion?',
+    'She must decline the trip; disclosure does not cure accepting lavish issuer-funded travel that threatens objectivity',
+    ['She may accept so long as her next report discloses the trip in bold text', 'C', 'Disclosure cannot legitimize gifts or hospitality from covered issuers that impair independence.'],
+    ['She may accept only if she rates the stock Sell afterward', 'M', 'A subsequent rating does not cure accepting an impairing benefit.'],
+    'Standard I(B) requires refusing benefits that could reasonably compromise independence; compliance sign-off on disclosure cannot override the Standard.',
+    'Tests Standard I(B) non-curability by disclosure.', 'evaluation', 'eval-gold-03'
+  ),
+  itemN('r059-b', 'M', 'calculate', 'calculation',
+    '[Eval-Gold-04] The 1-year spot rate is {z1}% and the 2-year spot rate is {z2}% (annual compounding). What is the implied 1-year forward rate 1 year from today?',
+    { z1: 4.0, z2: 5.5 },
+    '(((1+z2/100)^2)/(1+z1/100)-1)*100',
+    'pct2',
+    ['2*z2-z1', 'F', 'Used linear approximation (7.00%) instead of exact geometric compounding (7.02%).'],
+    ['(z1+z2)/2', 'C', 'Averaged the two spot rates instead of extracting the forward rate.'],
+    '(1.055^2 / 1.04) − 1 = 1.113025 / 1.04 − 1 = 7.02%.',
+    'Tests exact forward-rate compounding vs. linear approximation.', 'evaluation', 'eval-gold-04'
+  ),
+]
+
+export type NegativeEvaluationCase = {
+  id: string
+  defectCode: string
+  expectedGateFailure: string
+  stem: string
+  options: string[]
+  keyIndex: number
+  reason: string
+}
+
+export const C8_EVALUATION_NEGATIVE_EXAMPLES: NegativeEvaluationCase[] = [
+  {
+    id: 'eval-neg-01-missing-assumption',
+    defectCode: 'MISSING_FRAMEWORK_ASSUMPTION',
+    expectedGateFailure: 'HUMAN_REVIEW_OR_REVISE: LIFO eligibility and write-down reversal depend on stating IFRS vs. US GAAP.',
+    stem: 'A firm writes down inventory by $10,000 in Year 1; in Year 2 net realizable value recovers by $12,000. How much of the write-down is reversed in Year 2?',
+    options: ['$0', '$10,000', '$12,000'],
+    keyIndex: 1,
+    reason: 'Defective negative example: fails to state whether the company reports under IFRS ($10,000 reversal) or US GAAP ($0 reversal).',
+  },
+  {
+    id: 'eval-neg-02-numeric-mismatch',
+    defectCode: 'NUM_KEY_MISMATCH',
+    expectedGateFailure: 'VOID: Computed value (10.5%) does not match declared keyIndex 0 (9.5%).',
+    stem: 'Rf = 3.0%, MRP = 5.0%, beta = 1.5. What is CAPM expected return?',
+    options: ['9.5%', '10.5%', '12.0%'],
+    keyIndex: 0,
+    reason: 'Defective negative example: authored keyIndex points to 9.5% instead of correct 10.5%.',
+  },
+  {
+    id: 'eval-neg-03-giveaway-absolute',
+    defectCode: 'EDITORIAL_GIVEAWAY_ABSOLUTE',
+    expectedGateFailure: 'REVISE: Distractors use giveaway absolutes ("always", "guaranteed") while key does not.',
+    stem: 'Why do investors diversify across imperfectly correlated assets?',
+    options: [
+      'To reduce portfolio variance for a given expected return',
+      'To guarantee zero loss in every market crash',
+      'Because single stocks always lose money every year',
+    ],
+    keyIndex: 0,
+    reason: 'Defective negative example: two distractors rely on absurd absolutes ("guarantee zero loss", "always lose money").',
+  },
+  {
+    id: 'eval-neg-04-format-except',
+    defectCode: 'FORMAT_EXCEPT_AND_TRUE_FALSE',
+    expectedGateFailure: 'FORMAT_EXCEPT / FORMAT_TRUE_FALSE: Prohibited "except" lead-in and compound option.',
+    stem: 'All of the following are true about bonds EXCEPT:',
+    options: ['Coupons are usually fixed', 'Prices move inversely with yields', 'All of the above'],
+    keyIndex: 2,
+    reason: 'Defective negative example: uses banned "EXCEPT" lead-in and "All of the above" compound option.',
+  },
+  {
+    id: 'eval-neg-05-rounding-collision',
+    defectCode: 'ROUNDING_AMBIGUITY',
+    expectedGateFailure: 'NUM_AMBIGUOUS: Computed 12.345% sits on a half-way rounding tie between 12.34% and 12.35%.',
+    stem: 'A bond returns 12.345%. Rounded to two decimal places, what is its return?',
+    options: ['12.34%', '12.35%', '12.50%'],
+    keyIndex: 1,
+    reason: 'Defective negative example: rounding tie without an explicit rounding convention.',
+  },
+  {
+    id: 'eval-neg-06-unsupported-source',
+    defectCode: 'UNSUPPORTED_SCOPE_OFF_SYLLABUS',
+    expectedGateFailure: 'SOURCE_BLOCKER: Tests Level III behavioral wealth-tax estate trusts outside Level I scope.',
+    stem: 'How is an irrevocable generation-skipping grantor trust taxed under US estate law?',
+    options: ['At grantor marginal bracket', 'At trust compressed bracket', 'Exempt from gift tax'],
+    keyIndex: 1,
+    reason: 'Defective negative example: off-syllabus estate-tax law not supported in 2027 Level I curriculum packs.',
+  },
+]

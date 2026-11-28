@@ -2,10 +2,16 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { AlertTriangle, CheckCircle2, ChevronDown, Loader2, RefreshCw, TrendingDown, TrendingUp } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronDown, Loader2, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { PHASE_LABEL, PHASE_PURPOSE, type Roadmap } from '../../lib/curriculum/roadmap'
 import type { Progress } from '../../lib/curriculum/roadmapService'
+import type { Signals } from '../../lib/signals/signals'
+import { todayInZone } from '../../lib/planning/studyWeek'
+import type { MockTransition } from '../../lib/exam/mockTransition'
+import { MockTransitionCard } from './MockTransitionCard'
+import { RecoveryStatusNote } from '../recovery/RecoveryStatusNote'
+import type { RecoveryStatus } from '../../lib/planning/recovery/status'
 
 type TopicInfo = { id: string; name: string; weightMin: number; weightMax: number; summary: string }
 type ModuleInfo = { id: string; topic: string; name: string; summary: string; effortBand: number; difficulty: number }
@@ -31,8 +37,10 @@ function shortDate(d: string) {
  * a plan that cannot say whether it is working is decoration.
  */
 export function RoadmapView({
-  roadmap, status, progress, topics, modules, coverage, examLabel, changeExamHref,
+  roadmap, status, progress, topics, modules, coverage, examLabel, changeExamHref, position, next, classLed, pace, mockPrep, recovery,
 }: {
+  mockPrep?: MockTransition | null
+  recovery?: RecoveryStatus | 'unavailable' | null
   roadmap: Roadmap
   status: string
   progress: Progress
@@ -41,6 +49,10 @@ export function RoadmapView({
   coverage: Record<string, string>
   examLabel: string | null
   changeExamHref: string
+  position: { signals: Signals; timezone: string; gapCount: number; gaps: { id: string; name: string; progress: string; attemptId: string | null; href: string }[] } | null
+  next: { title: string; href: string; label: string } | null
+  classLed: boolean
+  pace: number | null
 }) {
   const router = useRouter()
   const [open, setOpen] = useState<string | null>(
@@ -90,11 +102,10 @@ export function RoadmapView({
     : feas.verdict === 'tight' ? 'warn'
     : feas.verdict === 'not_enough_time' ? 'bad' : 'neutral'
 
-  const progressTone =
-    progress.verdict === 'ahead' ? 'ok'
-    : progress.verdict === 'on_track' ? 'ok'
-    : progress.verdict === 'slipping' ? 'warn'
-    : progress.verdict === 'behind' ? 'bad' : 'neutral'
+  const signals = position?.signals
+  const lastEvidence = signals?.understanding.latestEvidenceAt
+  const evidenceDay = lastEvidence && position ? todayInZone(position.timezone, new Date(lastEvidence)) : null
+  const mockPhase = roadmap.phases.find(phase => phase.phase === 'final')
 
   return (
     <div className="roadmap">
@@ -106,13 +117,8 @@ export function RoadmapView({
             <p className="glass-hero__meta" style={{ marginTop: 6 }}>
               {shortDate(roadmap.startDate)} → {shortDate(roadmap.targetDate)}
               {status === 'draft' && ' · draft'}
-              {' · '}Week {progress.weeksElapsed + 1} of {progress.totalWeeks}
+              {' · '}Week {Math.min(progress.weeksElapsed + 1, totalWeeks)} of {totalWeeks}
             </p>
-          </div>
-          <div className="glass-hero__facts" aria-label="Coverage, as you reported it">
-            <strong>{modules.filter(m => ['studied', 'verified'].includes(coverage[m.id] ?? '')).length} of {modules.length}</strong>
-            <span>readings reported covered</span>
-            <small>{modules.filter(m => coverage[m.id] === 'taught').length} partly covered · your own report, not test evidence</small>
           </div>
         </div>
         <div className="glass-panel__foot" style={{ marginTop: 'var(--space-5)' }}>
@@ -125,6 +131,33 @@ export function RoadmapView({
       </section>
       <p role={notice?.tone === 'error' ? 'alert' : 'status'} className={notice ? `note${notice.tone === 'error' ? ' note--warn' : ''}` : 'sr-only'}>{notice?.text ?? (busy || saving ? 'Saving…' : '')}</p>
 
+      <section className="verdict verdict--neutral" aria-labelledby="position-h">
+        <h2 id="position-h">Where you stand</h2>
+        {signals ? <>
+          <ul className="verdict-options">
+            <li><strong>Coverage.</strong> {signals.position.readings.covered} of {signals.position.readings.total} readings covered, {signals.position.readings.partial} partly. Based on your reports and recorded work. <Link href="/app/curriculum">Open readings</Link></li>
+            <li><strong>This week.</strong> {signals.execution.completed} of {signals.execution.total} study blocks finished, {signals.execution.partial} partial, {signals.execution.postponed} postponed, {signals.execution.skipped} skipped and {signals.execution.unreported} overdue without a report. <Link href="/app/calendar">Open Calendar</Link></li>
+            <li><strong>What you’ve demonstrated.</strong> {signals.understanding.validEvents > 0
+              ? <>{signals.position.tested} of {signals.position.total} outcomes have eligible observations. Latest valid evidence <time dateTime={evidenceDay ?? undefined}>{evidenceDay}</time>{signals.understanding.recent ? '.' : ' (older evidence).'} A narrow check only speaks to what it asked.</>
+              : 'No valid scored evidence is recorded yet. You can still log study and use recall.'}
+              {signals.understanding.integrityWarning && ' Some observations are disputed.'}{' '}
+              {signals.understanding.latestAttemptId && <Link href={`/app/tests/${signals.understanding.latestAttemptId}/result`}>Open scored result</Link>}{' '}
+              <Link href="/app/curriculum?view=readiness">See evidence by outcome</Link></li>
+          </ul>
+        </> : <p role="alert">Your recorded position could not be loaded. <Link href="/app/curriculum?view=roadmap">Try again</Link></p>}
+        {position && <details suppressHydrationWarning>
+          <summary>{position.gapCount} outcome{position.gapCount === 1 ? '' : 's'} with a recorded gap · {Math.max(0, position.signals.position.total - position.signals.position.tested)} without eligible observations</summary>
+          {position.gaps.length > 0 && <ul>{position.gaps.map(gap => <li key={gap.id}>
+            <Link href={gap.href}>{gap.name}</Link>
+            {gap.progress === 'in_progress' || gap.progress === 'retest_due' ? ' · work recorded, new evidence pending.' : ' · gap recorded.'}
+            {gap.attemptId && <> <Link href={`/app/tests/${gap.attemptId}/result`}>Supporting result</Link></>}
+          </li>)}</ul>}
+          <Link href="/app/curriculum?view=readiness">See all outcome findings and untested areas</Link>
+        </details>}
+        <p><strong>Next action.</strong> {next ? <><span>{next.title}.</span>{' '}<Link href={next.href}>{next.label}</Link></> : <Link href="/app">Check your next action on Home</Link>}</p>
+      </section>
+
+      <h2>What fits before the exam</h2>
       {/* Phase bar — the shape of the whole run, including the reserved weeks. */}
       <div className="phase-bar" role="img" aria-label={`Plan phases: ${roadmap.phases.map(p => `${PHASE_LABEL[p.phase]} ${p.weeks} weeks`).join(', ')}`}>
         {roadmap.phases.map(p => (
@@ -140,7 +173,7 @@ export function RoadmapView({
         ))}
       </div>
       <p className="fine-print phase-note">
-        {PHASE_PURPOSE[roadmap.phases[roadmap.phases.length - 1].phase]}
+        {classLed ? 'Your classes set the order of new material. Log each class to plan follow-up and keep earlier readings in rotation.' : PHASE_PURPOSE[roadmap.phases[roadmap.phases.length - 1].phase]}
       </p>
 
       <div className="roadmap-verdicts">
@@ -151,6 +184,8 @@ export function RoadmapView({
             Does this fit?
           </h3>
           <p>{feas.message}</p>
+          <p>{feas.weeklyCapacityMinutes == null ? 'Study time has not been confirmed.' : `${feas.weeklyCapacityMinutes} minutes of weekly study time after regular commitments.`} {pace == null ? 'Effort uses the planning estimate until enough completed blocks have reported time.' : `Effort uses your observed pace of about ${Math.round(pace)} minutes per effort unit.`}</p>
+          <p><Link href="/app/settings">Review planning inputs</Link></p>
           {feas.options.length > 0 && (
             <ul className="verdict-options">
               {feas.options.map((o, i) => <li key={i}>{o}</li>)}
@@ -158,33 +193,19 @@ export function RoadmapView({
           )}
         </section>
 
-        <section className={`verdict verdict--${progressTone}`}>
-          <h3>
-            {progress.verdict === 'ahead' && <TrendingUp size={16} aria-hidden />}
-            {(progress.verdict === 'slipping' || progress.verdict === 'behind') && <TrendingDown size={16} aria-hidden />}
-            Planned against actual
-          </h3>
-          <div className="progress-compare">
-            <div>
-              <span>Plan expected</span>
-              <div className="progress-track"><div className="progress-fill progress-fill--blue" style={{ width: `${progress.plannedPercent}%` }} /></div>
-              <small>{progress.plannedPercent}%</small>
-            </div>
-            <div>
-              <span>Covered so far</span>
-              <div className="progress-track"><div className={`progress-fill ${progress.actualPercent >= progress.plannedPercent ? 'progress-fill--green' : 'progress-fill--amber'}`} style={{ width: `${progress.actualPercent}%` }} /></div>
-              <small>{progress.actualPercent}%</small>
-            </div>
-          </div>
-          <p>{progress.message}</p>
-          <p className="fine-print">
-            Week {progress.weeksElapsed + 1} of {progress.totalWeeks} · {progress.modulesDone} of {progress.modulesTotal} modules verified. Measured by effort; your setup coverage is an estimate, not test evidence.
-          </p>
+        <section className="verdict verdict--neutral">
+          <h3>First-pass effort</h3>
+          <p>{progress.actualEffortDone} of {progress.totalEffort} estimated effort units covered. Reading length, difficulty and recorded coverage shape this estimate.</p>
+          <p>Calendar shows the accepted work and Weekly Review shows what can fit in the next proposal.</p>
+          <Link href="/app/review-week">Open Weekly Review</Link>
         </section>
       </div>
 
+      <RecoveryStatusNote status={recovery} />
+      {mockPrep && <MockTransitionCard transition={mockPrep} />}
+
       {(roadmap.checkpoints.length > 0 || roadmap.warnings.length > 0 || roadmap.assumptions.length > 0) && (
-        <details className="verdict verdict--neutral verdict--fold" aria-label="What this plan is based on">
+        <details suppressHydrationWarning className="verdict verdict--neutral verdict--fold" aria-label="What this plan is based on">
           <summary>What this plan is based on</summary>
           <ul className="verdict-options">
             {roadmap.checkpoints.map(c => <li key={c.id ?? c.date} data-appointment={c.id}>{c.label?.trim() || 'Your mock'} on {shortDate(c.date)}{c.startTime ? ` at ${c.startTime}` : ''} (week {c.week}). It shapes preparation; it does not replace your exam date. <Link href={`/app/calendar?week=${c.date}${c.id ? `&appointment=${c.id}` : ''}#checkpoint`} className="prose-link">See it in Calendar</Link></li>)}
@@ -208,9 +229,17 @@ export function RoadmapView({
       )}
 
       <div className="section-heading" style={{ marginTop: 28 }}>
-        <h2>The sequence</h2>
+        <h2>Preparation milestones</h2>
         <span className="text-muted" style={{ fontSize: 12 }}>{roadmap.milestones.length} milestones</span>
       </div>
+      <ul className="verdict-options">
+        {mockPhase && <li><strong>Ready for mocks.</strong> {mockPrep?.available ? `${mockPrep.headline}. The reasons and what would change are above.`
+          : progress.currentPhaseLabel === 'final' ? 'The current plan is in mock preparation.' : `Mock preparation is planned from ${shortDate(mockPhase.startDate)}.`}
+          {' '}Use mocks and scoped checks to choose follow-up instead of working through chapters in order. <Link href="/app/tests?view=mocks">Open mocks</Link></li>}
+        <li><strong>Ready for exam day.</strong> Work toward the exam target on {shortDate(roadmap.targetDate)} by reviewing unresolved findings and planning the final days. <Link href="/app/exam">Open exam details</Link></li>
+        {roadmap.phases.map(phase => <li key={phase.phase}><strong>{PHASE_LABEL[phase.phase]}.</strong> {shortDate(phase.startDate)}–{shortDate(phase.endDate)}. {classLed && phase.phase === 'first_pass' ? 'Follow the class sequence and record what each class covers.' : PHASE_PURPOSE[phase.phase]}</li>)}
+      </ul>
+      <p className="fine-print">These dates guide your plan. Criteria for achieving each milestone are still open.</p>
 
       <ol className="milestone-list">
         {roadmap.milestones.map(m => {
@@ -224,8 +253,6 @@ export function RoadmapView({
             .map(id => topicById.get(id))
             .filter(Boolean)
             .reduce((acc, t) => ({ min: acc.min + t!.weightMin, max: acc.max + t!.weightMax }), { min: 0, max: 0 })
-          const done = mods.filter(x => coverage[x.id] === 'verified').length
-          const started = mods.filter(x => coverage[x.id] && coverage[x.id] !== 'not_started').length
           const milestoneKey = `${m.topicId}-${m.sequence}`
           const isOpen = open === milestoneKey
           const isCurrent = progress.currentMilestone?.topicId === m.topicId &&
@@ -243,15 +270,11 @@ export function RoadmapView({
                   <small>
                     {`${combinedWeight.min}–${combinedWeight.max}% of the exam · `}
                     {mods.length} module{mods.length === 1 ? '' : 's'}
-                    {done > 0 && ` · ${done} verified`}
                     {m.phase !== 'first_pass' && ` · ${PHASE_LABEL[m.phase].toLowerCase()}`}
                     {m.basis === 'reported_uncertainty' && ' · you marked this to revisit'}
                     {m.basis === 'mock_preparation' && ' · before your mock'}
                     {isCurrent && ' · current'}
                   </small>
-                  <span className="progress-track" style={{ marginTop: 6 }}>
-                    <span className="progress-fill progress-fill--green" style={{ width: `${mods.length ? (done / mods.length) * 100 : 0}%` }} />
-                  </span>
                 </span>
                 <ChevronDown size={17} className={`review-chevron ${isOpen ? 'is-open' : ''}`} aria-hidden />
               </button>
@@ -266,7 +289,7 @@ export function RoadmapView({
                       return (
                         <li key={mod.id} className={`module-row ${locked ? 'is-verified' : ''}`}>
                           <span>
-                            <strong>{mod.name}</strong>
+                            <strong><Link href={`/app/curriculum/${mod.topic}/${mod.id}`}>{mod.name}</Link></strong>
                             <small>{mod.summary}</small>
                           </span>
                           <span className="module-row__state">

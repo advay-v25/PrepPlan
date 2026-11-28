@@ -2,13 +2,10 @@
  *  Fixture rows are inserted with triggers relaxed (they test timing, not publication) and deleted by recorded id.
  *  npm run progress:db:test -- --confirm-target=<project-ref> */
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict')
-const { Client } = require('pg'); const { parse } = require('dotenv')
-const { configuration } = require('./lib/migrations.cjs')
+const { Client } = require('pg')
+const { openStage } = require('./lib/stage.cjs')
 async function main(args = process.argv.slice(2)) {
-  const root = path.resolve(__dirname, '..'), env = parse(fs.readFileSync(path.join(root, '.env.staging.local')))
-  const cfg = configuration(['--env=staging', '--dry-run'], env)
-  if (!env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF || env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF !== cfg.identity) throw Error('Not the user-confirmed disposable project; refusing.')
-  if (!args.includes(`--confirm-target=${cfg.identity}`)) throw Error(`Pass --confirm-target=${cfg.identity}.`)
+  const stage = await openStage(args), cfg = stage.cfg; global.__stage = stage
   setTimeout(() => { console.error('Stopped: deadline reached.'); process.exit(2) }, 120000).unref()
   const mk = () => new Client({ ...cfg.connection, connectionTimeoutMillis: 45000, keepAlive: true, query_timeout: 60000 })
   const a = mk(); await a.connect(); let n = 0
@@ -68,7 +65,21 @@ async function main(args = process.argv.slice(2)) {
     r = await late
     ok('a heartbeat that raced a submit waits for it and is refused as closed', r.ok === false && r.code === 'closed')
     ok('closed attempt progress is untouched', Number(await one(a, 'select active_seconds from public.attempt_item_progress where attempt_id=$1', [att3])) === before)
+
+    console.log('\nAnswer commands')
+    const grants = (await a.query(`select
+      has_function_privilege('authenticated', 'public.save_attempt_answer(uuid,text,integer,integer,integer,integer,boolean,bigint)', 'EXECUTE') as canonical,
+      has_function_privilege('authenticated', 'public.save_attempt_response(uuid,text,integer,integer,integer,integer,boolean,bigint)', 'EXECUTE') as internal,
+      has_function_privilege('anon', 'public.record_assessment_response(uuid,text,integer,integer,integer)', 'EXECUTE') as anonymous`)).rows[0]
+    ok('student access goes through the canonical or compatibility command, and anonymous access is refused', grants.canonical && !grants.internal && !grants.anonymous)
+    const legacyAttempt = await attempt()
+    await w1.query(`select set_config('request.jwt.claim.sub',$1,false)`, [u1])
+    await w1.query('set role authenticated')
+    const legacySave = () => one(w1, 'select public.record_assessment_response($1,$2,0,3,15)', [legacyAttempt, item])
+    const receipt = await legacySave()
+    ok('compatibility answer saves timing and returns the same receipt on retry', receipt && receipt === await legacySave()
+      && await one(a, 'select active_seconds from public.attempt_item_progress where attempt_id=$1', [legacyAttempt]) === 15)
   } finally { await cleanup(); await a.end().catch(() => {}) }
   console.log(`\n${n} passed, 0 failed\n`)
 }
-main().catch(e => { console.error('\nFAILED:', e.message); process.exit(1) })
+main().then(() => global.__stage?.stop()).catch(async e => { console.error('\nFAILED:', e.message); await global.__stage?.stop(); process.exit(1) })

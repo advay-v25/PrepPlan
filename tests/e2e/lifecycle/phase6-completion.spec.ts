@@ -4,9 +4,9 @@ import fs from 'node:fs'
 import { createStudent, FRESH_STUDENT_ONBOARDING } from '../../../scripts/lib/e2eSession'
 import { admin, login, noHorizontalOverflow, RUN, addDays, wd } from './helpers'
 import { scopedErrors } from './scopedErrors'
+import { todayInZone, zonedTimeToUtc } from '../../../src/lib/planning/studyWeek'
 
 const db = admin(), owned: string[] = [], se = scopedErrors(), records: unknown[] = []
-test.describe.configure({ mode: 'serial' })
 test.beforeEach(({ page }) => se.attach(page))
 test.afterAll(async ({}, info) => {
   for (const id of owned.splice(0)) { const r = await db.auth.admin.deleteUser(id); expect(!r.error || /not found/i.test(r.error.message)).toBe(true) }
@@ -48,7 +48,14 @@ test('Settings: committed impact-read failure remains visible; reload shows the 
 test('Calendar: keyboard placement and resize, protected-conflict exact link, input retained, history and forecast', async ({ page }) => {
   const s = await createStudent(db, `p6c${RUN}`, { onboard: true, onboarding:FRESH_STUDENT_ONBOARDING, register: id => owned.push(id) })
   const cycle = (await db.from('planning_cycles').select('*').eq('user_id', s.id).eq('status', 'active').single()).data!
-  const day = addDays(new Date().toISOString().slice(0,10), 1)
+  const timezone = 'Europe/London'
+  const day = addDays(todayInZone(timezone), 1)
+  if (day > cycle.ends_at_local) {
+    await db.from('planning_cycles').update({
+      ends_at_local: day,
+      ends_at: zonedTimeToUtc(day, '23:59', timezone).toISOString(),
+    }).eq('id', cycle.id).throwOnError()
+  }
   await db.from('plan_blocks').delete().eq('user_id', s.id).throwOnError()
   const task = `p6-keyboard-${RUN}`
   // This test starts from an ordinary in-window move on any weekday, then
@@ -56,7 +63,7 @@ test('Calendar: keyboard placement and resize, protected-conflict exact link, in
   await db.from('availability_windows').delete().eq('user_id', s.id).eq('weekday', wd(day)).throwOnError()
   await db.from('availability_windows').insert({ user_id: s.id, weekday: wd(day), start_time: '18:30', end_time: '22:00', status: 'active' }).throwOnError()
   await db.from('plan_blocks').insert({ id: task, user_id: s.id, cycle_id: cycle.id, title: 'Keyboard placement probe', detail: 'Owned fixture for keyboard placement', task_type: 'study', origin: 'student', priority: 'core', placement: 'day_preferred', execution: 'not_started', local_date: day, day, duration_minutes: 44, duration: '44', created_by: 'student' }).throwOnError()
-  const c = (await db.from('calendar_commitments').insert({ user_id: s.id, label: 'Protected appointment probe', kind: 'personal', recurrence: 'none', starts_at: `${day}T20:00:00Z`, ends_at: `${day}T21:00:00Z`, is_protected: true, status: 'active' }).select('id').single()).data!
+  const c = (await db.from('calendar_commitments').insert({ user_id: s.id, label: 'Protected appointment probe', kind: 'personal', recurrence: 'none', starts_at: zonedTimeToUtc(day, '20:00', timezone).toISOString(), ends_at: zonedTimeToUtc(day, '21:00', timezone).toISOString(), is_protected: true, status: 'active' }).select('id').single().throwOnError()).data!
   await login(page, db, s.email, `/app/calendar?week=${day}&view=agenda&task=${task}`)
   const drawer = page.getByRole('dialog'), start = drawer.getByLabel('Start', { exact: true })
   await start.fill('19:00'); await expect(drawer.getByRole('combobox', { name: 'Length', exact: true })).toHaveValue('44')
@@ -70,7 +77,6 @@ test('Calendar: keyboard placement and resize, protected-conflict exact link, in
   const saved = (await db.from('plan_blocks').select('starts_at, duration_minutes, revision').eq('id', task).single()).data!
   expect(saved.duration_minutes).toBe(44); expect(saved.starts_at).toBeTruthy()
   await page.goto(`/app/calendar?week=${day}&view=agenda&task=${task}`)
-  // London is the seeded student's timezone; November has UTC offset zero.
   await start.fill('20:00')
   await se.expecting([{ label: 'protected slot refusal', url: /\/api\/tasks\//, statuses: [409], min: 1, max: 1 }], async () => {
     await drawer.getByRole('button', { name: 'Apply', exact: true }).click()
@@ -178,7 +184,7 @@ test('Home: real failed progress read never becomes zero; retry recovers; final-
   const snapshot = async () => (await db.from('plan_blocks').select('id,execution,revision').eq('user_id', s.id).order('id').throwOnError()).data
   await login(page, db, s.email, '/app'); const before = await snapshot()
   try {
-    fs.writeFileSync(faults!, JSON.stringify({ rules: [{ id: 'p6-progress', match: '/rest/v1/evidence_events?select=validity', mode: 'status', status: 500 }] }))
+    fs.writeFileSync(faults!, JSON.stringify({ rules: [{ id: 'p6-progress', match: '/rest/v1/evidence_events?select=attempt_id', method: 'GET', mode: 'status', status: 500 }] }))
     await page.reload()
     const failed = page.getByRole('alert').filter({ hasText: 'Your progress summary' })
     await expect(failed).toContainText('could not be loaded')
@@ -190,7 +196,7 @@ test('Home: real failed progress read never becomes zero; retry recovers; final-
     await noHorizontalOverflow(page)
   } finally { fs.writeFileSync(faults!, JSON.stringify({ rules: [] })) }
   // Relative-date phase fixture, not a supported 2026 signup: clear the 2027 window so it cannot contradict this UI-only target.
-  const today = new Date().toISOString().slice(0,10)
+  const today = todayInZone('Europe/London')
   await db.from('profiles').update({ exam_date: addDays(today, 6), exam_window_id:null, exam_year:null, exam_sitting:null }).eq('id', s.id).throwOnError()
   await page.reload(); await expect(page.getByLabel('Final stretch', { exact: true })).toBeVisible()
   await expect(page.locator('.countdown')).toContainText('6 days')
@@ -231,12 +237,12 @@ test('Settings app-wide: midway coverage, uncertainty, sitting limit and booked 
   await page.goto('/onboarding/week?returnTo=%2Fapp%2Fsettings')
   await page.getByRole('button',{name:'30 min',exact:true}).click(); await save()
   expect((await db.from('profiles').select('max_session_minutes').eq('id',s.id).single()).data?.max_session_minutes).toBe(30)
-  await expect(page.locator('.settings-section').filter({has:page.getByRole('heading',{name:'Your week',exact:true})})).toContainText('sittings up to 30 min')
+  await expect(page.locator('.settings-section').filter({has:page.getByRole('heading',{name:'Study time',exact:true})})).toContainText('sittings up to 30 min')
   await page.goto('/onboarding/exam?returnTo=%2Fapp%2Fsettings')
   await page.getByRole('button',{name:/^August/}).click()
   await page.getByRole('button',{name:'Yes, I have a date',exact:true}).click()
   await page.getByLabel('Exact booked exam date').fill('2027-08-20'); await save()
-  await expect(page.locator('.settings-section').filter({has:page.getByRole('heading',{name:'Your exam',exact:true})})).toContainText('2027-08-20')
+  await expect(page.locator('.settings-section').filter({has:page.getByRole('heading',{name:'Exam date',exact:true})})).toContainText('2027-08-20')
   await page.goto('/app'); await expect(page.locator('.countdown')).toContainText('20 Aug 2027')
   await page.goto('/app/curriculum?view=roadmap'); await expect(page.locator('.curriculum-page')).toContainText(/2027|Aug/)
   await page.goto('/app/tests'); await expect(page.locator('.tests-page')).toBeVisible(); await expect(page.locator('.tests-page')).not.toContainText('Paper is ready')

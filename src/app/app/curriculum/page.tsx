@@ -8,14 +8,17 @@ import { createClient } from '../../../lib/supabase/server'
 import { createAdminClient } from '../../../lib/supabase/admin'
 import { computeProgress, getActiveRoadmap } from '../../../lib/curriculum/roadmapService'
 import { RoadmapView } from '../../../components/curriculum/RoadmapView'
+import { loadMockTransition } from '../../../lib/exam/mockTransitionService'
+import { loadRecoveryStatus } from '../../../lib/planning/recovery/service'
 import { onboardingHref } from '../../../lib/routing/registry'
 import { ReadinessTracker } from '../../../components/curriculum/ReadinessTracker'
 import { getLosTracker, getRepairLinks } from '../../../lib/curriculum/losTrackerService'
 import type { LosBand } from '../../../lib/curriculum/losTracker'
-import { COVERAGE_LABEL, FILTERS, filterRows, getCardTotals, getWorkspaceRows, isFilterKey, snippetFor, type CardTotals, type WorkspaceRow } from '../../../lib/curriculum/workspaceIndex'
+import { COVERAGE_LABEL, FILTERS, filterRows, getCardTotals, getNotesIndex, getWorkspaceRows, isFilterKey, snippetFor, type CardTotals, type WorkspaceRow } from '../../../lib/curriculum/workspaceIndex'
 import { getCurrentOperatingState } from '../../../lib/state/operatingState'
-import { noteText, type NoteDoc } from '../../../lib/curriculum/notes/doc'
 import type { ReadingCoverageSummary } from '../../../lib/curriculum/readingCoverage'
+import { getSignals } from '../../../lib/signals/signals-loader'
+import { profileTimezone } from '../../../lib/ops/sharedReads'
 
 export const metadata = { title: 'Curriculum' }
 
@@ -45,7 +48,9 @@ async function CurriculumContent({ searchParams }: CurriculumProps) {
 
   const admin = createAdminClient()
 
-  const [roadmap, tracker, repairLinks, workspace, totals, next] = await Promise.all([
+  const mockPrep = view === 'roadmap' ? loadMockTransition(user.id).catch(e => { console.error('[roadmap] mock transition unavailable', e); return null }) : null
+  const recoveryP = view === 'roadmap' ? loadRecoveryStatus(user.id).catch(() => 'unavailable' as const) : null
+  const [roadmap, tracker, repairLinks, workspace, totals, next, position, notes] = await Promise.all([
     view === 'roadmap' ? Promise.all([
       admin.from('profiles').select('exam_year, exam_sitting, registered').eq('id', user.id).maybeSingle().throwOnError(),
       admin.from('topics').select('id, name, exam_weight_min, exam_weight_max, default_sequence, summary').order('default_sequence').throwOnError(),
@@ -58,18 +63,19 @@ async function CurriculumContent({ searchParams }: CurriculumProps) {
     })) : null,
     view === 'readiness' ? getLosTracker(user.id) : null,
     view === 'readiness' ? getRepairLinks(user.id).catch(() => ({} as Record<string, string>)) : {},
-    view === 'overview' || view === 'notes' ? getWorkspaceRows(user.id, supabase).catch(() => null) : null,
+    view === 'overview' ? getWorkspaceRows(user.id, supabase).catch(() => null) : null,
     view === 'overview' ? getCardTotals(supabase).catch(() => null) : null,
-    view === 'overview' ? getCurrentOperatingState(user.id).then(s => s.nextAction).catch(() => null) : null,
+    view === 'overview' || view === 'roadmap' ? getCurrentOperatingState(user.id).then(s => s.nextAction).catch(() => null) : null,
+    view === 'roadmap' ? Promise.all([getSignals(user.id), profileTimezone(user.id), getLosTracker(user.id)]).then(([signals, timezone, facts]) => {
+      const topics = new Map(facts.topics.flatMap(t => t.modules.map(m => [m.id, t.id] as const)))
+      const gaps = facts.studyOrder.filter(r => r.sample > 0 && r.band === 'repair')
+      return { signals, timezone: timezone ?? 'UTC', gapCount: gaps.length,
+        gaps: gaps.slice(0, 3).map(r => ({ id: r.outcomeId, name: r.name, progress: r.progress, attemptId: r.gapAttemptId ?? null,
+          href: `/app/curriculum/${topics.get(r.readingId)}/${r.readingId}?los=${r.outcomeId}#los-${r.outcomeId}` })) }
+    }).catch(() => null) : null,
+    view === 'notes' ? getNotesIndex(supabase, q).catch(() => null) : null,
   ])
   const { profile, topics, modules, coverage, active, progress } = roadmap ?? {}
-  const rows = workspace?.rows
-  let subjectNotes: { id: string; name: string; updatedAt: string; preview: string; text: string }[] = [], subjectNotesError = false
-  if (view === 'notes') {
-    const sn = await supabase.from('curriculum_notes').select('scope_id, doc, updated_at').eq('scope_type', 'subject').limit(100)
-    if (sn.error) subjectNotesError = true
-    else { const names = new Map((rows ?? []).map(r => [r.subjectId, r.subjectName])); subjectNotes = (sn.data ?? []).map(n => ({ id: n.scope_id as string, name: names.get(n.scope_id as string) ?? (n.scope_id as string), updatedAt: n.updated_at as string, ...(() => { const text = noteText(n.doc as NoteDoc).replace(/\s+/g, ' ').trim(); return { preview: text.slice(0, 160), text } })() })) }
-  }
   const adaptation = view === 'roadmap' ? await getCurrentAdaptation(user.id).catch(() => null) : null
 
   const changeExamHref = onboardingHref('exam', '/app/curriculum')
@@ -85,7 +91,7 @@ async function CurriculumContent({ searchParams }: CurriculumProps) {
               : view === 'notes' ? 'Your private notes, by reading and subject.'
               : view === 'readiness'
               ? 'What your tests show on each outcome, and what to work on next.'
-              : 'The syllabus in order, and how you are tracking against the plan.'}
+              : 'See where you stand, what fits before the exam and what to work toward next.'}
           </p>
         </div>
         <Link href="/app/calendar" className="text-button">Calendar &rarr;</Link>
@@ -105,8 +111,8 @@ async function CurriculumContent({ searchParams }: CurriculumProps) {
         !workspace ? <p role="alert" className="review-error">Your curriculum could not be loaded just now. <Link href="/app/curriculum">Try again</Link></p>
         : <Overview rows={workspace.rows} coverage={workspace.coverage} totals={totals} revisionUnavailable={workspace.revisionUnavailable} q={q} filterKey={filterKey} next={next ? { title: next.title, href: next.destination, label: next.actionLabel ?? 'Open', scope: next.scope } : null} />
       ) : view === 'notes' ? (
-        !rows ? <p role="alert" className="review-error">Your notes could not be loaded just now. <Link href="/app/curriculum?view=notes">Try again</Link></p>
-        : <NotesIndex rows={rows} q={q} subjectNotes={subjectNotes} subjectNotesError={subjectNotesError} />
+        !notes ? <p role="alert" className="review-error">Your notes could not be loaded just now. <Link href="/app/curriculum?view=notes">Try again</Link></p>
+        : <NotesIndex {...notes} q={q} />
       ) : view === 'readiness' && tracker ? (
         <ReadinessTracker tracker={tracker} band={band as LosBand | 'all'} repairLinks={repairLinks} />
       ) : !active ? (
@@ -120,6 +126,12 @@ async function CurriculumContent({ searchParams }: CurriculumProps) {
           roadmap={active.roadmap}
           status={active.status}
           progress={progress!}
+          position={position}
+          mockPrep={await mockPrep}
+          recovery={await recoveryP}
+          next={next?.destination ? { title: next.title, href: next.destination, label: next.actionLabel ?? 'Open' } : null}
+          classLed={active.input.route !== 'self_study' && !active.input.classesCompletedDate}
+          pace={active.input.observedMinutesPerEffortUnit ?? null}
           topics={(topics ?? []).map(t => ({
             id: t.id as string, name: t.name as string,
             weightMin: Number(t.exam_weight_min), weightMax: Number(t.exam_weight_max),
@@ -182,7 +194,7 @@ function Overview({ rows, coverage, totals, revisionUnavailable, q, filterKey, n
 
       <div className="curriculum-outline">
         {[...bySubject].map(([subjectId, list], i) => (
-          <details key={subjectId} open={filtered || i === 0}>
+          <details suppressHydrationWarning key={subjectId} open={filtered || i === 0}>
             <summary><Link href={`/app/curriculum/${subjectId}`}>{list[0].subjectName}</Link> <span className="muted">· {list.length} reading{list.length === 1 ? '' : 's'}{list.some(r => r.needsAttention > 0) ? ` · ${list.filter(r => r.needsAttention > 0).length} need attention` : ''}</span></summary>
             <ul className="reading-list">
               {list.map(r => (
@@ -201,9 +213,7 @@ function Overview({ rows, coverage, totals, revisionUnavailable, q, filterKey, n
   )
 }
 
-function NotesIndex({ rows, q, subjectNotes, subjectNotesError }: { rows: WorkspaceRow[]; q: string; subjectNotes: { id: string; name: string; updatedAt: string; preview: string; text: string }[]; subjectNotesError: boolean }) {
-  const mine = filterRows(rows.filter(r => r.note), { q, inNotes: true })
-  const subs = subjectNotes.filter(n => !q || `${n.name} ${n.text}`.toLowerCase().includes(q.toLowerCase()))
+function NotesIndex({ rows: mine, q, subjectNotes: subs, subjectNotesError }: Awaited<ReturnType<typeof getNotesIndex>> & { q: string }) {
   const when = (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' })
   const back = encodeURIComponent(`/app/curriculum?view=notes${q ? `&q=${encodeURIComponent(q)}` : ''}`)
   return (
@@ -214,10 +224,10 @@ function NotesIndex({ rows, q, subjectNotes, subjectNotesError }: { rows: Worksp
         <button type="submit" className="secondary-button">Search</button>
       </form>
       {subjectNotesError && <p role="alert" className="review-error">Your subject notes could not be listed just now. Reading notes are shown below.</p>}
-      {mine.length === 0 && subs.length === 0 && <p className="muted">{q ? 'No note matches that search.' : 'You have not written any notes yet. Open a reading and choose Notes to start; there is no required format.'}</p>}
+      {!subjectNotesError && mine.length === 0 && subs.length === 0 && <p className="muted">{q ? 'No note matches that search.' : 'You have not written any notes yet. Open a reading and choose Notes to start; there is no required format.'}</p>}
       <ul className="note-index">
         {subs.map(n => <li key={`s-${n.id}`}><Link href={`/app/curriculum/${n.id}?tab=notes&return=${back}`}><strong>{n.name}</strong></Link> <span className="muted">subject · saved {when(n.updatedAt)}</span><p>{q ? snippetFor(n.text, q) : n.preview || 'Empty note'}</p></li>)}
-        {mine.map(r => <li key={r.readingId}><Link href={`/app/curriculum/${r.subjectId}/${r.readingId}?tab=notes&return=${back}`}><strong>Reading {r.readingNo}: {r.title}</strong></Link> <span className="muted">{r.subjectName} · saved {when(r.note!.updatedAt)}</span><p>{q ? snippetFor(r.note!.text, q) : r.note!.preview || 'Empty note'}</p></li>)}
+        {mine.map(r => <li key={r.readingId}><Link href={`/app/curriculum/${r.subjectId}/${r.readingId}?tab=notes&return=${back}`}><strong>Reading {r.readingNo}: {r.title}</strong></Link> <span className="muted">{r.subjectName} · saved {when(r.note.updatedAt)}</span><p>{q ? snippetFor(r.note.text, q) : r.note.preview || 'Empty note'}</p></li>)}
       </ul>
     </>
   )

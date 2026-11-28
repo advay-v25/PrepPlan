@@ -3,6 +3,7 @@
  * Only ever used with the dedicated +e2e identity (see scripts/lib/e2eIdentity.ts).
  */
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { appendFileSync } from 'node:fs'
 import { E2E_BASE_URL } from './e2eIdentity'
 
 export function createSession(admin: SupabaseClient, email: string) {
@@ -63,6 +64,8 @@ export async function completeOnboarding(
     exam?: { sittingIndex?: number; registered?: boolean; timezone?: string }
     /** Study windows / commitments / session limit. Default: Work Mon–Fri, 18:00–21:00 every day, 45-minute sittings, as before. */
     week?: { windows?: { weekday: number; startTime: string; endTime: string }[]; commitments?: unknown[]; maxSessionMinutes?: 20 | 30 | 45 | 60 | 90 }
+    /** Stop once the four setup answers are saved: no preview, no accepted week. */
+    answersOnly?: boolean
   } = {},
 ) {
   const { data: windows } = await admin.from('exam_windows').select('id, window_opens').eq('year', 2027).order('window_opens', { ascending: true })
@@ -93,12 +96,11 @@ export async function completeOnboarding(
     const r = await s.post(`/api/onboarding/${step}`, body)
     if (r.body?.ok !== true) throw new Error(`onboarding ${step} failed: ${JSON.stringify(r.body)}`)
   }
+  if (opts.answersOnly) return { draftId: '', tasks: [] as any[], paper: undefined as any }
   const preview = await s.post('/api/onboarding/plan/preview', {})
-  if (preview.body?.ok !== true) throw new Error(`preview failed: ${JSON.stringify(preview.body)}`)
-  const confirm = await s.post('/api/onboarding/plan/confirm', {
-    draftId: preview.body.data.draftId, expectedRevision: preview.body.data.revision,
-  })
-  if (confirm.body?.ok !== true) throw new Error(`confirm failed: ${JSON.stringify(confirm.body)}`)
+  if (preview.body?.ok !== true) throw new Error(`onboarding plan/preview failed: HTTP ${preview.status} ${JSON.stringify(preview.body)}`)
+  const confirm = await s.post('/api/onboarding/plan/confirm', { draftId: preview.body.data.draftId, expectedRevision: preview.body.data.revision })
+  if (confirm.body?.ok !== true) throw new Error(`onboarding plan/confirm failed: HTTP ${confirm.status} ${JSON.stringify(confirm.body)}`)
   return { draftId: preview.body.data.draftId as string, tasks: (preview.body.data.tasks ?? []) as any[], paper: preview.body.data.paper }
 }
 
@@ -133,6 +135,10 @@ export async function createStudent(admin: SupabaseClient, tag: string, opts: { 
     if (opts.onboard) await completeOnboarding(s, admin, opts.onboarding)
     return { id, s, email }
   } catch (e) {
+    // The failing stage and its response are written down BEFORE the account is removed, so nothing that happens during cleanup can replace them.
+    const record = JSON.stringify({ at: new Date().toISOString(), tag, studentId: id, failure: String((e as Error).message).slice(0, 2000) })
+    console.error(`[fixture setup failed] ${record}`)
+    try { appendFileSync(process.env.SETUP_FAILURE_FILE || 'docs/evidence/setup-failures.jsonl', `${record}\n`) } catch { /* the console line above stands */ }
     await admin.auth.admin.deleteUser(id).catch(() => {})
     throw e
   }

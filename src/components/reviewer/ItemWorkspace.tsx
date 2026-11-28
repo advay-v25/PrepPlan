@@ -1,5 +1,6 @@
 'use client'
 
+import { WhenReady } from '../ui/WhenReady'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -41,7 +42,7 @@ export function ItemWorkspace({ ws, readingOutcomes, blockersIfAcknowledged }: P
   const [note, setNote] = useState('')
   const [ack, setAck] = useState(false)
   const [busy, setBusy] = useState<string | null>(null)
-  const [msg, setMsg] = useState<{ tone: 'ok' | 'err'; text: string; list?: string[] } | null>(null)
+  const [msg, setMsg] = useState<{ tone: 'ok' | 'err'; text: string; list?: string[]; reload?: boolean } | null>(null)
   const [editing, setEditing] = useState(false)
   const [groupWith, setGroupWith] = useState('')
 
@@ -63,8 +64,15 @@ export function ItemWorkspace({ ws, readingOutcomes, blockersIfAcknowledged }: P
     try {
       const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       const d = await res.json().catch(() => ({}))
-      if (res.ok && d.ok !== false) { setMsg({ tone: 'ok', text: d.repeated ? 'Already recorded; nothing changed.' : 'Done.' }); setNote(''); setAck(false); after ? after(d) : router.refresh() }
-      else setMsg({ tone: 'err', text: d.error ?? d.message ?? 'That did not work. Nothing was changed.', list: d.blockers })
+      if (res.ok && d.ok !== false) {
+        setNote(''); setAck(false)
+        if (label === 'approve' && d.repeated) setMsg({ tone: 'ok', text: 'Already recorded; nothing changed.', reload: true })
+        else {
+          setMsg({ tone: 'ok', text: d.repeated ? 'Already recorded; nothing changed.' : 'Done.' })
+          after ? after(d) : router.refresh()
+        }
+      }
+      else setMsg({ tone: 'err', text: d.error ?? d.message ?? 'That did not work. Nothing was changed.', list: d.blockers, reload: label === 'approve' && res.status === 409 })
     } catch { setMsg({ tone: 'err', text: 'Network error. Nothing was changed.' }) }
     setBusy(null)
   }
@@ -74,6 +82,7 @@ export function ItemWorkspace({ ws, readingOutcomes, blockersIfAcknowledged }: P
   const decide = (decision: string) => call(decision, `/api/diagnostic/items/${encodeURIComponent(item.id)}/review`, { decision, note, expectedVersion: item.item_version, acknowledgeDisagreement: ack })
 
   return (
+    <WhenReady>
     <div className="rv-grid">
       <div style={{ display: 'grid', gap: 16, minWidth: 0 }}>
         {successor && <p className="notice notice--info"><span>A newer version exists: <Link href={`/app/tests/review/${encodeURIComponent(successor.id)}`}>{successor.id}</Link> ({itemStateLabel(successor.state)}). This one stays as it was for the attempts that used it.</span></p>}
@@ -135,7 +144,7 @@ export function ItemWorkspace({ ws, readingOutcomes, blockersIfAcknowledged }: P
           )}
           {verdict?.detail?.independentAnswerIndex != null && <p className="fine-print">The independent checker chose option {String.fromCharCode(65 + Number(verdict.detail.independentAnswerIndex))}; the key is option {item.key_index === null ? '?' : String.fromCharCode(65 + item.key_index)}.</p>}
           <p className="fine-print"><strong>Limits of these checks.</strong> {SEMANTIC_LIMIT_NOTICE}{item.item_card?.isNumeric ? ' This is a numerical item: the arithmetic was executed by a restricted calculator, and the inputs it used are listed in its derivation above.' : ''}</p>
-          {olderChecks.length > 0 && <details><summary>Earlier checks and repairs ({olderChecks.length}, from previous versions)</summary>
+          {olderChecks.length > 0 && <details suppressHydrationWarning><summary>Earlier checks and repairs ({olderChecks.length}, from previous versions)</summary>
             <ul className="rv-list">{olderChecks.map(v => <li key={v.id} className="fine-print">v{v.item_version ?? 1} · {when(v.created_at)} · <strong>{v.detail?.gate === 'verdict' ? 'Overall' : v.detail?.gate ?? v.reviewer_role}:</strong> {v.status}{v.detail?.detail ? ` — ${v.detail.detail}` : ''}</li>)}</ul>
             <p className="fine-print">These belong to superseded versions and do not count toward this version's approval.</p></details>}
         </section>
@@ -210,7 +219,7 @@ export function ItemWorkspace({ ws, readingOutcomes, blockersIfAcknowledged }: P
                   <textarea rows={2} value={why} onChange={e => setWhy(e.target.value)} placeholder="The distinction or reasoning the student must make; not stem length or arithmetic count." />
                 </label>
                 <div className="rv-actions"><button type="button" className="secondary-button" disabled={busy !== null || why.trim().length < 10 } onClick={confirmLevel}>{busy === 'difficulty' && <Loader2 size={15} className="animate-spin" aria-hidden />}{confirmedLevel ? 'Revise confirmed level' : 'Confirm level'}</button></div>
-                {ws.difficulty.history.length > 0 && <details><summary>Level history ({ws.difficulty.history.length})</summary><ul className="rv-list">{ws.difficulty.history.map(h => <li key={h.id}>v{h.item_version} · {h.level} · {when(h.created_at)} · reviewer {h.reviewer_id.slice(0, 8)} — {h.rationale}</li>)}</ul></details>}
+                {ws.difficulty.history.length > 0 && <details suppressHydrationWarning><summary>Level history ({ws.difficulty.history.length})</summary><ul className="rv-list">{ws.difficulty.history.map(h => <li key={h.id}>v{h.item_version} · {h.level} · {when(h.created_at)} · reviewer {h.reviewer_id.slice(0, 8)} — {h.rationale}</li>)}</ul></details>}
               </div>
               {disagreement && <label className="field"><span><input type="checkbox" checked={ack} onChange={e => setAck(e.target.checked)} /> I have read the checkers’ disagreement and judged it myself.</span></label>}
               <div className="rv-form">
@@ -219,7 +228,7 @@ export function ItemWorkspace({ ws, readingOutcomes, blockersIfAcknowledged }: P
                 </label>
               </div>
               <div className="rv-actions">
-                {(unpublished || legacy) && <button type="button" className="primary-button" disabled={busy !== null || !canApprove} onClick={() => decide('approve')}>{busy === 'approve' && <Loader2 size={15} className="animate-spin" aria-hidden />}{legacy ? 'Record my review' : 'Approve and publish'}</button>}
+                {(unpublished || legacy) && <button type="button" className="primary-button" disabled={busy !== null || !canApprove || msg?.reload} onClick={() => decide('approve')}>{busy === 'approve' && <Loader2 size={15} className="animate-spin" aria-hidden />}{legacy ? 'Record my review' : 'Approve and publish'}</button>}
                 {unpublished && <button type="button" className="secondary-button" disabled={busy !== null || note.trim().length < 3} onClick={() => decide('return')}>Return for correction</button>}
                 {unpublished && <button type="button" className="secondary-button is-danger" disabled={busy !== null || note.trim().length < 3} onClick={() => decide('reject')}>Reject</button>}
                 {item.review_status === 'reviewed' && <button type="button" className="secondary-button is-danger" disabled={busy !== null || note.trim().length < 3} onClick={() => decide('retire')}>Retire</button>}
@@ -232,7 +241,11 @@ export function ItemWorkspace({ ws, readingOutcomes, blockersIfAcknowledged }: P
                 <Link className="secondary-button" href={`/app/tests/review/${encodeURIComponent(item.id)}/preview`}>Preview as a student</Link>
               </div>
             </>)}
-          {msg && <p role={msg.tone === 'err' ? 'alert' : 'status'} className={msg.tone === 'err' ? 'auth-error' : 'fine-print'}>{msg.text}{msg.list && <ul className="rv-list">{msg.list.map(b => <li key={b}>{b}</li>)}</ul>}</p>}
+          {msg && <div role={msg.tone === 'err' ? 'alert' : 'status'} className={msg.tone === 'err' ? 'auth-error' : 'fine-print'}>
+            {msg.text}
+            {msg.list && <ul className="rv-list">{msg.list.map(b => <li key={b}>{b}</li>)}</ul>}
+            {msg.reload && <> <button type="button" className="text-button" onClick={() => window.location.reload()}>Reload this question</button></>}
+          </div>}
         </section>
 
         <section className="rv-panel" aria-labelledby="src-h">
@@ -257,6 +270,7 @@ export function ItemWorkspace({ ws, readingOutcomes, blockersIfAcknowledged }: P
         </section>
       </aside>
     </div>
+    </WhenReady>
   )
 }
 

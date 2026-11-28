@@ -8,9 +8,9 @@ import { trace } from '../../../lib/ops/trace'
 import { GOOGLE_SIGN_IN_ENABLED, passwordRule, TURNSTILE_SITE_KEY, VERIFICATION_TYPES } from '../../../lib/auth/authPolicy'
 import { authDestination } from '../../../lib/auth/redirect'
 import { AUTH_PRIVATE_CACHE, authOrigin, JsonInputError, readBoundedJson, sessionCookieOptions } from '../../../lib/auth/requestSecurity'
-import { authNetworkLimit, cleanEnv, makeRecoveryIntent, matchesRecoveryAddress, rateLimit, readRecoveryIntent, recoveryGrant } from '../../../lib/auth/securityServer'
+import { authNetworkLimit, cleanEnv, makeRecoveryIntent, makeResetReceipt, matchesRecoveryAddress, rateLimit, readRecoveryIntent, recoveryGrant, RESET_RECEIPT_COOKIE, RESET_RECEIPT_SECONDS } from '../../../lib/auth/securityServer'
 import { verifiedSession } from '../../../lib/auth/recoverySession'
-import { needsPassword } from '../../../lib/auth/passwordState'
+import { NAME_ERROR, normalizePersonName } from '../../../lib/auth/personName'
 
 const email = z.string().trim().toLowerCase().max(254).email()
 const password = z.string().min(1).max(1024)
@@ -19,18 +19,26 @@ const next = z.string().max(2048).optional()
 
 const input = z.discriminatedUnion('action', [
   z.strictObject({ action: z.literal('login'), email, password, captchaToken, next }),
-  z.strictObject({ action: z.literal('signup'), email, password, captchaToken, name: z.string().trim().min(1).max(100), accepted: z.literal(true) }),
+  z.strictObject({ action: z.literal('signup'), email, password, captchaToken, name: z.string().max(300), accepted: z.literal(true) }),
   z.strictObject({ action: z.literal('forgot'), email, captchaToken }),
   z.strictObject({ action: z.literal('resend'), email, captchaToken }),
   z.strictObject({ action: z.literal('verify'), type: z.enum(VERIFICATION_TYPES), tokenHash: z.string().regex(/^[A-Za-z0-9_-]{20,256}$/), intent: z.string().max(512).optional(), next }),
   z.strictObject({ action: z.literal('update'), password }),
   z.strictObject({ action: z.literal('signout') }),
-  z.strictObject({ action: z.literal('setpassword'), password, next }),
   z.strictObject({ action: z.literal('google'), next }),
 ])
 
 function reply(body: Record<string, unknown>, status = 200, headers: HeadersInit = {}) {
   return Response.json(body, { status, headers: { 'Cache-Control': AUTH_PRIVATE_CACHE, ...headers } })
+}
+
+async function resetSaved(status: 'success' | 'sessions') {
+  try {
+    ;(await cookies()).set(RESET_RECEIPT_COOKIE, makeResetReceipt(status), { ...sessionCookieOptions(), maxAge: RESET_RECEIPT_SECONDS })
+  } catch {
+    trace('auth', 'password_reset_receipt', { result: 'unavailable' })
+  }
+  return reply({ ok: true, next: '/login' })
 }
 
 function provider(action: string, error?: AuthError | null) {
@@ -45,7 +53,7 @@ function providerFailure(error: AuthError) {
 }
 
 function mailClient() {
-  const anonKey = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  const anonKey = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) || cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
   return createSupabaseClient(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
@@ -65,9 +73,12 @@ export async function POST(request: Request) {
   const parsed = input.safeParse(payload)
   if (!parsed.success) return reply({ error: 'Check the details and try again.' }, 400)
   const data = parsed.data
+  const name = data.action === 'signup' ? normalizePersonName(data.name) : null
+  if (data.action === 'signup' && name === null) return reply({ error: NAME_ERROR, code: 'INVALID_NAME' }, 400)
   const origin = authOrigin(request)
   if (!origin) return reply({ error: 'This address is not configured for PrepPlan sign-in.' }, 503)
 
+  const started = performance.now()
   try {
     if (data.action === 'signout') {
       try {
@@ -90,7 +101,7 @@ export async function POST(request: Request) {
       }
       let saved = false
       try {
-        const { error } = await boundedStage('update password', 12_000, () => supabase.auth.updateUser({ password: data.password }))
+        const { error } = await boundedStage('update password', 12_000, () => supabase.auth.updateUser({ password: data.password, data: { password_set: true } }))
         provider('password_update', error)
         if (error && error.status && error.status < 500) {
           return reply({ error: 'Your password was refused. Request a new link and choose a different password.', code: 'RECOVERY_REQUIRED' }, 400)
@@ -98,27 +109,11 @@ export async function POST(request: Request) {
         if (error) throw new Error('Password update not confirmed')
         saved = true
         const { error: signOutError } = await boundedStage('revoke sessions', 10_000, () => supabase.auth.signOut({ scope: 'global' }))
-        return reply({ ok: true, next: signOutError ? '/login?reset=sessions' : '/login?reset=success' })
+        return await resetSaved(signOutError ? 'sessions' : 'success')
       } catch {
-        if (saved) return reply({ ok: true, next: '/login?reset=sessions' })
+        if (saved) return await resetSaved('sessions')
         return reply({ error: 'PrepPlan could not confirm the password change. Try signing in with the new password, or request a new reset email.', code: 'RESET_OUTCOME_UNKNOWN' }, 502)
       } finally { await clearSessionCookies() }
-    }
-
-    if (data.action === 'setpassword') {
-      // Only an account that has no password yet (Google sign-up) may set one on its current session. Changing an existing password needs the reset email.
-      const rule = passwordRule(data.password)
-      if (rule) return reply({ error: rule }, 400)
-      const limited = await authNetworkLimit(request, 'signin')
-      if (limited) return limited
-      const supabase = await createClient()
-      const { data: { user } } = await boundedStage('read account', 10_000, () => supabase.auth.getUser())
-      if (!user?.email_confirmed_at) return reply({ error: 'Sign in again to continue.', code: 'SIGN_IN_REQUIRED' }, 401)
-      if (!needsPassword(user)) return reply({ error: 'This account already has a password. Use "Forgot password" to change it.', code: 'ALREADY_SET' }, 409)
-      const { error } = await boundedStage('set password', 12_000, () => supabase.auth.updateUser({ password: data.password, data: { password_set: true } }))
-      provider('password_set', error)
-      if (error) return providerFailure(error) ?? reply({ error: 'That password was refused. Choose a different one.' }, 400)
-      return reply({ ok: true, next: authDestination(data.next ?? null) })
     }
 
     if (data.action === 'verify') {
@@ -141,7 +136,7 @@ export async function POST(request: Request) {
         const { error: sessionError } = await boundedStage('install recovery session', 10_000, () => supabase.auth.setSession({
           access_token: result.session!.access_token, refresh_token: result.session!.refresh_token,
         }))
-        if (sessionError) throw new Error(`Recovery session unavailable (${sessionError.status ?? 'no status'}: ${sessionError.code ?? sessionError.name}: ${sessionError.message.slice(0, 120)})`)
+        if (sessionError) throw new Error('Recovery session unavailable')
         return reply({ ok: true, next: '/update-password' })
       }
       const { data: result, error } = await boundedStage('verify email', 12_000, () =>
@@ -205,7 +200,7 @@ export async function POST(request: Request) {
     const send = async () => {
       const options = { captchaToken: data.captchaToken, emailRedirectTo: origin + '/auth/verify' }
       if (data.action === 'signup') return client.auth.signUp({
-        email: data.email, password: data.password, options: { ...options, data: { full_name: data.name } },
+        email: data.email, password: data.password, options: { ...options, data: { full_name: name } },
       })
       if (data.action === 'resend') return client.auth.resend({ type: 'signup', email: data.email, options })
       const intent = makeRecoveryIntent(data.email)
@@ -218,10 +213,10 @@ export async function POST(request: Request) {
     if (error?.code === 'captcha_failed') return reply({ error: 'The security check expired. Try it again.' }, 400)
     // Duplicate, unknown, not admitted, provider mail limits and recipient-specific delivery errors have one outward result.
     return reply({ ok: true }, 202)
-  } catch (error) {
-    // The reason is logged server-side (message only, never credentials or request bodies); the caller gets the neutral message below.
-    console.error('[auth] action failed:', data.action, error instanceof Error ? error.message : 'unknown')
+  } catch {
     trace('auth', 'unavailable', { action: data.action })
     return reply({ error: 'PrepPlan could not confirm the request. Wait a moment and try again.' }, 503)
+  } finally {
+    trace('auth', 'duration', { action: data.action, elapsedMs: Math.round(performance.now() - started) })
   }
 }

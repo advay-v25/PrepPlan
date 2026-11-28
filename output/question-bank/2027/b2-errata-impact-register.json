@@ -1,0 +1,59 @@
+{
+  "schema": "b2-errata-impact-register.1",
+  "checkedDate": "2026-11-25",
+  "officialNotice": {
+    "title": "Curriculum Errata Notice — 2027 Level I CFA Program (September 2026, 39 pages)",
+    "indexUrl": "https://www.cfainstitute.org/programs/candidate-resources/submit-errata",
+    "pdfUrl": "https://www.cfainstitute.org/sites/default/files/docs/programs/cfa-program/candidate-resources/2027-cfa-program-level-1-notice.pdf",
+    "localCache": "content/source-packs/private/reference-2027/closeout/official-errata-september-2026.pdf"
+  },
+  "topicWeightsSource": {
+    "url": "https://www.cfainstitute.org/programs/cfa-program/candidate-resources/level-i-exam",
+    "reconciled": true,
+    "note": "Mock candidate allocation (180 selected + 10 reserves = 190 candidates) matches official 2027 Level I session/topic ranges."
+  },
+  "impacts": [
+    {
+      "area": "FCFE vs. share repurchases/issuances (Notice pp. 6, 23)",
+      "affectedItems": ["pp-mock1-r031-a-medium-1", "pp-ref2027-r044-a-medium"],
+      "disposition": "already_consistent",
+      "detail": "Bank uses FCFE = OCF - Capex + Net Borrowing; share repurchases/issuances do not enter FCFE directly."
+    },
+    {
+      "area": "Cash conversion cycle direction when stretching AP (Notice p. 19)",
+      "affectedItems": ["pp-2027-c5-r023-a-medium", "pp-mock1-r023-a-easy-1", "pp-ref2027-r023-a-easy"],
+      "disposition": "already_consistent",
+      "detail": "All CCC items use DOH + DSO - DPO so higher DPO decreases CCC."
+    },
+    {
+      "area": "Empirical vs. analytical duration (Notice p. 8)",
+      "affectedItems": ["pp-2027-c5-r063-d-easy", "pp-2027-c5-r063-d-hard"],
+      "disposition": "already_consistent",
+      "detail": "Items accurately state empirical duration uses statistical estimation on historical data while analytical uses mathematical formulas."
+    },
+    {
+      "area": "Semiannual yield & convexity conventions (Notice pp. 7, 30-31)",
+      "affectedItems": ["pp-2027-c5-r057-a-easy", "pp-2027-c5-r057-a-hard", "pp-2027-c5-r061-a-medium"],
+      "disposition": "already_consistent",
+      "detail": "Periodicity=2 conversions and convexity sign/scaling match semiannual conventions."
+    },
+    {
+      "area": "Hedge fund incentive fee ordering post-management-fee & HWM (Notice pp. 35-36)",
+      "affectedItems": ["pp-2027-c5-r081-b-easy", "pp-2027-c5-r081-b-hard"],
+      "disposition": "already_consistent",
+      "detail": "Both items deduct management fee before computing incentive fee above the high-water mark."
+    },
+    {
+      "area": "Standard III(C) suitability & mandate consistency (Notice p. 38)",
+      "affectedItems": ["pp-mock1-r097-c-hard-1", "pp-ref2027-r097-c-easy", "pp-ref2027-r097-c-medium"],
+      "disposition": "already_consistent",
+      "detail": "Mandate/IPS consistency language aligns with restored Standard III(C) text."
+    },
+    {
+      "area": "Capitalized vs. expensed interest cash-flow classification (Notice p. 4)",
+      "affectedItems": ["pp-ref2027-r030-a-medium", "pp-ref2027-r030-b-hard"],
+      "disposition": "not_applicable",
+      "detail": "Items test general OCF/FCF classification and indirect OCF rather than the specific Example 5 investing-cash-flow erratum."
+    }
+  ]
+}

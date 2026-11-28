@@ -2,8 +2,20 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { tracedFetch } from '../ops/readTrace'
 import { sessionCookieOptions } from '../auth/requestSecurity'
-import { budgetFetch } from '../ops/requestBudget'
+import { boundedStage, budgetFetch } from '../ops/requestBudget'
 import { cleanEnv } from '../auth/securityServer'
+
+export async function getEntryUser() {
+  const cookieStore = await cookies()
+  if (!cookieStore.getAll().some(({ name }) => /^sb-.*-auth-token(?:\.\d+)?$/.test(name))) return null
+  try {
+    const client = await createClient()
+    const { data, error } = await boundedStage('check sign-in session', 4000, () => client.auth.getUser())
+    return error ? null : data.user
+  } catch {
+    return null
+  }
+}
 
 export async function clearSessionCookies() {
   const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
@@ -18,7 +30,7 @@ export async function clearSessionCookies() {
 
 export async function createClient() {
   const cookieStore = await cookies()
-  const anonKey = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+  const anonKey = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) || cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL)
 
   return createServerClient(

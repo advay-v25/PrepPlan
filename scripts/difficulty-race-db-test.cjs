@@ -3,18 +3,14 @@
  *  accepted-decision comparison and the reservation commit. TEST-ONLY fixture bank + throwaway students, removed by recorded id.
  *  npm run difficulty:race:db:test -- --confirm-target=<project-ref> [--bank=<fixture-bank record>] */
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os'), assert = require('node:assert/strict')
-const { execFileSync } = require('node:child_process')
-const { Client } = require('pg'); const { parse } = require('dotenv')
-const { configuration } = require('./lib/migrations.cjs')
+const { Client } = require('pg')
+const { openStage } = require('./lib/stage.cjs')
 
 async function main(args = process.argv.slice(2)) {
-  const root = path.resolve(__dirname, '..'), env = parse(fs.readFileSync(path.join(root, '.env.staging.local')))
-  const cfg = configuration(['--env=staging', '--dry-run'], env)
-  if (!env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF || env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF !== cfg.identity) throw Error('Not the user-confirmed disposable project; refusing.')
-  if (!args.includes(`--confirm-target=${cfg.identity}`)) throw Error(`Pass --confirm-target=${cfg.identity}.`)
-  const target = `--confirm-target=${cfg.identity}`, given = (args.find(a => a.startsWith('--bank=')) ?? '').slice(7)
+  const stage = await openStage(args), cfg = stage.cfg; global.__stage = stage
+  const given = (args.find(a => a.startsWith('--bank=')) ?? '').slice(7)
   const file = given || path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'race-fixture-')), 'bank.json')
-  if (!given) execFileSync('node', [path.join(__dirname, 'fixture-bank.cjs'), 'create', target, `--out=${file}`, '--readings=r028', '--per-outcome=5', '--variants=1'], { stdio: 'inherit' })
+  if (!given) await stage.create(file, ['--readings=r028', '--per-outcome=9', '--variants=1'])
   const bank = JSON.parse(fs.readFileSync(file, 'utf8')), tag = Date.now().toString(36)
   const mk = () => new Client({ ...cfg.connection, connectionTimeoutMillis: 45000, keepAlive: true, query_timeout: 90000 })
   const setup = mk(), A = mk(), B = mk(); await Promise.all([setup.connect(), A.connect(), B.connect()])
@@ -103,7 +99,7 @@ async function main(args = process.argv.slice(2)) {
     }
     {
       const u = await student(), ids = take().map(i => i.id), lv = await levelsOf(ids), key = `race-3-${tag}`
-      const a0 = await reservation(A, u, null, lv, paper(ids, key + 'x')); ok('probe attempt reserved', a0.ok === true)
+      const a0 = await reservation(A, u, null, lv, paper(ids, key + 'x')); ok('probe attempt reserved', a0.ok === true, JSON.stringify(a0))
       const v0 = await one(setup, 'select public.difficulty_evidence_version($1)', [u]), ids2 = take().map(i => i.id), lv2 = await levelsOf(ids2)
       await B.query('BEGIN'); await B.query('update public.assessment_attempts set status = status where id = $1', [a0.attemptId])   // any planning-scope writer fires the same trigger
       const waiting = reservation(A, u, v0, lv2, paper(ids2, key))
@@ -135,7 +131,7 @@ async function main(args = process.argv.slice(2)) {
       }
     } catch (e) { console.error('cleanup:', e.message) }
     await Promise.all([setup.end(), A.end(), B.end()]).catch(() => {})
-    if (!given) execFileSync('node', [path.join(__dirname, 'fixture-bank.cjs'), 'destroy', target, `--file=${file}`], { stdio: 'inherit' })
+    if (!given) await stage.destroy(file)
   }
 }
-main().catch(e => { console.error(e); process.exit(1) })
+main().then(() => global.__stage?.stop()).catch(async e => { console.error(e); await global.__stage?.stop(); process.exit(1) })

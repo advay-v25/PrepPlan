@@ -1,0 +1,2044 @@
+{
+  "quant": [
+    {
+      "o": "r001-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe, compare and interpret returns"
+    },
+    {
+      "o": "r001-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe required rates of return: risk-free rate, risk premia, inflation"
+    },
+    {
+      "o": "r002-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret returns for assets, instruments and indicators"
+    },
+    {
+      "o": "r003-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and compare money-weighted and time-weighted returns"
+    },
+    {
+      "o": "r003-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe index weighting choices and their implications"
+    },
+    {
+      "o": "r005-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Calculate central tendency and dispersion measures"
+    },
+    {
+      "o": "r005-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Interpret skewness and kurtosis"
+    },
+    {
+      "o": "r005-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret covariance and correlation"
+    },
+    {
+      "o": "r005-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate semi-deviation and the coefficient of variation"
+    },
+    {
+      "o": "r006-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Calculate expected values, variance and covariance"
+    },
+    {
+      "o": "r006-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Evaluate the key distributions used in finance"
+    },
+    {
+      "o": "r006-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate conditional expectations, variances and covariances"
+    },
+    {
+      "o": "r006-d",
+      "t": [
+        "E",
+        "M"
+      ],
+      "title": "Apply Bayesian updating to investment problems"
+    },
+    {
+      "o": "r007-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Apply the central limit theorem, confidence intervals and sampling methods"
+    },
+    {
+      "o": "r007-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain hypothesis testing: significance, Type I and II errors, power"
+    },
+    {
+      "o": "r007-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Choose between parametric and non-parametric tests and interpret results"
+    },
+    {
+      "o": "r008-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate portfolio return, variance, covariance and correlation"
+    },
+    {
+      "o": "r008-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe the minimum-variance portfolio and the efficient frontier"
+    },
+    {
+      "o": "r008-c",
+      "t": [
+        "E",
+        "M"
+      ],
+      "title": "Explain the optimal portfolio, the CAL and the market line"
+    },
+    {
+      "o": "r009-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe historical simulation and its uses"
+    },
+    {
+      "o": "r009-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe bootstrap resampling and its uses"
+    },
+    {
+      "o": "r009-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe Monte Carlo simulation and its uses"
+    },
+    {
+      "o": "r010-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe and explain simple linear regression and least squares"
+    },
+    {
+      "o": "r010-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Assess regression assumptions, residuals, goodness of fit and ANOVA"
+    },
+    {
+      "o": "r010-c",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Calculate predicted values and prediction intervals; compare functional forms"
+    },
+    {
+      "o": "r010-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Interpret CAPM estimates from a regression"
+    },
+    {
+      "o": "r011-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe big data, machine learning, AI and fintech in investment management"
+    }
+  ],
+  "econ": [
+    {
+      "o": "r012-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Interpret breakeven and shutdown points and scale economies"
+    },
+    {
+      "o": "r012-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe competition, monopolistic competition, oligopoly and monopoly"
+    },
+    {
+      "o": "r012-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain supply, demand, price and output under monopolistic competition"
+    },
+    {
+      "o": "r012-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain supply, demand, price and output under oligopoly"
+    },
+    {
+      "o": "r012-e",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Identify market structure and describe concentration measures"
+    },
+    {
+      "o": "r013-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe the business cycle and its phases"
+    },
+    {
+      "o": "r013-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe credit cycles"
+    },
+    {
+      "o": "r013-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe how activity across sectors varies over the cycle and how it is measured"
+    },
+    {
+      "o": "r014-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Compare monetary and fiscal policy"
+    },
+    {
+      "o": "r014-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe fiscal policy roles, objectives and the debt debate"
+    },
+    {
+      "o": "r014-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe fiscal tools and their advantages and disadvantages"
+    },
+    {
+      "o": "r014-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain fiscal implementation and expansionary vs contractionary stance"
+    },
+    {
+      "o": "r015-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe central bank roles and objectives"
+    },
+    {
+      "o": "r015-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe monetary tools and the transmission mechanism"
+    },
+    {
+      "o": "r015-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe effective central banks, inflation targeting and policy stance"
+    },
+    {
+      "o": "r015-d",
+      "t": [
+        "E",
+        "M"
+      ],
+      "title": "Explain the interaction of monetary and fiscal policy"
+    },
+    {
+      "o": "r016-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe geopolitics from a cooperation versus competition perspective"
+    },
+    {
+      "o": "r016-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe geopolitics and globalization"
+    },
+    {
+      "o": "r016-c",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe international organizations that facilitate trade"
+    },
+    {
+      "o": "r016-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe geopolitical risk"
+    },
+    {
+      "o": "r016-e",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe geopolitical tools and their impact on regions and economies"
+    },
+    {
+      "o": "r016-f",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe the impact of geopolitical risk on investments"
+    },
+    {
+      "o": "r017-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe the benefits and costs of international trade"
+    },
+    {
+      "o": "r017-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare trade restrictions: tariffs, quotas, export subsidies"
+    },
+    {
+      "o": "r017-c",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Explain motivations for trading blocs, common markets and economic unions"
+    },
+    {
+      "o": "r018-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe the FX market and interpret currency changes"
+    },
+    {
+      "o": "r018-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe exchange rate regimes and their effects"
+    },
+    {
+      "o": "r018-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe capital restrictions imposed by governments"
+    },
+    {
+      "o": "r019-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret currency cross-rates"
+    },
+    {
+      "o": "r019-b",
+      "t": [
+        "E",
+        "M"
+      ],
+      "title": "Explain no-arbitrage, forward rates, points and premium or discount"
+    }
+  ],
+  "ci": [
+    {
+      "o": "r020-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Compare organizational forms of businesses"
+    },
+    {
+      "o": "r020-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe key features of corporate issuers"
+    },
+    {
+      "o": "r020-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare publicly and privately owned issuers"
+    },
+    {
+      "o": "r021-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare claims and motivations of lenders and shareholders"
+    },
+    {
+      "o": "r021-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe stakeholder groups and their interests"
+    },
+    {
+      "o": "r021-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe ESG factors investors consider"
+    },
+    {
+      "o": "r022-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe principal-agent relationships and conflicts"
+    },
+    {
+      "o": "r022-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe governance mechanisms and how they mitigate risk"
+    },
+    {
+      "o": "r022-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe risks of poor governance and benefits of effective governance"
+    },
+    {
+      "o": "r023-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Explain the cash conversion cycle and compare issuers"
+    },
+    {
+      "o": "r023-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain and compare liquidity levels"
+    },
+    {
+      "o": "r023-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe objectives and methods of managing working capital"
+    },
+    {
+      "o": "r024-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe types of capital investments"
+    },
+    {
+      "o": "r024-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate NPV, IRR and ROIC and contrast their use"
+    },
+    {
+      "o": "r024-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe capital allocation principles and pitfalls"
+    },
+    {
+      "o": "r024-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe real options in capital investments"
+    },
+    {
+      "o": "r025-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret WACC"
+    },
+    {
+      "o": "r025-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain factors affecting capital structure and WACC"
+    },
+    {
+      "o": "r025-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain the Modigliani-Miller propositions"
+    },
+    {
+      "o": "r025-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe optimal and target capital structures"
+    },
+    {
+      "o": "r026-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe key features of business models"
+    },
+    {
+      "o": "r026-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe types of business models"
+    }
+  ],
+  "fsa": [
+    {
+      "o": "r027-a",
+      "t": [
+        "H"
+      ],
+      "title": "Describe the steps in the financial statement analysis framework"
+    }
+  ],
+  "eq": [
+    {
+      "o": "r039-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe basic features and types of equity instruments"
+    },
+    {
+      "o": "r039-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Contrast publicly listed with private equity securities"
+    },
+    {
+      "o": "r040-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe differences in economic and voting rights across jurisdictions and classes"
+    },
+    {
+      "o": "r040-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe the voting process and the roles of managers, boards, proxy advisors and owners"
+    },
+    {
+      "o": "r041-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe primary and secondary equity markets and their functions"
+    },
+    {
+      "o": "r041-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare exchange, off-exchange and over-the-counter trading"
+    },
+    {
+      "o": "r041-c",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe liquidity measures and calculate float and average daily volume"
+    },
+    {
+      "o": "r041-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe types of equity indexes"
+    },
+    {
+      "o": "r042-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe dividends, share repurchases, stock splits and reverse splits"
+    },
+    {
+      "o": "r042-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe dividend payment chronology"
+    },
+    {
+      "o": "r042-c",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Calculate price and total return for equities"
+    },
+    {
+      "o": "r043-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Contrast price and value for an equity security"
+    },
+    {
+      "o": "r043-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Contrast book value, market capitalization and enterprise value"
+    },
+    {
+      "o": "r043-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe major valuation models and their advantages and disadvantages"
+    },
+    {
+      "o": "r044-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Contrast dividend, FCFF, FCFE and residual income inputs and value equity"
+    },
+    {
+      "o": "r044-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Value equity using constant and multistage growth models"
+    },
+    {
+      "o": "r044-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain shortcomings of constant and multistage assumptions"
+    },
+    {
+      "o": "r044-d",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Value non-callable, non-convertible preferred stock"
+    },
+    {
+      "o": "r045-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain using multiples: comparables and forecasted fundamentals"
+    },
+    {
+      "o": "r045-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Calculate and interpret price and enterprise value multiples"
+    },
+    {
+      "o": "r045-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Determine a peer group for multiples-based valuation"
+    },
+    {
+      "o": "r045-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe using multiples on past, current and projected values"
+    },
+    {
+      "o": "r046-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain rationale, construction and uses of forecast models"
+    },
+    {
+      "o": "r046-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Evaluate a valuation model based on company characteristics"
+    },
+    {
+      "o": "r046-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Estimate and interpret value from a forecast model"
+    },
+    {
+      "o": "r047-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe the process of industry and competitive analysis"
+    },
+    {
+      "o": "r047-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe industry classification methods"
+    },
+    {
+      "o": "r047-c",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Determine industry size, growth, profitability and market share trends"
+    },
+    {
+      "o": "r047-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Analyze industry structure with Porter's Five Forces and PESTLE"
+    },
+    {
+      "o": "r048-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain a company's competitive strategy and position"
+    },
+    {
+      "o": "r048-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Evaluate revenue drivers, profitability and pricing power"
+    },
+    {
+      "o": "r048-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Evaluate working capital, capital investment and capital structure"
+    },
+    {
+      "o": "r049-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe the elements of a detailed company research report"
+    },
+    {
+      "o": "r049-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare sell-side and buy-side reports and their conclusions"
+    },
+    {
+      "o": "r049-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain why estimates differ across modeling approaches"
+    },
+    {
+      "o": "r050-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Explain use of the CAPM and market model to estimate required return"
+    },
+    {
+      "o": "r050-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe arbitrage pricing theory and multi-factor models"
+    }
+  ],
+  "fi": [
+    {
+      "o": "r051-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe the features of a fixed-income security"
+    },
+    {
+      "o": "r051-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe bond indenture contents and covenants"
+    },
+    {
+      "o": "r052-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe cash flow structures and contingency provisions"
+    },
+    {
+      "o": "r052-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe legal, regulatory and tax effects on issuance and trading"
+    },
+    {
+      "o": "r053-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe market segments and their participants"
+    },
+    {
+      "o": "r053-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe types of fixed-income indexes"
+    },
+    {
+      "o": "r053-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare primary and secondary markets with equity markets"
+    },
+    {
+      "o": "r054-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare short-term funding alternatives for corporations"
+    },
+    {
+      "o": "r054-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe repurchase agreements, uses and risks"
+    },
+    {
+      "o": "r054-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Contrast long-term funding of investment-grade and high-yield issuers"
+    },
+    {
+      "o": "r055-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe funding choices of sovereign, non-sovereign and supranational issuers"
+    },
+    {
+      "o": "r055-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Contrast issuance and trading of government and corporate instruments"
+    },
+    {
+      "o": "r056-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate a bond's price on or between coupon dates"
+    },
+    {
+      "o": "r056-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Identify relationships among price, coupon, maturity and yield"
+    },
+    {
+      "o": "r056-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe matrix pricing"
+    },
+    {
+      "o": "r057-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate annual yield for varying compounding periods"
+    },
+    {
+      "o": "r057-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare, calculate and interpret yield and spread measures"
+    },
+    {
+      "o": "r058-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret spread measures for floating-rate instruments"
+    },
+    {
+      "o": "r058-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret yield measures for money market instruments"
+    },
+    {
+      "o": "r059-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Define spot rates and price a bond using them"
+    },
+    {
+      "o": "r059-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Define par, spot and forward rates and their relationships"
+    },
+    {
+      "o": "r059-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare the spot, par and forward curves"
+    },
+    {
+      "o": "r060-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret return sources from a fixed-rate bond"
+    },
+    {
+      "o": "r060-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe holding period return, horizon and Macaulay duration"
+    },
+    {
+      "o": "r060-c",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Calculate and interpret Macaulay duration"
+    },
+    {
+      "o": "r061-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Define and calculate modified duration, money duration and PVBP"
+    },
+    {
+      "o": "r061-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain how maturity, coupon and yield affect interest rate risk"
+    },
+    {
+      "o": "r062-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret convexity"
+    },
+    {
+      "o": "r062-b",
+      "t": [
+        "E",
+        "M"
+      ],
+      "title": "Calculate percentage price change from duration and convexity"
+    },
+    {
+      "o": "r062-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate portfolio duration and convexity and their limitations"
+    },
+    {
+      "o": "r063-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain effective duration and convexity for bonds with options"
+    },
+    {
+      "o": "r063-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate price change using effective duration and convexity"
+    },
+    {
+      "o": "r063-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Define key rate duration and its use"
+    },
+    {
+      "o": "r063-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe empirical versus analytical duration"
+    },
+    {
+      "o": "r064-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe credit risk and its components"
+    },
+    {
+      "o": "r064-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe uses and limits of credit ratings"
+    },
+    {
+      "o": "r064-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe factors that influence yield spreads"
+    },
+    {
+      "o": "r065-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain considerations in evaluating sovereign and non-sovereign credit"
+    },
+    {
+      "o": "r066-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe qualitative and quantitative factors in corporate credit analysis"
+    },
+    {
+      "o": "r066-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Calculate and interpret financial ratios for credit analysis"
+    },
+    {
+      "o": "r066-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe seniority rankings and priority of claims"
+    },
+    {
+      "o": "r067-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain benefits of securitization for issuers, investors and markets"
+    },
+    {
+      "o": "r067-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe securitization parties and roles"
+    },
+    {
+      "o": "r068-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe covered bonds versus other ABS"
+    },
+    {
+      "o": "r068-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe credit enhancement structures"
+    },
+    {
+      "o": "r068-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe non-mortgage ABS types, cash flows and risks"
+    },
+    {
+      "o": "r068-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe collateralized debt obligations"
+    },
+    {
+      "o": "r069-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Define prepayment risk and tranching"
+    },
+    {
+      "o": "r069-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe residential mortgage loan features"
+    },
+    {
+      "o": "r069-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe residential MBS types, cash flows and risks"
+    },
+    {
+      "o": "r069-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe commercial MBS characteristics and risks"
+    }
+  ],
+  "deriv": [
+    {
+      "o": "r070-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Define and describe a derivative instrument"
+    },
+    {
+      "o": "r070-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe derivative markets and contrast OTC with exchange-traded"
+    },
+    {
+      "o": "r071-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Define forwards, futures, swaps, options and credit derivatives"
+    },
+    {
+      "o": "r071-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Determine value and profit at expiration for options"
+    },
+    {
+      "o": "r071-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Contrast forward commitments with contingent claims"
+    },
+    {
+      "o": "r072-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe benefits and risks of derivatives"
+    },
+    {
+      "o": "r072-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare derivative use among issuers and investors"
+    },
+    {
+      "o": "r073-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain arbitrage and replication in derivative pricing"
+    },
+    {
+      "o": "r073-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain spot versus future price and cost of carry"
+    },
+    {
+      "o": "r074-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain forward contract value and price through its life"
+    },
+    {
+      "o": "r074-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain how forward rates are determined and used"
+    },
+    {
+      "o": "r075-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare value and price of forwards and futures"
+    },
+    {
+      "o": "r075-b",
+      "t": [
+        "E",
+        "M"
+      ],
+      "title": "Explain why forward and futures prices differ"
+    },
+    {
+      "o": "r076-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe how swaps relate to and differ from forwards"
+    },
+    {
+      "o": "r076-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Contrast value and price of swaps"
+    },
+    {
+      "o": "r077-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Explain exercise value, moneyness and time value"
+    },
+    {
+      "o": "r077-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Contrast arbitrage and replication in forwards and contingent claims"
+    },
+    {
+      "o": "r077-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Identify and describe factors that determine option value"
+    },
+    {
+      "o": "r078-a",
+      "t": [
+        "E",
+        "M"
+      ],
+      "title": "Explain put-call parity for European options"
+    },
+    {
+      "o": "r078-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain put-call forward parity"
+    },
+    {
+      "o": "r079-a",
+      "t": [
+        "E",
+        "M"
+      ],
+      "title": "Value a derivative using a one-period binomial model"
+    },
+    {
+      "o": "r079-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe risk neutrality in derivative pricing"
+    }
+  ],
+  "alt": [
+    {
+      "o": "r080-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe features and categories of alternative investments"
+    },
+    {
+      "o": "r080-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Compare direct, co-investment and fund investment methods"
+    },
+    {
+      "o": "r080-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe ownership and compensation structures"
+    },
+    {
+      "o": "r081-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe performance appraisal of alternative investments"
+    },
+    {
+      "o": "r081-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret returns before and after fees"
+    },
+    {
+      "o": "r082-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain private equity features and characteristics"
+    },
+    {
+      "o": "r082-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain private debt features and characteristics"
+    },
+    {
+      "o": "r082-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe the diversification benefits of private capital"
+    },
+    {
+      "o": "r083-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain features and characteristics of real estate"
+    },
+    {
+      "o": "r083-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain characteristics of real estate investments"
+    },
+    {
+      "o": "r083-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain features and characteristics of infrastructure"
+    },
+    {
+      "o": "r083-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain characteristics of infrastructure investments"
+    },
+    {
+      "o": "r084-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain features of raw land, timberland and farmland"
+    },
+    {
+      "o": "r084-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe features of commodities and their characteristics"
+    },
+    {
+      "o": "r084-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Analyze risk, return and diversification of natural resources"
+    },
+    {
+      "o": "r085-a",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain hedge fund features and contrast them with other assets"
+    },
+    {
+      "o": "r085-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe hedge fund forms and vehicles"
+    },
+    {
+      "o": "r085-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Analyze risk, return and diversification among hedge funds"
+    },
+    {
+      "o": "r086-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe financial applications of distributed ledger technology"
+    },
+    {
+      "o": "r086-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain features of digital assets versus other asset classes"
+    },
+    {
+      "o": "r086-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe forms and vehicles for digital asset investment"
+    },
+    {
+      "o": "r086-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Analyze risk, return and diversification of digital assets"
+    }
+  ],
+  "pm": [
+    {
+      "o": "r087-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe asset-class characteristics investors consider"
+    },
+    {
+      "o": "r087-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Explain risk aversion and its implications"
+    },
+    {
+      "o": "r087-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain optimal portfolio selection, utility and the CAL"
+    },
+    {
+      "o": "r087-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate mean, variance and covariance from historical data"
+    },
+    {
+      "o": "r087-e",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret portfolio standard deviation"
+    },
+    {
+      "o": "r087-f",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe the effect of imperfectly correlated assets"
+    },
+    {
+      "o": "r087-g",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe minimum-variance and efficient frontiers"
+    },
+    {
+      "o": "r088-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe combining a risk-free asset with a risky portfolio"
+    },
+    {
+      "o": "r088-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain the CAL and the CML"
+    },
+    {
+      "o": "r088-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain systematic and nonsystematic risk"
+    },
+    {
+      "o": "r088-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain return-generating models"
+    },
+    {
+      "o": "r088-e",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Calculate and interpret beta"
+    },
+    {
+      "o": "r088-f",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain the CAPM, its assumptions and the SML"
+    },
+    {
+      "o": "r088-g",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Calculate expected return using the CAPM and SML"
+    },
+    {
+      "o": "r088-h",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Apply the CAPM and SML"
+    },
+    {
+      "o": "r088-i",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Calculate and interpret Sharpe, Treynor, M-squared and Jensen's alpha"
+    },
+    {
+      "o": "r089-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe the portfolio approach to investing"
+    },
+    {
+      "o": "r089-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe the steps in the portfolio management process"
+    },
+    {
+      "o": "r089-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe investor types and their needs"
+    },
+    {
+      "o": "r089-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe defined contribution and defined benefit plans"
+    },
+    {
+      "o": "r089-e",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe aspects of the asset management industry"
+    },
+    {
+      "o": "r089-f",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe mutual funds and compare pooled products"
+    },
+    {
+      "o": "r090-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe reasons for an investment policy statement"
+    },
+    {
+      "o": "r090-b",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Describe IPS components"
+    },
+    {
+      "o": "r090-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe risk and return objectives"
+    },
+    {
+      "o": "r090-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain willingness versus ability to take risk"
+    },
+    {
+      "o": "r090-e",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe investment constraints"
+    },
+    {
+      "o": "r090-f",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain specifying asset classes"
+    },
+    {
+      "o": "r090-g",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe principles of portfolio construction and asset allocation"
+    },
+    {
+      "o": "r090-h",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe ESG considerations in planning"
+    },
+    {
+      "o": "r091-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Compare cognitive errors and emotional biases"
+    },
+    {
+      "o": "r091-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Discuss common behavioral biases and their implications"
+    },
+    {
+      "o": "r091-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe how biases can conflict with traditional finance"
+    },
+    {
+      "o": "r092-a",
+      "t": [
+        "M",
+        "H"
+      ],
+      "title": "Define risk management"
+    },
+    {
+      "o": "r092-b",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe features of a risk management framework"
+    },
+    {
+      "o": "r092-c",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Define risk governance and its elements"
+    },
+    {
+      "o": "r092-d",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Explain how risk tolerance affects risk management"
+    },
+    {
+      "o": "r092-e",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe risk budgeting and its role in governance"
+    },
+    {
+      "o": "r092-f",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Identify financial and non-financial sources of risk"
+    },
+    {
+      "o": "r092-g",
+      "t": [
+        "E",
+        "H"
+      ],
+      "title": "Describe methods to measure and modify risk exposures"
+    }
+  ],
+  "eth": [
+    {
+      "o": "r093-d",
+      "t": [
+        "H"
+      ],
+      "title": "Explain why high ethical standards matter especially in investment management"
+    }
+  ]
+}

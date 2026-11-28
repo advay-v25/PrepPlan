@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, X } from 'lucide-react'
+import { BookOpen, Check, Layers, MonitorPlay, Plus, Users, X } from 'lucide-react'
 import { ROUTE_OPTIONS, CLASS_PATTERN_OPTIONS, type PrepRoute, type ClassPattern } from '../../../lib/onboarding/steps'
 import { findTimeProblem } from '../../../lib/onboarding/schema'
 import { DISPLAY_ORDER, weekdayShort, weekdayName } from '../../../lib/planning/weekday'
@@ -11,6 +11,8 @@ import { Button, IconButton } from '../../ui/Button'
 import { Notice } from '../../ui/Notice'
 import { nextClassFrom, type NextClass } from '../../../lib/onboarding/classDisplay'
 import type { OnboardingState } from '../OnboardingShell'
+
+const ROUTE_ICON = { self_study: BookOpen, self_paced_course: MonitorPlay, instructor_led: Users, hybrid: Layers } as const
 
 type DraftClass = { id: string; label: string; weekdays: number[]; startTime: string; endTime: string; endsOn: string }
 const hhmm = (v: unknown, fallback: string) => (v ? String(v).slice(0, 5) : fallback)
@@ -82,35 +84,48 @@ export function RouteStep({
 
   return (
     <div className="ob-section">
-      <div className="ob-routegrid">
-        {ROUTE_OPTIONS.map(o => (
-          <button key={o.value} type="button" className={`ob-route ${prepMode === o.value ? 'is-selected' : ''}`}
-            aria-pressed={prepMode === o.value}
-            onClick={() => { setPrepMode(o.value); if (!o.anchors) { setClassPattern(null); setClasses([]); setNext(null) } }}>
-            <strong>{o.label}</strong>
-            <small>{o.detail}</small>
-          </button>
-        ))}
+      <div className="fl-cards fl-cards--2">
+        {ROUTE_OPTIONS.map(o => {
+          const Icon = ROUTE_ICON[o.value]
+          return (
+            <button key={o.value} type="button" className={`fl-card fl-card--row ${prepMode === o.value ? 'is-selected' : ''}`}
+              aria-pressed={prepMode === o.value}
+              onClick={() => { setPrepMode(o.value); if (!o.anchors) { setClassPattern(null); setClasses([]); setNext(null) } }}>
+              <span className="fl-card__icon" aria-hidden><Icon size={20} /></span>
+              <span className="fl-card__text"><strong>{o.label}</strong><small>{o.detail}</small></span>
+              <span className="fl-card__check" aria-hidden><Check size={13} /></span>
+            </button>
+          )
+        })}
       </div>
 
+      {prepMode && (
+        <p className="fl-result" aria-live="polite">
+          {derived !== null
+            ? <>Your week runs through <strong>{weekdayName(derived)}</strong>, with the paper before your next class</>
+            : wantsNext && next
+              ? <>Your week will follow your classes once Calendar has the one after this</>
+              : ledByClasses
+                ? <>Temporary plan: study Monday to Saturday, paper on <strong>Sunday</strong>, until your classes are known</>
+                : <>Study Monday to Saturday, paper on <strong>Sunday</strong></>}
+        </p>
+      )}
+
       {ledByClasses && (
-        <section className="mt-8">
-          <h2 className="ob-subhead">When are your classes?</h2>
-          <div className="ob-tilegrid ob-tilegrid--3">
+        <section>
+          <h2 className="fl-label">When are your classes?</h2>
+          <div className="fl-segment" role="group" aria-label="When are your classes?">
             {CLASS_PATTERN_OPTIONS.map(o => (
-              <button key={o.value} type="button" className={`ob-tile ob-tile--compact ${classPattern === o.value ? 'is-selected' : ''}`}
-                aria-pressed={classPattern === o.value} onClick={() => setClassPattern(o.value)}>
-                <strong>{o.label}</strong>
-              </button>
+              <button key={o.value} type="button" className={classPattern === o.value ? 'is-selected' : ''}
+                aria-pressed={classPattern === o.value} onClick={() => setClassPattern(o.value)}>{o.label}</button>
             ))}
           </div>
         </section>
       )}
 
       {wantsWeekly && (
-        <section className="mt-8">
-          <h2 className="ob-subhead">{classPattern === 'mixed' ? 'Your fixed weekly classes' : 'Your weekly classes'}</h2>
-          {classPattern === 'mixed' && <p className="fine-print">Add only the ones that repeat. One-off classes are added later in Calendar.</p>}
+        <section>
+          <h2 className="fl-label">{classPattern === 'mixed' ? 'Weekly classes that repeat' : 'Weekly classes'}</h2>
           <div className="ob-classes">
             {classes.map(c => (
               <div key={c.id} className="ob-class-row">
@@ -126,19 +141,19 @@ export function RouteStep({
                   <span>to</span>
                   <input type="time" className="ob-input" value={c.endTime} aria-label="End time"
                     onChange={e => setClasses(p => p.map(x => x.id === c.id ? { ...x, endTime: e.target.value } : x))} />
+                  <IconButton label="Remove class" onClick={() => setClasses(p => p.filter(x => x.id !== c.id))}><X size={16} /></IconButton>
                 </div>
-                <details className="ob-class-row__more">
-                  <summary>Name or end date (optional)</summary>
+                <details suppressHydrationWarning className="ob-class-row__more">
+                  <summary>Name or end date</summary>
                   <input className="ob-input" value={c.label} maxLength={80} placeholder="Provider or class name" aria-label="Class name (optional)"
                     onChange={e => setClasses(p => p.map(x => x.id === c.id ? { ...x, label: e.target.value } : x))} />
                   <input type="date" className="ob-input" value={c.endsOn} aria-label="Last class date (optional)"
                     onChange={e => setClasses(p => p.map(x => x.id === c.id ? { ...x, endsOn: e.target.value } : x))} />
                 </details>
-                <IconButton label="Remove class" onClick={() => setClasses(p => p.filter(x => x.id !== c.id))}><X size={16} /></IconButton>
               </div>
             ))}
           </div>
-          <Button variant="text" onClick={() => setClasses(p => [...p, { id: crypto.randomUUID(), label: '', weekdays: [], startTime: '18:00', endTime: '20:00', endsOn: '' }])} className="mt-4">
+          <Button variant="text" onClick={() => setClasses(p => [...p, { id: crypto.randomUUID(), label: '', weekdays: [], startTime: '18:00', endTime: '20:00', endsOn: '' }])} className="mt-3">
             <Plus size={16} aria-hidden /> Add a class
           </Button>
           {problem && <Notice tone="warn" role="alert" className="mt-4">{problem}</Notice>}
@@ -146,44 +161,29 @@ export function RouteStep({
       )}
 
       {wantsNext && (
-        <section className="mt-8">
-          <h2 className="ob-subhead">Your next known class</h2>
+        <section>
+          <h2 className="fl-label">Your next class</h2>
           {next ? (
             <div className="ob-class-row">
-              <input type="date" className="ob-input" value={next.date} aria-label="Date of your next class"
-                onChange={e => setNext({ ...next, date: e.target.value })} />
               <div className="ob-class-row__times">
+                <input type="date" className="ob-input" value={next.date} aria-label="Date of your next class"
+                  onChange={e => setNext({ ...next, date: e.target.value })} />
                 <input type="time" className="ob-input" value={next.startTime} aria-label="Start time" onChange={e => setNext({ ...next, startTime: e.target.value })} />
                 <span>to</span>
                 <input type="time" className="ob-input" value={next.endTime} aria-label="End time" onChange={e => setNext({ ...next, endTime: e.target.value })} />
+                <IconButton label="Remove this class" onClick={() => setNext(null)}><X size={16} /></IconButton>
               </div>
-              <IconButton label="Remove this class" onClick={() => setNext(null)}><X size={16} /></IconButton>
             </div>
           ) : (
             <Button variant="text" onClick={() => setNext({ label: '', date: '', startTime: '18:00', endTime: '20:00' })}>
-              <Plus size={16} aria-hidden /> Add my next known class
+              <Plus size={16} aria-hidden /> Add my next class
             </Button>
           )}
           {nextProblem && <Notice tone="warn" role="alert" className="mt-4">{nextProblem}</Notice>}
-          {!next && (
-            <Notice tone="info" className="mt-4">
-              No class yet is fine. Your first cycle will be a provisional Monday to Sunday week, and Calendar will ask for your next class before it builds around your classes.
-            </Notice>
-          )}
+          {!next && <p className="fl-hint">No class yet is fine. You start on a temporary Monday to Sunday week</p>}
         </section>
       )}
 
-      {prepMode && (
-        <p className="ob-derived" aria-live="polite">
-          {derived !== null
-            ? <>Your study week runs from your first class through <strong>{weekdayName(derived)}</strong>, with your paper before the next class.</>
-            : wantsNext && next
-              ? <>Your cycle will follow your classes once Calendar has the next one after this.</>
-              : ledByClasses
-                ? <>Provisional: Monday to Saturday study with a paper on <strong>Sunday</strong> until your classes are known.</>
-                : <>Monday to Saturday study with a paper on <strong>Sunday</strong>.</>}
-        </p>
-      )}
     </div>
   )
 }

@@ -9,12 +9,15 @@
  */
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
-dotenv.config({ path: '.env.local', quiet: true } as any)
+dotenv.config({ path: process.env.E2E_ENV_FILE || '.env.staging.local', quiet: true } as any)
 import fs from 'node:fs'
 import { createStudent, makeCheck } from './lib/e2eSession'
+import { E2E_BASE_URL } from './lib/e2eIdentity'
+import { assertRehearsalTarget } from './lib/rehearsalTarget'
+import lifecycleSetup from './lifecycle-setup'
 
 const { check, finish } = makeCheck()
-const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
+const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || 'unconfigured', { auth: { persistSession: false } })
 const addDays = (d: string, n: number) => new Date(new Date(`${d}T12:00:00Z`).getTime() + n * 86_400_000).toISOString().slice(0, 10)
 const today = new Date().toISOString().slice(0, 10)
 const J = { 'Content-Type': 'application/json' }
@@ -91,6 +94,13 @@ async function appointmentsAndDesignation(st: Student) {
 }
 
 async function main() {
+  if (process.env.E2E_SUITE === 'local-stack') await lifecycleSetup()
+  else await assertRehearsalTarget(process.env, E2E_BASE_URL)
+  if (!['fixture', 'legacy', 'live'].includes(part)) throw new Error('Unknown journey part.')
+  if (part !== 'live') {
+    const bank = JSON.parse(fs.readFileSync(arg('bank'), 'utf8'))
+    if (!Array.isArray(bank.items) || bank.items.length < 180) throw new Error('A complete registered rehearsal fixture record is required.')
+  }
   const st: Student = await createStudent(admin, 'rehj', { onboard: true }); const uid = st.id; made.push(uid)
   if (part === 'live') return liveTrack(st)
   if (part === 'legacy') return legacyTrack(st)

@@ -1,0 +1,49 @@
+== start, source {"short":"dc2cce0687b6214a","files":1056}  [03:41:30]
+build 0
+Checked 57 browser assets. 0 findings.
+tsc 0
+lint 0
+verify 0
+contracts 0
+bank before the runs:
+student_eligible_items 0
+assessment_items 0
+routes 0
+== production build: early input, calendar save, early disclosure  [03:42:49]
+prod-input exit 0
+  26 passed (3.9m)
+== full suite, dev server with fixture bank  [03:46:52]
+suite exit 1
+  ✘   28 [desktop] › tests/e2e/lifecycle/mock-progress-owner.spec.ts:16:1 › recovery time does not imply completion; review the sitting, explicitly clear the last choice, and reload (38.0s)
+  ✘   40 [desktop] › tests/e2e/lifecycle/phase4-reviewer.spec.ts:135:1 › simultaneous decision from a stale second tab leaves one receipt; a material edit makes a new unapproved version (23.9s)
+  -   81 [desktop] › tests/e2e/lifecycle/phase6-forecast.spec.ts:162:1 › forecast · a failed catch-up read is said to have failed, never shown as nothing owed
+  -  191 [mobile-390] › tests/e2e/lifecycle/phase6-forecast.spec.ts:162:1 › forecast · a failed catch-up read is said to have failed, never shown as nothing owed
+  2 failed
+  2 skipped
+  216 passed (40.7m)
+== fault proxy and provider stub  [04:27:44]
+faults exit 0
+  30 passed (5.9m)
+faultread exit 0
+  2 passed (21.8s)
+== production build behind the proxy  [04:34:13]
+proxy build 0
+prodproxy exit 0
+  34 passed (1.4m)
+== fixture-key build: turnstile retry  [04:35:58]
+turnstile build 0
+turnstile exit 0
+  4 passed (6.3s)
+== late confirmation, dev server, both widths in parallel  [04:36:22]
+late exit 0
+  -  5 [mobile-390] › tests/e2e/lifecycle/phase6-late-confirm.spec.ts:150:1 › late confirmation · ordinary fixture setup begun at the end of a minute, inside a nearly used-up window, still accepts
+  -  7 [mobile-390] › tests/e2e/lifecycle/phase6-late-confirm.spec.ts:167:1 › late confirmation · a setup failure keeps its failing stage and response, and cleanup cannot replace it
+  2 skipped
+  6 passed (22.6m)
+bank after the runs:
+student_eligible_items 0
+assessment_items 0
+== end, source {"short":"dc2cce0687b6214a","files":1056}  [04:59:07]
+listeners:        0
+setup failures recorded: 0
+hydration captures:        0

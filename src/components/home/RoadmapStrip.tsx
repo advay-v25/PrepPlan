@@ -52,9 +52,8 @@ export function RoadmapStrip({ status, roadmap, progress, weekNote }: { status: 
           {now && <small>{now.startWeek === now.endWeek ? `Week ${now.startWeek}` : `Weeks ${now.startWeek}–${now.endWeek}`}{next ? ` · then ${next.topicName}` : ''}</small>}
         </div>
         <div className="road__fact road__fact--bars">
-          <span className="road__label">Effort</span>
-          <span className="road__bar"><span>Planned by now</span><i><b style={{ width: `${progress.plannedPercent}%` }} /></i><em>{progress.plannedPercent}%</em></span>
-          <span className="road__bar is-done"><span>Done</span><i><b style={{ width: `${progress.actualPercent}%` }} /></i><em>{progress.actualPercent}%</em></span>
+          <span className="road__label">First-pass effort estimate</span>
+          <span className="road__bar is-done"><span>Covered</span><i><b style={{ width: `${progress.actualPercent}%` }} /></i><em>{progress.actualPercent}%</em></span>
         </div>
       </div>
       {weekNote && <p className="road__note road__note--clamp" data-testid="road-week-note" title={weekNote}>{weekNote}</p>}

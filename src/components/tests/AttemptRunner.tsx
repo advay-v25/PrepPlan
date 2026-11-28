@@ -262,7 +262,7 @@ export function AttemptRunner({ attemptId }: { attemptId: string }) {
             </li>
           ))}
         </ol>
-        {unanswered.length > 0 && <label className="attempt-review__ack"><input type="checkbox" checked={allowUnanswered} onChange={e => setAllowUnanswered(e.target.checked)} /> Submit with {unanswered.length} unanswered (they will not be scored)</label>}
+        {unanswered.length > 0 && <label className="attempt-review__ack"><input type="checkbox" checked={allowUnanswered} onChange={e => setAllowUnanswered(e.target.checked)} /> Submit with {unanswered.length} unanswered</label>}
         {error && <p role="alert" className="review-error">{error}</p>}
         <div className="attempt-review__actions">
           <button type="button" className="secondary-button" onClick={() => { setReviewing(false); setIdx(Math.max(0, items.findIndex(i => !i.answer))) }}>Keep working</button>

@@ -1,0 +1,1647 @@
+{
+  "schema": "c2-prerequisite-map.1",
+  "note": "Prerequisites inform dependency mapping only; they do not create standalone L1 exam outcomes.",
+  "mappedOutcomes": 82,
+  "links": [
+    {
+      "outcomeId": "r012-a",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 25,
+          "printedPage": "17",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 30,
+          "printedPage": "22",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r012-b",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 45,
+          "printedPage": "37",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 46,
+          "printedPage": "38",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r012-c",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 45,
+          "printedPage": "37",
+          "score": 9
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 51,
+          "printedPage": "43",
+          "score": 8
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r012-d",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 45,
+          "printedPage": "37",
+          "score": 8
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 51,
+          "printedPage": "43",
+          "score": 7
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r012-e",
+      "readingId": "r012",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 46,
+          "printedPage": "38",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 45,
+          "printedPage": "37",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r013-a",
+      "readingId": "r013",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 169,
+          "printedPage": "161",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 170,
+          "printedPage": "162",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r013-b",
+      "readingId": "r013",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 170,
+          "printedPage": "162",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r013-c",
+      "readingId": "r013",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 84,
+          "printedPage": "76",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 169,
+          "printedPage": "161",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r014-a",
+      "readingId": "r014",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 5,
+          "printedPage": "v",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 97,
+          "printedPage": "89",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r014-b",
+      "readingId": "r014",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 193,
+          "printedPage": "185",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 104,
+          "printedPage": "96",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r014-c",
+      "readingId": "r014",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 112,
+          "printedPage": "104",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 115,
+          "printedPage": "107",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r014-d",
+      "readingId": "r014",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 193,
+          "printedPage": "185",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 215,
+          "printedPage": "207",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r015-a",
+      "readingId": "r015",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 193,
+          "printedPage": "185",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 100,
+          "printedPage": "92",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r015-b",
+      "readingId": "r015",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 112,
+          "printedPage": "104",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 115,
+          "printedPage": "107",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r015-c",
+      "readingId": "r015",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 157,
+          "printedPage": "149",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 100,
+          "printedPage": "92",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r015-d",
+      "readingId": "r015",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 5,
+          "printedPage": "v",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 97,
+          "printedPage": "89",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r016-a",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 48,
+          "printedPage": "40",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 3,
+          "printedPage": "iii",
+          "score": 2
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r016-c",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 5,
+          "printedPage": "v",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 197,
+          "printedPage": "189",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r016-d",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 68,
+          "printedPage": "60",
+          "score": 2
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 74,
+          "printedPage": "66",
+          "score": 2
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r016-e",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 146,
+          "printedPage": "138",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 162,
+          "printedPage": "154",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r016-f",
+      "readingId": "r016",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 146,
+          "printedPage": "138",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 157,
+          "printedPage": "149",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r017-a",
+      "readingId": "r017",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 197,
+          "printedPage": "189",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 198,
+          "printedPage": "190",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r017-b",
+      "readingId": "r017",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 199,
+          "printedPage": "191",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 246,
+          "printedPage": "G-4",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r017-c",
+      "readingId": "r017",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 217,
+          "printedPage": "209",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 102,
+          "printedPage": "94",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r018-a",
+      "readingId": "r018",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 5,
+          "printedPage": "v",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 85,
+          "printedPage": "77",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r018-b",
+      "readingId": "r018",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 225,
+          "printedPage": "217",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 226,
+          "printedPage": "218",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r018-c",
+      "readingId": "r018",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 199,
+          "printedPage": "191",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 226,
+          "printedPage": "218",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r019-a",
+      "readingId": "r019",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 226,
+          "printedPage": "218",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 238,
+          "printedPage": "230",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r019-b",
+      "readingId": "r019",
+      "subjectId": "econ",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 239,
+          "printedPage": "231",
+          "score": 8
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Economics.PDF",
+          "pdfPage": 229,
+          "printedPage": "221",
+          "score": 7
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r027-a",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 3,
+          "printedPage": "iii",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 6,
+          "printedPage": "vi",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r027-b",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 11,
+          "printedPage": "3",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 12,
+          "printedPage": "4",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r027-c",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 11,
+          "printedPage": "3",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 12,
+          "printedPage": "4",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r027-d",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 11,
+          "printedPage": "3",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 12,
+          "printedPage": "4",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r027-e",
+      "readingId": "r027",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 279,
+          "printedPage": "271",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 3,
+          "printedPage": "iii",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r028-a",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 41,
+          "printedPage": "33",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 54,
+          "printedPage": "46",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r028-b",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 41,
+          "printedPage": "33",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 54,
+          "printedPage": "46",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r028-c",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 63,
+          "printedPage": "55",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 66,
+          "printedPage": "58",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r028-d",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 27,
+          "printedPage": "19",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 23,
+          "printedPage": "15",
+          "score": 2
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r028-e",
+      "readingId": "r028",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 41,
+          "printedPage": "33",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 59,
+          "printedPage": "51",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r029-a",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 20,
+          "printedPage": "12",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r029-b",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 24,
+          "printedPage": "16",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r029-c",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 12,
+          "printedPage": "4",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 20,
+          "printedPage": "12",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r029-d",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 24,
+          "printedPage": "16",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r029-e",
+      "readingId": "r029",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 124,
+          "printedPage": "116",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r030-a",
+      "readingId": "r030",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 30,
+          "printedPage": "22",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r030-b",
+      "readingId": "r030",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 312,
+          "printedPage": "G-2",
+          "score": 7
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r030-c",
+      "readingId": "r030",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 32,
+          "printedPage": "24",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r030-d",
+      "readingId": "r030",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 103,
+          "printedPage": "95",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 108,
+          "printedPage": "100",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r031-a",
+      "readingId": "r031",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 30,
+          "printedPage": "22",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r031-b",
+      "readingId": "r031",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 103,
+          "printedPage": "95",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 228,
+          "printedPage": "220",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r032-a",
+      "readingId": "r032",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 81,
+          "printedPage": "73",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 82,
+          "printedPage": "74",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r032-b",
+      "readingId": "r032",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 123,
+          "printedPage": "115",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 155,
+          "printedPage": "147",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r032-c",
+      "readingId": "r032",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 123,
+          "printedPage": "115",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 4,
+          "printedPage": "iv",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r033-a",
+      "readingId": "r033",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 192,
+          "printedPage": "184",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 54,
+          "printedPage": "46",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r033-b",
+      "readingId": "r033",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 192,
+          "printedPage": "184",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 205,
+          "printedPage": "197",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r033-c",
+      "readingId": "r033",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 54,
+          "printedPage": "46",
+          "score": 7
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 5,
+          "printedPage": "v",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r034-a",
+      "readingId": "r034",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 24,
+          "printedPage": "16",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 25,
+          "printedPage": "17",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r034-b",
+      "readingId": "r034",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 63,
+          "printedPage": "55",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 94,
+          "printedPage": "86",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r034-c",
+      "readingId": "r034",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 94,
+          "printedPage": "86",
+          "score": 7
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 84,
+          "printedPage": "76",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r035-a",
+      "readingId": "r035",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 231,
+          "printedPage": "223",
+          "score": 10
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 237,
+          "printedPage": "229",
+          "score": 8
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r035-b",
+      "readingId": "r035",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 85,
+          "printedPage": "77",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 141,
+          "printedPage": "133",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r035-c",
+      "readingId": "r035",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 281,
+          "printedPage": "273",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 61,
+          "printedPage": "53",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r035-d",
+      "readingId": "r035",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 5,
+          "printedPage": "v",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 28,
+          "printedPage": "20",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r036-a",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 30,
+          "printedPage": "22",
+          "score": 8
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 73,
+          "printedPage": "65",
+          "score": 8
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r036-b",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 275,
+          "printedPage": "267",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 12,
+          "printedPage": "4",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r036-c",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 259,
+          "printedPage": "251",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 12,
+          "printedPage": "4",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r036-d",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 12,
+          "printedPage": "4",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 14,
+          "printedPage": "6",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r036-e",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 14,
+          "printedPage": "6",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 259,
+          "printedPage": "251",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r036-f",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 14,
+          "printedPage": "6",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 15,
+          "printedPage": "7",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r036-g",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 300,
+          "printedPage": "292",
+          "score": 7
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 14,
+          "printedPage": "6",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r036-h",
+      "readingId": "r036",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 275,
+          "printedPage": "267",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 300,
+          "printedPage": "292",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r037-a",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 13,
+          "printedPage": "5",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 32,
+          "printedPage": "24",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r037-b",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 155,
+          "printedPage": "147",
+          "score": 7
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 146,
+          "printedPage": "138",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r037-c",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 41,
+          "printedPage": "33",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 191,
+          "printedPage": "183",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r037-d",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 207,
+          "printedPage": "199",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 289,
+          "printedPage": "281",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r037-e",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 288,
+          "printedPage": "280",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 292,
+          "printedPage": "284",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r037-f",
+      "readingId": "r037",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 165,
+          "printedPage": "157",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 285,
+          "printedPage": "277",
+          "score": 5
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r038-a",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 288,
+          "printedPage": "280",
+          "score": 5
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 73,
+          "printedPage": "65",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r038-b",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 12,
+          "printedPage": "4",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 276,
+          "printedPage": "268",
+          "score": 4
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r038-c",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 124,
+          "printedPage": "116",
+          "score": 4
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 3,
+          "printedPage": "iii",
+          "score": 3
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r038-d",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 124,
+          "printedPage": "116",
+          "score": 6
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 133,
+          "printedPage": "125",
+          "score": 6
+        }
+      ],
+      "examinableAsStandalone": false
+    },
+    {
+      "outcomeId": "r038-e",
+      "readingId": "r038",
+      "subjectId": "fsa",
+      "backgroundAnchors": [
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 124,
+          "printedPage": "116",
+          "score": 3
+        },
+        {
+          "source": "cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+          "pdfPage": 3,
+          "printedPage": "iii",
+          "score": 2
+        }
+      ],
+      "examinableAsStandalone": false
+    }
+  ]
+}

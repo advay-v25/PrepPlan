@@ -1,6 +1,7 @@
 import { isAdmitted } from '../../../../lib/beta/admission'
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
+import { createAdminClient } from '../../../../lib/supabase/admin'
 import { isStep } from '../../../../lib/onboarding/steps'
 import {
   readCanonicalState,
@@ -21,6 +22,24 @@ type OnboardingResponse<T = unknown> =
 
 function errorResponse(status: number, code: string, message: string, fields?: Record<string, string>) {
   return NextResponse.json({ ok: false, code, message, fields } satisfies OnboardingResponse, { status })
+}
+
+export async function GET(req: Request, { params }: { params: Promise<{ step: string }> }) {
+  const { step } = await params
+  if (step !== 'position') return errorResponse(404, 'not_found', 'No lookup is available for this step.')
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return errorResponse(401, 'unauthorized', 'Sign in to open your setup.')
+  if (!user.email_confirmed_at || !(await isAdmitted(user.id))) return errorResponse(403, 'not_admitted', 'PrepPlan needs a verified and invited account.')
+  const topic = new URL(req.url).searchParams.get('topic')
+  if (!topic || !/^[a-z][a-z0-9_-]{0,39}$/.test(topic)) return errorResponse(400, 'invalid_input', 'Choose a topic.')
+  try {
+    const { data } = await createAdminClient().from('learning_modules').select('id, topic_id, name')
+      .eq('is_active', true).eq('topic_id', topic).order('sequence_hint').order('id').throwOnError()
+    return NextResponse.json({ ok: true, readings: (data ?? []).map(r => ({ id: r.id, topicId: r.topic_id, name: r.name })) })
+  } catch {
+    return errorResponse(503, 'lookup_unavailable', 'Readings could not be loaded. Try again.')
+  }
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ step: string }> }) {

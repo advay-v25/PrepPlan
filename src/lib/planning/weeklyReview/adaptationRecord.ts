@@ -1,4 +1,5 @@
-import { createAdminClient } from '../../supabase/admin'
+import type { WeekAdaptation } from '../pulse/generateWeek'
+import { activeCycleRow, openingReviewRecap } from '../../ops/sharedReads'
 
 /** What the accepted week rested on, as saved with the review that opened it. Every page reads this; none recomputes it. */
 export type AdaptationRecord = {
@@ -8,15 +9,14 @@ export type AdaptationRecord = {
   lighter: boolean
   optionalMinutes: number
   waiting: number
+  waitingWork?: WeekAdaptation['waiting']
   ahead: string | null
 }
 
 export async function getCurrentAdaptation(userId: string): Promise<AdaptationRecord | null> {
-  const admin = createAdminClient()
-  const { data: cycle } = await admin.from('planning_cycles').select('id').eq('user_id', userId).eq('status', 'active').maybeSingle()
+  const cycle = await activeCycleRow(userId)
   if (!cycle) return null
-  const { data } = await admin.from('weekly_reviews').select('recap').eq('user_id', userId).eq('next_cycle_id', cycle.id as string).maybeSingle()
-  const a = (data?.recap as { adaptation?: Partial<AdaptationRecord> & { headline?: string } } | null)?.adaptation
+  const a = (await openingReviewRecap(userId, cycle.id as string) as { adaptation?: Partial<AdaptationRecord> & { headline?: string } } | null)?.adaptation
   if (!a?.headline || !Array.isArray(a.reasons)) return null   // a week opened before this was recorded makes no claim
-  return { headline: a.headline, reasons: a.reasons, mode: String(a.mode ?? ''), lighter: a.lighter === true, optionalMinutes: Number(a.optionalMinutes ?? 0), waiting: Number(a.waiting ?? 0), ahead: a.ahead ?? null }
+  return { headline: a.headline, reasons: a.reasons, mode: String(a.mode ?? ''), lighter: a.lighter === true, optionalMinutes: Number(a.optionalMinutes ?? 0), waiting: Number(a.waiting ?? 0), waitingWork: a.waitingWork, ahead: a.ahead ?? null }
 }

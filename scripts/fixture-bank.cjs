@@ -23,10 +23,10 @@ async function connect(args) {
 }
 const one = async (c, s, p) => Object.values((await c.query(s, p)).rows[0] ?? { v: null })[0]
 
-async function create(args) {
+async function create(args, open = () => connect(args)) {
   const out = arg(args, 'out'); if (!out) throw Error('--out=<file> is required')
   const readings = arg(args, 'readings', 'r028,r029').split(','), per = Number(arg(args, 'per-outcome', 8)), variants = Number(arg(args, 'variants', 1))
-  const c = await connect(args), tag = Date.now().toString(36), rec = { tag, items: [], concepts: [], families: [], users: [], approvals: 0 }
+  const c = await open(), tag = Date.now().toString(36), rec = { tag, items: [], concepts: [], families: [], users: [], approvals: 0 }
   const save = () => fs.writeFileSync(out, JSON.stringify(rec, null, 1))
   try {
     const man = await one(c, 'select id from public.curriculum_manifests where is_active and (capabilities->>\'blueprint_available\')::boolean limit 1')
@@ -140,9 +140,9 @@ async function create(args) {
   } catch (e) { save(); console.error('create failed:', e.message, '- recorded rows remain in', out, '; run destroy'); process.exitCode = 1 } finally { await c.end() }
 }
 
-async function destroy(args) {
+async function destroy(args, open = () => connect(args)) {
   const file = arg(args, 'file'); if (!file) throw Error('--file=<file> is required')
-  const rec = JSON.parse(fs.readFileSync(file, 'utf8')), c = await connect(args)
+  const rec = JSON.parse(fs.readFileSync(file, 'utf8')), c = await open()
   // A reviewer edit of a fixture item creates a successor version that the record does not list; it is the fixture's own row, so it goes too.
   for (let more = [1]; more.length;) { more = (await c.query('select id from public.assessment_items where supersedes_item_id = any($1) and id <> all($1)', [rec.items])).rows.map(r => r.id); rec.items.push(...more) }
   const run = async (label, sql, p) => { try { return (await c.query(sql, p)).rowCount } catch (e) { console.error(`cleanup ${label}:`, e.message); return 0 } }
@@ -185,5 +185,8 @@ async function destroy(args) {
   } finally { await c.end() }
 }
 
-const [cmd, ...rest] = process.argv.slice(2)
-;(cmd === 'create' ? create(rest) : cmd === 'destroy' ? destroy(rest) : Promise.reject(Error('usage: fixture-bank.cjs create|destroy …'))).catch(e => { console.error(e.message); process.exit(1) })
+if (require.main === module) {
+  const [cmd, ...rest] = process.argv.slice(2)
+  ;(cmd === 'create' ? create(rest) : cmd === 'destroy' ? destroy(rest) : Promise.reject(Error('usage: fixture-bank.cjs create|destroy …'))).catch(e => { console.error(e.message); process.exit(1) })
+}
+module.exports = { create, destroy }

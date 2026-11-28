@@ -23,7 +23,7 @@ export function MockSchedule({ appointments, capability }: { appointments: Appoi
         {capable ? <span><strong>A full rehearsal can be built.</strong> {capability.reasons[0]}</span> : (
           <div>
             <p><strong>A full rehearsal cannot be built yet.</strong> There are not enough reviewed, held-back questions for both sessions. You can still plan an external mock or keep preparing: <Link className="prose-link" href="/app/calendar#checkpoint">plan a mock in Calendar</Link>.</p>
-            {capability.reasons.length > 0 && <details><summary>Why, in detail</summary><ul>{capability.reasons.map((r, i) => <li key={i}>{r}</li>)}</ul></details>}
+            {capability.reasons.length > 0 && <details suppressHydrationWarning><summary>Why, in detail</summary><ul>{capability.reasons.map((r, i) => <li key={i}>{r}</li>)}</ul></details>}
           </div>
         )}
       </div>
@@ -42,7 +42,7 @@ export function MockSchedule({ appointments, capability }: { appointments: Appoi
         ))}
       </ul>
       {past.length > 0 && (
-        <details><summary>Earlier mocks and rehearsals</summary>
+        <details suppressHydrationWarning><summary>Earlier mocks and rehearsals</summary>
           <ul>{past.map(a => <li key={a.id}>{a.title} · {day(a.date)} · {a.status === 'completed' ? 'finished' : a.status === 'missed' ? 'not taken' : a.status}{a.rehearsal?.stage === 'complete' && <> · <Link className="prose-link" href={`/app/tests/rehearsal/${a.rehearsal.id}`}>combined result</Link></>}</li>)}</ul>
         </details>
       )}

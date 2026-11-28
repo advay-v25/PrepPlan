@@ -27,10 +27,7 @@ function digest(purpose: string, value: string) {
   // The first configured value that is long enough: a too-short or stale APP_SECURITY_SECRET falls through to the next server credential instead of stopping every sign-in.
   const candidates = [process.env.APP_SECURITY_SECRET, process.env.SUPABASE_SECRET_KEY, process.env.SUPABASE_SERVICE_ROLE_KEY]
   const key = candidates.map(cleanEnv).find(val => val.length >= 32)
-  if (!key) {
-    const lens = candidates.map(c => c ? cleanEnv(c).length : 'undef').join(',')
-    throw new Error(`Security key unavailable (lengths: ${lens})`)
-  }
+  if (!key) throw new Error('Security key unavailable')
   return createHmac('sha256', key).update(purpose).update('\0').update(value).digest('hex')
 }
 
@@ -44,15 +41,14 @@ export async function rateLimit(scope: LimitScope, subject: string) {
   try {
     const { data, error } = await boundedStage('security rate limit', 8000, async () =>
       await createAdminClient().rpc('security_take_rate_limit', { p_scope: scope, p_subject_hash: digest(scope, subject) }))
-    if (error) console.error('[auth] security_take_rate_limit rpc returned error:', error)
-    if (error || !Number.isInteger(data) || data < 0) throw new Error('Rate limit unavailable: ' + (error?.message ?? 'unknown'))
+    if (error || !Number.isInteger(data) || data < 0) throw new Error('Rate limit unavailable')
     if (data === 0) return null
     const message = 'Too many requests. Wait a little and try again.'
     return Response.json({ ok: false, code: 'RATE_LIMITED', error: message, message }, {
       status: 429, headers: { 'Retry-After': String(data), 'Cache-Control': AUTH_PRIVATE_CACHE },
     })
-  } catch (err) {
-    console.error('[auth] request quota unavailable', scope, err)
+  } catch {
+    console.error('[auth] request quota unavailable', scope)
     const message = 'PrepPlan could not check this request. Try again shortly.'
     return Response.json({ ok: false, code: 'SECURITY_UNAVAILABLE', error: message, message }, {
       status: 503, headers: { 'Retry-After': '10', 'Cache-Control': AUTH_PRIVATE_CACHE },
@@ -85,6 +81,24 @@ export function readRecoveryIntent(token: string, now = Date.now()) {
 
 export function matchesRecoveryAddress(intent: NonNullable<ReturnType<typeof readRecoveryIntent>>, email: string) {
   return equalSecret(intent.address, digest('recovery-address', email.trim().toLowerCase()))
+}
+
+export const RESET_RECEIPT_COOKIE = 'prepplan-reset-receipt'
+export const RESET_RECEIPT_SECONDS = 120
+
+export function makeResetReceipt(status: 'success' | 'sessions', now = Date.now()) {
+  const value = `${status}.${now + RESET_RECEIPT_SECONDS * 1000}`
+  return `${value}.${digest('password-reset-receipt', value)}`
+}
+
+export function readResetReceipt(token?: string, now = Date.now()) {
+  const parsed = /^(success|sessions)\.(\d{13})\.([a-f0-9]{64})$/.exec(token ?? '')
+  if (!parsed || Number(parsed[2]) <= now || Number(parsed[2]) - now > RESET_RECEIPT_SECONDS * 1000) return undefined
+  const [, status, expiry, signature] = parsed
+  try {
+    if (equalSecret(signature, digest('password-reset-receipt', `${status}.${expiry}`))) return status === 'success' ? 'success' : 'sessions'
+  } catch { /* A missing signing configuration must not block sign-in. */ }
+  return undefined
 }
 
 export async function recoveryGrant(action: 'open' | 'check' | 'take', userId: string, sessionId: string, requestId?: string) {

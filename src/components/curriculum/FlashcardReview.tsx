@@ -41,8 +41,15 @@ export function FlashcardReview({ cards, onDone }: { cards: Card[]; onDone: (sum
       if (!due) setParked(p => [...p, res.card!])
       if (res.replay) setNote('That rating had already been saved; the schedule shown is the saved one.')
     } else if (res.code === 'STALE_CARD' && res.card) {
-      keys.current.done(sig); setQueue(q => [res.card!, ...q.slice(1)]); setShown(false)
-      setNote('This card was changed or rated somewhere else, so your rating was not applied. Here is its current state; rate it again if you still want to.')
+      const current = res.card
+      const due = new Date(current.due_at).getTime() <= Date.now()
+      keys.current.done(sig)
+      setQueue(q => due ? [current, ...q.slice(1)] : q.slice(1))
+      if (!due) setParked(p => [...p, current])
+      setShown(false)
+      setNote(due
+        ? 'This card changed elsewhere. Your rating was not applied. You can review its current version.'
+        : 'This card was rescheduled elsewhere. Your rating was not applied. It will return when it is due.')
     } else if (res.code === 'NOT_FOUND') {
       keys.current.done(sig); setQueue(q => q.slice(1)); setShown(false); setNote('That card was deleted elsewhere, so it was skipped.')
     } else setProblem(res.error ?? 'That rating was not saved. It is safe to press the same rating again.')

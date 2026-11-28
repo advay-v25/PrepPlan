@@ -24,7 +24,7 @@ const today = new Date().toISOString().slice(0, 10)
 const J = { 'Content-Type': 'application/json' }
 const made: string[] = []
 type Student = Awaited<ReturnType<typeof createStudent>>
-const TARGET = 'asylsxszdhlnzewhwtga'
+const TARGET = 'mnlezctdqkdfgvmipmcj'
 
 const block = (uid: string, cycleId: string, id: string, o: Record<string, unknown> = {}) => ({
   id, user_id: uid, cycle_id: cycleId, title: id, detail: 'd', task_type: 'study', origin: 'planner', priority: 'core', placement: 'day_preferred', execution: 'not_started',

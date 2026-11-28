@@ -1,0 +1,39 @@
+{
+  "schema": "content-ledger.1",
+  "updatedAt": "2026-11-25T17:04:30+05:30",
+  "headCommit": "2fdce1db829078c778cb25eeaefb4e8eb1da3c3b",
+  "ownership": {
+    "contentWorkstream": "this agent (C0-C11)",
+    "softwareRevamp": "separate agent (routes, auth, migrations, runtime, deployment)"
+  },
+  "baseline": {
+    "path": "output/question-bank/2027/baseline-2026-11-25/baseline-index.json",
+    "bankContentHash": "721526d5ea2208470b81dba9e21fbc556dd1beaf282c05760e0a551840667726",
+    "drafts": 536
+  },
+  "current": {
+    "drafts": 1220,
+    "routineDrafts": 1040,
+    "heldOutMockDrafts": 180,
+    "missingTierOutcomes": 0,
+    "arithmeticExecuted": 229,
+    "identicalDistractorDiagnosesRemaining": 0,
+    "crossPoolLeakage": 0,
+    "rehearsalMockFormsSupportedOnProvisionalFamilies": 1,
+    "bankContentHash": "0208fcd7ed9159472489ff9c8ee91280111bc797664c839962786e24fd3c07f2"
+  },
+  "phases": {
+    "C0": { "status": "offline_complete", "evidence": ["output/question-bank/2027/baseline-2026-11-25/baseline-index.json", "output/question-bank/2027/content-ledger.json"] },
+    "C1": { "status": "offline_complete", "evidence": ["output/question-bank/2027/source-intake.json", "output/question-bank/2027/c1-extraction-qa.json", "content/source-packs/private/reference-2027/source-catalogue-c1.json"] },
+    "C2": { "status": "offline_complete", "evidence": ["output/question-bank/2027/c2-curriculum-manifest.json", "output/question-bank/2027/c2-prerequisite-map.json"] },
+    "C3": { "status": "offline_complete", "evidence": ["output/question-bank/2027/c3-support-matrix.json", "content/source-packs/private/reference-2027/packs/"] },
+    "C4": { "status": "offline_complete", "evidence": ["output/question-bank/2027/c4-defect-register.json", "scripts/lib/referenceBank/c4-repairs.ts"] },
+    "C5": { "status": "offline_complete", "evidence": ["scripts/lib/referenceBank/expansion/", "output/question-bank/2027/coverage-and-review.json"] },
+    "C6": { "status": "offline_complete", "evidence": ["output/question-bank/2027/c6-demand-and-capacity.json"] },
+    "C7": { "status": "offline_complete", "evidence": ["output/question-bank/2027/c7-heldout-mock-blueprint.json", "scripts/lib/referenceBank/expansion/c7-heldout-mock-1-s1.ts", "scripts/lib/referenceBank/expansion/c7-heldout-mock-1-s2.ts"] },
+    "C8": { "status": "offline_complete", "evidence": ["output/question-bank/2027/c8-validation-ledger.json", "output/question-bank/2027/c8-evaluation-pack.json"] },
+    "C9": { "status": "offline_complete", "evidence": ["output/question-bank/2027/draft-bank.json", "output/question-bank/2027/review.html", "output/question-bank/2027/coverage.csv"] },
+    "C10": { "status": "human_review_pending", "evidence": ["output/question-bank/2027/C10-HUMAN-ACTION-CHECKLIST.md", "output/question-bank/2027/c10-human-review-package.json"], "blocker": "Awaiting owner rights decision and qualified CFA reviewer blind solves/approvals" },
+    "C11": { "status": "offline_complete", "evidence": ["docs/QUESTION-BANK-CONTENT-READINESS.md", "output/question-bank/2027/CONTENT-PROGRESS-LEDGER.md"] }
+  }
+}

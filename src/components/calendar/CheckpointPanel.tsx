@@ -7,6 +7,7 @@ import { calendarTaskHref } from '../../lib/routing/calendar'
 import Link from 'next/link'
 import { CalendarClock, Loader2, Pencil } from 'lucide-react'
 import { Dialog } from '../ui/Dialog'
+import { useHydrated } from '../ui/WhenReady'
 import { Notice } from '../ui/Notice'
 import { MOCK_KINDS, MOCK_KIND_LABEL, type MockKind } from '../../lib/curriculum/entryContext'
 import { checkpointTitle, describeTiming, toHHMM, type AssessmentChoice, type MockOutcome } from '../../lib/curriculum/mockCheckpoint'
@@ -40,6 +41,7 @@ export function CheckpointPanel({ view, review, defaultDate, today }: { view: Ch
   const [info, setInfo] = useState('')
   const [detailsRef, setDetailsRef] = useState('')
   const editButton = useRef<HTMLButtonElement>(null)
+  const ready = useHydrated()
   // One key per intent, reused on retry and dropped only once the server has confirmed it (or definitely refused it).
   const keys = useRef<Record<string, string>>({})
   const keyFor = (intent: string) => (keys.current[intent] ??= crypto.randomUUID())
@@ -147,7 +149,7 @@ export function CheckpointPanel({ view, review, defaultDate, today }: { view: Ch
     return (
       <section id="checkpoint" className="cal-checkpoint cal-checkpoint--empty" aria-label="Mock or checkpoint">
         <p><CalendarClock size={16} aria-hidden /> Have a mock or checkpoint coming up? Add it and PrepPlan will plan around it. You can add several, including a PrepPlan rehearsal.</p>
-        <button type="button" ref={editButton} className="secondary-button" onClick={() => setDialog('edit')}>Add a mock</button>
+        <button type="button" ref={editButton} className="secondary-button" disabled={!ready} onClick={() => setDialog('edit')}>Add a mock</button>
         {reviewList(review)}
         {dialog === 'edit' && <EditDialog view={null} defaultDate={defaultDate} onClose={() => { setDialog(null); editButton.current?.focus() }} send={send} busy={busy === 'save'} serverError={error} onSaved={() => setInfo('Mock added.')} />}
         {feedback}
@@ -162,7 +164,7 @@ export function CheckpointPanel({ view, review, defaultDate, today }: { view: Ch
   return (
     <section id="checkpoint" className="cal-checkpoint" aria-labelledby="cp-h">
       {schedule}
-      <p><button type="button" className="secondary-button" onClick={() => setDialog('add')}>Add another mock or rehearsal</button></p>
+      <p><button type="button" className="secondary-button" disabled={!ready} onClick={() => setDialog('add')}>Add another mock or rehearsal</button></p>
       <header className="cal-checkpoint__head">
         <div>
           <p className="cal-summary__label">{internal ? 'PrepPlan rehearsal' : 'Mock or checkpoint'}</p>
@@ -171,9 +173,9 @@ export function CheckpointPanel({ view, review, defaultDate, today }: { view: Ch
           <p className="fine-print">{MOCK_KIND_LABEL[c.kind]}. Your own entry, not a second exam date.</p>
         </div>
         <div className="cal-checkpoint__actions">
-          <button type="button" ref={editButton} className="secondary-button" onClick={() => setDialog('edit')}><Pencil size={14} aria-hidden /> Edit or move</button>
-          <button type="button" className="secondary-button" onClick={() => setDialog('outcome')}>{internal ? 'Postpone or skip it' : 'Record what happened'}</button>
-          <button type="button" className="text-button" onClick={() => setDialog('cancel')}>Cancel it</button>
+          <button type="button" ref={editButton} className="secondary-button" disabled={!ready} onClick={() => setDialog('edit')}><Pencil size={14} aria-hidden /> Edit or move</button>
+          <button type="button" className="secondary-button" disabled={!ready} onClick={() => setDialog('outcome')}>{internal ? 'Postpone or skip it' : 'Record what happened'}</button>
+          <button type="button" className="text-button" disabled={!ready} onClick={() => setDialog('cancel')}>Cancel it</button>
         </div>
       </header>
 
@@ -208,7 +210,7 @@ export function CheckpointPanel({ view, review, defaultDate, today }: { view: Ch
         {CHOICES.map(o => (
           <label key={o.value} className="ob-check cal-checkpoint__option">
             <input type="radio" name="assessment-choice" checked={view.choice === o.value}
-              disabled={busy !== null || (o.value === 'use_mock' && view.paper.started)} onChange={() => pickChoice(o.value)} />
+              disabled={!ready || busy !== null || (o.value === 'use_mock' && view.paper.started)} onChange={() => pickChoice(o.value)} />
             <span><strong>{o.value === 'use_mock' ? `Use this ${thing} as this week’s assessment` : o.label}</strong><small>{o.value === 'use_mock' && paperUnstarted ? 'You will be asked whether it replaces the unstarted paper.' : o.hint}</small></span>
           </label>
         ))}

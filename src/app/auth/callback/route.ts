@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
   const providerError = url.searchParams.get('error')
   if (providerError) redirect(providerError === 'access_denied' ? '/auth/error?reason=cancelled' : '/auth/error?reason=provider')
-  if (!GOOGLE_SIGN_IN_ENABLED || !pending || !code || code.length > 256) redirect('/auth/error?reason=missing_code')
+  if (!GOOGLE_SIGN_IN_ENABLED || !pending || !code || code.length > 256) redirect('/auth/error?reason=missing_code&flow=google')
 
   let destination = authDestination(pending)
   try {
@@ -24,13 +24,13 @@ export async function GET(request: Request) {
     const { data, error } = await boundedStage('oauth callback', 12_000, () => supabase.auth.exchangeCodeForSession(code))
     if (error || !data.user?.email_confirmed_at || !data.session) {
       if (data.session) await clearSessionCookies()
-      destination = '/auth/error?reason=expired'
-    } else if (needsPassword(data.user)) {
-      // A first Google sign-in has no password; ask for one now so email sign-in works later.
+      destination = '/auth/error?reason=expired&flow=google'
+    } else if (destination === '/onboarding' && needsPassword(data.user)) {
+      // Account creation can offer password setup. Regular Google sign-in goes straight to the destination.
       destination = '/set-password?next=' + encodeURIComponent(destination)
     }
   } catch {
-    destination = '/auth/error?reason=unavailable'
+    destination = '/auth/error?reason=unavailable&flow=google'
   }
   redirect(destination)
 }

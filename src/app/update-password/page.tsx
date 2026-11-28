@@ -12,7 +12,7 @@ export default async function UpdatePasswordPage() {
     const session = await verifiedSession(await createClient())
     allowed = !!session && await recoveryGrant('check', session.userId, session.id)
   } catch {
-    redirect('/auth/error?reason=unavailable')
+    redirect('/auth/error?reason=unavailable&flow=recovery')
   }
   if (!allowed) redirect('/forgot-password')
   return <UpdatePasswordForm />

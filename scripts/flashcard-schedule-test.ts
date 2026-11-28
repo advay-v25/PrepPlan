@@ -1,20 +1,19 @@
 /** The database command owns the schedule: it must equal the existing pure scheduler for every rating and state, and a direct caller can forge nothing.
- *  npm run flashcards:schedule:test -- --confirm-target=<ref>   (disposable project; owned fixture users removed) */
+ *  npm run flashcards:schedule:test -- --local, or --confirm-target=<ref> (owned fixture users removed) */
 import { createRequire } from 'node:module'
-import { readFileSync } from 'node:fs'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env.local', quiet: true } as any)
-const req = createRequire(import.meta.url), { Client } = req('pg'), { parse } = req('dotenv'), { configuration } = req('./lib/migrations.cjs')
+const req = createRequire(import.meta.url), { Client } = req('pg'), { openStage } = req('./lib/stage.cjs')
 import { RATINGS, scheduleReview, type Rating } from '../src/lib/curriculum/flashcards'
 let pass = 0, fail = 0
 const ok = (n: string, c: boolean, d?: unknown) => { c ? pass++ : fail++; console.log(`${c ? '  ✓' : '  ✗'} ${n}${c ? '' : ' — ' + JSON.stringify(d)}`) }
-const cfg = configuration(['--env=staging', '--dry-run'], parse(readFileSync('.env.staging.local')))
-if (process.argv.find(a => a.startsWith('--confirm-target=')) !== `--confirm-target=${cfg.identity}`) { console.error(`Pass --confirm-target=${cfg.identity}.`); process.exit(1) }
 
 async function main() {
-  const db = new Client({ ...cfg.connection, connectionTimeoutMillis: 45000, keepAlive: true }); await db.connect()
+  const stage = await openStage(process.argv.slice(2)), { cfg } = stage
+  const db = new Client({ ...cfg.connection, connectionTimeoutMillis: 45000, keepAlive: true })
   const tag = Date.now().toString(36), users: string[] = []
   try {
+    await db.connect()
     console.log('\nThe database schedule equals the existing algorithm')
     const now = new Date('2027-01-11T09:30:00.000Z'); const input: { rating: string; reps: number; interval: number; ease: number; lapses: number }[] = []
     for (const rating of RATINGS) for (const reps of [0, 1, 2, 3, 5, 9]) for (const interval of [0, 1, 2, 3, 4, 6, 7, 10, 14, 30.5, 100, 250.25, 364, 365]) for (const ease of [1.3, 1.45, 1.5, 1.85, 2, 2.1, 2.5, 2.65, 3, 3.35, 3.5]) input.push({ rating, reps, interval, ease, lapses: Math.floor(reps + interval) % 4 })
@@ -51,11 +50,12 @@ async function main() {
     const r2 = await cmd(u, k, 'review', id, 2, { rating: 'hard' }), after = (await db.query('select revision, reps, due_at from public.flashcards where id=$1', [id])).rows[0]
     ok('an exact retry a moment later replays the ORIGINAL committed result (same due time) and applies nothing', r1.ok && r2.replay === true && r2.card.due_at === r1.card.due_at && after.revision === before.revision && after.reps === before.reps && +after.due_at === +before.due_at, [r1.card.due_at, r2.card.due_at])
     ok('the same key with a different rating is KEY_REUSED', (await cmd(u, k, 'review', id, 2, { rating: 'easy' })).code === 'KEY_REUSED')
-    ok('a rating wrote no evidence, coverage or repair row', ['evidence_events', 'user_module_state', 'repair_threads'].every(async () => true) && Number((await db.query('select (select count(*) from public.evidence_events where user_id=$1)+(select count(*) from public.user_module_state where user_id=$1)+(select count(*) from public.repair_threads where user_id=$1) n', [u])).rows[0].n) === 0)
+    ok('a rating wrote no evidence, coverage or repair row', Number((await db.query('select (select count(*) from public.evidence_events where user_id=$1)+(select count(*) from public.user_module_state where user_id=$1)+(select count(*) from public.repair_threads where user_id=$1) n', [u])).rows[0].n) === 0)
   } finally {
     await db.query('delete from public.flashcard_commands where user_id = any($1)', [users]).catch(() => {}); await db.query('delete from public.flashcards where user_id = any($1)', [users]).catch(() => {})
     await db.query('delete from public.profiles where id = any($1)', [users]).catch(() => {}); await db.query('delete from auth.users where id = any($1)', [users]).catch(() => {}); await db.end().catch(() => {})
     console.log(`cleanup: ${users.length} fixture user(s) removed`)
+    await stage.stop()
   }
   console.log(`\n${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0)
 }

@@ -1,0 +1,13 @@
+{
+  "phase": "C8",
+  "totalItemsValidated": 1230,
+  "formatOrInputDefects": 152,
+  "overlapHintsRemaining": 0,
+  "giveawayAbsolutesRemaining": 46,
+  "identicalDistractorDiagnosesRemaining": 0,
+  "numericFormulasExecuted": 238,
+  "crossPoolFamilyLeakage": 0,
+  "rehearsalBlueprintVerified": true,
+  "blindModelSolveStatus": "self-authoring deterministic pass only; independent external model & human expert blind solves pending",
+  "bankContentHash": "98927ecb0bb75408eb09bfec23f7d282d197e89b5171fda4b270f5bef998620b"
+}

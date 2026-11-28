@@ -1,26 +1,38 @@
 "use client"
 
-import { useState, type FormEvent } from 'react'
+import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Eye, EyeOff } from 'lucide-react'
+import gsap from 'gsap'
+import { ArrowRight } from 'lucide-react'
 import { authRequest } from '../../lib/auth/authRequest'
 import { GOOGLE_SIGN_IN_ENABLED, TURNSTILE_SITE_KEY } from '../../lib/auth/authPolicy'
 import { TurnstileCheck } from './TurnstileCheck'
 import { GoogleMark } from './GoogleMark'
 import { AuthShell } from './AuthShell'
 import { LoginAside } from './AuthAside'
+import { PasswordField } from './PasswordField'
+import { useAuthFormReady } from './useAuthFormReady'
 import { Notice } from '../ui/Notice'
+import { calm, enter } from '../flow/motion'
 
 /** The /login page. Same frame and field style as sign-up. */
 export function LoginForm({ nextPath = '/app', reset }: { nextPath?: string; reset?: 'success' | 'sessions' }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [captcha, setCaptcha] = useState('')
   const [captchaAttempt, setCaptchaAttempt] = useState(0)
-  const blocked = loading || (!!TURNSTILE_SITE_KEY && !captcha)
+  const card = useRef<HTMLDivElement>(null)
+  const ready = useAuthFormReady()
+  const blocked = !ready || loading || (!!TURNSTILE_SITE_KEY && !captcha)
+
+  useLayoutEffect(() => { if (card.current) enter(card.current.querySelectorAll(':scope > *')) }, [])
+  // A refused sign-in nudges the form sideways once, so the error is felt as well as read.
+  const refuse = (message: string) => {
+    setError(message)
+    if (!calm() && card.current) gsap.fromTo(card.current.querySelector('.su-form'), { x: 0 }, { x: 0, keyframes: { x: [-8, 7, -4, 2, 0] }, duration: 0.38, ease: 'power2.out' })
+  }
 
   const signInWithGoogle = async () => {
     if (loading) return
@@ -40,42 +52,38 @@ export function LoginForm({ nextPath = '/app', reset }: { nextPath?: string; res
     try {
       const result = await authRequest('login', { email, password, captchaToken: captcha || undefined, next: nextPath })
       if (result.ok) { window.location.assign(result.data?.next ?? '/app'); return }
-      setError(result.data?.error ?? 'Sign-in could not be confirmed. Try again.')
+      refuse(result.data?.error ?? 'Sign-in could not be confirmed. Try again.')
     } catch {
-      setError('PrepPlan could not be reached. Try again.')
+      refuse('PrepPlan could not be reached. Try again.')
     } finally {
       setCaptcha(''); setCaptchaAttempt(v => v + 1); setLoading(false)
     }
   }
 
   return (
-    <AuthShell top={<>New to PrepPlan? <Link href="/signup">Create account</Link></>} aside={<LoginAside />}>
-      <h1>Welcome back</h1>
-      <p className="su-lede">Sign in to continue your CFA Level I plan</p>
+    <AuthShell top={<>New here? <Link href="/signup">Create account</Link></>} aside={<LoginAside />}>
+      <div ref={card} className="su-stack">
+        <h1>Welcome back</h1>
 
-      {reset ? <Notice tone={reset === 'success' ? 'success' : 'warn'} role="status">{reset === 'success' ? 'Password updated. Sign in with your new password.' : 'Password updated. PrepPlan could not confirm that every previous session was revoked.'}</Notice> : null}
+        {reset ? <Notice tone={reset === 'success' ? 'success' : 'warn'} role="status">{reset === 'success' ? 'Password updated. Sign in with it now.' : 'Password updated. Other devices may still be signed in.'}</Notice> : null}
 
-      {GOOGLE_SIGN_IN_ENABLED ? <>
-        <button type="button" className="su-google" onClick={signInWithGoogle} disabled={loading}><GoogleMark /> Continue with Google</button>
-        <div className="su-or"><span>or use your email</span></div>
-      </> : null}
+        {GOOGLE_SIGN_IN_ENABLED ? <>
+          <button type="button" className="su-google" onClick={signInWithGoogle} disabled={!ready || loading}><GoogleMark /> Continue with Google</button>
+          <div className="su-or"><span>or</span></div>
+        </> : null}
 
-      <form className="su-form" onSubmit={submit}>
-        <label className="su-field"><span>Email</span>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" maxLength={254} required placeholder="you@example.com" />
-        </label>
-        <label className="su-field">
-          <span className="su-fieldrow">Password <Link href="/forgot-password">Forgot password?</Link></span>
-          <span className="su-pass">
-            <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" required maxLength={1024} />
-            <button type="button" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button>
-          </span>
-        </label>
-        <TurnstileCheck onToken={setCaptcha} attempt={captchaAttempt} />
-        {error ? <p className="auth-error" role="alert">{error}</p> : null}
-        <button type="submit" className="su-submit" disabled={blocked}>{loading ? 'Please wait…' : 'Sign in'} <ArrowRight size={18} aria-hidden /></button>
-        <p className="su-small">Haven&rsquo;t confirmed your email yet? <Link href="/check-email">Send the confirmation link again</Link></p>
-      </form>
+        <form className="su-form" onSubmit={submit}>
+          <label className="su-field"><span>Email</span>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" maxLength={254} required placeholder="you@example.com" />
+          </label>
+          <PasswordField value={password} onChange={setPassword} autoComplete="current-password" meter={false} maxLength={1024}
+            rightLabel={<Link href="/forgot-password">Forgot password?</Link>} />
+          <TurnstileCheck onToken={setCaptcha} attempt={captchaAttempt} />
+          {error ? <p className="auth-error" role="alert">{error}</p> : null}
+          <button type="submit" className="su-submit" disabled={blocked}>{loading ? 'Signing in…' : 'Sign in'} <ArrowRight size={18} aria-hidden /></button>
+        </form>
+        <p className="su-small"><Link href="/check-email">Resend confirmation email</Link></p>
+      </div>
     </AuthShell>
   )
 }

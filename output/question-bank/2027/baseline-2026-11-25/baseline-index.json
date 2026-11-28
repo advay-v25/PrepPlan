@@ -1,0 +1,81 @@
+{
+  "recordedAt": "2026-11-25T11:02:18.812Z",
+  "headCommit": "2fdce1db829078c778cb25eeaefb4e8eb1da3c3b",
+  "sourceScope": "content-only (C0-C11)",
+  "counts": {
+    "drafts": 536,
+    "newOriginalDrafts": 254,
+    "revisedLegacyDrafts": 243,
+    "carriedForwardDrafts": 39,
+    "readingCoverage": 102,
+    "outcomeCoverage": 343,
+    "subjects": {
+      "quant": {
+        "outcomes": 30,
+        "drafts": 39
+      },
+      "econ": {
+        "outcomes": 30,
+        "drafts": 30
+      },
+      "ci": {
+        "outcomes": 22,
+        "drafts": 22
+      },
+      "fsa": {
+        "outcomes": 53,
+        "drafts": 162
+      },
+      "eq": {
+        "outcomes": 37,
+        "drafts": 37
+      },
+      "fi": {
+        "outcomes": 51,
+        "drafts": 51
+      },
+      "deriv": {
+        "outcomes": 22,
+        "drafts": 22
+      },
+      "alt": {
+        "outcomes": 22,
+        "drafts": 22
+      },
+      "pm": {
+        "outcomes": 40,
+        "drafts": 40
+      },
+      "eth": {
+        "outcomes": 36,
+        "drafts": 111
+      }
+    },
+    "arithmeticExecuted": 99,
+    "formatOrInputReview": 0,
+    "overlapReview": 4,
+    "nearMatchReview": 8,
+    "missingTierOutcomes": 253,
+    "emptyOutcomeTierCells": {
+      "foundation": 196,
+      "standard": 63,
+      "difficult": 245,
+      "total": 504
+    },
+    "confirmedIndependentFamilies": 0,
+    "approvedRoutine": 0,
+    "approvedHeldOut": 0,
+    "learnerReleaseEligible": false
+  },
+  "bankContentHash": "721526d5ea2208470b81dba9e21fbc556dd1beaf282c05760e0a551840667726",
+  "fileHashes": {
+    "draft-bank.json": "4734e26791a398f1980893b3aa05eadd68cb182e147b8096d30e60818868da49",
+    "coverage-and-review.json": "42f39484dadc3e00a3143b27826a57d444465d87f5f815970a46c6b7f171d6b1",
+    "source-intake.json": "2702cfa21e3de59a0af06e7a424005ad1cb58fa4690fe27c431927c388aee1ed",
+    "validation.json": "ae75208f5b32b7fe5f09090f5b9e3bee09c358cf9a8f4fc1c295d0e1bfe161e7"
+  },
+  "manualAvailability": {
+    "diagnosticEngineMetaPrompt": "docs/archive/root/DIAGNOSTIC-ENGINE-META-PROMPT-AND-TRAINING-PLAN.md (present)",
+    "standaloneOriginalTrainingManual": "not_present_in_repo (recorded as unavailable rather than claimed loaded)"
+  }
+}

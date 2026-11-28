@@ -19,6 +19,7 @@ export function ScopePanel({ preview, catalog }: { preview: PaperPreview; catalo
   const readingName = new Map(catalog.flatMap(s => s.readings.map(r => [r.id, { no: r.no, title: r.title, subject: s.id, outcomes: r.outcomes }] as const)))
   const subjName = new Map(catalog.map(s => [s.id, s.name]))
   const classSources = new Map(scope.targets.flatMap(target => target.sources.filter(source => source.type === 'class').map(source => [source.id, source] as const)))
+  const recordedReadings = new Map(scope.targets.map(target => [target.readingId, target.subjectId]))
 
   return (
     <section className="scope-panel" aria-labelledby="scope-h">
@@ -38,6 +39,16 @@ export function ScopePanel({ preview, catalog }: { preview: PaperPreview; catalo
           </ul>
           {blueprint.rollingCoverage.length > 0 && <p className="note">{blueprint.rollingCoverage.length} completed outcome{blueprint.rollingCoverage.length === 1 ? ' does' : 's do'} not fit in this paper and carry into a later one. Appearing once does not mean everything you studied is verified.</p>}
           {preview.limitation && <p role="alert" className="notice notice--warn">{preview.limitation}</p>}
+        </>
+      )}
+
+      {preview.noPaperReason && recordedReadings.size > 0 && (
+        <>
+          <p>Recorded for this week. {preview.noPaperReason}</p>
+          <ul className="scope-panel__readings">{[...recordedReadings].map(([id, subject]) => {
+            const reading = readingName.get(id)
+            return reading && <li key={id}><Link href={`/app/curriculum/${subject}/${id}`}>Reading {reading.no}: {reading.title}</Link></li>
+          })}</ul>
         </>
       )}
 

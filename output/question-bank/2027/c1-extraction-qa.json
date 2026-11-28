@@ -1,0 +1,424 @@
+{
+  "phase": "C1",
+  "totalSources": 16,
+  "qaItems": [
+    {
+      "id": "official-quant",
+      "pages": 631,
+      "factualPagesRetained": 323,
+      "emptyFactualPages": [],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "official-econ",
+      "pages": 278,
+      "factualPagesRetained": 141,
+      "emptyFactualPages": [],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "official-ci",
+      "pages": 255,
+      "factualPagesRetained": 87,
+      "emptyFactualPages": [],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "official-fsa",
+      "pages": 518,
+      "factualPagesRetained": 244,
+      "emptyFactualPages": [],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "official-eq",
+      "pages": 522,
+      "factualPagesRetained": 195,
+      "emptyFactualPages": [],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "official-fi",
+      "pages": 553,
+      "factualPagesRetained": 188,
+      "emptyFactualPages": [],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "official-deriv",
+      "pages": 253,
+      "factualPagesRetained": 64,
+      "emptyFactualPages": [],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "official-alt",
+      "pages": 226,
+      "factualPagesRetained": 83,
+      "emptyFactualPages": [],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "official-pm",
+      "pages": 304,
+      "factualPagesRetained": 161,
+      "emptyFactualPages": [],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "official-eth",
+      "pages": 295,
+      "factualPagesRetained": 96,
+      "emptyFactualPages": [
+        294
+      ],
+      "lowTitleMatches": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "prereq-econ",
+      "pages": 246,
+      "nonEmptyPages": 244,
+      "emptyPages": [
+        10,
+        224
+      ],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "prereq-fsa",
+      "pages": 313,
+      "nonEmptyPages": 313,
+      "emptyPages": [],
+      "status": "pass_machine_check"
+    },
+    {
+      "id": "schweser-qm-eco-cf",
+      "pages": 448,
+      "ocrMeanConfidence": 0.9897,
+      "factualPagesRetained": 249,
+      "excludedQuizOrExamplePages": 191,
+      "emptyPages": [
+        38,
+        100,
+        252,
+        298,
+        352,
+        360,
+        378,
+        424
+      ],
+      "lowConfidencePageCount": 37,
+      "lowConfidenceSample": [
+        {
+          "pdfPage": 22,
+          "meanConf": 0.973,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 78,
+          "meanConf": 0.959,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 79,
+          "meanConf": 0.971,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 92,
+          "meanConf": 0.963,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 93,
+          "meanConf": 0.979,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 95,
+          "meanConf": 0.959,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 109,
+          "meanConf": 0.967,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 111,
+          "meanConf": 0.965,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 120,
+          "meanConf": 0.93,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 129,
+          "meanConf": 0.962,
+          "minConf": 0.3
+        }
+      ],
+      "formulaSuspectPageCount": 0,
+      "formulaSuspectSample": [],
+      "status": "provisional_ocr_requires_page_qa_for_formulas"
+    },
+    {
+      "id": "schweser-fsa-eq",
+      "pages": 428,
+      "ocrMeanConfidence": 0.9927,
+      "factualPagesRetained": 230,
+      "excludedQuizOrExamplePages": 184,
+      "emptyPages": [
+        60,
+        76,
+        106,
+        158,
+        222,
+        288,
+        298,
+        328,
+        374,
+        390,
+        421,
+        422,
+        427,
+        428
+      ],
+      "lowConfidencePageCount": 31,
+      "lowConfidenceSample": [
+        {
+          "pdfPage": 4,
+          "meanConf": 0.937,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 19,
+          "meanConf": 0.953,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 30,
+          "meanConf": 0.981,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 98,
+          "meanConf": 0.934,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 103,
+          "meanConf": 0.985,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 124,
+          "meanConf": 0.982,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 164,
+          "meanConf": 0.988,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 200,
+          "meanConf": 0.974,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 244,
+          "meanConf": 0.984,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 290,
+          "meanConf": 0.976,
+          "minConf": 0.3
+        }
+      ],
+      "formulaSuspectPageCount": 0,
+      "formulaSuspectSample": [],
+      "status": "provisional_ocr_requires_page_qa_for_formulas"
+    },
+    {
+      "id": "schweser-fi-der",
+      "pages": 292,
+      "ocrMeanConfidence": 0.9915,
+      "factualPagesRetained": 163,
+      "excludedQuizOrExamplePages": 106,
+      "emptyPages": [
+        20,
+        32,
+        42,
+        60,
+        72,
+        84,
+        102,
+        120,
+        132,
+        154,
+        164,
+        172,
+        194,
+        204,
+        216,
+        224,
+        240,
+        246,
+        252,
+        270,
+        290,
+        291,
+        292
+      ],
+      "lowConfidencePageCount": 17,
+      "lowConfidenceSample": [
+        {
+          "pdfPage": 3,
+          "meanConf": 0.986,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 15,
+          "meanConf": 0.961,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 22,
+          "meanConf": 0.945,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 65,
+          "meanConf": 0.964,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 70,
+          "meanConf": 0.939,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 73,
+          "meanConf": 0.953,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 91,
+          "meanConf": 0.893,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 92,
+          "meanConf": 0.968,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 114,
+          "meanConf": 0.975,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 115,
+          "meanConf": 0.939,
+          "minConf": 0.3
+        }
+      ],
+      "formulaSuspectPageCount": 0,
+      "formulaSuspectSample": [],
+      "status": "provisional_ocr_requires_page_qa_for_formulas"
+    },
+    {
+      "id": "schweser-ai-pc-ethics",
+      "pages": 256,
+      "ocrMeanConfidence": 0.9912,
+      "factualPagesRetained": 148,
+      "excludedQuizOrExamplePages": 95,
+      "emptyPages": [
+        12,
+        22,
+        34,
+        42,
+        79,
+        80,
+        124,
+        138,
+        152,
+        168,
+        216,
+        234,
+        256
+      ],
+      "lowConfidencePageCount": 13,
+      "lowConfidenceSample": [
+        {
+          "pdfPage": 67,
+          "meanConf": 0.964,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 75,
+          "meanConf": 0.965,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 99,
+          "meanConf": 0.894,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 102,
+          "meanConf": 0.908,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 103,
+          "meanConf": 0.956,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 107,
+          "meanConf": 0.964,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 110,
+          "meanConf": 0.85,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 116,
+          "meanConf": 0.862,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 117,
+          "meanConf": 0.919,
+          "minConf": 0.3
+        },
+        {
+          "pdfPage": 121,
+          "meanConf": 0.943,
+          "minConf": 0.3
+        }
+      ],
+      "formulaSuspectPageCount": 0,
+      "formulaSuspectSample": [],
+      "status": "provisional_ocr_requires_page_qa_for_formulas"
+    }
+  ],
+  "note": "OCR confidence values are directly emitted by macOS Vision VNRecognizeTextRequest. Formula regions with meanConfidence < 0.95 require visual comparison against original PDFs before relying on them for released items."
+}

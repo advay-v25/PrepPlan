@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { WhenReady } from '../ui/WhenReady'
 import { CALENDAR_EXPORT_PATH } from '../../lib/calendar/ics'
 
 type Preview = { events: number; timed: number; allDay: number; excludedUnplaced: number; excludedHistory: number; excludedClasses: number }
@@ -25,6 +26,7 @@ export function CalendarExport({ initialFrom, initialTo }: { initialFrom: string
 
   return (
     <div className="calendar-export" data-calendar-export>
+      <WhenReady>
       <p className="fine-print">A snapshot of your accepted schedule as a calendar file. It does not update when PrepPlan changes, and importing it again may duplicate events in some calendar apps.</p>
       <div className="calendar-export__row">
         <label>From <input type="date" disabled={busy} value={from} onChange={e => { setFrom(e.target.value); setPreview(null) }} /></label>
@@ -43,6 +45,7 @@ export function CalendarExport({ initialFrom, initialTo }: { initialFrom: string
         </p>
       )}
       {error && <p role="alert" className="review-error">{error}</p>}
+      </WhenReady>
     </div>
   )
 }

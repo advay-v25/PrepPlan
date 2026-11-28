@@ -129,7 +129,8 @@ test('continuity, the unplaced remainder, the selected report, the exam boundary
     await db.from('planning_cycles').update({ starts_at_local: start, ends_at_local: end }).eq('id', c2).throwOnError()
     await db.from('plan_blocks').update({ local_date: addDays(start, 2), day: addDays(start, 2) }).eq('id', id).throwOnError()
     const p = await json(await page.request.post('/api/weekly-review/preview', { data: { cycleId: c2, choices: { [id]: { happened: 'partial', next: 'continue', estimateMinutes: 20 } }, acknowledgeNoPaper: true } })); expect(p.body.ok).toBe(true)
-    expect((await json(await page.request.post('/api/weekly-review/accept', { data: { draftId: p.body.draftId } }))).body.continued).toBe(1)
+    const acc = await json(await page.request.post('/api/weekly-review/accept', { data: { draftId: p.body.draftId } }))
+    expect(acc.body.continued, `accept: ${JSON.stringify(acc.body).slice(0, 400)}`).toBe(1)
   })
   await rec.browser('the continuation keeps the report provenance; its drawer says what it continues; the original keeps its own week and 10 reported minutes', async () => {
     const succ = (await db.from('plan_blocks').select('id, local_date, source_report_id, duration_minutes').eq('continued_from_task_id', T[2]).single()).data!
@@ -185,35 +186,49 @@ test('continuity, the unplaced remainder, the selected report, the exam boundary
   // ===== the real failed Calendar read and the real Coach deadline =====
   await rec.browser('Calendar failed read: an upstream 500 on the progress read is shown as "could not be loaded", the rest of the page works, and Try again recovers', async () => {
     const before = upstream().length
-    setFaults([{ id: 'signals-500', match: '/rest/v1/evidence_events?select=validity', mode: 'status', status: 500 }])
+    const progressRead = '/rest/v1/evidence_events?select=attempt_id'
+    setFaults([{ id: 'signals-500', match: progressRead, method: 'GET', mode: 'status', status: 500 }])
     await page.goto('/app/calendar')
     await page.locator('[data-week-context] > summary').click()
     const msg = page.getByTestId('calendar-signals-unavailable')
     await expect(msg).toBeVisible(); await expect(msg).toContainText('could not be loaded just now'); await expect(msg).not.toContainText(/0 of|nothing/i)
     await expect(page.getByTestId('mock-reports')).toBeVisible(); await fitsViewport(page)
-    evidence.calendarFault = { rule: 'status 500 on the progress read: /rest/v1/evidence_events?select=validity,… (src/lib/signals/signals-loader.ts)', applied: upstream().slice(before).filter(e => e.event === 'fault_status' && e.id === 'signals-500').length }
+    evidence.calendarFault = { rule: `status 500 on the progress read: ${progressRead},… (src/lib/signals/signals-loader.ts)`, applied: upstream().slice(before).filter(e => e.event === 'fault_status' && e.id === 'signals-500').length }
     expect((evidence.calendarFault as any).applied).toBeGreaterThan(0)
     setFaults([]); await msg.getByRole('link', { name: 'Try again' }).click(); await expect(page.getByTestId('calendar-signals-unavailable')).toHaveCount(0); await fitsViewport(page)
   })
   await rec.browser('Coach deadline: a REAL stalled upstream read hits the server context deadline (reads aborted, lease expired, retryable 503), the question is kept, and Retry gives exactly one answer', async () => {
     test.setTimeout(900_000)
+    expect(fs.existsSync(SERVERLOG), `SERVER_LOG missing: ${SERVERLOG}`).toBe(true)
+    expect(fs.existsSync(UPLOG), `UPSTREAM_LOG missing: ${UPLOG}`).toBe(true)
     await page.goto('/app/coach'); const box = page.getByRole('textbox', { name: 'Ask the coach' })
-    const t0 = Date.now(); const upBefore = upstream().length, srvBefore = fs.existsSync(SERVERLOG) ? fs.statSync(SERVERLOG).size : 0
+    const propBefore = (await db.from('coach_proposals').select('id', { count: 'exact', head: true }).eq('user_id', A.id)).count
+    const t0 = Date.now(); const upBefore = upstream().length, srvBefore = fs.statSync(SERVERLOG).size
     setFaults([{ id: 'ctx-stall', match: '/rest/v1/plan_blocks', method: 'GET', mode: 'stall', ms: 120000 }])
     let key = ''; page.on('request', r => { if (r.method() === 'POST' && /\/api\/coach$/.test(r.url())) key = JSON.parse(r.postData() ?? '{}').turnKey })
+    const coachResPromise = page.waitForResponse(r => r.request().method() === 'POST' && /\/api\/coach$/.test(r.url()), { timeout: 120_000 })
     allowed503 = true; await box.fill('What should I do today?'); await box.press('Enter')
+    const coachRes = await coachResPromise
+    expect(coachRes.status()).toBe(503)
+    const coachBody = await coachRes.json()
+    expect(coachBody.code).toBe('CONTEXT_TIMEOUT')
     await expect(page.locator('.coach-error[role=alert]')).toContainText('could not be checked in time', { timeout: 120_000 }); const waited = Date.now() - t0; allowed503 = false
     setFaults([])
-    const up = upstream().slice(upBefore), srv = fs.readFileSync(SERVERLOG).subarray(srvBefore).toString('utf8')
+    const up = upstream().slice(upBefore)
+    let srv = ''
+    await expect.poll(() => {
+      srv = fs.readFileSync(SERVERLOG).subarray(srvBefore).toString('utf8')
+      return srv
+    }, { timeout: 5000 }).toMatch(/Coach context exceeded its budget \(\d+ ms\); reads aborted, late result discarded/)
     const stalled = up.filter(e => e.event === 'fault_stall' && e.id === 'ctx-stall'), cancelled = up.filter(e => e.event === 'client_cancelled' && /plan_blocks/.test(e.url ?? ''))
     expect(waited, 'the server answered at its own deadline, not at the stall length').toBeGreaterThan(20_000); expect(waited).toBeLessThan(75_000)
     expect(stalled.length).toBeGreaterThan(0); expect(cancelled.length, 'the server CANCELLED the in-flight read').toBeGreaterThan(0)
-    expect(srv).toMatch(/exceeded its budget \(\d+ ms\); reads aborted, late result discarded/)
     const student = (await db.from('coach_messages').select('id, lease_until, lease_token').eq('user_id', A.id).eq('turn_key', key).eq('role', 'student')).data!
     expect(student).toHaveLength(1); expect(new Date(student[0].lease_until as string).getTime(), 'the lease was expired, not left held').toBeLessThanOrEqual(Date.now() + 1000)
     expect((await db.from('coach_messages').select('id').eq('user_id', A.id).eq('turn_key', key).eq('role', 'coach')).data).toHaveLength(0)
     await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible()
     const prop0 = (await db.from('coach_proposals').select('id', { count: 'exact', head: true }).eq('user_id', A.id)).count
+    expect(prop0, 'timed-out request wrote no proposal').toBe(propBefore)
     await page.getByRole('button', { name: 'Retry' }).click()
     await expect(page.locator('.coach-message--coach').last()).toContainText(/\w/, { timeout: 90_000 }); await expect(page.getByText('Checking your evidence…')).toHaveCount(0, { timeout: 90_000 })
     expect((await db.from('coach_messages').select('id').eq('user_id', A.id).eq('turn_key', key).eq('role', 'student')).data).toHaveLength(1)

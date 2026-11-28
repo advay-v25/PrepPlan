@@ -1,0 +1,24 @@
+== reh-db
+14 checks passed
+== reh-install
+runner dry-run after install: 0 pending (checkout has 160 migrations)
+ledger rows: 160; checksum mismatches: 0; migrations without a ledger row: 0
+  ✓ auth.users: 0 rows (expected 0)
+  ✓ public.profiles: 0 rows (expected 0)
+  ✓ public.assessment_items: 0 rows (expected 0)
+  ✓ public.item_batches: 0 rows (expected 0)
+== reh-upgrade
+runner dry-run after install: 0 pending (checkout has 160 migrations)
+ledger rows: 160; checksum mismatches: 0; migrations without a ledger row: 0
+  ✓ auth.users: 0 rows (expected 0)
+  ✓ public.profiles: 0 rows (expected 0)
+  ✓ public.assessment_items: 0 rows (expected 0)
+  ✓ public.item_batches: 0 rows (expected 0)
+== reh-restore
+32 checks passed (nothing persisted)
+== reh-ref
++ actual - expected
++ 'reference-draft-bank.2'
+- 'reference-draft-bank.1'
+== reh-ref1
+{"inserted":536,"preserved":0,"bankHash":"c6196d23975b5db04cf0d28324448090cf057d793cb746553ed60090eb0b86be","localRehearsal":"PASS","idempotent":true,"changedContentRefused":true,"atomicRollback":true,"learnerEligible":0,"heldOutEligible":0,"humanApprovals":0}

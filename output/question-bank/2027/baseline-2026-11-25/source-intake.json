@@ -1,0 +1,199 @@
+{
+  "sources": [
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V7_Derivs_ONLINE.pdf",
+      "pages": 253,
+      "sha256": "7be3ac71afc6ffbba6872451056ba41e74942cb7ee250e4a2838d98d54131bba",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        124,
+        1552,
+        1806
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V4_FSA_ONLINE.pdf",
+      "pages": 518,
+      "sha256": "b84e7a955d951b7fe77bb8719bd1d1181a9a223e96913ba89ca18a438ca7d6e7",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        142,
+        2666,
+        2926
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V8_Alts_ONLINE.pdf",
+      "pages": 226,
+      "sha256": "35f3a6570094485b78cd84d1ad29d6fba8d731e84c18aaad157c7d47f06a6c63",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        137,
+        1780,
+        2125
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V2_Econ_ONLINE.pdf",
+      "pages": 278,
+      "sha256": "449867afc9159e7aa3bc8c882c27207bffb0a48097fcf124c3163b63646ba583",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        122,
+        1877,
+        2459
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V3_CorpFin_ONLINE.pdf",
+      "pages": 255,
+      "sha256": "2bd17910ac94bf13ef81c23c838c1c20f7bb0d2ba27e9a56004c4673ca7e4aa3",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        130,
+        1964,
+        1660
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V5_Equities_ONLINE.pdf",
+      "pages": 522,
+      "sha256": "d762de00aeecbcfc62b1bc7815d487b2476ab17c22cc2f43cf0a8eab1c18f1ca",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        58,
+        8,
+        2968
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V10_Ethics_ONLINE.pdf",
+      "pages": 295,
+      "sha256": "644fa6daeebb165f236b0f556b5643c3397fc0c7c0c8a6845a9da2a9893ff31e",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        150,
+        1710,
+        2608
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V9_PortConstr_ONLINE.pdf",
+      "pages": 304,
+      "sha256": "8ddcb46a0224207a998ea88510648feca65e0a377321dcb3fc20fa7ff7bc5646",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        136,
+        85,
+        2565
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V1_Quants_ONLINE.pdf",
+      "pages": 631,
+      "sha256": "5c89433fef139bb9663e25694c72c5ab2003e77e8c6a7ddd7959002061e6e6ba",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        134,
+        83,
+        2693
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/2027_CFA_L1V6_FI_ONLINE.pdf",
+      "pages": 553,
+      "sha256": "a26bb009cb63e72d8643657ebc3cfb21ec9e7438e51cbde47666d63a4b663b14",
+      "role": "official_main",
+      "fullTextReferenceIntake": true,
+      "textSampleLengths": [
+        125,
+        75,
+        2570
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/cfa-program2027L1PrereqRead-Economics.PDF",
+      "pages": 246,
+      "sha256": "3e07d61aa3786a8f5ae15c24b7176a7e103a8f0293daba059328d8895b64e5e9",
+      "role": "prerequisite_background",
+      "fullTextReferenceIntake": false,
+      "textSampleLengths": [
+        72,
+        1832,
+        2900
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/1. Curriculum 2027 Books/cfa-program2027L1PrereqRead-Financial Statement Analysis.PDF",
+      "pages": 313,
+      "sha256": "6ba1b5b179b9169deaece777e94ebd29d0ffd3d9442569fa06568806060572c0",
+      "role": "prerequisite_background",
+      "fullTextReferenceIntake": false,
+      "textSampleLengths": [
+        161,
+        2267,
+        3123
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/Schweser CFA L1 2027 AI,PC,ETHICS.pdf",
+      "pages": 256,
+      "sha256": "88eb096cf65bf3a3bca9492d3c3b6fce234b0e7d9d2b72ff9c4a428a26672d74",
+      "role": "scanned_supplement_not_ocr_processed",
+      "fullTextReferenceIntake": false,
+      "textSampleLengths": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/Schweser CFA L1 2027 FSA , EQ.pdf",
+      "pages": 428,
+      "sha256": "1d714d06cd5d3195b449483316f70265f1c83c2edd5e80492e66b68cc29b4a77",
+      "role": "scanned_supplement_not_ocr_processed",
+      "fullTextReferenceIntake": false,
+      "textSampleLengths": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/Schweser CFA L1 2027 FI, DER.pdf",
+      "pages": 292,
+      "sha256": "e996dd4dbf6d89848deb2e29c24cdc9e0419002f1e52f9fcb37f3a552af77856",
+      "role": "scanned_supplement_not_ocr_processed",
+      "fullTextReferenceIntake": false,
+      "textSampleLengths": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "file": "/Users/advay/Downloads/Schweser CFA L1 2027 QM,ECO,CF.pdf",
+      "pages": 448,
+      "sha256": "6b8680a344c3a12787efcd4e615b4bb8c04e7ca449d54913968a588edb1de3ae",
+      "role": "scanned_supplement_not_ocr_processed",
+      "fullTextReferenceIntake": false,
+      "textSampleLengths": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "privateTextExported": false,
+  "sourceInstructionsFollowed": false,
+  "semanticReferenceSupport": "Human review required"
+}

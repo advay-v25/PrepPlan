@@ -2,7 +2,7 @@ import { createAdminClient } from '../supabase/admin'
 import { getActiveRoadmap } from './roadmapService'
 import { currentPhase, type Phase } from './roadmap'
 import { selectRevisionForWeek } from './revisionQueueService'
-import { checkCapability, toLine, type CheckCapability, type RevisionLine } from './revisionQueue'
+import { checkCapability, toLine, type CheckCapability, type QueueState, type RevisionLine } from './revisionQueue'
 import { loadEligibleItemPool } from '../tests/itemPool'
 import { MIN_PAPER_QUESTIONS } from '../tests/limits'
 import { getStudyWeekContext } from '../planning/schedule'
@@ -12,7 +12,7 @@ import { daysBetween } from '../planning/studyWeek'
  * What Curriculum, Coach and Home may say about revision, from the same selection the planner uses. Read-only.
  * A reading's status is where its obligation lives now, never a verdict: "in your rotation" is not "weak" or "forgotten".
  */
-export type ReadingRevisionStatus = 'in_plan' | 'continuing' | 'repair' | 'next' | 'rotation'
+export type ReadingRevisionStatus = 'in_plan' | 'continuing' | 'repair' | 'next' | 'rotation' | 'held'
 export type ReadingRevision = { status: ReadingRevisionStatus; label: string; line: RevisionLine }
 export type RevisionOverview = {
   weekStart: string; phase: Phase; cap: number; eligible: number
@@ -22,8 +22,12 @@ export type RevisionOverview = {
 
 const LABEL: Record<ReadingRevisionStatus, string> = {
   in_plan: 'In this week’s plan', continuing: 'Continuing from last week', repair: 'Covered by an open repair',
-  next: 'Next in your revision rotation', rotation: 'In your revision rotation',
+  next: 'Candidate for recall', rotation: 'In your revision rotation',
+  held: 'Waiting for broader revision',
 }
+
+export const revisionStatusForEntry = (state: QueueState): ReadingRevisionStatus =>
+  state === 'waiting' ? 'held' : state === 'selected' ? 'next' : state
 
 export async function getRevisionOverview(userId: string, now = new Date()): Promise<RevisionOverview | null> {
   const active = await getActiveRoadmap(userId)
@@ -37,7 +41,7 @@ export async function getRevisionOverview(userId: string, now = new Date()): Pro
   const put = (e: Parameters<typeof toLine>[0], status: ReadingRevisionStatus) => { byReading[e.readingId] = { status, label: LABEL[status], line: toLine(e) } }
   for (const e of selection.waiting) put(e, 'rotation')
   for (const e of selection.selected) put(e, 'next')
-  for (const e of selection.elsewhere) put(e, e.state === 'repair' ? 'repair' : e.state === 'continuing' ? 'continuing' : 'in_plan')
+  for (const e of selection.elsewhere) put(e, revisionStatusForEntry(e.state))
   return {
     weekStart: ctx.week.startDate, phase: revisionPhase, cap, eligible: selection.eligible,
     inPlan: selection.elsewhere.filter(e => e.state === 'in_plan').map(toLine),

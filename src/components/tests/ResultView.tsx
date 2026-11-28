@@ -117,7 +117,7 @@ export function ResultView({ r }: { r: AttemptResult }) {
         {(r.omitted.length > 0 || r.invalidated.length > 0) && (
           <div className="note" role="status">
             {r.omitted.length > 0 && <p><strong>Not answered:</strong> question{r.omitted.length === 1 ? '' : 's'} {r.omitted.map(o => o.seq).join(', ')}. No confidence was recorded and no cause is assumed; these are not counted as wrong.</p>}
-            {r.invalidated.length > 0 && <p><strong>Not counted as evidence:</strong> {r.invalidated.map(i => `question ${i.seq} (${i.why === 'challenged' || i.why === 'disputed' ? 'under review, still counted' : 'voided after a challenge was upheld'})`).join('; ')}.</p>}
+            {r.invalidated.length > 0 && <p><strong>Review status:</strong> {r.invalidated.map(i => `question ${i.seq} (${i.why === 'disputed' ? 'under review, still counted in the score' : 'set aside after review'})`).join('; ')}.</p>}
           </div>
         )}
       </section>
@@ -240,7 +240,7 @@ export function ResultView({ r }: { r: AttemptResult }) {
 
       {(r.integrity.voidedOrDisputed > 0 || r.integrity.challenges > 0 || r.integrity.unmappedQuestions > 0) && (
           <p className="note" role="status">
-            {r.integrity.voidedOrDisputed > 0 && `${r.integrity.voidedOrDisputed} evidence record${r.integrity.voidedOrDisputed === 1 ? ' is' : 's are'} voided or disputed and not counted. `}
+            {r.integrity.voidedOrDisputed > 0 && `${r.integrity.voidedOrDisputed} question${r.integrity.voidedOrDisputed === 1 ? ' is' : 's are'} excluded from evidence while under review or after being set aside. `}
             {r.integrity.challenges > 0 && `${r.integrity.challenges} question${r.integrity.challenges === 1 ? ' is' : 's are'} under challenge. `}
             {r.integrity.unmappedQuestions > 0 && `${r.integrity.unmappedQuestions} question${r.integrity.unmappedQuestions === 1 ? '' : 's'} could not be tied to a specific outcome, so they appear only in the totals.`}
           </p>

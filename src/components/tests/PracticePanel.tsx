@@ -3,19 +3,21 @@
 import { useMemo, useState } from 'react'
 import { PreflightStart } from './PreflightStart'
 import { AdaptivePractice } from './AdaptivePractice'
+import { AdaptiveItemPractice } from './AdaptiveItemPractice'
 
 export type PracticeCatalog = {
   subjects: { id: string; name: string; completed: boolean; readings: { id: string; no: number; title: string; completed: boolean }[] }[]
   /** Outcomes per reading, for an optional narrower scope. */
   outcomes: Record<string, { id: string; title: string }[]>
 }
-type Mode = 'reading' | 'subject' | 'baseline' | 'practice' | 'adaptive'
+type Mode = 'reading' | 'subject' | 'baseline' | 'practice' | 'adaptive' | 'adaptive_item'
 
 const MODES: { id: Mode; label: string; help: string }[] = [
   { id: 'reading', label: 'Reading check', help: 'Tests the part of one reading you have completed. It can create evidence.' },
   { id: 'subject', label: 'Subject check', help: 'Samples across what you have completed in one subject. It can create evidence.' },
   { id: 'baseline', label: 'Baseline', help: 'Tests a reading or subject whether or not you have completed it, to see where you start. You opt in below.' },
-  { id: 'adaptive', label: 'Adaptive practice', help: 'Sets of five questions on one reading, untimed, up to 10 or 20 in all. Practice only: each set adjusts the next, and it never changes your understanding signal.' },
+  { id: 'adaptive_item', label: 'Item-by-item adaptive', help: 'One question at a time on one reading, starting at Easy and stepping up or down after each committed answer. Practice only.' },
+  { id: 'adaptive', label: 'Adaptive practice (sets)', help: 'Sets of five questions on one reading, untimed, up to 10 or 20 in all. Practice only: each set adjusts the next, and it never changes your understanding signal.' },
   { id: 'practice', label: 'Timed practice', help: 'A short timed set on one reading. Practice only: it never changes your understanding signal or closes a repair.' },
 ]
 
@@ -35,7 +37,7 @@ export function PracticePanel({ catalog, initial }: { catalog: PracticeCatalog; 
 
   const subject = catalog.subjects.find(s => s.id === subjectId)
   const needsCompleted = mode === 'reading' || mode === 'subject'
-  const readings = useMemo(() => (subject?.readings ?? []).filter(r => mode === 'baseline' || mode === 'practice' || mode === 'adaptive' || r.completed), [subject, mode])
+  const readings = useMemo(() => (subject?.readings ?? []).filter(r => mode === 'baseline' || mode === 'practice' || mode === 'adaptive' || mode === 'adaptive_item' || r.completed), [subject, mode])
   const readingOk = readingId && readings.some(r => r.id === readingId)
   const outcomes = readingOk ? catalog.outcomes[readingId] ?? [] : []
 
@@ -46,6 +48,7 @@ export function PracticePanel({ catalog, initial }: { catalog: PracticeCatalog; 
     else body = { kind: 'subject', subjectId }
   } else if (!readingOk) why = needsCompleted && readings.length === 0 ? 'No reading in this subject is completed yet.' : 'Choose a reading.'
   else if (mode === 'reading') body = { kind: 'reading', readingId }
+  else if (mode === 'adaptive_item') body = { kind: 'practice', mode: 'adaptive_item', readingId, ...(losId ? { outcomeIds: [losId] } : {}) }
   else if (mode === 'adaptive') body = { kind: 'practice', mode: 'adaptive', readingId, cap, ...(losId ? { outcomeIds: [losId] } : {}) }
   else if (mode === 'practice') body = { kind: 'practice', readingId, ...(losId ? { outcomeIds: [losId] } : {}) }
   else if (mode === 'baseline') { if (!optIn) why = 'Tick the box to confirm you want to be tested on this without having completed it.'; else body = { kind: 'reading', readingId, baseline: true } }
@@ -79,7 +82,7 @@ export function PracticePanel({ catalog, initial }: { catalog: PracticeCatalog; 
             </select>
           </label>
         )}
-        {(mode === 'practice' || mode === 'adaptive') && outcomes.length > 0 && (
+        {(mode === 'practice' || mode === 'adaptive' || mode === 'adaptive_item') && outcomes.length > 0 && (
           <label>Narrow to one outcome <span className="muted">(optional)</span>
             <select value={losId} onChange={e => setLosId(e.target.value)}>
               <option value="">The whole reading</option>
@@ -99,7 +102,9 @@ export function PracticePanel({ catalog, initial }: { catalog: PracticeCatalog; 
           {[10, 20].map(n => <label key={n} className={cap === n ? 'is-selected' : ''}><input type="radio" name="cap" checked={cap === n} onChange={() => setCap(n as 10 | 20)} /><span><strong>{n} questions</strong><small>{n / 5} sets of five{n === 10 ? ' (default)' : ''}</small></span></label>)}
         </fieldset>
       )}
-      {body && mode === 'adaptive'
+      {body && mode === 'adaptive_item'
+        ? <AdaptiveItemPractice key={JSON.stringify(body)} readingId={readingId} outcomeIds={losId ? [losId] : undefined} />
+        : body && mode === 'adaptive'
         ? <AdaptivePractice key={JSON.stringify(body)} readingId={readingId} outcomeIds={losId ? [losId] : undefined} cap={cap} />
         : body
         ? <PreflightStart key={JSON.stringify(body)} body={body} reviewLabel="Review this check" startLabel="Start" />

@@ -19,7 +19,19 @@ const isPlanCall = (u: string, m: string) => m === 'POST' && /\/api\/planning\/c
 test.describe.configure({ mode: 'serial' })
 
 test.beforeEach(({ page }) => {
-  page.on('requestfailed', r => { const u = new URL(r.url()); const cancelledSelection = r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && r.headers()['rsc'] === '1' && u.pathname === '/app/calendar' && u.searchParams.has('_rsc'); if (cancelledSelection) { cancelledCalendarRsc.push({ path: u.pathname + u.search.replace(/([?&])_rsc=[^&]*/, ''), from: new URL(page.url()).pathname }); return } const ok = (r.method() === 'PATCH' && /\/api\/commitments\//.test(r.url()) && injected > 0) || (isPlanCall(r.url(), r.method()) && plan.aborted > 0); if (!ok) unexpected.push(`requestfailed ${r.url()} ${r.failure()?.errorText}`) })
+  page.on('requestfailed', r => {
+    const u = new URL(r.url());
+    const cancelledSelection = r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && (
+      (r.headers()['rsc'] === '1' && (u.searchParams.has('_rsc') || r.headers()['next-router-prefetch'] === '1')) ||
+      (/[?&]_rsc=/.test(r.url()))
+    );
+    if (cancelledSelection) {
+      cancelledCalendarRsc.push({ path: u.pathname + u.search.replace(/([?&])_rsc=[^&]*/, ''), from: new URL(page.url()).pathname });
+      return;
+    }
+    const ok = (r.method() === 'PATCH' && /\/api\/commitments\//.test(r.url()) && injected > 0) || (isPlanCall(r.url(), r.method()) && plan.aborted > 0);
+    if (!ok) unexpected.push(`requestfailed ${r.url()} ${r.failure()?.errorText}`);
+  })
   page.on('response', r => { if (r.status() >= 400 && !(r.status() === 409 && r.request().method() === 'PATCH' && /\/api\/commitments\//.test(r.url())) && !(r.status() === 409 && isPlanCall(r.url(), r.request().method()) && plan.stale > 0)) unexpected.push(`HTTP ${r.status()} ${r.url()}`) })
   page.on('console', m => { if (m.type() === 'error' && !/^Failed to load resource.*(409|ERR_FAILED)/.test(m.text())) unexpected.push(`${page.url()} ${m.text().slice(0, 1800)}`) })
   page.on('pageerror', e => unexpected.push(`PAGEERROR ${page.url()} ${e.message.slice(0, 200)}`))
@@ -370,7 +382,10 @@ test('keyboard and IME: composing text never submits or loses input, Escape/Tab 
     expect(coachCalls).toBe(0); await noHorizontalOverflow(page)
   })
   await rec.browser('class dialog: Tab cycles inside the dialog, Escape closes it and returns focus to the class', async () => {
-    await page.goto(`/app/calendar?week=${S.occ}`); const chip = page.locator('button[aria-label^="Class, "]').first(); await expect(chip).toBeVisible(); await chip.focus(); await page.keyboard.press('Enter')
+    await page.goto(`/app/calendar?week=${S.occ}&view=agenda`)
+    const chip = page.getByRole('tabpanel', { name: 'Agenda' }).getByRole('button', { name: /^Class, / }).first()
+    await expect(chip).toBeVisible(); await chip.focus(); await expect(chip).toBeFocused()
+    await page.keyboard.press('Enter')
     await expect(dialog(page)).toBeVisible()
     for (let i = 0; i < 12; i++) { await page.keyboard.press('Tab'); expect(await page.evaluate(() => !!document.activeElement?.closest('[role=dialog]'))).toBe(true) }
     await page.keyboard.press('Escape'); await expect(dialog(page)).toHaveCount(0)
@@ -424,8 +439,17 @@ test('partial class log (UI) -> next-week continuation -> explicit whole-outcome
 
   await rec.api('the weekly command rolls the week over (continuing both partly-done tasks)', async () => {
     const choices = Object.fromEntries(cons.map(x => [x.id as string, { happened: 'partial', next: 'continue', estimateMinutes: 30 }]))
-    const p = await page.request.post('/api/weekly-review/preview', { data: { cycleId, choices, acknowledgeNoPaper: true } }); const pj = await p.json(); expect(pj.ok, JSON.stringify(pj).slice(0, 300)).toBe(true)
-    const a = await page.request.post('/api/weekly-review/accept', { data: { draftId: pj.draftId } }); const aj = await a.json(); expect(aj.ok, JSON.stringify(aj).slice(0, 300)).toBe(true)
+    const t0 = Date.now()
+    const p = await page.request.post('/api/weekly-review/preview', { data: { cycleId, choices, acknowledgeNoPaper: true } })
+    const previewMs = Date.now() - t0
+    const pj = await p.json()
+    expect(pj.ok, JSON.stringify(pj).slice(0, 300)).toBe(true)
+    const t1 = Date.now()
+    const a = await page.request.post('/api/weekly-review/accept', { data: { draftId: pj.draftId } })
+    const acceptMs = Date.now() - t1
+    const aj = await a.json()
+    expect(aj.ok, JSON.stringify(aj).slice(0, 300)).toBe(true)
+    console.log(`[WEEKLY-REVIEW-TIMING] preview: ${previewMs}ms, accept: ${acceptMs}ms`)
   })
   const succ = (await db.from('plan_blocks').select('id, title, local_date, outcome_id, class_session_id, continued_from_task_id, cycle_id, duration_minutes').eq('user_id', c.id).not('continued_from_task_id', 'is', null)).data ?? []
   expect(succ).toHaveLength(2); expect(succ.every(s => s.class_session_id === null && s.cycle_id !== cycleId)).toBe(true)   // lineage only: the class link was reset by the weekly command
@@ -439,9 +463,9 @@ test('partial class log (UI) -> next-week continuation -> explicit whole-outcome
       await page.goto(`/app/calendar?week=${s.local_date}&view=agenda`); await expect(page.locator(`[aria-label*="${(s.title as string).replace(/"/g, '')}"]`).first()).toBeVisible()
     }
     await page.goto('/app')
-    const cyc = (await db.from('planning_cycles').select('id').eq('user_id', c.id).eq('status', 'active').single()).data!.id as string
-    const open = (await db.from('plan_blocks').select('id, title', { count: 'exact' }).eq('user_id', c.id).eq('cycle_id', cyc).is('cancelled_at', null).neq('execution', 'cancelled').eq('is_protected_commitment', false)).data ?? []
-    await expect(page.getByText(new RegExp(`0 of ${open.length} done`)).first()).toBeVisible()   // Home's week count is Calendar's/the database's count for the same cycle
+    const active = (await db.from('planning_cycles').select('id, starts_at_local').eq('user_id', c.id).eq('status', 'active').single().throwOnError()).data!
+    expect(succ.every(s => s.cycle_id === active.id)).toBe(true)
+    await expect(page.locator('.week-cal a')).toHaveAttribute('href', `/app/calendar?week=${active.starts_at_local}`)
     // The Coach's deterministic class-log answer (intent hint, no model) names the SAME next unlogged class the class-log context holds, never the one just logged.
     const left = ((await page.evaluate(async () => (await fetch('/api/class-log/context')).json())).context.pendingDates as string[]).slice().sort()
     const r = await page.request.post('/api/coach', { data: { message: 'log my class', intent: 'log_class', turnKey: `cp-${RUN}-1` } }); const body = await r.json()

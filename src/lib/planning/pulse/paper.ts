@@ -84,7 +84,7 @@ export type PaperPlan =
       estimatedMinutes: number
       skipped: SkippedModule[]
     }
-  | { kind: 'none'; reason: 'no_scope' | 'insufficient_bank' | 'below_minimum_paper' | 'mock_chosen'; skipped: SkippedModule[] }
+  | { kind: 'none'; reason: 'no_scope' | 'insufficient_bank' | 'below_minimum_paper' | 'mock_chosen' | 'no_slot'; skipped: SkippedModule[] }
 
 /** Pure: decide the paper from the week's scope and what the bank can support. */
 export function classifyWeeklyPaper(input: {

@@ -12,8 +12,12 @@ import { getStudyWeekContext } from '../planning/schedule'
 import { addDays, daysBetween, todayInZone, utcToZonedParts } from '../planning/studyWeek'
 import {
   Milestone, Roadmap, RoadmapInput, buildRoadmap, currentMilestone, currentPhase,
-  remainingEffort, type ModuleInput,
+  firstPassEffort, type ModuleInput,
 } from './roadmap'
+import { profileRow } from '../ops/sharedReads'
+import { ownedBlocks } from '../ops/sharedReads'
+import { refRows } from '../ops/refCache'
+import { weeklySeries } from '../ops/sharedReads'
 
 /**
  * Loading the roadmap's inputs, persisting a plan, and comparing planned with
@@ -33,7 +37,9 @@ export type CoverageRow = { lmId: string; state: ModuleInput['coverage']; source
  * it. Returns null when there is nothing to go on — an invented figure would
  * make every downstream verdict a guess wearing a number.
  */
-export async function weeklyCapacityMinutes(userId: string): Promise<number | null> {
+/** Request-scoped: the Roadmap, the mock recommendation and the recovery status ask the same question in one request. */
+export const weeklyCapacityMinutes = perRequest((userId: string) => loadWeeklyCapacity(userId), (userId: string) => userId)
+async function loadWeeklyCapacity(userId: string): Promise<number | null> {
   const admin = createAdminClient()
 
   const { data: windows } = await admin
@@ -76,14 +82,15 @@ export async function weeklyCapacityMinutes(userId: string): Promise<number | nu
  * Minutes actually spent per unit of effort, from time the student reported on finished modules.
  * The rule lives in observedPace.ts; this only loads the rows. Absent until there is enough to mean anything.
  */
-export async function observedPace(userId: string): Promise<{ minutesPerEffortUnit: number | null; modules: number }> {
+async function loadObservedPace(userId: string): Promise<{ minutesPerEffortUnit: number | null; modules: number }> {
   const admin = createAdminClient()
   const [{ data: blocks }, { data: events }, { data: state }, { data: mods },coverage,activity] = await Promise.all([
-    readAll<any>((a,z)=>admin.from('plan_blocks').select('id, lm_id, execution, cancelled_at, continued_from_task_id, learning_activity_id').eq('user_id', userId).eq('task_type', 'study').not('lm_id', 'is', null).order('id').range(a,z)).then(data=>({data})),
+    // Derived from the full history getStudyActivity reads in this same call: the same rows (study blocks with a reading), no second request.
+    ownedBlocks(userId).then(all => ({ data: all.filter(b => b.task_type === 'study' && b.lm_id !== null) })),
     // Filtered in code rather than with a long .in() list, which would outgrow a request URL on a long-lived account.
     readAll<any>((a,z)=>admin.from('task_events').select('task_id, actual_duration_minutes').eq('user_id', userId).not('actual_duration_minutes', 'is', null).order('id').range(a,z)).then(data=>({data})),
     admin.from('user_module_state').select('lm_id').eq('user_id', userId).in('coverage_state', ['studied', 'verified', 'decaying']).throwOnError(),
-    admin.from('learning_modules').select('id, effort_band').throwOnError(),
+    refRows('roadmap.module-bands', () => admin.from('learning_modules').select('id, effort_band')).then(r => { if (r.error) throw r.error; return r }),
     getActivityCoverage(userId),getStudyActivity(userId),
   ])
   const classLogs=new Set(activity.blocks.filter(b=>b.activityKind==='class').map(b=>b.id))
@@ -95,20 +102,18 @@ export async function observedPace(userId: string): Promise<{ minutesPerEffortUn
   )
 }
 
+export const observedPace = perRequest(loadObservedPace, (userId: string) => userId)
+
 export const observedMinutesPerEffortUnit = async (userId: string) => (await observedPace(userId)).minutesPerEffortUnit
 
-export async function loadRoadmapInputs(userId: string, options: { targetDate?: string } = {}): Promise<RoadmapInput | null> {
+export async function loadRoadmapInputs(userId: string, options: { targetDate?: string; now?: Date } = {}): Promise<RoadmapInput | null> {
   // The canonical mock schedule: every planned appointment, not only the profile's "next" projection.
   const { data: apptRows } = await createAdminClient().from('mock_appointments').select('id, version, planned_date, kind, label, start_time').eq('user_id', userId).eq('status', 'planned').order('planned_date').throwOnError()
   const appts = (apptRows ?? []).map(a => ({ id: a.id as string, version: a.version as number, date: a.planned_date as string, kind: a.kind as MockKind, label: (a.label ?? null) as string | null, startTime: a.start_time ? String(a.start_time).slice(0, 5) : null }))
   const admin = createAdminClient()
-  const ctx = await getStudyWeekContext(userId)
+  const ctx = await getStudyWeekContext(userId, options.now)
 
-  const { data: profile } = await admin
-    .from('profiles')
-    .select('exam_window_id, exam_year, exam_sitting, exam_date, prep_mode, study_mode, classes_completed_at')
-    .eq('id', userId)
-    .maybeSingle()
+  const profile = await profileRow(userId)
 
   let targetDate = options.targetDate ?? null
   const targetKind: 'booked' | 'sitting' = profile?.exam_date && (!options.targetDate || options.targetDate === profile.exam_date) ? 'booked' : 'sitting'
@@ -117,8 +122,8 @@ export async function loadRoadmapInputs(userId: string, options: { targetDate?: 
     targetDate = profile.exam_date as string
   }
   if (!targetDate && profile?.exam_window_id) {
-    const { data: window } = await admin
-      .from('exam_windows').select('window_opens').eq('id', profile.exam_window_id).maybeSingle()
+    const { data: window } = await refRows(`exam-window.opens:${profile.exam_window_id}`, () => admin
+      .from('exam_windows').select('window_opens').eq('id', profile.exam_window_id).maybeSingle())
     targetDate = (window?.window_opens ?? null) as string | null
   }
   if (!targetDate) return null
@@ -133,9 +138,9 @@ export async function loadRoadmapInputs(userId: string, options: { targetDate?: 
     activityState,
     entry,
   ] = await Promise.all([
-    admin.from('topics').select('id, name, exam_weight_min, exam_weight_max, default_sequence').order('default_sequence'),
-    admin.from('learning_modules').select('id, topic_ref, name, effort_band, effort_units, difficulty_weight, sequence_hint, is_active').eq('is_active', true),
-    admin.from('lm_edges').select('from_lm, to_lm, kind').eq('kind', 'prerequisite'),
+    refRows('roadmap.topics', () => admin.from('topics').select('id, name, exam_weight_min, exam_weight_max, default_sequence').order('default_sequence')),
+    refRows('roadmap.modules', () => admin.from('learning_modules').select('id, topic_ref, name, effort_band, effort_units, difficulty_weight, sequence_hint, is_active').eq('is_active', true)),
+    refRows('roadmap.edges', () => admin.from('lm_edges').select('from_lm, to_lm, kind').eq('kind', 'prerequisite')),
     admin.from('user_module_state').select('lm_id, coverage_state').eq('user_id', userId),
     weeklyCapacityMinutes(userId),
     observedMinutesPerEffortUnit(userId),
@@ -149,12 +154,7 @@ export async function loadRoadmapInputs(userId: string, options: { targetDate?: 
   // it should not be second-guessed by a series that just hasn't been edited, so it takes precedence.
   let classesCompletedDate: string | null = (profile?.classes_completed_at as string | null) ?? null
   if (!classesCompletedDate) {
-    const { data: classSeries } = await admin
-      .from('calendar_commitments')
-      .select('ends_on')
-      .eq('user_id', userId)
-      .eq('kind', 'class')
-      .eq('recurrence', 'weekly')
+    const classSeries = (await weeklySeries(userId)).filter(r => r.kind === 'class')   // any status, as before
     const series = classSeries ?? []
     // Classes count as finished only once every known weekly series has a known end date in the past — a
     // single series still running (ends_on null, or in the future) means the course as a whole is ongoing,
@@ -325,10 +325,10 @@ export async function computeProgress(userId: string, roadmap: Roadmap, preloade
   // Total effort is measured against a clean slate, so "50% done" means half
   // the curriculum, not half of whatever is left today.
   const totalEffort = modules.reduce(
-    (s, m) => s + remainingEffort({ ...m, coverage: 'not_started' }), 0
+    (s, m) => s + firstPassEffort({ ...m, coverage: 'not_started' }), 0
   )
   const actualEffortDone = modules.reduce(
-    (s, m) => s + (remainingEffort({ ...m, coverage: 'not_started' }) - remainingEffort(m)), 0
+    (s, m) => s + (firstPassEffort({ ...m, coverage: 'not_started' }) - firstPassEffort(m)), 0
   )
 
   // Fractional, not whole weeks. Rounding to whole weeks makes the plan expect
@@ -340,10 +340,15 @@ export async function computeProgress(userId: string, roadmap: Roadmap, preloade
   // What the plan expected finished by now: milestones that have closed in
   // full, plus how far through the one in progress today falls.
   let plannedEffortDone = 0
-  for (const m of roadmap.milestones) {
-    const milestoneEffort = m.moduleIds.reduce(
-      (s, id) => s + (byId.has(id) ? remainingEffort({ ...byId.get(id)!, coverage: 'not_started' }) : 0), 0
-    )
+  const counted = new Set<string>()
+  for (const m of roadmap.milestones.filter(milestone => milestone.phase === 'first_pass')) {
+    let milestoneEffort = 0
+    for (const id of m.moduleIds) {
+      const module = byId.get(id)
+      if (!module || counted.has(id)) continue
+      counted.add(id)
+      milestoneEffort += firstPassEffort({ ...module, coverage: 'not_started' })
+    }
     // A milestone covering weeks 3–5 occupies elapsed-week 2 up to 5.
     const opensAt = m.startWeek - 1
     const closesAt = m.endWeek
@@ -364,9 +369,9 @@ export async function computeProgress(userId: string, roadmap: Roadmap, preloade
   let message: string
   // Nothing meaningful to compare in the first week of a nine-month plan.
   // Within the first week, "done" can only be what the student said they had covered, which is not progress against the plan.
-  if (elapsedWeeks < 1) {
+  if (elapsedWeeks < 1 || !firstPass || counted.size === 0) {
     verdict = 'not_started'
-    message = 'The plan has not started yet. Nothing to compare.'
+    message = 'There is no elapsed first-pass milestone comparison for this plan.'
   } else if (weeksAhead >= 1) {
     verdict = 'ahead'
     message = `You are roughly ${Math.round(weeksAhead)} week${Math.round(weeksAhead) === 1 ? '' : 's'} ahead of the plan. That is worth spending on consolidation rather than racing further forward.`

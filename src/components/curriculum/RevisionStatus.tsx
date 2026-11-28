@@ -13,10 +13,10 @@ export function RevisionStatus({ revision, capability }: { revision: ReadingRevi
       <h2 id="revision-h">Revision</h2>
       <p>
         <strong>{revision.label}</strong>
-        {line.kind === 'targeted' ? ' · you marked this to revisit' : ' · maintenance'}
+        {line.kind === 'targeted' ? ' · you marked this to revisit' : ' · recall rotation'}
         {' · last activity: '}{line.recency.days == null ? 'unknown' : `${line.recency.days} day${line.recency.days === 1 ? '' : 's'} ago (${HOW[line.recency.provenance ?? 'recorded']})`}
       </p>
-      <details>
+      <details suppressHydrationWarning>
         <summary>Why is this {revision.status === 'next' ? 'queued' : 'here'}?</summary>
         <ul>{line.why.map(w => <li key={w}>{w}</li>)}</ul>
         {line.note && <p>{line.note}</p>}

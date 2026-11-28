@@ -148,8 +148,9 @@ export async function getRehearsal(userId: string, rehearsalId: string, now = ne
   const formPolicy = new Map<string, string | null>((forms ?? []).map(f => [f.id as string, (f.scoring_policy ?? null) as string | null] as [string, string | null]))
   const counts = new Map<string, number>()
   for (const a of attempts ?? []) {
-    const { count } = await admin.from('assessment_responses').select('id', { count: 'exact', head: true }).eq('attempt_id', a.id as string)
-    counts.set(a.id as string, count ?? 0)
+    const { count } = await admin.from('assessment_responses').select('id', { count: 'exact', head: true }).eq('attempt_id', a.id as string).throwOnError()
+    if (count === null) throw new Error('Could not count the rehearsal session answers.')
+    counts.set(a.id as string, count)
   }
   const sessions: SessionState[] = (attempts ?? []).map(a => {
     const ended = ENDED.has(a.status as string)
@@ -201,17 +202,18 @@ export async function startSession(userId: string, attemptId: string): Promise<S
  */
 export async function settleRehearsal(db: SupabaseClient, userId: string, rehearsalId: string, now = new Date()): Promise<void> {
   const admin = createAdminClient()
-  const { data: attempts } = await admin.from('assessment_attempts').select('id, status, deadline_at, session_no').eq('rehearsal_id', rehearsalId).eq('user_id', userId)
+  const { data: attempts } = await admin.from('assessment_attempts').select('id, status, deadline_at, session_no').eq('rehearsal_id', rehearsalId).eq('user_id', userId).throwOnError()
   for (const a of attempts ?? []) {
     if (ENDED.has(a.status as string) || !a.deadline_at) continue
     if (now.getTime() <= new Date(a.deadline_at as string).getTime() + 10_000) continue
-    const { count } = await admin.from('assessment_responses').select('id', { count: 'exact', head: true }).eq('attempt_id', a.id as string)
-    if (!count) {
-      await admin.from('assessment_attempts').update({ status: 'expired', completed_at: a.deadline_at, submitted_at: a.deadline_at, valid_response_count: 0, correct_response_count: 0 }).eq('id', a.id as string).in('status', ['ready', 'in_progress'])
+    const { count } = await admin.from('assessment_responses').select('id', { count: 'exact', head: true }).eq('attempt_id', a.id as string).throwOnError()
+    if (count === null) throw new Error('Could not count the rehearsal session answers.')
+    if (count === 0) {
+      await admin.from('assessment_attempts').update({ status: 'expired', completed_at: a.deadline_at, submitted_at: a.deadline_at, valid_response_count: 0, correct_response_count: 0 }).eq('id', a.id as string).in('status', ['ready', 'in_progress']).throwOnError()
     } else {
       const { error } = await db.rpc('finalize_assessment_attempt', { p_attempt_id: a.id, p_scoring_policy: '1.0', p_evidence_policy: EVIDENCE_POLICY_VERSION })
-      if (error) console.error('[settleRehearsal] finalize', error.message)
-      await admin.from('assessment_attempts').update({ submitted_at: a.deadline_at }).eq('id', a.id as string).is('submitted_at', null)
+      if (error) throw new Error(error.message)
+      await admin.from('assessment_attempts').update({ submitted_at: a.deadline_at }).eq('id', a.id as string).is('submitted_at', null).throwOnError()
     }
   }
   await syncRehearsalStatus(userId, rehearsalId)
@@ -220,10 +222,11 @@ export async function settleRehearsal(db: SupabaseClient, userId: string, rehear
 /** complete when both sessions ended. Called after any submit as well. */
 export async function syncRehearsalStatus(userId: string, rehearsalId: string): Promise<void> {
   const admin = createAdminClient()
-  const { data: attempts } = await admin.from('assessment_attempts').select('status').eq('rehearsal_id', rehearsalId).eq('user_id', userId)
+  const { data: attempts } = await admin.from('assessment_attempts').select('status').eq('rehearsal_id', rehearsalId).eq('user_id', userId).throwOnError()
   if ((attempts ?? []).length === 2 && (attempts ?? []).every(a => ENDED.has(a.status as string))) {
-    const { data: appt } = await admin.from('mock_rehearsals').update({ status: 'complete', completed_at: new Date().toISOString() }).eq('id', rehearsalId).eq('user_id', userId).in('status', ['ready', 'in_progress']).select('appointment_id').maybeSingle()
-    if (appt?.appointment_id) await admin.from('mock_appointments').update({ status: 'completed' }).eq('id', appt.appointment_id as string).eq('user_id', userId).eq('status', 'planned')
+    await admin.from('mock_rehearsals').update({ status: 'complete', completed_at: new Date().toISOString() }).eq('id', rehearsalId).eq('user_id', userId).in('status', ['ready', 'in_progress']).throwOnError()
+    const { data: rehearsal } = await admin.from('mock_rehearsals').select('appointment_id').eq('id', rehearsalId).eq('user_id', userId).eq('status', 'complete').maybeSingle().throwOnError()
+    if (rehearsal?.appointment_id) await admin.from('mock_appointments').update({ status: 'completed' }).eq('id', rehearsal.appointment_id as string).eq('user_id', userId).eq('status', 'planned').throwOnError()
   }
 }
 

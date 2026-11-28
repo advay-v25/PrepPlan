@@ -1,0 +1,481 @@
+{
+  "phase": "C4",
+  "totalRepairsRecorded": 95,
+  "repairs": [
+    {
+      "id": "pp-ref2027-r004-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r008-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r010-d-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r014-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r014-d-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r020-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r020-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r023-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r023-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r024-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r025-d-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r027-b-hard",
+      "version": 2,
+      "disposition": "C4.3: Replaced identical generic distractor diagnoses with distinct role-specific explanations."
+    },
+    {
+      "id": "pp-ref2027-r029-a-easy",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r029-d-hard",
+      "version": 1,
+      "disposition": "C4.2: Grouped with pp-ref2027-r029-d-medium under one provisional construction family (same bond issue scenario)."
+    },
+    {
+      "id": "pp-ref2027-r029-d-medium",
+      "version": 1,
+      "disposition": "C4.2: Grouped with pp-ref2027-r029-d-hard under one provisional construction family (same bond issue scenario)."
+    },
+    {
+      "id": "pp-ref2027-r031-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r033-c-easy",
+      "version": 1,
+      "disposition": "C4.2: Grouped with pp-ref2027-r033-c-medium under one provisional construction family (same depreciation scenario)."
+    },
+    {
+      "id": "pp-ref2027-r033-c-medium",
+      "version": 1,
+      "disposition": "C4.2: Grouped with pp-ref2027-r033-c-easy under one provisional construction family (same depreciation scenario)."
+    },
+    {
+      "id": "pp-ref2027-r034-c-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r035-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r035-c-easy",
+      "version": 1,
+      "disposition": "C4.2: Grouped with pp-ref2027-r035-c-medium under one provisional construction family (same tax scenario)."
+    },
+    {
+      "id": "pp-ref2027-r035-c-medium",
+      "version": 1,
+      "disposition": "C4.2: Grouped with pp-ref2027-r035-c-easy under one provisional construction family (same tax scenario)."
+    },
+    {
+      "id": "pp-ref2027-r036-e-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r036-f-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r037-d-easy",
+      "version": 1,
+      "disposition": "C4.2: Reviewed near-match with r037-d-medium; distinct 3-step vs 5-step DuPont formulas, flagged for human family confirmation."
+    },
+    {
+      "id": "pp-ref2027-r037-d-medium",
+      "version": 1,
+      "disposition": "C4.2: Reviewed near-match with r037-d-easy; distinct 5-step vs 3-step DuPont formulas, flagged for human family confirmation."
+    },
+    {
+      "id": "pp-ref2027-r037-e-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r037-f-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r038-c-easy",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r038-d-easy",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r040-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r041-d-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r042-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r042-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r043-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r046-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r047-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r050-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r054-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r055-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r056-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r058-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r059-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r060-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r062-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r063-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r066-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r067-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r068-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r069-b-easy",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r069-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r069-d-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r071-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r072-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r075-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r075-b-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r077-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r079-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r080-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r080-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r081-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r083-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r084-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r086-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r086-d-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r087-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r087-f-easy",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r088-d-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r089-a-easy",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r090-c-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r092-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r092-d-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r093-a-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r093-b-hard",
+      "version": 2,
+      "disposition": "C4.3: Replaced identical generic distractor diagnoses with distinct purpose-specific explanations."
+    },
+    {
+      "id": "pp-ref2027-r093-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r093-f-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r093-g-easy",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r093-g-hard",
+      "version": 2,
+      "disposition": "C4.3: Replaced identical generic distractor diagnoses with distinct ethics-vs-law explanations."
+    },
+    {
+      "id": "pp-ref2027-r094-a-hard",
+      "version": 2,
+      "disposition": "C4.3: Replaced incoherent negative lead-in and non-parallel Option C via closeout-revisions."
+    },
+    {
+      "id": "pp-ref2027-r094-c-easy",
+      "version": 2,
+      "disposition": "C4.3: Replaced identical distractor diagnoses with standard-specific explanations."
+    },
+    {
+      "id": "pp-ref2027-r096-a-easy",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r098-a-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r098-b-hard",
+      "version": 2,
+      "disposition": "C4.3: Rewrote \"OUTSIDE\" lead-in to \"least likely to require written consent under Standard IV(B)\" and wrote distinct diagnoses."
+    },
+    {
+      "id": "pp-ref2027-r098-c-easy",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r099-b-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r099-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r100-a-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r100-c-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-ref2027-r102-b-hard",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-2027-r032-a-easy",
+      "version": 2,
+      "disposition": "C4.1: Rewrote stem and solution in original prose to remove verbatim IAS 2 / textbook 8-gram overlap."
+    },
+    {
+      "id": "pp-2027-r095-a-easy",
+      "version": 2,
+      "disposition": "C4.1 & C4.3: Rewrote stem, distractor B (removed \"always\"), and solution in original prose to clear 8-gram overlap."
+    },
+    {
+      "id": "pp-2027-r095-b-easy",
+      "version": 2,
+      "disposition": "C4.1: Rewrote solution in original prose to remove verbatim Standard I(B) 8-gram overlap."
+    },
+    {
+      "id": "pp-2027-r095-b-medium",
+      "version": 2,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    },
+    {
+      "id": "pp-2027-r095-e-easy",
+      "version": 2,
+      "disposition": "C4.1 & C4.3: Rewrote distractor A (removed \"solely\") and solution in original prose to clear 8-gram overlap."
+    },
+    {
+      "id": "pp-2027-r095-e-hard",
+      "version": 3,
+      "disposition": "C4.3 giveaway-absolute distractor rewritten"
+    }
+  ]
+}

@@ -1,11 +1,12 @@
 'use client'
 
 import { formatStudyDate } from '../../lib/format/date'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { Dialog } from '../ui/Dialog'
+import { useHydrated, WhenReady } from '../ui/WhenReady'
 import { WEEKDAY_SHORT } from '../../lib/planning/studyWeek'
 import { calendarReviewHref, calendarTaskHref } from '../../lib/routing/calendar'
 import type { OccurrenceSelection } from '../../lib/planning/classOccurrence'
@@ -42,6 +43,9 @@ export function ClassOccurrenceDialog({ selection: s, closeHref, logHref, saved 
   const [retryable, setRetryable] = useState(false)
   const [done, setDone] = useState<{ affected: Affected[]; replayed: boolean; action: string } | null>(null)
   const firstRef = useRef<HTMLInputElement>(null)
+  const ready = useHydrated()
+  // Opened by a link, the dialog is on screen before it can take input: focus goes to the first control once it can.
+  useEffect(() => { if (ready) firstRef.current?.focus() }, [ready])
 
   const close = () => router.replace(closeHref, { scroll: false })
   const edited = () => { setPreview(null); setOpKey(null); setError(''); setRetryable(false) }
@@ -109,6 +113,7 @@ export function ClassOccurrenceDialog({ selection: s, closeHref, logHref, saved 
       description={s.state === 'skipped' ? 'This class is cancelled.' : s.state === 'moved' ? `Moved from ${day(s.occurrence)} (${s.startTime}–${s.endTime}).` : `Repeats ${s.weekdays.map(d => WEEKDAY_SHORT[d]).join(', ')} ${s.startTime}–${s.endTime}${s.endsOn ? ` until ${day(s.endsOn)}` : ''}.`}
       initialFocusRef={firstRef}>
       <div style={{ display: 'grid', gap: 14 }} data-testid="class-occurrence" data-state={s.state} data-commitment={s.commitmentId} data-occurrence={s.occurrence}>
+        <WhenReady>
         {s.current && <p><strong>{day(s.current.date)}, {s.current.start}–{s.current.end}</strong></p>}
         {logHref && <Link prefetch={false} href={logHref} className="prose-link">{saved ? 'Open saved class log' : 'Log this class'}</Link>}
         {pastNote ? <p>This class has already happened, so its record is kept as it is.</p> : (
@@ -174,6 +179,7 @@ export function ClassOccurrenceDialog({ selection: s, closeHref, logHref, saved 
           {!pastNote && !preview && <button type="button" className="primary-button" onClick={runPreview} disabled={busy !== null}>{busy === 'preview' ? <><Loader2 size={16} className="animate-spin" aria-hidden /> Checking…</> : 'Preview change'}</button>}
           {!pastNote && preview && <button type="button" className="primary-button" onClick={confirm} disabled={busy !== null || !canConfirm}>{busy === 'confirm' ? <><Loader2 size={16} className="animate-spin" aria-hidden /> Saving…</> : retryable ? 'Retry confirm' : 'Confirm change'}</button>}
         </div>
+        </WhenReady>
       </div>
     </Dialog>
   )

@@ -37,7 +37,7 @@ export type AttemptResult = {
   nextAction: NextAction
   /** Questions with no answer (omitted), and questions whose evidence is disputed, voided or under challenge. Neither counts as a wrong answer. */
   omitted: { seq: number; itemId: string; outcomeId: string | null; outcomeTitle: string | null }[]
-  invalidated: { itemId: string; seq: number; why: 'disputed' | 'voided' | 'challenged' }[]
+  invalidated: { itemId: string; seq: number; why: 'disputed' | 'voided' }[]
   /** Which eligibility rule the paper was reserved under; null = reserved before the approved-version rule. */
   eligibilityPolicy: string | null
   /** A further paper from confirmed scope this one left pending. */
@@ -218,13 +218,15 @@ export async function getAttemptResult(userId: string, attemptId: string, now = 
 
   // Omitted questions: on the paper, never answered. No confidence exists for them and no cause is assumed.
   const answeredIds = allResponded
-  const omittedIds = (formItems ?? []).filter(f => !answeredIds.has(f.item_id as string)).map(f => ({ itemId: f.item_id as string, seq: f.sequence_number as number }))
+  const omittedIds = (formItems ?? []).filter(f => !answeredIds.has(f.item_id as string) && !voidedNow.has(f.item_id as string)).map(f => ({ itemId: f.item_id as string, seq: f.sequence_number as number }))
   const { data: omittedItems } = omittedIds.length ? await admin.from('assessment_items').select('id, stem, options, per_option_feedback, key_index, item_card, review_status, lm_id, outcome_id, concept_id, intended_difficulty, item_form, cognition, concept:curriculum_concepts ( name )').in('id', omittedIds.map(o => o.itemId)) : { data: [] as any[] }
   const omittedOutcome = new Map((omittedItems ?? []).map(i => [i.id as string, (i.outcome_id ?? null) as string | null]))
   const omitted = omittedIds.sort((a, b) => a.seq - b.seq).map(o => ({ ...o, outcomeId: omittedOutcome.get(o.itemId) ?? null, outcomeTitle: omittedOutcome.get(o.itemId) ? outcomeTitle.get(omittedOutcome.get(o.itemId)!) ?? null : null }))
   const disputed = pendingNow
   const voided = voidedNow
-  const invalidated = [...new Set([...disputed, ...voided, ...(challenges ?? []).map(c => c.item_id as string)])].map(id => ({ itemId: id, seq: seqOf.get(id) ?? 0, why: (voided.has(id) ? 'voided' : disputed.has(id) ? 'disputed' : 'challenged') as 'voided' | 'disputed' | 'challenged' })).sort((a, b) => a.seq - b.seq)
+  const invalidated = [...new Set([...disputed, ...voided])].map((id): AttemptResult['invalidated'][number] => ({
+    itemId: id, seq: seqOf.get(id) ?? 0, why: voided.has(id) ? 'voided' : 'disputed',
+  })).sort((a, b) => a.seq - b.seq)
   const distractorOf = (itemId: string) => {
     const t = analysis.tagged.find(x => x.itemId === itemId); const q = itemById.get(itemId) as any
     if (!t || t.correct || !q) return null
@@ -244,7 +246,7 @@ export async function getAttemptResult(userId: string, attemptId: string, now = 
       timing.practice = { readingId: slowReading, outcomeIds: outIds, state: decision.state, deliverable: decision.deliverable, minutes: decision.minutes, message: decision.message }
     }
   }
-  // Unanswered questions are reviewable too (a voided one is not scored, but it is still listed as set aside).
+  // Unanswered questions are reviewable too. Voided questions have their own list.
   for (const o of omittedIds) {
     const it: any = (omittedItems ?? []).find(x => x.id === o.itemId); if (!it) continue
     const reading = it.lm_id ? readingById.get(it.lm_id as string) : null
@@ -267,7 +269,7 @@ export async function getAttemptResult(userId: string, attemptId: string, now = 
   return {
     attempt: { id: attemptId, kind: attempt.attempt_kind as string | null, paperKind: attempt.paper_kind as string | null, startedAt: attempt.started_at as string | null, submittedAt: attempt.submitted_at as string | null, pausedMinutes: Math.round(((attempt.paused_seconds as number) ?? 0) / 60), timed: attempt.deadline_at !== null },
     analysis: analysisOut, ledger, findings, nextAction, omitted, invalidated, pendingScope, eligibilityPolicy: (attempt.eligibility_policy ?? null) as string | null,
-    integrity: { voidedOrDisputed: voidedNow.size + pendingNow.size, challenges: (challenges ?? []).length, unmappedQuestions: analysis.tagged.filter(t => !t.outcomeId).length },
+    integrity: { voidedOrDisputed: voidedNow.size + pendingNow.size, challenges: pendingNow.size, unmappedQuestions: analysis.tagged.filter(t => !t.outcomeId).length },
     coverage,
     names: { readings: nameMap([...readingById].map(([id, r]) => [id, rname(id)] as [string, string])), subjects: nameMap((topics ?? []).map(t => [t.id as string, t.name as string] as [string, string])), outcomes: nameMap([...outcomeTitle]) },
     subjectOfReading: nameMap([...readingById].map(([id, r]) => [id, r.topic_id as string] as [string, string])),

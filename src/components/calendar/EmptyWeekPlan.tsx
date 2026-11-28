@@ -8,7 +8,7 @@ import { Loader2, RefreshCw } from 'lucide-react'
 import { Notice } from '../ui/Notice'
 import { Button } from '../ui/Button'
 import { groupSittings } from '../../lib/onboarding/sittingGroups'
-import { ASSESSMENT_AVAILABILITY_HREF, PAPER_UNAVAILABLE_BANK } from '../../lib/tests/assessmentStage'
+import { ASSESSMENT_AVAILABILITY_HREF, PAPER_UNAVAILABLE_BANK, PAPER_UNAVAILABLE_SLOT } from '../../lib/tests/assessmentStage'
 import type { CurrentWeekPlanState } from '../../lib/planning/currentWeek/state'
 
 type Task = { id: string; title: string; duration_minutes: number; task_type: string; local_date: string }
@@ -153,7 +153,7 @@ export function EmptyWeekPlan({ state: initial, autoOpen = false, ownerId }: { s
                   </li>
                 ))}
               </ol>
-              {proposal.paper?.kind === 'none' && <p className="fine-print">No paper is placed this week. {proposal.paper.reason === 'insufficient_bank' || proposal.paper.reason === 'below_minimum_paper' ? <>{PAPER_UNAVAILABLE_BANK} <Link className="prose-link" href={ASSESSMENT_AVAILABILITY_HREF}>View assessment availability</Link></> : 'The week closes with a checkpoint instead.'}</p>}
+              {proposal.paper?.kind === 'none' && <p className="fine-print">No paper is placed this week. {proposal.paper.reason === 'insufficient_bank' || proposal.paper.reason === 'below_minimum_paper' ? <>{PAPER_UNAVAILABLE_BANK} <Link className="prose-link" href={ASSESSMENT_AVAILABILITY_HREF}>View assessment availability</Link></> : proposal.paper.reason === 'no_slot' ? PAPER_UNAVAILABLE_SLOT : 'The week closes with a checkpoint instead.'}</p>}
               <div className="ob-actions">
                 {!pending && <Button variant="text" onClick={() => setOpen(false)} disabled={busy}>Close preview</Button>}
                 <Button variant="text" onClick={() => void keepEmpty()} disabled={busy || needsRebuild || !!recoveryUrl || pending === 'accept'}>{pending === 'dismiss' ? 'Retry keeping the week empty' : 'Keep the week empty'}</Button>

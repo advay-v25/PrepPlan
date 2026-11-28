@@ -14,7 +14,7 @@ export type ReviewBlock = {
   repairThreadId?: string | null
 }
 
-export type DueTask = { id: string; title: string; taskType: string; localDate: string | null; execution: string; durationMinutes: number; isProtected: boolean; lmId: string | null; outcomeId: string | null; repairThreadId: string | null }
+export type DueTask = { /** Minutes actually logged on this task (absent when none). */ loggedMinutes?: number; id: string; title: string; taskType: string; localDate: string | null; execution: string; durationMinutes: number; isProtected: boolean; lmId: string | null; outcomeId: string | null; repairThreadId: string | null }
 
 // A task deferred earlier in the week is unfinished work too; it must be decided on, not dropped at closure.
 const OPEN = ['not_started', 'in_progress', 'partial', 'deferred']

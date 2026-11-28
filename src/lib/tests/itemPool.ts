@@ -3,6 +3,7 @@ import type { allowedTiers } from '../diagnostic/blueprint'
 import { eligibleItems, FIXTURE_PROVENANCE } from '../diagnostic/itemState'
 import { getPaperManifestId } from '../planning/pulse/paper'
 import { readAll } from '../supabase/readAll'
+import { perRequest } from '../ops/perRequest'
 
 export type PoolItem = {
   id: string; lm_id: string; outcome_id: string | null; concept_id: string | null
@@ -26,7 +27,7 @@ export function filterEligiblePool(items: PoolItem[], seen: Set<string>, activeC
 export type PoolSource = 'routine' | 'heldout'
 
 /** Shared candidate policy for the preview, the counts and the reservation. Failures are not an empty bank. */
-export async function loadEligibleItemPool(userId: string, readingIds: string[], _purpose?: Parameters<typeof allowedTiers>[0], source: PoolSource = 'routine'): Promise<PoolItem[]> {
+async function loadEligibleItemPoolUncached(userId: string, readingIds: string[], _purpose?: Parameters<typeof allowedTiers>[0], source: PoolSource = 'routine'): Promise<PoolItem[]> {
   if (!readingIds.length) return []
   const manifestId = await getPaperManifestId()
   if (!manifestId) return []
@@ -68,13 +69,27 @@ export async function countFreshByReading(userId: string, readingIds?: string[])
   return counts
 }
 
-/** Questions already shown to the student: in a paper that was opened (not merely reserved), answered or not. */
+/** Questions already shown to the student: in a paper that was opened (not merely reserved) or in item-by-item adaptive practice. */
 async function deliveredItems(userId: string): Promise<{ item_id: string; item: any }[]> {
   const admin = createAdminClient()
-  const { data: attempts } = await admin.from('assessment_attempts').select('form_id').eq('user_id', userId).not('status', 'in', '(ready,assembling)').throwOnError()
+  const [{ data: attempts }, adaptiveRuns] = await Promise.all([
+    admin.from('assessment_attempts').select('form_id').eq('user_id', userId).not('status', 'in', '(ready,assembling)').throwOnError(),
+    readAll<{ id: string }>((a, z) => admin.from('adaptive_item_runs').select('id').eq('user_id', userId).order('id').range(a, z)),
+  ])
   const forms = (attempts ?? []).map(a => a.form_id as string).filter(Boolean)
-  if (!forms.length) return []
-  return readAll<{ item_id: string; item: any }>((a, z) => admin.from('form_items').select('item_id, form_id, item:assessment_items(family_id)').in('form_id', forms).order('form_id').order('item_id').range(a, z))
+  const runIds = adaptiveRuns.map(r => r.id)
+  const [formRows, adaptiveRows] = await Promise.all([
+    forms.length
+      ? readAll<{ item_id: string; item: any }>((a, z) => admin.from('form_items').select('item_id, form_id, item:assessment_items(family_id)').in('form_id', forms).order('form_id').order('item_id').range(a, z))
+      : Promise.resolve([]),
+    runIds.length
+      ? readAll<{ item_id: string; family_id: string | null }>((a, z) => admin.from('adaptive_item_steps').select('item_id, family_id, seq').in('run_id', runIds).order('run_id').order('seq').range(a, z))
+      : Promise.resolve([]),
+  ])
+  return [
+    ...formRows,
+    ...adaptiveRows.map(r => ({ item_id: r.item_id, item: { family_id: r.family_id } })),
+  ]
 }
 
 async function pinnedRehearsalItems(userId: string): Promise<{ item_id: string; item: any }[]> {
@@ -86,3 +101,13 @@ async function pinnedRehearsalItems(userId: string): Promise<{ item_id: string; 
   if (!forms.length) return []
   return readAll<{ item_id: string; item: any }>((a, z) => admin.from('form_items').select('item_id, form_id, item:assessment_items(family_id)').in('form_id', forms).order('form_id').order('item_id').range(a, z))
 }
+
+/**
+ * Within ONE server render (Calendar asks twice: the paper preview and the weekly paper state, with the same readings) the pool is read once. A route handler,
+ * including starting a paper, is not inside a render, so it always reads fresh. The purpose argument does not change the result, so it is not part of the key.
+ * Each caller gets its own array.
+ */
+const pooledOnce = perRequest(loadEligibleItemPoolUncached, (userId: string, readingIds: string[], _purpose?: Parameters<typeof allowedTiers>[0], source: PoolSource = 'routine') =>
+  `${userId}|${source}|${[...new Set(readingIds)].sort().join(',')}`)
+export const loadEligibleItemPool = (userId: string, readingIds: string[], purpose?: Parameters<typeof allowedTiers>[0], source: PoolSource = 'routine'): Promise<PoolItem[]> =>
+  pooledOnce(userId, readingIds, purpose, source).then(pool => pool.slice())

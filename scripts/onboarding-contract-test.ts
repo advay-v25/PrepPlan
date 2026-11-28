@@ -2,6 +2,7 @@
 import { bookedDateProblem, isSelectableSitting } from '../src/lib/onboarding/examWindows'
 import { groupSittings } from '../src/lib/onboarding/sittingGroups'
 import { stageFromPlannedPaper, stageFromWeeklyPrimary } from '../src/lib/tests/assessmentStage'
+import { PositionSetupSchema } from '../src/lib/onboarding/schema'
 
 let passed = 0, failed = 0
 const check = (n: string, ok: boolean, d = '') => { ok ? (passed++, console.log(`  ✓ ${n}`)) : (failed++, console.log(`  ✗ ${n}${d ? ` — ${d}` : ''}`)) }
@@ -42,6 +43,12 @@ console.log('\nOne assessment vocabulary')
   check('Calendar: scope to confirm is awaiting confirmed work', stageFromWeeklyPrimary({ kind: 'confirm_scope' }) === 'awaiting_confirmed_work' && stageFromWeeklyPrimary({ kind: 'no_scope' }) === 'awaiting_confirmed_work')
   check('Calendar: a blocked start is unavailable coverage, a clear one a scheduled paper', stageFromWeeklyPrimary({ kind: 'start', blocked: 'x' }) === 'unavailable_coverage' && stageFromWeeklyPrimary({ kind: 'start', blocked: null }) === 'scheduled_paper')
 }
+
+const position = { stage: 'revising_or_mocks', topicExposure: { fsa: 'recent' } }
+check('the latest mock and revision are optional for a mature entrant', PositionSetupSchema.safeParse(position).success)
+check('a previous mock feeling and revision are separate from an upcoming mock', PositionSetupSchema.safeParse({ ...position, revisionCompleted: true, lastMockFeeling: 'below_target' }).success)
+check('the mock feeling is restricted to the choices shown in setup', !PositionSetupSchema.safeParse({ ...position, lastMockFeeling: '95%' }).success)
+check('previous answers can be cleared', PositionSetupSchema.safeParse({ ...position, revisionCompleted: null, lastMockFeeling: null }).success)
 
 console.log(`\n${passed} passed, ${failed} failed`)
 process.exit(failed ? 1 : 0)

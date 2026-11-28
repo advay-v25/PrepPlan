@@ -88,14 +88,16 @@ async function main() {
   const { data: cyc } = await admin.from('planning_cycles').select('id').eq('user_id', a.id).eq('status', 'active').single()
   const tokenOf = async () => (await admin.rpc('weekly_source_version', { p_user: a.id, p_cycle: cyc!.id })).data as string
   const fp0 = await planFingerprint(), tok0 = await tokenOf()
+  const { data: setup } = await admin.from('profiles').select('onboarding_context_version').eq('id', a.id).single().throwOnError()
   const edit = await a.s.post('/api/onboarding/position', {
     stage: 'first_pass_underway', topicExposure: rec(T.slice(0, 3)),
     uncertainty: { [T[0]]: { level: 'few', lmIds: [] } }, mock,
+    expectedVersion: setup!.onboarding_context_version,
   })
   check('the edit saves', edit.body?.ok === true, JSON.stringify(edit.body))
   check('the accepted week is exactly as it was', fp0 === await planFingerprint())
   check('the weekly change token moved, so an unaccepted weekly proposal built before the edit is stale', tok0 !== await tokenOf())
-  const keep = await a.s.post('/api/onboarding/position', { stage: 'first_pass_underway', topicExposure: rec(T.slice(0, 3)) })
+  const keep = await a.s.post('/api/onboarding/position', { stage: 'first_pass_underway', topicExposure: rec(T.slice(0, 3)), expectedVersion: edit.body?.version })
   check('a save from a client that does not know the new fields keeps uncertainty and the mock', keep.body?.ok === true && ((await admin.from('user_entry_uncertainty').select('*', { count: 'exact', head: true }).eq('user_id', a.id)).count === 1) && (await admin.from('profiles').select('mock_date').eq('id', a.id).single()).data?.mock_date === mock.date)
 
   console.log('\nC. First pass complete, a mock in a month')
@@ -106,7 +108,8 @@ async function main() {
   check('the preview is built', prevC.body?.ok === true, JSON.stringify(prevC.body).slice(0, 200))
   const tasksC = (prevC.body.data.tasks ?? []) as any[]
   check('no first-pass study at all', tasksC.length > 0 && !tasksC.some(t => t.task_type === 'study'), JSON.stringify(tasksC.map(t => t.title)))
-  check('the week is revision-oriented and centred on the flagged topic first', tasksC.some(t => t.task_type === 'review') && topicOf.get(tasksC.find(t => t.task_type === 'review').lm_id) === T[3])
+  check('the week includes targeted revision for the flagged topic', tasksC.some(t => t.task_type === 'review' && topicOf.get(t.lm_id) === T[3] && /self-reported|you said|you marked/i.test(t.rationale ?? '')),
+    JSON.stringify(tasksC.map(t => ({ title: t.title, why: t.rationale }))))
   const stale = (await admin.from('profiles').select('mock_kind, mock_date').eq('id', c.id).single()).data
   check('the mock is saved as a checkpoint', stale?.mock_date === mock.date && stale?.mock_kind === 'provider_mock')
   console.log('\n   A preview built before an edit cannot be accepted')

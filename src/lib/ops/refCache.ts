@@ -15,4 +15,13 @@ export function refCache<T>(key: string, load: () => Promise<T>): Promise<T> {
   return value
 }
 
+/**
+ * refCache for a Supabase query result ({ data, error }). An error response is NEVER cached: it is thrown out of the cache, then this call runs the query
+ * once more and returns whatever it returns, exactly as an uncached read would.
+ */
+export async function refRows<R extends { error: unknown }>(key: string, query: () => PromiseLike<R>): Promise<R> {
+  try { return await refCache(key, async () => { const r = await query(); if (r.error) throw r.error; return r }) }
+  catch { return await query() }
+}
+
 export const refCacheClear = () => store.clear()

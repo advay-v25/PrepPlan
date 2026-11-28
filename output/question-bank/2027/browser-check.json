@@ -1,0 +1,26 @@
+{
+  "browser": "Chromium",
+  "fallback": "Browser plugin not available",
+  "results": [
+    {
+      "width": 1280,
+      "title": true,
+      "search": true,
+      "filters": true,
+      "blindAndAnswer": true,
+      "pagination": true,
+      "noOverflow": true,
+      "consoleErrors": []
+    },
+    {
+      "width": 390,
+      "title": true,
+      "search": true,
+      "filters": true,
+      "blindAndAnswer": true,
+      "pagination": true,
+      "noOverflow": true,
+      "consoleErrors": []
+    }
+  ]
+}

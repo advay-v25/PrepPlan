@@ -17,7 +17,7 @@ export function toDraftTasks(dayPlans: DayPlan[], timezone: string) {
       id: ids[i].id, title: p.title, duration: p.durationMinutes, duration_minutes: p.durationMinutes, detail: p.detail,
       task_type: p.taskType, local_date: day.date, lm_id: p.lmId, repair_thread_id: p.repairThreadId, priority: 'core',
       placement: timedReview ? 'timed' : 'day_preferred',
-      starts_at: timedReview ? zonedTimeToUtc(day.date, PAPER_START_TIME, timezone).toISOString() : null,
+      starts_at: timedReview ? zonedTimeToUtc(day.date, p.paperStart ?? PAPER_START_TIME, timezone).toISOString() : null,
       origin: isReview ? 'diagnostic' : 'planner', assessment_scope: p.assessmentScope ?? null, rationale: p.rationale ?? '',
       learning_objective: p.learningObjective ?? '', suggested_approach: p.suggestedApproach ?? '', completion_meaning: p.completionMeaning ?? '',
     }

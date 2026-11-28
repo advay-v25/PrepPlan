@@ -1,5 +1,6 @@
 'use client'
 
+import { WhenReady } from '../ui/WhenReady'
 import { formatStudyDate } from '../../lib/format/date'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -7,7 +8,13 @@ import { useRouter } from 'next/navigation'
 import type { DueTask, PreviewResult, RevisionPreview, ReviewClassReport } from '../../lib/planning/weeklyReview/service'
 import type { Happened, Next } from '../../lib/planning/weeklyReview/dispositions'
 import { RevisionRotation } from './RevisionRotation'
+import { remainingMinutes } from '../../lib/planning/weeklyReview/dispositions'
+import { MockProposalNote, type Estimates } from './MockProposalNote'
+import { ExtraTimePanel, type WindowInput } from './ExtraTimePanel'
+import { RecoveryProposalNote } from './RecoveryProposalNote'
+import type { PathKey } from '../../lib/planning/recovery/status'
 import { AdaptationNote } from './AdaptationNote'
+import { PAPER_UNAVAILABLE_SLOT } from '../../lib/tests/assessmentStage'
 import { onboardingHref } from '../../lib/routing/registry'
 import type { WeekAdaptation } from '../../lib/planning/pulse/generateWeek'
 import { classLogHref } from '../../lib/routing/calendar'
@@ -65,6 +72,12 @@ export function ReviewWeekForm(props: {
   }, [key])
   useEffect(() => { if (restored) try { sessionStorage.setItem(key, JSON.stringify({ answers, ack, unreported })) } catch { /* convenience only */ } }, [key, answers, ack, unreported, restored])
   const [lighter, setLighter] = useState(props.saved?.lighter ?? false)
+  const [declineMock, setDeclineMock] = useState(false)
+  const [recoveryPath, setRecoveryPath] = useState<PathKey | null>(null)
+  const [estimates, setEstimates] = useState<Estimates | null>(null)
+  const [windows, setWindows] = useState<WindowInput[]>([])
+  const [plannedBreak, setPlannedBreak] = useState(false)
+  const [useLeftover, setUseLeftover] = useState(true)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [preview, setPreview] = useState<Preview | null>(null)
@@ -75,7 +88,7 @@ export function ReviewWeekForm(props: {
 
   const set = (id: string, patch: Answer) => { setPreview(null); setAnswers(s => ({ ...s, [id]: { ...s[id], ...patch } })) }
 
-  async function buildPreview(current: Record<string, Answer> = answers, makeLighter: boolean = lighter) {
+  async function buildPreview(current: Record<string, Answer> = answers, makeLighter: boolean = lighter, decline: boolean = declineMock, recovery: PathKey | null = recoveryPath, own: Estimates | null = estimates, extra: WindowInput[] = windows, leftover: boolean = useLeftover): Promise<boolean> {
     setBusy(true); setMessage(null)
     try {
       const choices = Object.fromEntries(props.dueTasks.map(t => {
@@ -90,13 +103,14 @@ export function ReviewWeekForm(props: {
       const res = await fetch('/api/weekly-review/preview', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          cycleId: props.cycleId, choices, acknowledgeNoPaper: props.needsNoPaperAck && ack, lighter: makeLighter,
+          cycleId: props.cycleId, choices, acknowledgeNoPaper: props.needsNoPaperAck && ack, lighter: makeLighter, declineMock: decline, recoveryPath: recovery, mockEstimates: own, extraWindows: extra, plannedBreak, useLeftover: leftover,
           unreportedClassKeys: props.classReports.filter(report => unreported.includes(report.key)).map(report => report.key),
         }),
       })
       const body = await res.json()
-      if (body.ok) setPreview(body); else setMessage(body.message ?? body.error ?? 'Could not prepare the review.')
-    } catch { setMessage('Could not reach PrepPlan. Nothing was changed. Try again.') }
+      if (body.ok) { setPreview(body); return true }
+      setMessage(body.message ?? body.error ?? 'Could not prepare the review.'); return false
+    } catch { setMessage('Could not reach PrepPlan. Nothing was changed. Try again.'); return false }
     finally { setBusy(false) }
   }
 
@@ -105,6 +119,30 @@ export function ReviewWeekForm(props: {
     const next = { ...answers, [taskId]: { ...answers[taskId], placeDate: value } }
     setAnswers(next)
     await buildPreview(next)
+  }
+
+  async function toggleMock() {
+    const next = !declineMock
+    setDeclineMock(next)
+    await buildPreview(answers, lighter, next)
+  }
+
+  async function chooseRecovery(next: PathKey | null) {
+    setRecoveryPath(next)
+    await buildPreview(answers, lighter, declineMock, next)
+  }
+
+  /** A change that cannot be applied (a window over booked time) leaves the draft and the earlier choice as they were. */
+  async function applyWindows(next: WindowInput[]) {
+    if (await buildPreview(answers, lighter, declineMock, recoveryPath, estimates, next)) setWindows(next)
+  }
+
+  async function chooseLeftover(next: boolean) {
+    if (await buildPreview(answers, lighter, declineMock, recoveryPath, estimates, windows, next)) setUseLeftover(next)
+  }
+
+  async function applyEstimates(next: Estimates) {
+    if (await buildPreview(answers, lighter, declineMock, recoveryPath, next)) setEstimates(next)
   }
 
   async function toggleLighter() {
@@ -135,6 +173,8 @@ export function ReviewWeekForm(props: {
     const dayLabel = (d: string) => formatStudyDate(d, 'short')
     const placed = preview.continuing.filter(c => c.placement.date)
     const unplaced = preview.continuing.filter(c => !c.placement.date)
+    // One line per dated sitting: a task saved in several sittings appears on each of its days.
+    const dated = preview.continuing.flatMap(c => (c.sittings ?? [{ date: c.placement.date, minutes: c.minutes }]).flatMap((x, n) => x.date ? [{ key: `${c.taskId}:${n}`, date: x.date, minutes: x.minutes, title: c.sittings ? `${c.title} · part ${n + 1} of ${c.sittings.length}` : c.title }] : []))
     return (
       <div className="review-form">
         <h2>Next week, as it will be saved</h2>
@@ -143,6 +183,10 @@ export function ReviewWeekForm(props: {
           <p className="fine-print">{props.classReports.length} class {props.classReports.length === 1 ? 'report will' : 'reports will'} be left unreported. Coverage you already saved stays recorded.</p>
         )}
         <AdaptationNote adaptation={preview.next.adaptation} />
+        <RecoveryProposalNote recovery={preview.next.recovery} busy={busy} onChoose={chooseRecovery} />
+        <MockProposalNote mock={preview.next.mock} busy={busy} onToggle={toggleMock} onEstimates={applyEstimates} />
+        <ExtraTimePanel extra={preview.next.extraTime} dates={preview.next.placementDates ?? preview.next.week.days} windows={windows} busy={busy} onChange={applyWindows} useLeftover={useLeftover} onUseLeftover={chooseLeftover} />
+        {preview.next.paper.reason === 'no_slot' && <p className="fine-print">{PAPER_UNAVAILABLE_SLOT}</p>}
         <p>
           <button type="button" className="secondary-button" disabled={busy} aria-pressed={lighter} onClick={toggleLighter}>{lighter ? 'Back to the standard draft' : 'Make this draft lighter'}</button>{' '}
           <Link href={onboardingHref('week', '/app/review-week')}>Edit your availability</Link>
@@ -164,6 +208,9 @@ export function ReviewWeekForm(props: {
                       </select>
                     </label>
                   </div>
+                  {c.sittings && <ol className="verdict-options" data-testid="review-sittings" aria-label={`Sittings of ${c.title}, in order`}>
+                    {c.sittings.map((x, n) => <li key={n}>Part {n + 1} of {c.sittings!.length}: {x.minutes} min, {x.date ? `on ${dayLabel(x.date)}${x.start === undefined ? '' : ' in the window you added'}` : `waiting. ${x.reason ?? ''}`}</li>)}
+                  </ol>}
                   {c.placement.date && c.placement.note && <small className="fine-print">{c.placement.note}</small>}
                   {!c.placement.date && c.placement.reason && (
                     <small className="fine-print">Not placed: {c.placement.reason}{c.intent === 'continue' ? ' Choose a day, leave it for Calendar, or update your availability.' : ''}</small>
@@ -204,14 +251,14 @@ export function ReviewWeekForm(props: {
 
         <section aria-labelledby="new-h">
           <h3 id="new-h">Planned for {preview.next.week.startDate} – {preview.next.week.endDate}</h3>
-          {preview.next.taskCount === 0 && placed.length === 0
+          {preview.next.taskCount === 0 && dated.length === 0
             ? <p>No study work is planned for this week. That is allowed: you can place work yourself, or <Link href={onboardingHref('week', '/app/review-week')}>update your availability</Link>.</p>
             : <ol>{preview.next.days.map(d => <li key={d.date}><strong>{dayLabel(d.date)}</strong><ul>
                 {d.items.map((i, n) => <li key={n}>{i.title} <small>· {i.minutes} min</small></li>)}
-                {placed.filter(c => c.placement.date === d.date).map(c => <li key={c.taskId}>{c.title} <small>· {c.minutes} min · continuing</small></li>)}
+                {dated.filter(c => c.date === d.date).map(c => <li key={c.key}>{c.title} <small>· {c.minutes} min · continuing</small></li>)}
               </ul></li>)}
-              {days.filter(d => !preview.next.days.some(x => x.date === d) && placed.some(c => c.placement.date === d)).map(d => (
-                <li key={d}><strong>{dayLabel(d)}</strong><ul>{placed.filter(c => c.placement.date === d).map(c => <li key={c.taskId}>{c.title} <small>· {c.minutes} min · continuing</small></li>)}</ul></li>
+              {days.filter(d => !preview.next.days.some(x => x.date === d) && dated.some(c => c.date === d)).map(d => (
+                <li key={d}><strong>{dayLabel(d)}</strong><ul>{dated.filter(c => c.date === d).map(c => <li key={c.key}>{c.title} <small>· {c.minutes} min · continuing</small></li>)}</ul></li>
               ))}</ol>}
         </section>
         <RevisionRotation revision={preview.next.revision} />
@@ -224,6 +271,7 @@ export function ReviewWeekForm(props: {
   }
 
   return (
+    <WhenReady>
     <div className="review-form">
       <AdaptationNote adaptation={props.adaptation ?? null} />
       {props.adaptation && <p className="fine-print">This reads your earlier finished weeks. What you tell us about this week is added when you preview next week.</p>}
@@ -270,7 +318,7 @@ export function ReviewWeekForm(props: {
                   </div>
                 )}
                 {a.happened === 'partial' && (a.next ?? 'continue') !== 'remove' && (
-                  <label className="fine-print">About how much time to finish?{' '}
+                  <label className="fine-print">{t.loggedMinutes ? `${t.loggedMinutes} min logged of ${t.durationMinutes}. If you are not sure, ${remainingMinutes(t.durationMinutes, t.loggedMinutes)} min is carried as PrepPlan’s estimate. ` : ''}About how much time to finish?{' '}
                     <select value={a.estimateMinutes ?? ''} onChange={e => set(t.id, { estimateMinutes: e.target.value ? Number(e.target.value) : null })}>
                       <option value="">Not sure</option>
                       {ESTIMATES.map(m => <option key={m} value={m}>{m} min</option>)}
@@ -291,6 +339,11 @@ export function ReviewWeekForm(props: {
         </label>
       )}
 
+      <label className="review-ack">
+        <input type="checkbox" checked={plannedBreak} onChange={e => setPlannedBreak(e.target.checked)} />
+        This week was a planned break. Unfinished work is still carried, and the week does not count towards formal recovery.
+      </label>
+
       {message && <p role="alert" className="review-error">{message}</p>}
 
       <button type="button" className="primary-button" disabled={!ready || busy} onClick={() => buildPreview()}>
@@ -300,5 +353,6 @@ export function ReviewWeekForm(props: {
         <p className="review-hint">{unanswered} task{unanswered === 1 ? ' still needs' : 's still need'} an answer.</p>
       )}
     </div>
+    </WhenReady>
   )
 }

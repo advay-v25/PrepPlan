@@ -1,18 +1,15 @@
 /** Flashcard command proof on the REAL development schema (disposable project): exactly-once create/edit/delete/rating, monotonic revision, stale and competing requests,
  *  the atomic quota under concurrency, write protection, ownership, and that a rating writes no evidence/coverage/repair row. Rows are owned fixtures deleted by id.
- *  npm run flashcards:db:test -- --confirm-target=<project-ref> */
-const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict')
-const { Client } = require('pg'); const { parse } = require('dotenv')
-const { configuration } = require('./lib/migrations.cjs')
+ *  npm run flashcards:db:test -- --local (throwaway Postgres), or --confirm-target=<project-ref> */
+const assert = require('node:assert/strict')
+const { Client } = require('pg')
+const { openStage } = require('./lib/stage.cjs')
 
 async function main(args = process.argv.slice(2)) {
-  const root = path.resolve(__dirname, '..'), env = parse(fs.readFileSync(path.join(root, '.env.staging.local')))
-  const cfg = configuration(['--env=staging', '--dry-run'], env)
-  if (env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF !== cfg.identity) throw Error('Not the user-confirmed disposable project; refusing.')
-  if (!args.includes(`--confirm-target=${cfg.identity}`)) throw Error(`Pass --confirm-target=${cfg.identity}.`)
+  const stage = await openStage(args), { cfg } = stage
   setTimeout(() => { console.error('Stopped: deadline reached.'); process.exit(2) }, 600000).unref()
   const mk = () => new Client({ ...cfg.connection, connectionTimeoutMillis: 45000, keepAlive: true })
-  const a = mk(); await a.connect(); let n = 0; const pool = []
+  const a = mk(); let n = 0; const pool = []
   const ok = (name, v, d = '') => { assert.ok(v, `${name} ${JSON.stringify(d)}`); n++; console.log(`  ✓ ${name}`) }
   const conn = async () => { const c = mk(); await c.connect(); pool.push(c); return c }
   const tag = Date.now().toString(36), users = []
@@ -22,9 +19,10 @@ async function main(args = process.argv.slice(2)) {
   const as = async (c, uid, sql, p) => { await c.query('BEGIN'); await c.query('SET LOCAL ROLE authenticated'); await c.query("select set_config('request.jwt.claim.sub',$1,true), set_config('request.jwt.claims',$2,true)", [uid, JSON.stringify({ sub: uid, role: 'authenticated' })])
     try { const r = await c.query(sql, p); await c.query('COMMIT'); return r.rows } catch (e) { await c.query('ROLLBACK'); throw e } }
   const cmd = async (c, uid, key, action, card, exp, f) => (await as(c, uid, 'select public.flashcard_apply($1,$2,$3,$4,$5) r', [key, action, card, exp, f ?? {}]))[0].r
-  const reading = (await a.query("select id from public.curriculum_readings where is_active order by id limit 1")).rows[0].id
   const counts = async tbl => Number((await a.query(`select count(*) from public.${tbl} where user_id = any($1)`, [users])).rows[0].count)
   try {
+    await a.connect()
+    const reading = (await a.query("select id from public.curriculum_readings where is_active order by id limit 1")).rows[0].id
     const u = await mkUser(), v = await mkUser(), inc = await mkUser(false), c = await conn()
     const sch = { scopeType: 'reading', scopeId: reading }
     console.log('\nCreate, exact retry, key reuse')
@@ -92,6 +90,7 @@ async function main(args = process.argv.slice(2)) {
     await a.query('delete from public.flashcards where user_id = any($1)', [users]).catch(() => {})
     await a.query('delete from public.profiles where id = any($1)', [users]).catch(() => {}); await a.query('delete from auth.users where id = any($1)', [users]).catch(() => {})
     console.log(`cleanup: ${users.length} fixture user(s) removed`); await a.end().catch(() => {})
+    await stage.stop()
   }
   console.log(`\n${n} passed, 0 failed`)
 }

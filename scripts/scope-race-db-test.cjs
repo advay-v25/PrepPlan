@@ -3,19 +3,14 @@
  *  Uses a TEST-ONLY approved fixture bank and throwaway students; every row is removed by recorded id.
  *  npm run scope:race:test -- --confirm-target=<project-ref> */
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os'), assert = require('node:assert/strict')
-const { execFileSync } = require('node:child_process')
-const { Client } = require('pg'); const { parse } = require('dotenv')
-const { configuration } = require('./lib/migrations.cjs')
+const { Client } = require('pg')
+const { openStage } = require('./lib/stage.cjs')
 
 async function main(args = process.argv.slice(2)) {
-  const root = path.resolve(__dirname, '..'), env = parse(fs.readFileSync(path.join(root, '.env.staging.local')))
-  const cfg = configuration(['--env=staging', '--dry-run'], env)
-  if (!env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF || env.E2E_CONFIRMED_DISPOSABLE_PROJECT_REF !== cfg.identity) throw Error('Not the user-confirmed disposable project; refusing.')
-  const target = `--confirm-target=${cfg.identity}`
-  if (!args.includes(target)) throw Error(`Pass ${target}.`)
+  const stage = await openStage(args), cfg = stage.cfg; global.__stage = stage
   setTimeout(() => { console.error('Stopped: deadline reached (fixtures may remain; run fixture destroy by the recorded file).'); process.exit(2) }, 280000).unref()
   const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'race-fixture-')), 'bank.json')
-  execFileSync('node', [path.join(__dirname, 'fixture-bank.cjs'), 'create', target, `--out=${file}`, '--readings=r028', '--per-outcome=9', '--variants=0'], { stdio: 'inherit' })
+  await stage.create(file, ['--readings=r028', '--per-outcome=9', '--variants=0'])
   const bank = JSON.parse(fs.readFileSync(file, 'utf8'))
   // Bounded by construction: a lock wait, a statement or an abandoned transaction can never outlive the test (the server ends it).
   const open = []
@@ -170,10 +165,10 @@ async function main(args = process.argv.slice(2)) {
   } finally {
     for (const c of [x, x2, y]) { if (c) { try { await c.query('ROLLBACK') } catch {} } }   // the in-flight connections first, so cleanup is never blocked by their locks
     const run = async (sql, p) => { try { await a.query(sql, p) } catch (e) { console.error('cleanup:', e.message) } }
-    try { execFileSync('node', [path.join(__dirname, 'fixture-bank.cjs'), 'destroy', target, `--file=${file}`], { stdio: 'inherit' }) } catch (e) { console.error('fixture destroy failed; rerun by recorded file', file) }
+    try { await stage.destroy(file) } catch (e) { console.error('fixture destroy failed; rerun by recorded file', file) }
     await run('delete from public.block_scope_confirmations where user_id = any($1)', [users]); await run('delete from public.plan_blocks where id = any($1)', [blocks])
     await run('delete from public.planning_cycles where id = any($1)', [cycles]); await run('delete from public.profiles where id = any($1)', [users]); await run('delete from auth.users where id = any($1)', [users])
     console.log(JSON.stringify({ studentsLeft: Number(await one(a, 'select count(*) from auth.users where id = any($1)', [users])) })); await a.end()
   }
 }
-main().catch(e => { console.error('FAILED:', e.message); process.exit(1) })
+main().then(() => global.__stage?.stop()).catch(async e => { console.error('FAILED:', e.message); await global.__stage?.stop(); process.exit(1) })

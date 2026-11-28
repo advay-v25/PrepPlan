@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '../../../../lib/supabase/server'
 import { startAssessment, type StartKind } from '../../../../lib/tests/startAssessment'
 import { startAdaptive } from '../../../../lib/tests/adaptivePractice'
+import { startAdaptiveItem } from '../../../../lib/tests/adaptiveItemPractice'
 import { requireApplicationAccess } from '../../../../lib/auth/applicationAccess'
 import { rateLimit } from '../../../../lib/auth/securityServer'
 
@@ -26,6 +27,18 @@ export async function POST(request: Request) {
   if (limited) return limited
   const requestId = crypto.randomUUID()
   try {
+    if (body.kind === 'practice' && body.mode === 'adaptive_item') {
+      if (typeof body.readingId !== 'string' || typeof body.requestKey !== 'string' || body.requestKey.length < 8 || body.requestKey.length > 80) {
+        return NextResponse.json({ ok: false, code: 'bad_request', message: 'Choose a reading and retry the start.' }, { status: 400 })
+      }
+      const a = await startAdaptiveItem(
+        user.id,
+        { readingId: body.readingId, outcomeIds: Array.isArray(body.outcomeIds) ? body.outcomeIds.filter((x: unknown) => typeof x === 'string').slice(0, 40) : undefined },
+        body.requestKey
+      )
+      trace('paper', 'start', { kind: 'practice', mode: 'adaptive_item', ok: a.ok, code: a.ok ? null : a.code, requestId })
+      return a.ok ? NextResponse.json({ ...a, requestId, url: `/app/tests/adaptive/${a.runId}` }) : NextResponse.json({ ...a, requestId }, { status: a.code === 'failed' ? 500 : 409 })
+    }
     if (body.kind === 'practice' && body.mode === 'adaptive') {
       if (typeof body.readingId !== 'string' || typeof body.requestKey !== 'string' || body.requestKey.length < 8 || body.requestKey.length > 80) return NextResponse.json({ ok: false, code: 'bad_request', message: 'Choose a reading and retry the start.' }, { status: 400 })
       const a = await startAdaptive(user.id, { readingId: body.readingId, outcomeIds: Array.isArray(body.outcomeIds) ? body.outcomeIds.filter((x: unknown) => typeof x === 'string').slice(0, 40) : undefined, cap: body.cap === 20 ? 20 : 10 }, body.requestKey, typeof body.expectedDecision === 'string' ? body.expectedDecision : undefined)

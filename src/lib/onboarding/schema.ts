@@ -145,6 +145,8 @@ export const PositionSetupSchema = z.object({
   readingStates: z.record(z.string().min(1), z.enum(READING_STATES)).optional(),
   uncertainty: UncertaintySchema.optional(),
   mock: MockSchema.optional(),
+  revisionCompleted: z.boolean().nullable().optional(),
+  lastMockFeeling: z.enum(['not_taken', 'below_target', 'near_target', 'on_target', 'unscored']).nullable().optional(),
 }).superRefine((d, ctx) => {
   const needsTopics = d.stage === 'revising_or_mocks' || d.stage === 'retaking'
   if (needsTopics && Object.keys(d.topicExposure).length === 0) {

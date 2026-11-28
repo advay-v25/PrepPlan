@@ -122,7 +122,7 @@ async function WeekView({ userId }: { userId: string }) {
         <WeeklyPaperCard preview={preview} state={state} readingName={readingNames} today={studyWeek.today} result={result} classLed={studyWeek.classLed} />
         {needsConfirm || preview.scope.pendingPortions.length > 0
           ? <ScopePanel preview={preview} catalog={catalog} />
-          : (!preview.noPaperReason || preview.scope.excluded.length > 0) && <details className="scope-details"><summary>What this paper covers</summary><ScopePanel preview={preview} catalog={catalog} /></details>}
+          : (!preview.noPaperReason || preview.scope.targets.length > 0 || preview.scope.excluded.length > 0) && <details suppressHydrationWarning className="scope-details"><summary>What this paper covers</summary><ScopePanel preview={preview} catalog={catalog} /></details>}
       </>
     )
   } catch (e) {

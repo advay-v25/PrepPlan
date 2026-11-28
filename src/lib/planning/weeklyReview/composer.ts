@@ -1,3 +1,5 @@
+import { packWhole, type Gap } from '../pulse/gaps'
+
 /**
  * Placing continuing work in the proposed week. Pure.
  *
@@ -18,7 +20,30 @@ export type ContinuingItem = {
   originalDate: string | null
 }
 
-export type Placement = { taskId: string; date: string | null; reason: string | null; note: string | null }
+/** One sitting of a carried task. `date` null = it waits, with the reason. `start` (minutes from local midnight) is set only for an added window. */
+export type Sitting = { date: string | null; minutes: number; start?: number; startsAt?: string; reason?: string }
+export type Placement = { taskId: string; date: string | null; reason: string | null; note: string | null; /** Set when the student added a window for it: saved timed at this instant. */ startsAt?: string; /** Present when the task is saved as more than one ordered sitting. */ sittings?: Sitting[] }
+
+/** Study and revision may be done across ordered sittings. A repair or a re-check is one sitting; so is a timed mock. */
+export const SPLITTABLE = ['study', 'review', 'class_consolidation']
+export const MIN_SITTING = 15
+/**
+ * The next sitting to take from `need` into a gap of `room` minutes; 0 when nothing worthwhile fits. What is left is divided evenly over the fewest
+ * sittings the limit allows (45 minutes at a 20-minute limit is 15 + 15 + 15), so no tiny remainder is stranded; a saved sitting is never under 5.
+ */
+export function nextSitting(need: number, room: number, limit: number): number {
+  const even = Math.ceil(need / Math.ceil(need / limit))
+  let take = Math.min(room, even)
+  if (need - take > 0 && need - take < 5) take = need - 5
+  return take >= Math.min(MIN_SITTING, even) ? take : 0
+}
+/** Why work that must stay in one sitting could not be placed, and what would take it. */
+export function oneSittingReason(taskType: string, minutes: number, limit: number | null): string {
+  const what = taskType === 'repair' ? 'this repair' : 'this check'
+  return `No room this week: ${what} is done in one sitting, so it needs a single ${minutes}-minute opening${limit && minutes > limit ? `, longer than your ${limit}-minute study sitting` : ''}. Add a window of at least ${minutes} minutes, or free one in Calendar.`
+}
+/** Chronological order (waiting sittings last), the order the sittings are declared to be done in. */
+export const inOrder = (list: Sitting[]) => [...list].sort((a, b) => (a.date ?? '9999').localeCompare(b.date ?? '9999') || (a.start ?? -1) - (b.start ?? -1))
 
 export type PlaceInput = {
   items: ContinuingItem[]
@@ -27,6 +52,9 @@ export type PlaceInput = {
   studyDates: string[]
   /** Free minutes per date, already net of the student's availability and protected commitments. */
   capacity: Record<string, number>
+  gapsByDate?: Record<string, Gap[]>
+  /** Days an EXPLICIT student choice may use. Defaults to studyDates; repairs allow any day of the week (a non-study day is allowed with a note). */
+  overrideDates?: string[]
   maxSittingMinutes: number | null
   /** Local day when this proposal is built; even a manual placement cannot backdate new work. */
   notBeforeDate?: string
@@ -37,6 +65,7 @@ export type PlaceInput = {
 export type PlaceResult = {
   placements: Placement[]
   reservedByDate: Record<string, number>
+  gapsAfterContinuations?: Record<string, Gap[]>
   /** Placed study-like minutes: this is what the weekly new-learning budget gives up. */
   reservedStudyMinutes: number
 }
@@ -51,6 +80,10 @@ export function placeContinuing(input: PlaceInput): PlaceResult {
   const week = new Set(input.weekDates)
   const hasContinuingRepair = new Set(input.items.filter(i => i.taskType === 'repair' && i.repairThreadId).map(i => i.repairThreadId!))
   const overrides = input.overrides ?? {}
+  const gaps = input.gapsByDate && { ...input.gapsByDate }
+  const room = (date: string, minutes: number) => gaps
+    ? packWhole(gaps[date] ?? [], minutes) !== null
+    : (input.capacity[date] ?? 0) - (used[date] ?? 0) >= minutes
 
   const ordered = input.items.map((it, index) => ({ it, index })).sort((a, b) =>
     rank(a.it.taskType) - rank(b.it.taskType)
@@ -60,7 +93,10 @@ export function placeContinuing(input: PlaceInput): PlaceResult {
   for (const it of ordered) {
     const done = (date: string | null, reason: string | null, note: string | null = null) => {
       placed.set(it.taskId, { taskId: it.taskId, date, reason, note })
-      if (date) used[date] = (used[date] ?? 0) + it.minutes
+      if (date) {
+        used[date] = (used[date] ?? 0) + it.minutes
+        if (gaps) gaps[date] = packWhole(gaps[date] ?? [], it.minutes) ?? []
+      }
       if (it.repairThreadId && it.taskType === 'repair') repairDateByThread.set(it.repairThreadId, date)
     }
     const choice = overrides[it.taskId]
@@ -69,9 +105,10 @@ export function placeContinuing(input: PlaceInput): PlaceResult {
     if (choice && input.notBeforeDate && choice < input.notBeforeDate) {
       done(null, 'That day has already passed. Choose today or a later day, or leave this unplaced.'); continue
     }
-    if (input.maxSittingMinutes && it.minutes > input.maxSittingMinutes) {
-      done(null, `It is longer than your ${input.maxSittingMinutes}-minute sitting. Split it in Calendar to place it.`); continue
-    }
+    const splittable = SPLITTABLE.includes(it.taskType)
+    const limit = input.maxSittingMinutes
+    const tooLong = Boolean(limit && it.minutes > limit)
+    if (tooLong && !splittable) { done(null, oneSittingReason(it.taskType, it.minutes, limit)); continue }
 
     // A re-check must come after the repair it checks, never before it.
     let after: string | null = null
@@ -80,19 +117,42 @@ export function placeContinuing(input: PlaceInput): PlaceResult {
       if (!after) { done(null, 'Its repair has not been placed yet, so this check waits for it.'); continue }
     }
 
-    if (choice && week.has(choice)) {
-      if (after && choice <= after) { done(null, 'A re-check has to come after its repair. Pick a later day.'); continue }
-      const fuller = (used[choice] ?? 0) + it.minutes > (input.capacity[choice] ?? 0)
-      const notStudyDay = !input.studyDates.includes(choice)
-      done(choice, null, fuller ? 'This day is fuller than you planned.' : notStudyDay ? 'This is not one of your usual study days.' : null)
-      continue
+    const chosen = choice && week.has(choice) ? choice : null
+    if (chosen) {
+      if (after && chosen <= after) { done(null, 'A re-check has to come after its repair. Pick a later day.'); continue }
+      const fuller = !room(chosen, it.minutes)
+      const notStudyDay = !input.studyDates.includes(chosen), notAllowed = !(input.overrideDates ?? input.studyDates).includes(chosen)
+      if (gaps && notAllowed) { done(null, 'That day is outside this week’s study schedule. Choose another day or leave this unplaced.'); continue }
+      if (!tooLong && !(gaps && fuller)) { done(chosen, null, fuller ? 'This day is fuller than you planned.' : notStudyDay ? 'This is not one of your usual study days.' : null); continue }
+      if (!splittable || !gaps) { done(null, `That day has no single ${it.minutes}-minute opening. Choose another day or leave this unplaced.`); continue }
     }
-    if (it.intent === 'later') { done(null, 'Kept for later, as you chose.'); continue }
+    if (!chosen && it.intent === 'later') { done(null, 'Kept for later, as you chose.'); continue }
 
-    const fit = input.studyDates.find(d => (!input.notBeforeDate || d >= input.notBeforeDate)
-      && (!after || d > after) && (input.capacity[d] ?? 0) - (used[d] ?? 0) >= it.minutes)
-    if (fit) done(fit, null)
-    else done(null, `There is no room this week: no day has ${it.minutes} free minutes after your commitments and planned work.`)
+    const days = chosen ? [chosen] : input.studyDates.filter(d => (!input.notBeforeDate || d >= input.notBeforeDate) && (!after || d > after))
+    const fit = !chosen && !tooLong ? days.find(d => room(d, it.minutes)) : undefined
+    if (fit) { done(fit, null); continue }
+
+    // Study and revision continue across ordered sittings: what fits is proposed, the rest waits.
+    if (splittable && gaps) {
+      const cap = limit ?? it.minutes
+      const sittings: Sitting[] = []
+      let need = it.minutes
+      for (const d of days) {
+        for (let i = 0; need > 0 && i < (gaps[d] ?? []).length && sittings.length < 12;) {
+          const g = gaps[d][i], take = nextSitting(need, g.end - g.start, cap)
+          if (!take) { i++; continue }
+          gaps[d] = gaps[d].map((x, k) => k === i ? { start: x.start + take, end: x.end } : x)
+          sittings.push({ date: d, minutes: take }); need -= take
+        }
+      }
+      if (sittings.length) {
+        if (need > 0) sittings.push({ date: null, minutes: need, reason: chosen ? 'The chosen day has no room for the rest.' : 'No further opening this week; it stays owed.' })
+        for (const x of sittings) if (x.date) used[x.date] = (used[x.date] ?? 0) + x.minutes
+        placed.set(it.taskId, sittings.length === 1 ? { taskId: it.taskId, date: sittings[0].date, reason: null, note: null } : { taskId: it.taskId, date: sittings[0].date, reason: null, note: null, sittings })
+        continue
+      }
+    }
+    done(null, splittable ? 'There is no room this week: no opening is long enough for even a short sitting after your commitments and planned work.' : oneSittingReason(it.taskType, it.minutes, limit))
   }
 
   const placements = input.items.map(i => placed.get(i.taskId)!)
@@ -100,11 +160,13 @@ export function placeContinuing(input: PlaceInput): PlaceResult {
   let reservedStudyMinutes = 0
   for (const i of input.items) {
     const p = placed.get(i.taskId)!
-    if (!p.date) continue
-    reservedByDate[p.date] = (reservedByDate[p.date] ?? 0) + i.minutes
-    if (STUDY_LIKE.includes(i.taskType)) reservedStudyMinutes += i.minutes
+    for (const x of p.sittings ?? [{ date: p.date, minutes: i.minutes }]) {
+      if (!x.date) continue
+      reservedByDate[x.date] = (reservedByDate[x.date] ?? 0) + x.minutes
+      if (STUDY_LIKE.includes(i.taskType)) reservedStudyMinutes += x.minutes
+    }
   }
-  return { placements, reservedByDate, reservedStudyMinutes }
+  return { placements, reservedByDate, reservedStudyMinutes, gapsAfterContinuations: gaps }
 }
 
 type PlanRow = { task_type?: unknown; lm_id?: unknown; title?: unknown; duration_minutes?: unknown }

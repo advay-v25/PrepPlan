@@ -16,10 +16,22 @@ export function scopedErrors() {
     }
   }
   const attach = (page: Page) => {
+    const navTimes: number[] = []
+    page.on('framenavigated', f => { if (f === page.mainFrame()) navTimes.push(Date.now()) })
+    const rscReads: { req: unknown; path: string; at: number }[] = []
+    page.on('request', r => {
+      if (r.headers()['rsc'] === '1' && r.method() === 'GET') rscReads.push({ req: r, path: new URL(r.url()).pathname, at: Date.now() })
+      if (r.isNavigationRequest() && r.frame() === page.mainFrame()) navTimes.push(Date.now())
+    })
     page.on('requestfailed', r => {
       const u = new URL(r.url())
       if (r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && u.pathname === '/api/tests/scope/confirm' && cancelledScopeReads.has(u.searchParams.get('blockId') ?? '')) {
         allowances.push({ label:'owned drawer cancels its read on revision change/unmount (TaskLearningScope cleanup)', taskId:u.searchParams.get('blockId') }); return
+      }
+      // Local-stack runs use a Next DEV server (the only mode that serves fixture items). React Strict Mode mounts effects twice there, which cancels the first GET of an endpoint a page reads on mount.
+      // Never applies to production-build runs, and only to that one GET.
+      if (process.env.E2E_SUITE === 'local-stack' && r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && (/^\/api\/tests\/attempt\/[0-9a-f-]{36}$/.test(u.pathname) || u.pathname === '/api/log-learning' || u.pathname === '/api/tests/scope/confirm')) {
+        allowances.push({ label: 'dev-server Strict Mode cancels the first read of a page-owned GET endpoint', path: u.pathname }); return
       }
       // Next cancels speculative route prefetches when a real navigation supersedes them. This cannot cover an API call or a user-initiated document load.
       if (r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && r.headers()['rsc'] === '1' && r.headers()['next-router-prefetch'] === '1') {
@@ -29,7 +41,23 @@ export function scopedErrors() {
       if (r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && r.headers()['rsc'] === '1' && new URL(r.url()).pathname === '/account' && new URL(r.url()).searchParams.has('_rsc')) {
         allowances.push({ label: 'cancelled Account page read during navigation; destination is asserted by the account journey', path: '/account' }); return
       }
-      const abortedRsc = /[?&]_rsc=/.test(r.url()) && r.failure()?.errorText === 'net::ERR_ABORTED'
+      const abortedRsc = u.searchParams.has('_rsc') && !u.pathname.startsWith('/api/')
+        && r.failure()?.errorText === 'net::ERR_ABORTED'
+      // A soft-navigation or router.refresh() fetch that the page's own next navigation supersedes. Covered only when a real navigation of this page happens within 2s of the abort; an
+      // aborted RSC read with no navigation around it (a hang, a dropped connection) is still reported, after that window.
+      if (abortedRsc && r.method() === 'GET' && !active.some(x => x.url.test(r.url()))) {
+        const at = Date.now(), started = rscReads.find(x => x.req === r)?.at ?? at
+        setTimeout(() => {
+          // A router.refresh() replaced by a newer read of the same page (back-to-back saves) is the same supersession, with a read that really started after the abort began.
+          const replaced = rscReads.some(x => x.req !== r && x.path === u.pathname && x.at >= started && x.at <= at + 2000)
+          if (page.isClosed() || navTimes.some(t => Math.abs(t - at) <= 2000) || replaced) {
+            allowances.push({ label: 'RSC page read cancelled during navigation or page close', path: u.pathname })
+          } else {
+            unexpected.push(`requestfailed ${u.pathname} ${r.failure()?.errorText} (no navigation superseded it)`)
+          }
+        }, 2100)
+        return
+      }
       const hit = active.find(x => x.seen < x.max && x.url.test(r.url()) && x.failed && (!x.method || x.method === r.method()) && (!x.failureText || x.failureText === r.failure()?.errorText))
       if (hit) hit.seen++; else if (!abortedRsc || !active.some(x => x.label.startsWith('navigation'))) unexpected.push(`requestfailed ${r.url()} ${r.failure()?.errorText}`)
     })

@@ -1,5 +1,6 @@
 import { createAdminClient } from '../../supabase/admin'
-import { dailyCapacityMinutes } from './capacity'
+import { dailyFreeRanges } from './capacity'
+import { allFitWhole, busyFromTimed, gapsFromRanges, growthRoom, roomAfterAccepted, type Gap } from './gaps'
 import { getStudyWeekContext } from '../schedule'
 import { utcToZonedParts, weekdayOf } from '../studyWeek'
 
@@ -15,7 +16,7 @@ import { utcToZonedParts, weekdayOf } from '../studyWeek'
  */
 export const MAX_TASK_MINUTES = 180
 
-/** `maxAdd`: for a timed session, the minutes its END can move later before leaving its study window or reaching another occupant (unlimited for day-preferred work). */
+/** `maxAdd`: growth that leaves the whole sitting inside one real gap (timed work grows at its end). */
 export type Candidate = { id: string; revision: number; date: string; duration: number; title: string; maxAdd?: number }
 export type Change = { task_id: string; expected_revision: number; add_minutes: number }
 
@@ -52,7 +53,7 @@ export type RedistributionReceipt = {
 export async function redistributeMissedTask(userId: string, taskId: string, now = new Date()): Promise<RedistributionReceipt> {
   const admin = createAdminClient()
   const none = (reason: string, requested = 0, message = ''): RedistributionReceipt => ({ applied: false, replayed: false, requested, placed: 0, unplaced: requested, changes: [], reason, message: message || reason })
-  const { data: src } = await admin.from('plan_blocks').select('id, cycle_id, task_type, lm_id, execution, local_date, duration_minutes, cancelled_at').eq('id', taskId).eq('user_id', userId).maybeSingle()
+  const { data: src } = await admin.from('plan_blocks').select('id, cycle_id, task_type, lm_id, execution, local_date, duration_minutes, cancelled_at').eq('id', taskId).eq('user_id', userId).maybeSingle().throwOnError()
   if (!src || !['deferred', 'skipped'].includes(src.execution as string) || src.cancelled_at) return none('That task is not missed work.')
   if (src.task_type !== 'study' || !src.cycle_id) return none('Only study sittings are absorbed into the week.')
   const ctx = await getStudyWeekContext(userId, now)
@@ -60,7 +61,7 @@ export async function redistributeMissedTask(userId: string, taskId: string, now
   // Today's own deferrals are not "missed" yet: the student can choose another time, so nothing is moved automatically.
   if (!src.local_date || (src.local_date as string) >= ctx.today) return none('Set aside for now. Choose another time for it, or it waits for your weekly review.', requested)
   // Already absorbed (and not taken back): a repeat reports the original receipt and changes nothing.
-  const { data: prior } = await admin.from('redistribution_receipts').select('placed_minutes, changes').eq('source_task_id', taskId).eq('user_id', userId).is('reversed_at', null).maybeSingle()
+  const { data: prior } = await admin.from('redistribution_receipts').select('placed_minutes, changes').eq('source_task_id', taskId).eq('user_id', userId).is('reversed_at', null).maybeSingle().throwOnError()
   if (prior) {
     const ch = (prior.changes ?? []) as RedistributionReceipt['changes']; const placed = prior.placed_minutes as number
     return { applied: placed > 0, replayed: true, requested, placed, unplaced: Math.max(0, requested - placed), changes: ch, reason: null, message: `Already added: ${placed} min went to ${ch.length} later session${ch.length === 1 ? '' : 's'} of the same reading.` }
@@ -70,12 +71,13 @@ export async function redistributeMissedTask(userId: string, taskId: string, now
   // The hash of every planning input is taken BEFORE planning; the database refuses the commit if any of them moved since (see apply_redistribution).
   for (let attempt = 0; attempt < 2; attempt++) {
     const { data: hash } = await admin.rpc('current_week_source_hash', { p_user: userId, p_cycle: src.cycle_id as string })
+    if (typeof hash !== 'string') throw new Error('Could not read the current week for redistribution.')
     const [{ data: rows }, { data: profile }, { data: windows }, { data: mocks }] = await Promise.all([
       admin.from('plan_blocks').select('id, title, task_type, lm_id, execution, local_date, duration_minutes, revision, cancelled_at, placement, starts_at')
-        .eq('user_id', userId).eq('cycle_id', src.cycle_id as string).is('learning_activity_id', null),
-      admin.from('profiles').select('max_session_minutes').eq('id', userId).maybeSingle(),
-      admin.from('availability_windows').select('weekday, start_time, end_time').eq('user_id', userId).eq('status', 'active'),
-      admin.from('mock_appointments').select('planned_date, start_time, duration_minutes').eq('user_id', userId).eq('status', 'planned'),
+        .eq('user_id', userId).eq('cycle_id', src.cycle_id as string).is('learning_activity_id', null).throwOnError(),
+      admin.from('profiles').select('max_session_minutes').eq('id', userId).maybeSingle().throwOnError(),
+      admin.from('availability_windows').select('weekday, start_time, end_time').eq('user_id', userId).eq('status', 'active').throwOnError(),
+      admin.from('mock_appointments').select('planned_date, start_time, duration_minutes').eq('user_id', userId).eq('status', 'planned').throwOnError(),
     ])
     const live = (rows ?? []).filter(r => !r.cancelled_at && r.execution !== 'cancelled' && r.local_date && (r.local_date as string) >= ctx.today)
     const same = live.filter(r => r.task_type === 'study' && r.lm_id === src.lm_id && r.execution === 'not_started' && r.id !== taskId)
@@ -103,19 +105,35 @@ export async function redistributeMissedTask(userId: string, taskId: string, now
       return { ...base, maxAdd: Math.max(0, limit - curEnd) }
     })
     const dayRoom: Record<string, number> = {}
+    const gapsByDate: Record<string, Gap[]> = {}
+    // Room is a real contiguous gap, not a day total: what is already accepted is packed first and a session may only grow into what is left of one gap.
+    const open = (r: any) => !['completed', 'skipped', 'deferred'].includes(r.execution as string)
+    const timedBusy = busyFromTimed(live.filter(r => open(r) && r.placement === 'timed' && r.starts_at).map(r => ({ local_date: r.local_date as string, starts_at: r.starts_at as string, duration_minutes: (r.duration_minutes ?? 0) as number })), ctx.timezone)
     await Promise.all(dates.map(async d => {
-      const free = await dailyCapacityMinutes(userId, weekdayOf(d), d, ctx.timezone, now)
-      const scheduled = live.filter(r => r.local_date === d && !['completed', 'skipped', 'deferred'].includes(r.execution as string)).reduce((n, r) => n + ((r.duration_minutes ?? 0) as number), 0)
-      dayRoom[d] = Math.max(0, free - scheduled)
+      const free = gapsFromRanges(await dailyFreeRanges(userId, weekdayOf(d), d, ctx.timezone, now))
+      gapsByDate[d] = free
+      const flexible = live.filter(r => r.local_date === d && open(r) && (r.placement !== 'timed' || !r.starts_at)).map(r => (r.duration_minutes ?? 0) as number)
+      dayRoom[d] = roomAfterAccepted(free, timedBusy[d] ?? [], flexible)
+      for (const c of candidates.filter(c => c.date === d && c.maxAdd === undefined)) {
+        const others = live.filter(r => r.id !== c.id && r.local_date === d && open(r) && (r.placement !== 'timed' || !r.starts_at)).map(r => (r.duration_minutes ?? 0) as number)
+        c.maxAdd = growthRoom(free, timedBusy[d] ?? [], others, c.duration)
+      }
     }))
     const plan = planRedistribution({ missedMinutes: requested, candidates, dayRoom, sittingLimit: (profile?.max_session_minutes ?? 0) as number })
     if (plan.placed === 0) return none('There is no free study time later this week for it, so nothing moved.', requested)
+    // Multiple extensions must fit together, including a timed sitting's newly occupied end.
+    const added = new Map(plan.changes.map(c => [c.task_id, c.add_minutes]))
+    const updated = live.filter(open).map(r => ({ ...r, duration_minutes: Number(r.duration_minutes ?? 0) + (added.get(r.id) ?? 0) }))
+    const busyAfter = busyFromTimed(updated.filter(r => r.placement === 'timed' && r.starts_at).map(r => ({ local_date: r.local_date as string, starts_at: r.starts_at as string, duration_minutes: r.duration_minutes })), ctx.timezone)
+    if (dates.some(d => !allFitWhole(gapsByDate[d], busyAfter[d] ?? [], updated.filter(r => r.local_date === d && (r.placement !== 'timed' || !r.starts_at)).map(r => r.duration_minutes)))) {
+      return none('The longer sittings do not fit the remaining study gaps, so nothing moved.', requested)
+    }
 
     const { data, error } = await admin.rpc('apply_redistribution', { p_user: userId, p_source: taskId, p_changes: plan.changes, p_input_hash: hash })
     // A competing edit moved an input since this was planned: plan again from what is there now, once; then give up honestly.
     if (error && /STALE/.test(error.message) && attempt === 0) continue
     if (error?.code === 'BK409') return none('The longer session would run into your booked mock, so nothing moved.', requested)
-    if (error) return none(/STALE/.test(error.message) ? 'The week changed while this was being planned, so nothing moved.' : /OVERLAP/.test(error.message) ? 'The longer session would overlap other work, so nothing moved.' : 'Calendar could not make the change, so nothing moved.', requested)
+    if (error) return none(/STALE/.test(error.message) ? 'The week changed while this was being planned, so nothing moved.' : /NO_ROOM/.test(error.message) ? 'The longer sittings no longer fit the remaining study gaps, so nothing moved.' : /OVERLAP/.test(error.message) ? 'The longer session would overlap other work, so nothing moved.' : 'Calendar could not make the change, so nothing moved.', requested)
     return finish(data as any)
   }
   return none('The week changed while this was being planned, so nothing moved.', requested)

@@ -1,0 +1,19 @@
+{
+  "phase": "C6",
+  "routinePoolCandidates": 1040,
+  "provisionalRoutineFamilies": 1037,
+  "confirmedIndependentFamilies": 0,
+  "policyDerivedDemand": {
+    "conceptCheck": "5 items (blueprint.ts PURPOSE_LENGTHS)",
+    "repairRecheck": "8 items independent of initial diagnostic",
+    "moduleDiagnostic": "20 items across reading concepts",
+    "adaptivePracticeSet": "5 items per set (10 or 20 total cap per run)",
+    "sustainablePerOutcomeTarget": "6+ independent families per outcome (2+ per tier) for repeated diagnostic + repair + adaptive practice without sibling reuse"
+  },
+  "capacityStatus": {
+    "outcomesWithAll3Tiers": 343,
+    "outcomesWithGe6RoutineFamilies": 2,
+    "outcomesBelow6RoutineFamilies": 341,
+    "honestShortageSummary": "341 of 343 outcomes currently have <6 provisional routine families (typically 3: 1 per tier). Those outcomes sustain 1 initial diagnostic + cross-tier repair re-check, but cannot sustain 2+ independent same-tier adaptive sets + spaced rechecks without additional family authoring."
+  }
+}

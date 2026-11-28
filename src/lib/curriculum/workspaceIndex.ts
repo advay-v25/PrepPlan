@@ -8,6 +8,14 @@ import { noteText, type NoteDoc } from './notes/doc'
 import { readAll } from '../supabase/readAll'
 import { coverageOf, readingCoverageSummary, type CoverageState, type ReadingCoverageSummary } from './readingCoverage'
 
+const indexReadings = () => refCache('index.readings', () => readAll<{ id: string; reading_no: number; title: string; topic_id: string; structure_pending: boolean }>((a, z) =>
+  createAdminClient().from('curriculum_readings').select('id, reading_no, title, topic_id, structure_pending').eq('is_active', true).order('sequence').order('id').range(a, z) as any))
+
+const notePreview = (doc: unknown, updatedAt: string) => {
+  const text = noteText(doc as NoteDoc).replace(/\s+/g, ' ').trim()
+  return { updatedAt, preview: text.slice(0, 160), text }
+}
+
 /**
  * The Curriculum workspace read model: ONE row per reading combining what already exists (the canonical tracker, the revision overview, the student's own notes and cards).
  * It adds no score and no new store. Coverage here is reported/logged activity; "needs attention" is the canonical Repair band; neither means "understood".
@@ -34,6 +42,32 @@ export const isFilterKey = (v: unknown): v is FilterKey => FILTERS.some(f => f.k
 export type Workspace = { rows: WorkspaceRow[]; revisionUnavailable: boolean; coverage: ReadingCoverageSummary }
 export type CardTotals = { total: number; due: number }
 
+type ReadingNote = Pick<WorkspaceRow, 'subjectId' | 'subjectName' | 'readingId' | 'readingNo' | 'title'> & { note: NonNullable<WorkspaceRow['note']> }
+
+export async function getNotesIndex(supabase: Pick<SupabaseClient, 'from'>, query: string) {
+  const read = (scope: 'reading' | 'subject') => readAll<{ scope_id: string; doc: unknown; updated_at: string }>((a, z) =>
+    supabase.from('curriculum_notes').select('scope_id, doc, updated_at').eq('scope_type', scope).order('scope_id').range(a, z) as any)
+  const term = norm(query.trim())
+  const [subjects, readings, readingNotes, subjectNotes] = await Promise.all([getSubjects(), indexReadings(), read('reading'), read('subject').catch(() => null)])
+  const names = new Map(subjects.map(s => [s.id, s.name]))
+  const notes = new Map(readingNotes.map(n => [n.scope_id, notePreview(n.doc, n.updated_at)]))
+  const rows: ReadingNote[] = []
+  for (const reading of readings) {
+    const note = notes.get(reading.id)
+    if (!note) continue
+    const subjectName = names.get(reading.topic_id) ?? ''
+    if (norm(`${reading.title} reading ${reading.reading_no} ${subjectName}`).includes(term) || norm(note.text).includes(term)) {
+      rows.push({ subjectId: reading.topic_id, subjectName, readingId: reading.id, readingNo: reading.reading_no, title: reading.title, note })
+    }
+  }
+  const subjectRows = (subjectNotes ?? []).map(n => ({
+    id: n.scope_id,
+    name: names.get(n.scope_id) ?? n.scope_id,
+    ...notePreview(n.doc, n.updated_at),
+  })).filter(n => norm(`${n.name} ${n.text}`).includes(term))
+  return { rows, subjectNotes: subjectRows, subjectNotesError: subjectNotes === null }
+}
+
 /** Exact card totals across ALL scopes (the same numbers as Home). A failed count throws; it is never a zero. */
 export async function getCardTotals(supabase: Pick<SupabaseClient, 'from'>): Promise<CardTotals> {
   const [all, due] = await Promise.all([
@@ -52,10 +86,10 @@ export async function getWorkspaceRows(userId: string, supabase: Pick<SupabaseCl
     readAll<{ scope_id: string; doc: unknown; updated_at: string }>((a, z) => supabase.from('curriculum_notes').select('scope_id, doc, updated_at').eq('scope_type', 'reading').order('scope_id').range(a, z) as any),
     // Every card of every reading, in deterministic pages (500, ordered by id); any failed page throws instead of truncating a total.
     readAll<{ id: string; scope_id: string; due_at: string; suspended: boolean }>((a, z) => supabase.from('flashcards').select('id, scope_id, due_at, suspended').eq('scope_type', 'reading').order('id').range(a, z) as any),
-    refCache('index.readings', () => readAll<{ id: string; reading_no: number; title: string; topic_id: string; structure_pending: boolean }>((a, z) => createAdminClient().from('curriculum_readings').select('id, reading_no, title, topic_id, structure_pending').eq('is_active', true).order('sequence').order('id').range(a, z) as any)),
+    indexReadings(),
   ])
   if (!revision && !revisionUnavailable) { /* no active roadmap: nothing is queued, which is true, not a failure */ }
-  const noteBy = new Map(notes.map(n => { const text = noteText(n.doc as NoteDoc).replace(/\s+/g, ' ').trim(); return [n.scope_id, { updatedAt: n.updated_at, preview: text.slice(0, 160), text }] as const }))
+  const noteBy = new Map(notes.map(n => [n.scope_id, notePreview(n.doc, n.updated_at)] as const))
   const now = Date.now(), cardBy = new Map<string, { n: number; due: number }>()
   for (const c of cards) { const e = cardBy.get(c.scope_id) ?? { n: 0, due: 0 }; e.n++; if (!c.suspended && new Date(c.due_at).getTime() <= now) e.due++; cardBy.set(c.scope_id, e) }
   const status = new Map(tracker.topics.flatMap(t => t.modules.map(m => [m.id, m] as const)))

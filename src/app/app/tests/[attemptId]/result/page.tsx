@@ -97,6 +97,7 @@ export default async function DiagnosticResultPage({ params }: { params: Promise
         <div>
           <p className="eyebrow">Result</p>
           <h1>Your result</h1>
+          {result.attempt.submittedAt && <p>Submitted <time dateTime={result.attempt.submittedAt}>{new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(result.attempt.submittedAt))}</time> (UTC)</p>}
           <p>What this paper showed, and what to do next — without claiming more than the questions can support.</p>
         </div>
         <Link href="/app/tests" className="text-button">&larr; Back to Tests</Link>
@@ -137,7 +138,14 @@ export default async function DiagnosticResultPage({ params }: { params: Promise
 
       <details className="result-group" open>
         <summary><h2 id="q-all-h">Every question, and why</h2></summary>
-        <p className="muted">{result.questions.length} questions. Filter to what you got wrong, were unsure about, did not answer or flagged.</p>
+        <p className="muted">{result.questions.length} reviewable questions. Filter to what you got wrong, were unsure about, did not answer or flagged.</p>
+        {result.invalidated.some(question => question.why === 'voided') && (
+          <ul aria-label="Questions set aside after review">
+            {result.invalidated.filter(question => question.why === 'voided').map(question => (
+              <li key={question.itemId}>Question {question.seq}: your report was upheld and this question was set aside.</li>
+            ))}
+          </ul>
+        )}
         <ItemReviewList rows={result.questions} attemptId={attempt.id} />
       </details>
     </div>

@@ -5,7 +5,7 @@ import { confirmedActivity, type ActivityDateKind } from './studyActivity'
 import { getLosTracker } from './losTrackerService'
 import { isFirstPassPending, type ModuleInput, type Phase, type Roadmap, type RoadmapInput } from './roadmap'
 import { MAX_REVISION_TASKS, selectRevision, type RevisionReading, type Selection } from './revisionQueue'
-import { daysBetween } from '../planning/studyWeek'
+import { daysBetween, zonedTimeToUtc } from '../planning/studyWeek'
 import type { ClosingAnswers } from '../planning/cycleObservationService'
 
 /**
@@ -19,7 +19,7 @@ export type RevisionFacts = {
   topicWeight: Record<string, number>
 }
 
-const LIVE = ['not_started', 'in_progress']
+const LIVE = ['not_started', 'in_progress', 'partial']
 
 function newestKind(outcomeIds: string[], lastAt: Map<string, { at: string; kind: ActivityDateKind }>): ActivityDateKind | null {
   const dated = outcomeIds.map(id => lastAt.get(id)).filter((x): x is { at: string; kind: ActivityDateKind } => Boolean(x))
@@ -53,8 +53,10 @@ export async function loadRevisionFacts(
   }
 
   const evidenceOf = new Map<string, RevisionReading['evidence']>()
+  const openRepairReadings = new Set<string>()
   const evidenceByOutcome = new Map<string, { band: 'repair' | 'verify' | 'maintain' | 'untested'; checkedAt: string | null }>()
   for (const t of tracker.topics) for (const m of t.modules) {
+    if (m.rows.some(row => row.hasOpenRepair)) openRepairReadings.add(m.id)
     for (const row of m.rows) evidenceByOutcome.set(row.outcomeId, { band: row.band, checkedAt: row.lastCheckedAt ?? null })
     const ev = { repair: m.counts.repair, verify: m.counts.verify, maintain: m.counts.maintain, untested: m.counts.untested, latestAt: null as string | null }
     for (const row of m.rows) if (row.lastCheckedAt && (!ev.latestAt || row.lastCheckedAt > ev.latestAt)) ev.latestAt = row.lastCheckedAt
@@ -94,7 +96,7 @@ export async function loadRevisionFacts(
       outcomeEvidence: (outcomesOf.get(m.id) ?? []).map(id => evidenceByOutcome.get(id) ?? null),
       newestActivityKind: newestKind(outcomesOf.get(m.id) ?? [], lastAt),
       reportedCurrent: workingOn.has(m.topic),
-      evidence: ev, scheduled: scheduled.has(m.id), continuing: continuing.has(m.id), repairOverlap: ev.repair > 0,
+      evidence: ev, scheduled: scheduled.has(m.id), continuing: continuing.has(m.id), repairOverlap: openRepairReadings.has(m.id),
       history: history.get(m.id) ?? { lastPlannedAt: null, lastDeclinedAt: null },
     }
   })
@@ -107,7 +109,7 @@ export async function loadRevisionFacts(
  * first pass leads into real revision rather than a thin or empty week.
  */
 export async function selectRevisionForWeek(
-  userId: string, active: { roadmap: Roadmap; input: RoadmapInput }, week: { startDate: string; endDate: string },
+  userId: string, active: { roadmap: Roadmap; input: RoadmapInput }, week: { startDate: string; endDate: string; timezone: string },
   o: { phase: Phase; weekNumber: number; today: string; now: Date; continuingReadingIds?: string[]; closingAnswers?: ClosingAnswers },
 ): Promise<{ selection: Selection; revisionPhase: Phase; cap: number; firstPassLeft: boolean }> {
   const firstPassLeft = active.input.modules.some(isFirstPassPending)
@@ -115,10 +117,14 @@ export async function selectRevisionForWeek(
   const cap = Math.max(0, MAX_REVISION_TASKS[revisionPhase] - new Set(o.continuingReadingIds ?? []).size)
   const focusTopics = o.phase === 'first_pass' ? [] : active.roadmap.milestones.filter(m => m.phase === o.phase && m.startWeek <= o.weekNumber && o.weekNumber <= m.endWeek).map(m => m.topicId)
   const mock = active.roadmap.checkpoints[0]
+  const reviewAt = week.startDate > o.today ? zonedTimeToUtc(week.startDate, '00:00', week.timezone) : o.now
   const facts = await loadRevisionFacts(userId, active.input.modules, { weekStart: week.startDate, weekEnd: week.endDate, continuingReadingIds: o.continuingReadingIds, closingAnswers: o.closingAnswers, now: o.now })
   const selection = selectRevision({
-    readings: facts.readings, phase: revisionPhase, now: o.now, weekStart: week.startDate, limit: cap, topicWeight: facts.topicWeight, focusTopics,
-    daysToCheckpoint: mock && mock.date >= o.today ? daysBetween(o.today, mock.date) : null,
+    readings: facts.readings, phase: revisionPhase, now: reviewAt, weekStart: week.startDate, limit: cap, topicWeight: facts.topicWeight, focusTopics,
+    daysToCheckpoint: mock && mock.date >= week.startDate ? daysBetween(week.startDate, mock.date) : null,
+    // First pass is finished (confirmed, or reported on entry) and broader revision has not begun: weakness-only bridge.
+    bridge: (o.phase === 'first_pass' || o.phase === 'consolidation') && !firstPassLeft,
+    assessmentLed: o.phase === 'final',
   })
   return { selection, revisionPhase, cap, firstPassLeft }
 }

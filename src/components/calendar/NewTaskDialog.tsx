@@ -12,6 +12,7 @@ type Sent = { title: string; date: string; startMinutes: number | null; duration
 type Saved = { replayed: boolean; task: { id: string; title: string; local_date: string }; current: { title: string; local_date: string; execution: string; cancelled_at: string | null } | null }
 const STATUS: Record<string, string> = { not_started: 'not started', in_progress: 'in progress', partial: 'partly done', completed: 'completed', skipped: 'skipped', deferred: 'deferred' }
 const REPLY_WAIT_MS = 20000
+const hhmm = (minutes: number) => `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`
 
 /** What the saved result says now, in words: saved just now, or saved earlier with its present state (never "added" when nothing new was created). */
 function receiptLines({ replayed, task, current }: Saved) {
@@ -56,13 +57,18 @@ export function NewTaskDialog({
   const pending = phase === 'pending'
 
   const firstRef = useRef<HTMLInputElement>(null)
-  const [start, setStart] = useState(startMinutes)
+  // The field's own text: while a time is half-typed it reads as empty, and writing the old time back would erase what was typed.
+  const [clock, setClock] = useState(() => hhmm(startMinutes))
+  const [h, m] = clock.split(':').map(Number)
+  const start = clock ? h * 60 + m : startMinutes
   const close = () => { if (!pending) onClose() } // a save in flight is never abandoned by Cancel, Escape or a stray click
 
   async function submit(e: React.FormEvent | null, acceptWarnings = false) {
     e?.preventDefault()
     if (pending || phase === 'done') return
     if (phase !== 'unconfirmed' && title.trim().length < 2) { setError('Give it a name'); return }
+    // A half-typed time is stopped by the browser; an emptied one would otherwise be saved as the time the dialog opened with.
+    if (phase !== 'unconfirmed' && timed && !clock) { setError('Give a start time, or untick it to leave the time open.'); return }
     // After an uncertain reply the ORIGINAL payload is resent, whatever the fields now show.
     const payload: Sent = phase === 'unconfirmed' && sent ? sent : { title: title.trim(), date, startMinutes: timed ? start : null, durationMinutes: duration }
     setSent(payload); setPhase('pending'); setError(''); setConflict([]); setWarnings([])
@@ -132,11 +138,8 @@ export function NewTaskDialog({
               <span>Start time</span>
               <input
                 type="time"
-                value={`${String(Math.floor((frozen && sent?.startMinutes != null ? sent.startMinutes : start) / 60)).padStart(2, '0')}:${String((frozen && sent?.startMinutes != null ? sent.startMinutes : start) % 60).padStart(2, '0')}`}
-                onChange={e => {
-                  const [h, m] = e.target.value.split(':').map(Number)
-                  if (Number.isFinite(h)) setStart(h * 60 + (m || 0))
-                }}
+                value={frozen && sent?.startMinutes != null ? hhmm(sent.startMinutes) : clock}
+                onChange={e => setClock(e.target.value)}
               />
             </label>
           )}
@@ -158,7 +161,7 @@ export function NewTaskDialog({
         {conflict.length > 0 && (
           <div className="conflict-slots">
             {conflict.map((s, i) => (
-              <button key={i} type="button" className="conflict-slot" onClick={() => { setStart(s.start); setError('') }}>
+              <button key={i} type="button" className="conflict-slot" onClick={() => { setClock(hhmm(s.start)); setError('') }}>
                 <strong>{timeLabel(s.start)}</strong><small>{s.label}</small>
               </button>
             ))}

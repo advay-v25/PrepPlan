@@ -97,6 +97,16 @@ async function commitStep(userId: string, step: 'exam' | 'route' | 'position' | 
     const st = await createAdminClient().from('profiles').select('onboarding_status').eq('id', userId).maybeSingle(); must(st, 'read setup status')
     if (st.data?.onboarding_status === 'complete') throw new SetupVersionRequiredError(expectedVersion !== undefined && expectedVersion !== null)
   }
+  if (step === 'position' && ('revision_completed' in args || 'last_mock_feeling' in args)) {
+    const res = await createAdminClient().rpc('onboarding_commit_position_context', {
+      p_user: userId, p_args: args, p_expected: valid ? expectedVersion as number : null,
+    })
+    must(res, what)
+    const r = res.data as { ok: boolean; version?: number; currentVersion?: number }
+    if (!r.ok) throw new SetupStaleError(Number(r.currentVersion))
+    if (receipt) receipt.version = Number(r.version)
+    return Number(r.version)
+  }
   if (valid) {
     const res = await createAdminClient().rpc('onboarding_commit_step_checked', { p_user: userId, p_step: step, p_args: args, p_expected: expectedVersion as number })
     must(res, what)
@@ -227,6 +237,8 @@ export async function savePosition(userId: string, payload: unknown, expectedVer
     uncertainty: data.uncertainty ? uncertaintyEntries.map(([topic_id, u]) => ({ topic_id, level: u.level, lm_ids: u.lmIds })) : null,
     mock_set: data.mock !== undefined, mock: data.mock ? { date: data.mock.date, kind: data.mock.kind } : null,
     mock_timing: Object.keys(timing).length ? timing : null,
+    ...(data.revisionCompleted !== undefined ? { revision_completed: data.revisionCompleted } : {}),
+    ...(data.lastMockFeeling !== undefined ? { last_mock_feeling: data.lastMockFeeling } : {}),
   }, 'save position', expectedVersion, receipt)
   } catch (e: any) {
     // A started rehearsal keeps its restrictions on this path too: nothing was saved, and the student is told why.

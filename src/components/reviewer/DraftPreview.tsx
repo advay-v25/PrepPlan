@@ -1,5 +1,6 @@
 'use client'
 
+import { WhenReady } from '../ui/WhenReady'
 import { useState } from 'react'
 import Link from 'next/link'
 import { itemStateLabel } from '../../lib/diagnostic/itemState'
@@ -55,6 +56,7 @@ export function DraftPreview({ items, title, backHref }: { items: PreviewItem[];
   }
 
   return (
+    <WhenReady>
     <div className="rv-preview">
       {banner}
       <div className="attempt__head"><span><strong>{title}</strong> · Question {idx + 1} of {items.length}</span><span className="tag">{itemStateLabel(it.state)} · v{it.version}</span></div>
@@ -75,7 +77,7 @@ export function DraftPreview({ items, title, backHref }: { items: PreviewItem[];
         </div>
       </div>
       {a.selected != null && (
-        <details className="review-queue__details">
+        <details suppressHydrationWarning className="review-queue__details">
           <summary>Reviewer view: key, working and what each wrong answer means</summary>
           <p className="fine-print">Key: option {it.keyIndex == null ? '?' : String.fromCharCode(65 + it.keyIndex)}. {it.solution}</p>
           <ul className="rv-list">{it.options.map((o, n) => <li key={n}><strong>{String.fromCharCode(65 + n)}</strong> {it.feedback[String(n)] ?? ''} {it.diagnoses.find(d => d.optionIndex === n) ? `(${it.diagnoses.find(d => d.optionIndex === n)!.errorCode}: ${it.diagnoses.find(d => d.optionIndex === n)!.description})` : ''}</li>)}</ul>
@@ -90,5 +92,6 @@ export function DraftPreview({ items, title, backHref }: { items: PreviewItem[];
           : <button type="button" className="primary-button" onClick={() => setDone(true)}>Finish preview</button>}
       </footer>
     </div>
+    </WhenReady>
   )
 }

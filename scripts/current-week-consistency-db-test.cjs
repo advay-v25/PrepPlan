@@ -18,7 +18,7 @@ async function main() {
   const clients = []
   let passed = 0
   const connect = async () => {
-    const c = new Client({ host: '127.0.0.1', port, user: 'postgres', database: 'postgres', statement_timeout: 10000 })
+    const c = new Client({ host: '127.0.0.1', port, user: 'postgres', database: 'postgres', statement_timeout: 10000, options: '-c timezone=UTC' })
     await c.connect(); clients.push(c); return c
   }
   const check = async (name, fn) => { await fn(); passed++; console.log(`  ✓ ${name}`) }
@@ -119,6 +119,156 @@ async function main() {
       await db.query('delete from public.commitment_exceptions where commitment_id=$1', [id])
       await db.query('update public.calendar_commitments set ends_on=current_date where id=$1', [id])
       assert.equal(await capacity(), 180)
+    })
+    await check('fit is judged against contiguous gaps, not the day total: 45 minutes does not fit two 30-minute gaps, two 30s do', async () => {
+      const f = await fixture()
+      await db.query('delete from public.availability_windows where user_id=$1', [f.uid])
+      await db.query("insert into public.availability_windows(user_id,weekday,start_time,end_time) select $1,extract(dow from $2::date)::int,s::time,e::time from (values('09:00','09:30'),('11:00','11:30')) v(s,e)", [f.uid, tomorrow])
+      const draft = async tasks => { await db.query("update public.plan_drafts set draft_json=jsonb_set(draft_json,'{tasks}',$2::jsonb) where id=$1", [f.draft, JSON.stringify(tasks.map(m => ({ id: randomUUID(), title: 'Fit', duration_minutes: m, scheduled_date: tomorrow, metadata: { task_type: 'study' } })))]); await stamp(f) }
+      const problem = () => scalar("select public.current_week_proposal_problem($1,$2,(current_date::timestamp at time zone 'UTC'))", [f.uid, f.draft])
+      assert.equal(await scalar("select public.current_week_available_minutes($1,$2,'UTC',(current_date::timestamp at time zone 'UTC'))", [f.uid, tomorrow]), 60)
+      await draft([45]); assert.equal(await problem(), 'STALE_PROPOSAL')
+      await assert.rejects(command(f), /STALE_PROPOSAL/)
+      assert.equal(await scalar('select count(*)::int from public.plan_blocks where cycle_id=$1', [f.uid === f.uid ? f.cycle : f.cycle]), 0)
+      await draft([30, 30]); assert.equal(await problem(), null)
+      assert.equal((await command(f)).tasks_added, 2)
+    })
+    await check('accepted timed work and accepted flexible work reduce the room exactly once', async () => {
+      const f = await fixture()
+      await db.query('delete from public.availability_windows where user_id=$1', [f.uid])
+      await db.query("insert into public.availability_windows(user_id,weekday,start_time,end_time) select $1,extract(dow from $2::date)::int,'09:00','11:00'", [f.uid, tomorrow])
+      await db.query(`insert into public.plan_blocks(id,user_id,cycle_id,title,detail,task_type,origin,priority,placement,execution,local_date,day,starts_at,duration_minutes,duration,created_by)
+        values($1,$2,$3,'Timed paper','','diagnostic','diagnostic','core','timed','not_started',$4::date,$4::text,($4::date+time '10:00') at time zone 'UTC',60,'60','algorithm')`, [`t-${randomUUID()}`, f.uid, f.cycle, tomorrow])
+      const draft = async tasks => { await db.query("update public.plan_drafts set draft_json=jsonb_set(draft_json,'{tasks}',$2::jsonb) where id=$1", [f.draft, JSON.stringify(tasks.map(m => ({ id: randomUUID(), title: 'Fit', duration_minutes: m, scheduled_date: tomorrow, metadata: { task_type: 'study' } })))]); await stamp(f) }
+      const problem = () => scalar("select public.current_week_proposal_problem($1,$2,(current_date::timestamp at time zone 'UTC'))", [f.uid, f.draft])
+      await draft([60]); assert.equal(await problem(), null)           // 09:00-10:00 stays free beside the 10:00 paper
+      await draft([90]); assert.equal(await problem(), 'STALE_PROPOSAL')   // the paper hour is not counted twice or ignored
+      await db.query(`insert into public.plan_blocks(id,user_id,cycle_id,title,detail,task_type,origin,priority,placement,execution,local_date,day,duration_minutes,duration,created_by)
+        values($1,$2,$3,'Accepted flexible','','study','planner','core','day_preferred','not_started',$4::date,$4::text,45,'45','algorithm')`, [`t-${randomUUID()}`, f.uid, f.cycle, tomorrow])
+      await draft([30]); assert.equal(await problem(), 'STALE_PROPOSAL')   // 60 free - 45 accepted flexible leaves 15
+      await draft([15]); assert.equal(await problem(), null)
+    })
+    await check('weekly review acceptance validates reviewed rows with the same packer', async () => {
+      assert.match(await scalar("select pg_get_functiondef('public.accept_weekly_transition(uuid)'::regprocedure)"), /first_unfit_day/)
+      const f = await fixture(); await db.query('delete from public.availability_windows where user_id=$1', [f.uid])
+      await db.query("insert into public.availability_windows(user_id,weekday,start_time,end_time) select $1,extract(dow from $2::date)::int,s::time,e::time from (values('09:00','09:30'),('11:00','11:30')) v(s,e)", [f.uid, tomorrow])
+      const rows = ms => JSON.stringify(ms.map(m => ({ local_date: tomorrow, duration_minutes: m, task_type: 'study', placement: 'day_preferred' })))
+      assert.equal(await scalar("select public.first_unfit_day($1,'UTC',(current_date::timestamp at time zone 'UTC'),$2::jsonb,'local_date','duration_minutes','task_type','placement')::text", [f.uid, rows([45])]), tomorrow)
+      assert.equal(await scalar("select public.first_unfit_day($1,'UTC',(current_date::timestamp at time zone 'UTC'),$2::jsonb,'local_date','duration_minutes','task_type','placement')::text", [f.uid, rows([30, 30])]), null)
+      assert.equal(await scalar("select has_function_privilege('authenticated','public.first_unfit_day(uuid,text,timestamptz,jsonb,text,text,text,text)','execute')"), false)
+    })
+    await check('weekly acceptance counts a placed continuation against the next week\'s gaps, together with the generated rows', async () => {
+      const f = await fixture(); const nd = await scalar("select (current_date+7)::text"), end = await scalar("select (current_date+13)::text")
+      await db.query('delete from public.availability_windows where user_id=$1', [f.uid])
+      await db.query("insert into public.availability_windows(user_id,weekday,start_time,end_time) select $1,extract(dow from $2::date)::int,s::time,e::time from (values('09:00','09:30'),('11:00','11:30')) v(s,e)", [f.uid, nd])
+      const pred = `w-${randomUUID()}`
+      await db.query(`insert into public.plan_blocks(id,user_id,cycle_id,title,detail,task_type,origin,priority,placement,execution,local_date,day,duration_minutes,duration,created_by)
+        values($1,$2,$3,'Unfinished','','study','planner','core','day_preferred','not_started',current_date,current_date::text,45,'45','algorithm')`, [pred, f.uid, f.cycle])
+      const accept = async (minutes, rows = []) => {
+        const version = await scalar('select public.weekly_source_version($1,$2)', [f.uid, f.cycle])
+        const proposal = { next: { starts_at_local: nd, ends_at_local: end, timezone: 'UTC', anchor_day: 1, rows },
+          actions: [{ taskId: pred, setExecution: null, cancel: false, unknown: false, continuation: { minutes, intent: 'continue', provisional: false, placement: { date: nd, reason: null, note: null } } }], recap: { planned: 1 } }
+        await db.query("update public.weekly_transition_drafts set status='superseded' where cycle_id=$1 and status='ready'", [f.cycle])
+        const id = await scalar(`insert into public.weekly_transition_drafts(user_id,cycle_id,closure_kind,no_paper_reason,choices,proposal,source_version)
+          values ($1,$2,'no_paper','The bank cannot support a paper this week.','{}',$3,$4) returning id`, [f.uid, f.cycle, proposal, version])
+        await db.query('begin')
+        try {
+          await db.query("select set_config('request.jwt.claims',$1,true)", [JSON.stringify({ sub: f.uid, role: 'authenticated' })]); await db.query('set local role authenticated')
+          const r = (await db.query('select public.accept_weekly_transition($1) as r', [id])).rows[0].r; await db.query('commit'); return r
+        } catch (e) { await db.query('rollback'); throw e }
+      }
+      assert.equal((await accept(45)).code, 'STALE_PROPOSAL')                                 // 45 whole fits neither 30-minute gap
+      assert.equal(await scalar("select count(*)::int from public.plan_blocks where continued_from_task_id=$1", [pred]), 0)   // nothing written
+      const row = (m, t) => ({ id: `g-${randomUUID()}`, title: 'New', detail: '', task_type: 'study', origin: 'planner', priority: 'core', placement: 'day_preferred', execution: 'not_started', local_date: nd, day: nd, starts_at: '', duration_minutes: m, duration: String(m), created_by: 'algorithm' })
+      assert.equal((await accept(30, [row(30), row(30)])).code, 'STALE_PROPOSAL')            // two rows already fill both gaps; the continuation is a third
+      assert.equal((await accept(30)).ok, true)                                              // alone, 30 fits one gap
+    })
+    await check('a confirmed (strict) day-only move needs one contiguous gap on the target day; a deliberate Calendar move keeps its own flow', async () => {
+      const f = await fixture(); const dayAfter = await scalar("select (current_date+2)::text")
+      await db.query('delete from public.availability_windows where user_id=$1', [f.uid])
+      await db.query("insert into public.availability_windows(user_id,weekday,start_time,end_time) select $1,extract(dow from $2::date)::int,s::time,e::time from (values('09:00','09:30'),('11:00','11:30')) v(s,e)", [f.uid, tomorrow])
+      const block = async (id, date, mins) => db.query(`insert into public.plan_blocks(id,user_id,cycle_id,title,detail,task_type,origin,priority,placement,execution,local_date,day,duration_minutes,duration,created_by)
+        values($1,$2,$3,$1,'','study','planner','core','day_preferred','not_started',$4::date,$4::text,$5,$5::text,'algorithm')`.replace('$5,$5::text', '$5::int,($5::int)::text'), [id, f.uid, f.cycle, date, mins])
+      const move = (id, strict, mins = 30) => scalar("select public.apply_task_move($1,$2,1,$3::date,null,$4,$5,'coach')", [f.uid, id, tomorrow, mins, strict])
+      const [a, b, c] = [`m-${randomUUID()}`, `m-${randomUUID()}`, `m-${randomUUID()}`]
+      await block(a, tomorrow, 30); await block(b, tomorrow, 30); await block(c, dayAfter, 30)
+      assert.equal((await move(c, true)).code, 'NO_ROOM')                       // both 30-minute gaps are held by accepted sittings
+      assert.equal(await scalar('select local_date::text from public.plan_blocks where id=$1', [c]), dayAfter)   // nothing moved
+      assert.equal((await move(c, false)).ok, true)                              // the student's deliberate Calendar override is not this check's business
+      await db.query('delete from public.plan_blocks where id=any($1)', [[a, c]])   // the deliberate move put c on that day too
+      const d = `m-${randomUUID()}`; await block(d, dayAfter, 30)
+      assert.equal((await move(d, true)).ok, true)                              // one gap is free again
+      const e = `m-${randomUUID()}`; await block(e, dayAfter, 45)
+      assert.equal((await move(e, true, 45)).code, 'NO_ROOM')                   // 45 never fits a 30-minute gap
+      assert.match(await scalar("select pg_get_functiondef('public.confirm_coach_move(uuid)'::regprocedure)"), /no_room/)
+    })
+    await check('redistribution refuses a longer sitting that fits no gap and rolls back every change', async () => {
+      const f = await fixture()
+      await db.query('delete from public.availability_windows where user_id=$1', [f.uid])
+      await db.query("insert into public.availability_windows(user_id,weekday,start_time,end_time) select $1,extract(dow from $2::date)::int,s::time,e::time from (values('09:00','09:30'),('11:00','11:30')) v(s,e)", [f.uid, tomorrow])
+      const source = `src-${randomUUID()}`, target = `dst-${randomUUID()}`
+      await db.query(`insert into public.plan_blocks(id,user_id,cycle_id,title,detail,task_type,lm_id,origin,priority,placement,execution,local_date,day,duration_minutes,duration,created_by)
+        values($1,$3,$4,'Missed','','study','r032','planner','core','day_preferred','deferred',$5::date,$5::text,30,'30','algorithm'),
+              ($2,$3,$4,'Later','','study','r032','planner','core','day_preferred','not_started',$5::date,$5::text,30,'30','algorithm')`, [source, target, f.uid, f.cycle, tomorrow])
+      const resize = async minutes => {
+        const revision = await scalar('select revision from public.plan_blocks where id=$1', [target])
+        const hash = await scalar('select public.current_week_source_hash($1,$2)', [f.uid, f.cycle])
+        return scalar('select public.apply_redistribution($1,$2,$3::jsonb,$4)', [f.uid, source, JSON.stringify([{ task_id: target, expected_revision: revision, add_minutes: minutes }]), hash])
+      }
+      await assert.rejects(resize(30), /REDISTRIBUTION_NO_ROOM/)
+      assert.equal(await scalar('select duration_minutes from public.plan_blocks where id=$1', [target]), 30)
+      assert.equal(await scalar('select count(*)::int from public.redistribution_receipts where source_task_id=$1', [source]), 0)
+      await db.query("update public.plan_blocks set duration_minutes=15,duration='15' where id=$1", [target])
+      const saved = await resize(15)
+      assert.equal(saved.ok, true)
+      assert.equal(saved.placed, 15)
+      assert.equal(await scalar('select duration_minutes from public.plan_blocks where id=$1', [target]), 30)
+      assert.equal((await resize(15)).replayed, true)
+    })
+    await check('initial onboarding acceptance refuses fragmented room before writing tasks, then accepts whole sittings', async () => {
+      const f = await fixture()
+      await db.query('delete from public.availability_windows where user_id=$1', [f.uid])
+      await db.query("insert into public.availability_windows(user_id,weekday,start_time,end_time) select $1,extract(dow from $2::date)::int,s::time,e::time from (values('09:00','09:30'),('11:00','11:30')) v(s,e)", [f.uid, tomorrow])
+      const draft = async ms => db.query("update public.plan_drafts set purpose='onboarding_initial_week', draft_json=jsonb_set(draft_json,'{tasks}',$2::jsonb) where id=$1", [f.draft, JSON.stringify(ms.map(m => ({ id: randomUUID(), title: 'Initial study', duration_minutes: m, scheduled_date: tomorrow, metadata: { task_type: 'study', lm_id: 'r032' } })))])
+      await draft([45])
+      await assert.rejects(command(f, 'accept_onboarding_preview'), /STALE_PREVIEW/)
+      assert.equal(await scalar('select count(*)::int from public.plan_blocks where user_id=$1', [f.uid]), 0)
+      assert.equal(await scalar('select status from public.plan_drafts where id=$1', [f.draft]), 'ready')
+      await draft([30, 30])
+      const saved = await command(f, 'accept_onboarding_preview')
+      assert.ok(saved.cycle_id)
+      assert.equal(await scalar('select count(*)::int from public.plan_blocks where user_id=$1', [f.uid]), 2)
+      assert.equal((await command(f, 'accept_onboarding_preview')).cycle_id, saved.cycle_id)
+      assert.equal(await scalar('select count(*)::int from public.plan_blocks where user_id=$1', [f.uid]), 2)
+    })
+    await check('class recovery refuses a same-day flexible move that no longer fits and leaves no task event', async () => {
+      const f = await fixture(), id = `recovery-${randomUUID()}`
+      await db.query('delete from public.availability_windows where user_id=$1', [f.uid])
+      await db.query("insert into public.availability_windows(user_id,weekday,start_time,end_time) select $1,extract(dow from $2::date)::int,s::time,e::time from (values('09:00','09:30'),('11:00','11:30')) v(s,e)", [f.uid, tomorrow])
+      await db.query(`insert into public.plan_blocks(id,user_id,cycle_id,title,detail,task_type,lm_id,origin,priority,placement,execution,local_date,day,duration_minutes,duration,created_by)
+        values($1,$2,$3,'Recovery','','study','r032','planner','core','day_preferred','not_started',$4::date,$4::text,45,'45','algorithm')`, [id, f.uid, f.cycle, tomorrow])
+      const revision = await scalar('select revision from public.plan_blocks where id=$1', [id])
+      const hash = await scalar('select public.current_week_source_hash($1,$2)', [f.uid, f.cycle])
+      await db.query("update public.plan_drafts set purpose='class_change_recovery',context_fingerprint=$2,draft_json=$3::jsonb where id=$1", [f.draft, hash, JSON.stringify({ planning_date: today, change_key: 'fixture-change', moves: [{ task_id: id, title: 'Recovery', expected_revision: revision, minutes: 45, to_date: tomorrow, to_starts: null }], unplaced: [] })])
+      await assert.rejects(command(f, 'accept_class_recovery'), /STALE_PROPOSAL/)
+      assert.equal(await scalar('select revision from public.plan_blocks where id=$1', [id]), revision)
+      assert.equal(await scalar('select count(*)::int from public.task_events where task_id=$1', [id]), 0)
+      assert.equal(await scalar('select status from public.plan_drafts where id=$1', [f.draft]), 'ready')
+    })
+    await check('class recovery accepts a TIMED move when unrelated flexible work already overflowed the day, and still refuses a flexible move that fits no gap', async () => {
+      const f = await fixture(), timed = `rec-t-${randomUUID()}`, flex = `rec-f-${randomUUID()}`
+      await db.query('delete from public.availability_windows where user_id=$1', [f.uid])
+      await db.query("insert into public.availability_windows(user_id,weekday,start_time,end_time) select $1,extract(dow from $2::date)::int,s::time,e::time from (values('09:00','10:00'),('11:00','11:30')) v(s,e)", [f.uid, tomorrow])
+      const block = (id, placement, start, mins) => db.query(`insert into public.plan_blocks(id,user_id,cycle_id,title,detail,task_type,lm_id,origin,priority,placement,execution,local_date,day,starts_at,duration_minutes,duration,created_by)
+        values($1,$2,$3,$1,'','study','r032','planner','core',$4,'not_started',$5::date,$5::text,$6::timestamptz,$7::int,($7::int)::text,'algorithm')`, [id, f.uid, f.cycle, placement, tomorrow, start, mins])
+      await block(flex, 'day_preferred', null, 100)                       // already cannot fit the 60 + 30 minutes of windows: an overflow the move does not cause
+      await block(timed, 'timed', `${tomorrow}T09:00:00Z`, 30)
+      const revision = await scalar('select revision from public.plan_blocks where id=$1', [timed])
+      const hash = await scalar('select public.current_week_source_hash($1,$2)', [f.uid, f.cycle])
+      await db.query("update public.plan_drafts set purpose='class_change_recovery',context_fingerprint=$2,draft_json=$3::jsonb where id=$1", [f.draft, hash, JSON.stringify({ planning_date: today, change_key: 'fixture-change-2', moves: [{ task_id: timed, title: timed, expected_revision: revision, minutes: 30, to_date: tomorrow, to_starts: `${tomorrow}T09:30:00Z` }], unplaced: [] })])
+      const r = await command(f, 'accept_class_recovery')
+      assert.equal(r.moved, 1)                                            // the timed move is accepted
+      assert.equal(await scalar('select starts_at is not null and to_char(starts_at at time zone \'UTC\',\'HH24:MI\')=\'09:30\' from public.plan_blocks where id=$1', [timed]), true)
     })
     await check('a proposal becomes invalid when its study windows pass within the same day', async () => {
       const f = await fixture(null, today)

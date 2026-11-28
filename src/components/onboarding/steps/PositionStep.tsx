@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { BookOpenCheck, Check, ListChecks, RotateCcw, Sprout } from 'lucide-react'
 import { STARTING_STAGES } from '../../../lib/onboarding/steps'
 import type { Stage } from '../../../lib/onboarding/schema'
 import {
@@ -15,7 +16,7 @@ const COVERAGE_LABEL: Record<Coverage, string> = { partly: 'Partly covered', cov
 // Stored as the existing topic exposure: partly covered = "current", covered once = "recent".
 const TO_RECENCY: Record<Coverage, 'current' | 'recent'> = { partly: 'current', covered: 'recent' }
 const FROM_RECENCY = (r: unknown): Coverage | null => (r === 'current' ? 'partly' : r === 'recent' ? 'covered' : null)
-const todayLocal = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60_000).toISOString().slice(0, 10) }
+const STAGE_ICON = { starting_fresh: Sprout, first_pass_underway: ListChecks, revising_or_mocks: BookOpenCheck, retaking: RotateCcw, most_of_first_pass: ListChecks } as const
 
 type Uncertainty = { level: UncertaintyLevel; lmIds: string[] }
 
@@ -27,9 +28,10 @@ type Uncertainty = { level: UncertaintyLevel; lmIds: string[] }
  * All of it is the student's own estimate. It plans the roadmap and the first week and is never evidence.
  */
 export function PositionStep({
-  state, topics, readings, onChange,
+  state, today, topics, readings: savedReadings, onChange,
 }: {
   state: OnboardingState
+  today: string
   topics: TopicInfo[]
   readings: ReadingInfo[]
   onChange: (payload: Record<string, unknown>, continueAllowed?: boolean, reason?: string | null) => void
@@ -56,13 +58,15 @@ export function PositionStep({
   const [mockLabel, setMockLabel] = useState(state.entry?.mock?.label ?? '')
   const [mockStart, setMockStart] = useState(state.entry?.mock?.startTime ?? '')
   const [mockLength, setMockLength] = useState(state.entry?.mock?.durationMinutes ? String(state.entry.mock.durationMinutes) : '')
+  const [revision, setRevision] = useState(state.profile?.entry_revision_completed == null ? '' : state.profile.entry_revision_completed ? 'yes' : 'no')
+  const [lastMock, setLastMock] = useState(state.profile?.entry_last_mock_feeling ?? '')
+  const [readingLists, setReadingLists] = useState<Record<string, ReadingInfo[] | 'loading' | 'failed'>>({})
 
   const meta = STARTING_STAGES.find(s => s.value === stage)
-  const byTopic = useMemo(() => {
-    const m = new Map<string, ReadingInfo[]>()
-    for (const r of readings) m.set(r.topicId, [...(m.get(r.topicId) ?? []), r])
-    return m
-  }, [readings])
+  const topicByReading = useMemo(() => new Map([
+    ...savedReadings,
+    ...Object.values(readingLists).flatMap(list => Array.isArray(list) ? list : []),
+  ].map(r => [r.id, r.topicId])), [savedReadings, readingLists])
   const marked = Object.keys(coverage).length
   const showTopics = stage !== '' && stage !== 'starting_fresh'
   // "First pass complete" is a bulk declaration, so the fresh route stays short: a summary first, exceptions on demand.
@@ -79,7 +83,7 @@ export function PositionStep({
     // Only readings that differ from their topic's answer are sent; the rest follow the topic.
     const refinements: Record<string, ReadingState> = {}
     for (const [id, st] of Object.entries(readingStates)) {
-      const topic = readings.find(r => r.id === id)?.topicId
+      const topic = topicByReading.get(id)
       if (topic && st !== impliedFor(topic)) refinements[id] = st
     }
     const canContinue = !!stage && !(meta?.needsTopics && marked === 0)
@@ -90,9 +94,11 @@ export function PositionStep({
       readingStates: refinements,
       uncertainty,
       mock: mockDate ? { date: mockDate, kind: mockKind, label: mockLabel.trim() || null, startTime: mockStart || null, durationMinutes: mockLength ? Number(mockLength) : null } : null,
+      ...(bulkStage && (revision || state.profile?.entry_revision_completed != null) ? { revisionCompleted: revision ? revision === 'yes' : null } : {}),
+      ...(bulkStage && (lastMock || state.profile?.entry_last_mock_feeling != null) ? { lastMockFeeling: lastMock || null } : {}),
     }, canContinue, reason)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage, coverage, uncertainty, readingStates, mockDate, mockKind, mockLabel, mockStart, mockLength, meta, marked, onChange, readings])
+  }, [stage, coverage, uncertainty, readingStates, mockDate, mockKind, mockLabel, mockStart, mockLength, revision, lastMock, bulkStage, state.profile, meta, marked, onChange, topicByReading])
 
   function pickStage(next: Stage) {
     setStage(next)
@@ -106,7 +112,20 @@ export function PositionStep({
   function setTopicCoverage(id: string, value: Coverage | null) {
     setCoverage(prev => { const next = { ...prev }; if (value) next[id] = value; else delete next[id]; return next })
     // A reading refinement belongs to a covered topic; changing the topic's answer resets its readings to follow it.
-    setReadingStates(prev => Object.fromEntries(Object.entries(prev).filter(([lm]) => readings.find(r => r.id === lm)?.topicId !== id)))
+    setReadingStates(prev => Object.fromEntries(Object.entries(prev).filter(([lm]) => topicByReading.get(lm) !== id)))
+  }
+
+  async function loadReadings(topic: string) {
+    if (readingLists[topic] === 'loading' || Array.isArray(readingLists[topic])) return
+    setReadingLists(previous => ({ ...previous, [topic]: 'loading' }))
+    try {
+      const response = await fetch(`/api/onboarding/position?topic=${encodeURIComponent(topic)}`, { signal: AbortSignal.timeout(12_000) })
+      if (!response.ok) throw new Error('Reading lookup unavailable')
+      const { readings } = await response.json() as { readings: ReadingInfo[] }
+      setReadingLists(previous => ({ ...previous, [topic]: readings }))
+    } catch {
+      setReadingLists(previous => ({ ...previous, [topic]: 'failed' }))
+    }
   }
 
   function setLevel(id: string, level: UncertaintyLevel | null) {
@@ -131,63 +150,54 @@ export function PositionStep({
   return (
     <div className="ob-section">
       {state.profile?.onboarding_status === 'complete' && (
-        <Notice tone="info">
-          Changing this does not rewrite the week you accepted. It changes your roadmap and the weeks you plan next. A next-week proposal you have not accepted yet will ask you to refresh.
-        </Notice>
+        <Notice tone="info">Your accepted week stays as it is. This changes your roadmap and the weeks you plan next.</Notice>
       )}
       <section>
-        <h2 className="ob-subhead">Where you are</h2>
-        <div className="ob-tilegrid ob-tilegrid--3">
-          {STARTING_STAGES.filter(s => s.tile || s.value === stage).map(s => (
-            <button key={s.value} type="button" className={`ob-tile ob-tile--compact ${stage === s.value ? 'is-selected' : ''}`}
-              aria-pressed={stage === s.value} onClick={() => pickStage(s.value)}>
-              <strong>{s.label}</strong>
-            </button>
-          ))}
+        <div className="fl-cards fl-cards--2">
+          {STARTING_STAGES.filter(s => s.tile || s.value === stage).map(s => {
+            const Icon = STAGE_ICON[s.value]
+            return (
+              <button key={s.value} type="button" className={`fl-card fl-card--row ${stage === s.value ? 'is-selected' : ''}`}
+                aria-pressed={stage === s.value} onClick={() => pickStage(s.value)}>
+                <span className="fl-card__icon" aria-hidden><Icon size={20} /></span>
+                <span className="fl-card__text"><strong>{s.label}</strong></span>
+                <span className="fl-card__check" aria-hidden><Check size={13} /></span>
+              </button>
+            )
+          })}
         </div>
-        {stage && <p className="fine-print mt-3">Covered means you have studied it before. Your tests will help us understand how secure it is.</p>}
       </section>
 
-      {stage === 'starting_fresh' && (
-        <p className="fine-print mt-4">PrepPlan will plan your whole first pass. If you have already covered a topic, choose “Some subjects covered”.</p>
-      )}
-
       {showTopics && compact && (
-        <section className="mt-8" aria-label="Coverage summary">
-          <h2 className="ob-subhead">Your coverage</h2>
-          <p><strong>{marked - partlyCount} of {topics.length} topics</strong> covered once{partlyCount ? ` · ${partlyCount} partly covered` : ''}{uncertainCount ? ` · ${uncertainCount} marked uncertain` : ' · none marked uncertain'}.</p>
-          <p className="fine-print">This is what you report. It stays an estimate, separate from anything a paper confirms. Change a topic only if it is not really finished.</p>
-          <button type="button" className="text-button" onClick={() => setExceptionsOpen(true)}>Change topics, uncertainty or readings</button>
+        <section aria-label="Coverage summary">
+          <h2 className="fl-label">What you told us</h2>
+          <p className="fl-result">You said <strong>{marked - partlyCount} of {topics.length}</strong> topics are covered once{partlyCount ? `, ${partlyCount} partly` : ''}{uncertainCount ? `, ${uncertainCount} to revisit` : ''}. Practice results are tracked separately.</p>
+          <button type="button" className="text-button" onClick={() => setExceptionsOpen(true)}>Change topics or readings</button>
         </section>
       )}
 
       {showTopics && !compact && (
-        <section className="mt-8">
-          {bulkStage && <button type="button" className="text-button" onClick={() => setExceptionsOpen(false)}>Show the summary</button>}
+        <section>
           <div className="ob-subhead-row">
-            <h2 className="ob-subhead">Topics{meta?.needsTopics ? '' : ' (optional)'}</h2>
+            <h2 className="fl-label">Topics{meta?.needsTopics ? '' : ' (optional)'}</h2>
             <span className="ob-alt">
-              <button type="button" className="text-button" onClick={() => bulk('covered')}>All covered once</button>
+              {bulkStage && <button type="button" className="text-button" onClick={() => setExceptionsOpen(false)}>Summary</button>}
+              <button type="button" className="text-button" onClick={() => bulk('covered')}>All covered</button>
               <button type="button" className="text-button" onClick={() => bulk(null)}>Clear</button>
             </span>
           </div>
-          <p className="fine-print">
-            {stage === 'revising_or_mocks' || stage === 'retaking'
-              ? 'All topics start as covered once. Change any that you have not finished, then say which feel uncertain. Leave the rest.'
-              : 'Mark what you have covered. A topic you leave alone is “not reported”: Roadmap plans it as not started.'}
-          </p>
           <div className="ob-topics">
             {topics.map(t => {
               const cov = coverage[t.id] ?? null
               const u = uncertainty[t.id]
-              const list = byTopic.get(t.id) ?? []
+              const list = readingLists[t.id]
               return (
                 <div key={t.id} className="ob-topiccard">
                   <div className="ob-topic-row">
                     <strong id={`topic-${t.id}`}>{t.name}</strong>
-                    <div className="ob-chipset ob-chipset--wrap" role="group" aria-labelledby={`topic-${t.id}`}>
+                    <div className="fl-segment fl-segment--sm" role="group" aria-labelledby={`topic-${t.id}`}>
                       {(['partly', 'covered'] as Coverage[]).map(c => (
-                        <button key={c} type="button" className={`ob-chip ${cov === c ? 'is-selected' : ''}`} aria-pressed={cov === c}
+                        <button key={c} type="button" className={cov === c ? 'is-selected' : ''} aria-pressed={cov === c}
                           onClick={() => setTopicCoverage(t.id, cov === c ? null : c)}>{COVERAGE_LABEL[c]}</button>
                       ))}
                     </div>
@@ -195,18 +205,21 @@ export function PositionStep({
                   {cov && (
                     <>
                       <div className="ob-topiccard__sub">
-                        <span className="fine-print" id={`unsure-${t.id}`}>How much of it feels uncertain?</span>
-                        <div className="ob-chipset ob-chipset--wrap" role="group" aria-labelledby={`unsure-${t.id}`}>
+                        <span className="fine-print" id={`unsure-${t.id}`}>Feels uncertain?</span>
+                        <div className="fl-segment fl-segment--sm" role="group" aria-labelledby={`unsure-${t.id}`}>
                           {UNCERTAINTY_LEVELS.map(l => (
-                            <button key={l} type="button" className={`ob-chip ob-chip--sm ${u?.level === l ? 'is-selected' : ''}`} aria-pressed={u?.level === l}
+                            <button key={l} type="button" className={u?.level === l ? 'is-selected' : ''} aria-pressed={u?.level === l}
                               onClick={() => setLevel(t.id, u?.level === l ? null : l)}>{UNCERTAINTY_LABEL[l]}</button>
                           ))}
                         </div>
                       </div>
-                      {list.length > 0 && (
-                        <details className="ob-topiccard__readings">
-                          <summary className="text-button">Pick or correct individual readings{u?.lmIds.length ? ` (${u.lmIds.length} to revisit)` : ''}</summary>
-                          <ul>
+                        <details suppressHydrationWarning className="ob-topiccard__readings" onToggle={event => {
+                          if (event.currentTarget.open && list === undefined) void loadReadings(t.id)
+                        }}>
+                          <summary className="text-button">Individual readings{u?.lmIds.length ? ` (${u.lmIds.length} to revisit)` : ''}</summary>
+                          {list === 'loading' && <p role="status">Loading readings…</p>}
+                          {list === 'failed' && <p role="alert">Readings could not be loaded. <button type="button" className="text-button" onClick={() => void loadReadings(t.id)}>Retry</button></p>}
+                          {Array.isArray(list) && (list.length > 0 ? <ul>
                             {list.map(r => {
                               const st = readingStates[r.id] ?? impliedFor(t.id)
                               return (
@@ -225,9 +238,8 @@ export function PositionStep({
                                 </li>
                               )
                             })}
-                          </ul>
+                          </ul> : <p>No individual readings are listed for this topic.</p>)}
                         </details>
-                      )}
                     </>
                   )}
                 </div>
@@ -237,33 +249,43 @@ export function PositionStep({
         </section>
       )}
 
-      {stage && (
-        <section className="mt-8">
-          <h2 className="ob-subhead">Upcoming mock or checkpoint (optional)</h2>
-          <p className="fine-print">A mock from your course, school or a provider. It shapes preparation; your exam date stays the exam date.</p>
-          <div className="ob-window-row mt-3">
-            <label className="fine-print" htmlFor="mock-date">Date</label>
-            <input id="mock-date" type="date" className="ob-input" min={todayLocal()} value={mockDate} onChange={e => setMockDate(e.target.value)} />
-            <label className="fine-print" htmlFor="mock-kind">Type</label>
-            <select id="mock-kind" className="ob-input" value={mockKind} onChange={e => setMockKind(e.target.value as MockKind)}>
-              {MOCK_KINDS.map(k => <option key={k} value={k}>{MOCK_KIND_LABEL[k]}</option>)}
-            </select>
-            {mockDate && <button type="button" className="text-button" onClick={() => setMockDate('')}>Clear</button>}
+      {bulkStage && (
+        <details className="fl-more" open={!!(revision || lastMock)}>
+          <summary>Tell us how revision and mocks are going <span>optional</span></summary>
+          <div className="fl-fields">
+            <label>Have you revised the full syllabus?<select className="ob-input" value={revision} onChange={e => setRevision(e.target.value)}>
+              <option value="">Leave unanswered</option><option value="yes">Yes</option><option value="no">Not yet</option>
+            </select></label>
+            <label>How did your last mock go?<select className="ob-input" value={lastMock} onChange={e => setLastMock(e.target.value)}>
+              <option value="">Leave unanswered</option><option value="not_taken">I haven’t taken one</option>
+              <option value="below_target">Below my target</option><option value="near_target">Near my target</option>
+              <option value="on_target">At or above my target</option><option value="unscored">I don’t have a score yet</option>
+            </select></label>
           </div>
-          {mockDate && (
-            <div className="ob-window-row mt-3">
-              <label className="fine-print" htmlFor="mock-label">Called</label>
-              <input id="mock-label" className="ob-input" maxLength={80} placeholder="Coaching mock (optional)" value={mockLabel} onChange={e => setMockLabel(e.target.value)} />
-              <label className="fine-print" htmlFor="mock-start">Starts</label>
-              <input id="mock-start" type="time" className="ob-input" value={mockStart} onChange={e => setMockStart(e.target.value)} />
-              <label className="fine-print" htmlFor="mock-length">Length</label>
-              <select id="mock-length" className="ob-input" value={mockLength} onChange={e => setMockLength(e.target.value)}>
-                <option value="">Not set</option>
-                {[60, 90, 120, 180, 240, 300].map(m => <option key={m} value={m}>{m / 60} h</option>)}
-              </select>
-              <p className="fine-print">Only the date is needed. This is your next planned mock; any others you have added stay as they are. Manage them in Calendar.</p>
+          {lastMock === 'below_target' ? <p className="fl-hint">Use the topic choices above to mark where you want to focus. A mock feeling alone doesn’t identify weak topics.</p> : null}
+        </details>
+      )}
+
+      {stage && (
+        <section>
+          <details className="fl-more" open={!!mockDate}>
+            <summary>Add an upcoming mock <span>optional</span></summary>
+            <div className="fl-fields">
+              <label>Date<input id="mock-date" type="date" className="ob-input" min={today} value={mockDate} onChange={e => setMockDate(e.target.value)} /></label>
+              <label>Type<select id="mock-kind" className="ob-input" value={mockKind} onChange={e => setMockKind(e.target.value as MockKind)}>
+                {MOCK_KINDS.map(k => <option key={k} value={k}>{MOCK_KIND_LABEL[k]}</option>)}
+              </select></label>
+              {mockDate && <>
+                <label>Called<input id="mock-label" className="ob-input" maxLength={80} placeholder="Coaching mock" value={mockLabel} onChange={e => setMockLabel(e.target.value)} /></label>
+                <label>Starts<input id="mock-start" type="time" className="ob-input" value={mockStart} onChange={e => setMockStart(e.target.value)} /></label>
+                <label>Length<select id="mock-length" className="ob-input" value={mockLength} onChange={e => setMockLength(e.target.value)}>
+                  <option value="">Not set</option>
+                  {[60, 90, 120, 180, 240, 300].map(m => <option key={m} value={m}>{m / 60} h</option>)}
+                </select></label>
+                <button type="button" className="text-button" onClick={() => setMockDate('')}>Remove mock</button>
+              </>}
             </div>
-          )}
+          </details>
         </section>
       )}
     </div>

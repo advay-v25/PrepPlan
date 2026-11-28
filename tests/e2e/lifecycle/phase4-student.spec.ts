@@ -22,7 +22,7 @@ test.describe.configure({ mode: 'serial' })
  * (`min`), so an injected fault that never happens fails too. Anything else — another URL, another status, the same request in another step — is unexpected and fails
  * the run. Console "Failed to load resource" errors are accepted only when they point at a request an active rule covers (the browser location of the message).
  */
-type Rule = { label: string; url: RegExp; statuses?: number[]; failed?: 'any' | 'aborted-rsc'; min: number; max: number; seen: number }
+type Rule = { label: string; url: RegExp; statuses?: number[]; failed?: 'any' | 'aborted-rsc' | 'aborted-get'; min: number; max: number; seen: number }
 const active: Rule[] = []
 async function expecting<T>(rules: Omit<Rule, 'seen'>[], fn: () => Promise<T>): Promise<T> {
   const rs = rules.map(r => ({ ...r, seen: 0 })); active.push(...rs)
@@ -35,7 +35,12 @@ const NAV_ABORT: Omit<Rule, 'seen'> = { label: 'a Next.js RSC prefetch aborted b
 test.beforeEach(({ page }) => {
   page.on('requestfailed', r => {
     const abortedRsc = /[?&]_rsc=/.test(r.url()) && r.failure()?.errorText === 'net::ERR_ABORTED'
-    const hit = active.find(x => x.seen < x.max && x.url.test(r.url()) && x.failed && (x.failed === 'any' || abortedRsc))
+    // Local-stack runs use a Next DEV server; React Strict Mode mounts effects twice there and cancels the first attempt read. Only that one GET, only in that profile.
+    if (process.env.E2E_SUITE === 'local-stack' && r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED' && /\/api\/tests\/attempt\/[0-9a-f-]{36}$/.test(new URL(r.url()).pathname)) return
+    const hit = active.find(x => x.seen < x.max && x.url.test(r.url()) && (
+      x.failed === 'any' || (x.failed === 'aborted-rsc' && abortedRsc)
+      || (x.failed === 'aborted-get' && r.method() === 'GET' && r.failure()?.errorText === 'net::ERR_ABORTED')
+    ))
     if (hit) hit.seen++; else S.unexpected.push(`requestfailed ${r.url()} ${r.failure()?.errorText}`)
   })
   page.on('response', r => {
@@ -166,6 +171,46 @@ test('Tests: a failed preview read is honest, a missing bank is stated, Start cr
     await noHorizontalOverflow(page)
     await page.locator('.next-up a.next-up__cta').click()
     await expect(page).toHaveURL(new RegExp(`/app/tests/${S.attemptId}$`))
+  })
+})
+
+test('logging another reading changes live scope and preserves the reserved paper', async ({ page }) => {
+  await login(page, db, S.email, '/app/tests')
+  const readScope = async () => {
+    const response = await page.request.get('/api/tests/scope')
+    expect(response.ok()).toBe(true)
+    return (await response.json()).preview.scope as { revision: string; targets: { readingId: string }[] }
+  }
+  const frozen = async () => {
+    const { data: attempt } = await db.from('assessment_attempts').select('form_id,deadline_at').eq('id', S.attemptId).eq('user_id', S.id).single().throwOnError()
+    const [form, items, scope] = await Promise.all([
+      db.from('assessment_forms').select('scoring_policy').eq('id', attempt!.form_id).single().throwOnError(),
+      db.from('form_items').select('item_id,item_version,sequence_number').eq('form_id', attempt!.form_id).order('sequence_number').throwOnError(),
+      db.from('paper_scope_snapshots').select('scope,revision').eq('attempt_id', S.attemptId).single().throwOnError(),
+    ])
+    return { attempt, form: form.data, items: items.data, scope: scope.data }
+  }
+  await rec.browser('a new study log changes available scope; reopening the attempt preserves its form, scope, clock and scoring policy', async () => {
+    const before = await readScope()
+    const reading = ['r030', 'r031', 'r034', 'r035'].find(id => !before.targets.some(t => t.readingId === id))!
+    const pinned = await frozen()
+    const navigation = process.env.E2E_SUITE === 'local-stack' ? [NAV_ABORT, {
+      label: 'dev remount cancels the first reading context read', url: new RegExp(`/api/log-learning\\?reading=${reading}$`), failed: 'aborted-get' as const, min: 0, max: 1,
+    }] : [NAV_ABORT]
+    await expecting(navigation, async () => {
+      await page.goto(`/app/log?reading=${reading}`)
+      await page.getByRole('checkbox').first().check()
+      await page.getByRole('button', { name: '45m' }).click()
+      await page.getByRole('button', { name: 'Save', exact: true }).click()
+      await expect(page.getByRole('heading', { name: 'Session logged.' })).toBeVisible()
+      const after = await readScope()
+      expect(after.revision).not.toBe(before.revision)
+      expect(after.targets.some(t => t.readingId === reading)).toBe(true)
+      await page.goto(`/app/tests/${S.attemptId}`)
+      await expect(page.locator('#q-h')).toBeVisible()
+      expect(await frozen()).toEqual(pinned)
+      expect(await attempts()).toBe(1)
+    })
   })
 })
 
@@ -355,4 +400,121 @@ test('the re-check: placed from the result, refused before the spacing, fresh in
     expect(th.every(t => (t.status === 'closed' ? String(t.closure_reason).startsWith('supported_on_check') : t.status === 'awaiting_recheck'))).toBe(true)
   })
   void addDays
+})
+
+test('a reviewer keeps one challenged question and voids another; the student sees both decisions', async ({ page, browser }) => {
+  const reviewer = await db.auth.admin.createUser({ email: `p4challenge+${RUN}@example.com`, email_confirm: true })
+  expect(reviewer.error).toBeNull()
+  const user = reviewer.data.user!
+  owned.push(user.id)
+  await db.from('profiles').upsert({ id: user.id, onboarding_status: 'complete' }).throwOnError()
+  await db.from('user_roles').insert({ user_id: user.id, role: 'diagnostic_reviewer' }).throwOnError()
+  const resultUrl = `/app/tests/${S.attemptId}/result`
+  await login(page, db, S.email, resultUrl)
+  const score = async () => (await db.from('assessment_attempts').select('delivered_count,scoreable_count,score').eq('id', S.attemptId).single().throwOnError()).data!
+  const before = await score()
+  const openQuestions = async () => {
+    const details = page.locator('details').filter({ has: page.getByRole('heading', { name: 'Every question, and why', exact: true }) })
+    if (await details.getAttribute('open') === null) await details.locator('summary').click()
+    await details.getByRole('tab', { name: /^All\b/ }).click()
+    return details.locator('.review-item')
+  }
+  const expand = async (question: ReturnType<Page['locator']>) => {
+    const button = question.locator('.review-item__head')
+    if (await button.getAttribute('aria-expanded') === 'false') await button.click()
+  }
+  // Evidence counted per concept, exactly as the result page states it ("… · N valid").
+  const conceptValid = async () => {
+    const lines = await page.locator('li').filter({ hasText: /· \d+ valid/ }).allTextContents()
+    return new Map(lines.map(t => [t.split(' — ')[0], Number(/· (\d+) valid/.exec(t)![1])]))
+  }
+  const basis = page.locator('[data-score-basis]')
+  const hero = page.locator('#res-h')
+  const validBefore = await conceptValid()
+  const heroBefore = await hero.innerText()
+  expect(validBefore.size).toBeGreaterThan(0)
+  const questions = await openQuestions()
+  const report = [`Fixture wording check ${RUN}`, `Fixture arithmetic check ${RUN}`]
+  for (const [i, detail] of report.entries()) {
+    const question = questions.nth(i)
+    await expand(question)
+    await question.getByRole('button', { name: 'Something is wrong with this question' }).click()
+    const dialog = page.getByRole('dialog', { name: 'Challenge this question' })
+    await dialog.getByLabel('Detail').fill(detail)
+    await dialog.getByRole('button', { name: 'Raise challenge' }).click()
+    await expect(question).toContainText('under review, still counted for now')
+  }
+  const { data: challenged } = await db.from('item_challenges').select('item_id, comment').eq('attempt_id', S.attemptId).throwOnError()
+  const evidence = async () => (await db.from('evidence_events').select('item_id, validity').eq('attempt_id', S.attemptId).throwOnError()).data!
+  expect((await evidence()).filter(e => e.validity === 'disputed')).toHaveLength(2)
+  expect(await score()).toEqual(before)
+  // The two challenged items, with their ORIGINAL question numbers on this paper and the concept each one informs.
+  const { data: form } = await db.from('assessment_attempts').select('form_id').eq('id', S.attemptId).single().throwOnError()
+  const target = await Promise.all(report.map(async text => {
+    const itemId = challenged!.find(c => c.comment === text)!.item_id as string
+    const { data: f } = await db.from('form_items').select('sequence_number').eq('form_id', form!.form_id).eq('item_id', itemId).single().throwOnError()
+    const { data: item } = await db.from('assessment_items').select('concept:curriculum_concepts(name)').eq('id', itemId).single().throwOnError()
+    return { itemId, seq: f!.sequence_number as number, concept: (item!.concept as unknown as { name: string }).name }
+  }))
+  const expectedValid = (excluded: typeof target) => new Map([...validBefore].map(([k, v]) => [k, v - excluded.filter(t => t.concept === k).length]))
+  const sameCounts = async (excluded: typeof target) => {
+    const now = await conceptValid()
+    for (const [k, v] of expectedValid(excluded)) expect(now.get(k) ?? 0, `valid evidence for ${k}`).toBe(v)
+  }
+
+  // PENDING: still in the score and marked provisional; out of the evidence.
+  await page.reload()
+  await expect(basis).toContainText('2 under review, counted for now')
+  await expect(hero).toHaveText(heroBefore)
+  await expect(basis).toBeVisible()
+  await expect(page.getByText(/2 questions are under challenge/)).toHaveCount(1)   // in the collapsed integrity notes; the score line above says it openly
+  await expect(page.locator('body')).toContainText(`question ${target[0].seq} (under review, still counted in the score)`)
+  await expect(page.locator('body')).toContainText(`question ${target[1].seq} (under review, still counted in the score)`)
+  await sameCounts(target)
+  await noHorizontalOverflow(page)
+
+  const reviewerPage = await browser.newPage({ viewport: page.viewportSize()! })
+  try {
+    await login(reviewerPage, db, user.email!, '/app/tests/review/challenges')
+    await reviewerPage.locator('.rv-panel').filter({ hasText: report[0] }).getByRole('button', { name: 'Keep the question and the evidence' }).click()
+    await expect(reviewerPage.locator('.rv-panel').filter({ hasText: report[0] })).toContainText('Resolved: kept')
+    // KEPT (while the other is still pending): its evidence is restored and its pending label is gone; the other stays provisional.
+    await page.reload()
+    await expect(basis).toContainText('1 under review, counted for now')
+    await expect(page.locator('body')).not.toContainText(`question ${target[0].seq} (under review`)
+    await expect(page.locator('body')).toContainText(`question ${target[1].seq} (under review, still counted in the score)`)
+    await expect(hero).toHaveText(heroBefore)
+    await sameCounts([target[1]])
+    await expand((await openQuestions()).nth(0))
+    await expect(page.getByText(/your report was reviewed and the question stands/i)).toBeVisible()
+    expect(await score()).toEqual(before)
+    await reviewerPage.locator('.rv-panel').filter({ hasText: report[1] }).getByRole('button', { name: 'The question is defective: void the evidence' }).click()
+    await expect(reviewerPage.locator('.rv-panel').filter({ hasText: report[1] })).toContainText('Resolved: voided')
+    await noHorizontalOverflow(reviewerPage)
+  } finally {
+    await reviewerPage.context().close()
+  }
+  const validity = new Map((await evidence()).map(e => [e.item_id, e.validity]))
+  expect(validity.get(challenged!.find(c => c.comment === report[0])!.item_id)).toBe('valid')
+  expect(validity.get(challenged!.find(c => c.comment === report[1])!.item_id)).toBe('voided')
+  expect(await score()).toMatchObject({ delivered_count: before.delivered_count, scoreable_count: before.scoreable_count - 1 })
+  await page.reload()
+  await expect(page.locator('[data-adjusted]')).toContainText('this result was adjusted')
+  const resolved = await openQuestions()
+  await expand(resolved.nth(0))
+  await expect(page.getByText(/your report was reviewed and the question stands/i)).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Questions set aside after review' })).toContainText('your report was upheld')
+  await expect(page.getByText(/questions? (is|are) under challenge/i)).toHaveCount(0)
+  // VOIDED: removed from the denominator once, named by its original number, and its evidence withdrawn.
+  await expect(page.getByRole('list', { name: 'Questions set aside after review' }).getByRole('listitem')).toHaveText([`Question ${target[1].seq}: your report was upheld and this question was set aside.`])
+  await expect(basis).toContainText('1 set aside')
+  await expect(basis).not.toContainText('under review')
+  await expect(hero).toContainText(`of ${(before.scoreable_count as number) - 1} correct`)
+  await expect(page.locator('body')).toContainText(`question ${target[1].seq} (set aside after review)`)
+  await sameCounts([target[1]])
+  const settled = await score()
+  await page.reload()
+  await expect(hero).toContainText(`of ${(before.scoreable_count as number) - 1} correct`)
+  expect(await score()).toEqual(settled)
+  await noHorizontalOverflow(page)
 })

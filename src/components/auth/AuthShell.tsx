@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 
 /**
  * One frame for every authentication screen (sign in, sign up, reset, verify, errors): brand and one link at the top, the form in a centred column,
- * and an optional dark panel on the right. With no panel the screen is a single centred card, so all of them line up.
+ * and an optional dark panel on the right. With no panel the screen is a single centred column, so all of them line up.
  */
 export function AuthShell({ top, aside, children }: { top?: ReactNode; aside?: ReactNode; children: ReactNode }) {
   return (

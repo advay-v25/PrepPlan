@@ -10,6 +10,7 @@ import { loadEligibleItemPool } from './itemPool'
 import { planRepairCheck } from './repairCheck'
 import { MAX_ASSESSMENT_QUESTIONS, MIN_PAPER_QUESTIONS, PRACTICE_QUESTIONS, estimatedMinutes, practiceMinutes } from './limits'
 import type { CompletedCycleScope, ScopeTarget } from './completedScope'
+import { topicWeightRows } from '../curriculum/referenceReads'
 
 /**
  * THE assessment decision. Tests, Calendar, /api/tests/preflight, /api/tests/start, reading/subject checks, re-checks and the
@@ -117,7 +118,7 @@ async function sourceVersion(userId: string): Promise<string | null> {
 }
 
 async function subjectWeights(): Promise<SubjectWeight[]> {
-  const { data } = await createAdminClient().from('topics').select('id, exam_weight_min, exam_weight_max').throwOnError()
+  const data = await topicWeightRows()
   return (data ?? []).map(t => ({ id: t.id as string, min: Number(t.exam_weight_min), max: Number(t.exam_weight_max) }))
 }
 
@@ -239,11 +240,14 @@ export async function decideAssessment(userId: string, input: DecisionInput, opt
   // Read BEFORE the scope is built: an edit landing after this point makes the reservation refuse instead of reserving from an old scope.
   const scopeSource = input.baseline ? null : await sourceVersion(userId)
   const manifestId = await getPaperManifestId()
-  const cycleId = (await activeCycleId(userId).catch(() => undefined)) ?? null
+  // A failed read is not "no open week": it is reported as unavailable with a retry, never as an empty inventory.
+  let cycleReadFailed = false
+  const cycleId = (await activeCycleId(userId).catch(() => { cycleReadFailed = true; return undefined })) ?? null
 
   if (input.kind === 'weekly') {
     const part = Math.max(1, Math.floor(input.part ?? 1))
     const d0 = base('weekly', { part })
+    if (cycleReadFailed) return { decision: { ...d0, state: 'unavailable', purposeLabel: 'Weekly paper', message: 'Your week could not be read just now, so nothing is shown as missing. Try again.', next: { label: 'Try again', href: '/app/tests' } }, plan: noPlan() }
     if (!cycleId) return { decision: { ...d0, state: 'no_cycle', purposeLabel: 'Weekly paper', message: 'There is no open week, so there is no weekly paper. Prepare your week in Calendar first.', next: NEXT.calendar }, plan: noPlan() }
     const open = await findOpenAttempt(userId, 'weekly', { cycleId })
     if (open) return { decision: { ...d0, state: 'resume', attemptId: open.id, minutes: estimatedMinutes(open.questions), deliverable: open.questions, timed: open.timed }, plan: noPlan({ cycleId }) }

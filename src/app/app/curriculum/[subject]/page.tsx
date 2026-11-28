@@ -30,10 +30,13 @@ export default async function SubjectPage({ params, searchParams }: { params: Pr
   const data = await getSubjectReadings(subjectId)
   if (!data) notFound()
   const { subject, readings } = data
-  const noteRead = tab === 'notes' ? await supabase.from('curriculum_notes').select('doc, revision').eq('scope_type', 'subject').eq('scope_id', subject.id).maybeSingle() : null
+  const [noteRead, tracker, overview] = await Promise.all([
+    tab === 'notes' ? supabase.from('curriculum_notes').select('doc, revision').eq('scope_type', 'subject').eq('scope_id', subject.id).maybeSingle() : null,
+    tab === 'work' ? getLosTracker(user.id) : null,
+    tab === 'work' ? getRevisionOverview(user.id).catch(() => null) : null,
+  ])
   const note = noteRead?.data, noteError = noteRead?.error
-  const [tracker, overview] = await Promise.all([getLosTracker(user.id), getRevisionOverview(user.id).catch(() => null)])
-  const status = new Map((tracker.topics.find(t => t.id === subject.id)?.modules ?? []).map(m => [m.id, m]))
+  const status = new Map((tracker?.topics.find(t => t.id === subject.id)?.modules ?? []).map(m => [m.id, m]))
   const shownReadings = q ? readings.filter(r => `${r.title} reading ${r.readingNo}`.toLowerCase().includes(q.toLowerCase())) : readings
   const COVER: Record<string, string> = { taught: 'Covered in class', studied: 'Studied', verified: 'Verified by a paper', decaying: 'Going stale' }
 

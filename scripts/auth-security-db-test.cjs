@@ -84,6 +84,30 @@ async function main() {
   const linked = (await client.query('select f.id form, b.id blueprint from public.assessment_forms f join public.assessment_blueprints b on b.id=f.blueprint_id')).rows
   await client.query('rollback')
   check(linked.length === 1 && linked[0].form === f1 && linked[0].blueprint === b1, 'one student reads their form and blueprint only')
+
+  await client.query(`
+    alter table auth.users add column if not exists raw_user_meta_data jsonb;
+    create table public.profiles (id uuid primary key, display_name text, untouched boolean);
+    insert into public.profiles (id, display_name) values ('${u1}', 'Old123');
+  `)
+  await client.query(fs.readFileSync('supabase/migrations/20270129_profile_name_validation.sql', 'utf8'))
+  await client.query('create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user()')
+  const created = randomUUID()
+  await client.query('insert into auth.users (id, raw_user_meta_data) values ($1,$2)', [created, { full_name: 'Name42' }])
+  check(await value(client, "select display_name = 'Student' value from public.profiles where id = $1", [created]), 'unexpected provider metadata gets a safe profile name')
+  await client.query('update public.profiles set untouched=true where id=$1', [u1])
+  await assert.rejects(client.query('update public.profiles set display_name=$2 where id=$1', [u1, 'Name42']), { code: '23514' })
+  passes++
+  for (const bad of ["-Anne", "Anne-", "Anne--Marie", "O''Brien", "O'-Brien", "Anne - Marie", "O'"]) await assert.rejects(client.query('update public.profiles set display_name=$2 where id=$1', [u1, bad]), { code: '23514' })
+  passes++
+  for (const good of ['Anne-Marie', "O'Brien", 'O’Brien']) await client.query('update public.profiles set display_name=$2 where id=$1', [u1, good])
+  passes++
+  const imported = randomUUID()
+  await client.query('insert into auth.users (id, raw_user_meta_data) values ($1,$2)', [imported, { full_name: 'Anne-Marie  O’Brien' }])
+  check(await value(client, "select display_name = 'Anne-Marie O’Brien' value from public.profiles where id = $1", [imported]), 'Google-imported hyphen and apostrophe names are kept and tidied')
+  await client.query('update public.profiles set display_name=$2 where id=$1', [u1, 'आदित्य शिंदे'])
+  check(await value(client, 'select untouched and display_name = $2 value from public.profiles where id=$1', [u1, 'आदित्य शिंदे']), 'legacy profiles remain editable and legitimate Unicode names save')
+  check(await value(client, "select not has_function_privilege('anon','public.valid_profile_name(text)','EXECUTE') value"), 'database name validation is private')
   console.log(passes + ' database security checks passed')
 }
 

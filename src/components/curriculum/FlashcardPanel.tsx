@@ -1,5 +1,6 @@
 'use client'
 
+import { WhenReady } from '../ui/WhenReady'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FlashcardReview } from './FlashcardReview'
 import { NoteCardDrafter } from './NoteCardDrafter'
@@ -26,22 +27,40 @@ export function FlashcardPanel({ scopeType, scopeId, label }: { scopeType: 'subj
   const [message, setMessage] = useState<{ kind: 'error' | 'info'; text: string } | null>(null)
   const [busy, setBusy] = useState(false)
   const keys = useRef(keyring()); const addRef = useRef<HTMLInputElement>(null); const listRef = useRef<HTMLUListElement>(null)
+  const latest = useRef(0)   // replies can arrive out of order: only the newest list request may change what is shown
+  // What the student has chosen NOW. A change that lands late must reload this, not the selection it was started under.
+  const chosen = useRef({ filter, applied }); chosen.current = { filter, applied }
+  const wanted = useRef(PAGE)   // how many cards the student has asked to see
 
-  const fetchPage = useCallback(async (offset: number) => {
-    const qs = new URLSearchParams({ scopeType, scopeId, limit: String(PAGE), offset: String(offset), filter })
+  const fetchPage = useCallback(async (offset: number, limit = PAGE) => {
+    const { filter, applied } = chosen.current
+    const qs = new URLSearchParams({ scopeType, scopeId, limit: String(limit), offset: String(offset), filter })
     if (applied) qs.set('q', applied)
     const res = await fetch(`/api/curriculum/flashcards?${qs}`), b = await res.json().catch(() => null)
     if (!res.ok || !b?.ok) throw new Error(b?.error ?? 'Your cards could not be loaded. Nothing was changed.')
     return b as Page
-  }, [scopeType, scopeId, filter, applied])
+  }, [scopeType, scopeId])
+  /** Reloads the current selection, as many cards of it as are wanted (the server gives at most 100 a request). */
   const load = useCallback(async () => {
-    setLoadError(null)
-    try { setPage(await fetchPage(0)) } catch (e) { setLoadError((e as Error).message === 'Failed to fetch' ? 'Could not reach the server. Nothing was changed.' : (e as Error).message) }
+    setLoadError(null); setMoreError(null)
+    const mine = ++latest.current
+    try {
+      const next = await fetchPage(0, Math.min(wanted.current, 100))
+      while (mine === latest.current && next.cards.length < Math.min(wanted.current, next.matching)) {
+        const rest = await fetchPage(next.cards.length, Math.min(wanted.current - next.cards.length, 100))
+        if (!rest.cards.length) break
+        next.cards = [...next.cards, ...rest.cards]
+      }
+      if (mine === latest.current) setPage(next)
+    } catch (e) { if (mine === latest.current) setLoadError((e as Error).message === 'Failed to fetch' ? 'Could not reach the server. Nothing was changed.' : (e as Error).message) }
   }, [fetchPage])
-  useEffect(() => { setPage(null); void load() }, [load])
+  // A new filter or search starts again from its first page.
+  useEffect(() => { wanted.current = PAGE; setPage(null); void load() }, [load, filter, applied])
   async function more() {
     if (!page) return; setMoreError(null)
-    try { const next = await fetchPage(page.cards.length); setPage({ ...next, cards: [...page.cards, ...next.cards] }) } catch (e) { setMoreError((e as Error).message) }
+    wanted.current = page.cards.length + PAGE
+    const mine = ++latest.current
+    try { const next = await fetchPage(page.cards.length); if (mine === latest.current) setPage({ ...next, cards: [...page.cards, ...next.cards] }) } catch (e) { if (mine === latest.current) setMoreError((e as Error).message) }
   }
 
   const fail = (text: string) => setMessage({ kind: 'error', text })
@@ -86,6 +105,7 @@ export function FlashcardPanel({ scopeType, scopeId, label }: { scopeType: 'subj
   if (reviewCards) return <FlashcardReview cards={reviewCards} onDone={() => { setReviewCards(null); void load() }} />
   const due = page?.dueCount ?? 0
   return (
+    <WhenReady>
     <div className="flashcards">
       <div className="flashcards__head">
         <span role="status">{loadError ? 'Cards unavailable' : page === null ? 'Loading…' : `${page.total} card${page.total === 1 ? '' : 's'} · ${due} due now`}</span>
@@ -141,6 +161,7 @@ export function FlashcardPanel({ scopeType, scopeId, label }: { scopeType: 'subj
       {page && page.cards.length < page.matching && <p><button type="button" className="secondary-button" onClick={more}>Show more ({page.matching - page.cards.length} more)</button></p>}
       {moreError && <p role="alert" className="review-error">{moreError} <button type="button" className="text-button" onClick={more}>Try again</button></p>}
     </div>
+    </WhenReady>
   )
 }
 

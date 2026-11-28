@@ -5,13 +5,26 @@
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import { createStudent } from '../../../scripts/lib/e2eSession'
-import { admin, login, noHorizontalOverflow, recorder, RUN } from './helpers'
+import { addDays, admin, login, noHorizontalOverflow, recorder, RUN, zoneAtLocalHour } from './helpers'
+import { todayInZone } from '../../../src/lib/planning/studyWeek'
 import { scopedErrors } from './scopedErrors'
 
 const db = admin(), rec = recorder(), owned: string[] = []
 const S = { id: '', email: '' }, se = scopedErrors(), unexpected = se.unexpected
+// The student's clock is known: a zone where it is mid-morning now, so "today" and its two tasks do not depend on when the suite runs.
+const ZONE = zoneAtLocalHour(10, 11, 9)
+test.use({ timezoneId: ZONE })
 test.describe.configure({ mode: 'serial' })
-test.beforeAll(async () => { const a = await createStudent(db, `ph${RUN}`, { onboard: true, register: id => owned.push(id) }); S.id = a.id; S.email = a.email })
+test.beforeAll(async () => {
+  const a = await createStudent(db, `ph${RUN}`, { onboard: true, register: id => owned.push(id), onboarding: { exam: { timezone: ZONE } } }); S.id = a.id; S.email = a.email
+  // Exactly two eligible tasks today: the first sitting of two different readings. Anything else the planner put on today moves to tomorrow.
+  const today = todayInZone(ZONE)
+  const open = (await db.from('plan_blocks').select('id, lm_id, title, local_date').eq('user_id', S.id).eq('task_type', 'study').eq('execution', 'not_started').is('cancelled_at', null).order('local_date').order('title').throwOnError()).data!
+  const two = [...new Map(open.filter(b => !/ · sitting (?!1 )\d+ of /.test(b.title)).map(b => [b.lm_id, b])).values()].slice(0, 2)
+  expect(two, 'the seeded week needs first sittings of two readings').toHaveLength(2)
+  await db.from('plan_blocks').update({ local_date: addDays(today, 1), day: addDays(today, 1) }).eq('user_id', S.id).eq('local_date', today).throwOnError()
+  await db.from('plan_blocks').update({ local_date: today, day: today, placement: 'day_preferred', starts_at: null }).in('id', two.map(b => b.id)).throwOnError()
+})
 test.beforeEach(({ page }) => se.attach(page))
 test.afterAll(async ({}, info) => {
   const cleanup: { what: string; ok: boolean }[] = []
@@ -42,7 +55,7 @@ test('Home: one next action, report partial minutes, reload, defer, undo, stale 
   rec.rows.push({ step: `seed check: ${rows.length} plan blocks`, status: 'pass', how: 'endpoint-supplement' })
   expect(rows.length).toBeGreaterThan(0)
   const today = page.locator('section.today')
-  test.skip(!(await today.locator('li.today__row').count()), 'no second task today (the only one is the featured next action); Calendar spec covers the week')
+  await expect(today.locator('li.today__row'), 'one task is featured, the other is listed').toHaveCount(1)
   const first = today.locator('li.today__row').first()
   const title = (await first.locator('.today__title').innerText()).trim()
   const id = rows.find(r => r.title === title)?.id
@@ -74,7 +87,7 @@ test('Home: one next action, report partial minutes, reload, defer, undo, stale 
   })
   await rec.browser('a second tab holding the old revision is refused and writes nothing', async () => {
     await page.goto(`/app/calendar?view=agenda&week=${rows.find(r=>r.id===id)!.local_date}&task=${id}`)
-    const ctx2 = await browser.newContext({ storageState: await page.context().storageState(), viewport: page.viewportSize()!, timezoneId: 'Europe/London', locale: 'en-GB' })
+    const ctx2 = await browser.newContext({ storageState: await page.context().storageState(), viewport: page.viewportSize()!, timezoneId: ZONE, locale: 'en-GB' })
     const p2 = await ctx2.newPage(); se.attach(p2); await p2.goto(page.url()); await expect(p2.getByRole('dialog')).toContainText(title)
     await expect(p2.getByRole('dialog').getByText('Loading outcomes…',{exact:true})).toHaveCount(0)
     // the first tab changes the task; the second tab still holds the earlier revision

@@ -25,7 +25,7 @@ const shortDay = (d: string) => formatStudyDate(d, 'short')
  * with the rarer actions in a menu. Every write is a revision-guarded PATCH through the hook Calendar uses, so a stale tab is refused
  * and what the student typed is kept. Only completed counts as done. Order comes from the shared work model, never from this component.
  */
-export function TodaySequence({ work, featuredId, today, timezone }: { work: WorkModel; featuredId?: string | null; today: string; timezone: string }) {
+export function TodaySequence({ work, featuredId, today, timezone, quiet = false }: { work: WorkModel; featuredId?: string | null; today: string; timezone: string; quiet?: boolean }) {
   const m = useTaskMutation()
   const [ask, setAsk] = useState<Ask>(null)
   const [minutes, setMinutes] = useState('')
@@ -47,6 +47,24 @@ export function TodaySequence({ work, featuredId, today, timezone }: { work: Wor
     if (r == null) return 'Partly done · time not reported'
     const unk = t.timeUnknown ? ' (some time not reported)' : ''
     return r >= p && p > 0 ? `Partly done · ${r} min reported. Its ${p} min planned allocation is used, and it is still open${unk}` : `Partly done · ${r} of ${p} min reported${unk}`
+  }
+
+  // What was finished today, one list for the full card and for the quiet one below.
+  const completedList = work.completedToday.length > 0 && (
+    <details suppressHydrationWarning className="today__done-list">
+      <summary>Completed today ({work.completedToday.length}){work.reportedMinutesToday > 0 ? ` · ${work.reportedMinutesToday} min reported` : ''}</summary>
+      <ul>{work.completedToday.map(t => <li key={t.id}><Check size={13} aria-hidden /> {t.title} · {t.reportedMinutes != null ? `${t.reportedMinutes} min reported` : <>{t.durationMinutes} min planned <span className="chip-muted">Time not reported</span></>}</li>)}</ul>
+    </details>
+  )
+  // The next-action card already says today is done. Repeating "nothing else is planned" in a second card only pushes the week down, so when nothing is open,
+  // deferred or unplaced the card shrinks to what is still useful: what was finished, and the way to the full day.
+  if (quiet && rows.length === 0 && work.completedToday.length > 0 && work.deferred.length === 0 && work.unplaced === 0) {
+    return (
+      <section className="home-card today today--quiet" aria-label="Completed today">
+        {completedList}
+        <p><Link href={`/app/calendar?view=agenda&week=${today}`} className="text-button">Full day &rarr;</Link></p>
+      </section>
+    )
   }
 
   async function run(t: PlanBlock, body: Record<string, unknown>, undoMessage: string) {
@@ -97,7 +115,7 @@ export function TodaySequence({ work, featuredId, today, timezone }: { work: Wor
                 <div className="today__actions">
                   <Link className={t.assessmentControl.kind === 'waiting' || t.assessmentControl.kind === 'unavailable' ? 'text-button' : 'primary-button is-sm'} href={t.assessmentControl.href}>{t.assessmentControl.label}</Link>
                   {t.assessmentControl.note && <span className="fine-print">{t.assessmentControl.note}</span>}
-                  <details className="today__more">
+                  <details suppressHydrationWarning className="today__more">
                     <summary aria-label={`More actions for ${t.title}`}>More</summary>
                     <button type="button" className="text-button" disabled={m.busy} onClick={() => void run(t, { execution: 'deferred' }, 'Deferred')}>Defer</button>
                   </details>
@@ -109,7 +127,7 @@ export function TodaySequence({ work, featuredId, today, timezone }: { work: Wor
                     <Check size={15} aria-hidden /> Done
                   </button>
                   <button type="button" className="text-button" disabled={m.busy} onClick={() => setAsk({ id: t.id, kind: 'partial' })} aria-label={`Mark ${t.title} partly done`}>Partly done</button>
-                  <details className="today__more">
+                  <details suppressHydrationWarning className="today__more">
                     <summary aria-label={`More actions for ${t.title}`}>More</summary>
                     <button type="button" className="text-button" disabled={m.busy} onClick={() => void run(t, { execution: 'deferred' }, 'Deferred')}>Defer</button>
                     <button type="button" className="text-button" disabled={m.busy} onClick={() => void run(t, { execution: 'skipped' }, 'Skipped')}>Skip</button>
@@ -128,12 +146,7 @@ export function TodaySequence({ work, featuredId, today, timezone }: { work: Wor
         </footer>
       )}
 
-      {work.completedToday.length > 0 && (
-        <details className="today__done-list">
-          <summary>Completed today ({work.completedToday.length})</summary>
-          <ul>{work.completedToday.map(t => <li key={t.id}><Check size={13} aria-hidden /> {t.title} · {t.reportedMinutes != null ? `${t.reportedMinutes} min reported` : <>{t.durationMinutes} min planned <span className="chip-muted">Time not reported</span></>}</li>)}</ul>
-        </details>
-      )}
+      {completedList}
       {work.deferred.length > 0 && (
         <div className="home-card__note" role="group" aria-label="Deferred work">
           <p>{work.deferred.length} deferred: set aside, not done. Each can be given another time.</p>

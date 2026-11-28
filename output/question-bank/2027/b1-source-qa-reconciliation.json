@@ -1,0 +1,27 @@
+{
+  "schema": "b1-source-qa-reconciliation.1",
+  "date": "2026-11-25",
+  "totalSources": 16,
+  "officialVolumes": 10,
+  "prerequisiteBooks": 2,
+  "schweserScans": 4,
+  "schweserOcrPagesTotal": 1424,
+  "queuedFormulaSuspectPages": 48,
+  "agentVisualInspectionCompleted": 48,
+  "qualifiedHumanSignOffCompleted": 0,
+  "rawOcrExcludedFromGrounding": true,
+  "visualQaEvidence": [
+    "content/source-packs/private/reference-2027/closeout/visual-qa.reference",
+    "content/source-packs/private/reference-2027/closeout/ocr-qa/pages.reference"
+  ],
+  "observedSourceDefectsQuarantined": [
+    { "source": "schweser-qm-eco-cf", "pdfPage": 99, "issue": "Unlabelled answer-key continuation; excluded from grounding.", "bankItemsRelyingOnPage": 0 },
+    { "source": "schweser-qm-eco-cf", "pdfPage": 169, "issue": "Inconsistent sum/product cumulative-return expressions; excluded.", "bankItemsRelyingOnPage": 0 },
+    { "source": "schweser-qm-eco-cf", "pdfPage": 427, "issue": "Two-asset variance expression missing factor 2 on covariance; excluded.", "bankItemsRelyingOnPage": 0 },
+    { "source": "schweser-qm-eco-cf", "pdfPage": 443, "issue": "Overprinted/crossed-out dense reference text; excluded.", "bankItemsRelyingOnPage": 0 },
+    { "source": "schweser-fi-der", "pdfPage": 268, "issue": "Equity replication bullet omitting subtraction of debt from assets-plus-put; excluded.", "bankItemsRelyingOnPage": 0 },
+    { "source": "schweser-ai-pc-ethics", "pdfPage": 87, "issue": "Quiz/quiz continuation sharing page with factual material; excluded.", "bankItemsRelyingOnPage": 0 },
+    { "source": "schweser-ai-pc-ethics", "pdfPage": 109, "issue": "Quiz/quiz continuation sharing page with factual material; excluded.", "bankItemsRelyingOnPage": 0 }
+  ],
+  "note": "All 48 suspect Schweser OCR pages have been visually inspected by the agent and excluded from grounding. None of the 1,230 bank items rely on raw Schweser OCR pages (packs cite official 2027 curriculum volumes). Qualified human source verification remains pending."
+}

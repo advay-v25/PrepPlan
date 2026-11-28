@@ -1,0 +1,1347 @@
+{
+  "phase": "D1",
+  "rawFormatFlaggedItems": 152,
+  "falsePositiveDigitsInProse": 152,
+  "genuineFormatDefects": 0,
+  "answerLengthOutliersGe2x": 156,
+  "answerLengthOutliersSample": [
+    {
+      "id": "pp-mock1-r005-b-medium-1",
+      "keyLen": 93,
+      "meanDistractorLen": 45.5,
+      "ratio": 2.04
+    },
+    {
+      "id": "pp-mock1-r007-b-medium-1",
+      "keyLen": 88,
+      "meanDistractorLen": 44,
+      "ratio": 2
+    },
+    {
+      "id": "pp-2027-c5-r009-b-hard",
+      "keyLen": 154,
+      "meanDistractorLen": 75.5,
+      "ratio": 2.04
+    },
+    {
+      "id": "pp-2027-c5-r010-a-medium",
+      "keyLen": 124,
+      "meanDistractorLen": 56.5,
+      "ratio": 2.19
+    },
+    {
+      "id": "pp-2027-c5-r010-b-easy",
+      "keyLen": 74,
+      "meanDistractorLen": 37,
+      "ratio": 2
+    },
+    {
+      "id": "pp-mock1-r010-b-medium-1",
+      "keyLen": 117,
+      "meanDistractorLen": 46,
+      "ratio": 2.54
+    },
+    {
+      "id": "pp-2027-c5-r010-d-hard",
+      "keyLen": 149,
+      "meanDistractorLen": 69.5,
+      "ratio": 2.14
+    },
+    {
+      "id": "pp-2027-c5-r012-a-hard",
+      "keyLen": 160,
+      "meanDistractorLen": 76.5,
+      "ratio": 2.09
+    },
+    {
+      "id": "pp-2027-c5-r012-c-easy",
+      "keyLen": 111,
+      "meanDistractorLen": 52.5,
+      "ratio": 2.11
+    },
+    {
+      "id": "pp-2027-c5-r012-d-easy",
+      "keyLen": 141,
+      "meanDistractorLen": 53.5,
+      "ratio": 2.64
+    },
+    {
+      "id": "pp-mock1-r013-a-easy-1",
+      "keyLen": 23,
+      "meanDistractorLen": 7.5,
+      "ratio": 3.07
+    },
+    {
+      "id": "pp-2027-c5-r013-a-hard",
+      "keyLen": 154,
+      "meanDistractorLen": 61,
+      "ratio": 2.52
+    },
+    {
+      "id": "pp-2027-c5-r013-a-medium",
+      "keyLen": 23,
+      "meanDistractorLen": 10,
+      "ratio": 2.3
+    },
+    {
+      "id": "pp-2027-c5-r013-b-hard",
+      "keyLen": 143,
+      "meanDistractorLen": 67.5,
+      "ratio": 2.12
+    },
+    {
+      "id": "pp-2027-c5-r014-a-hard",
+      "keyLen": 155,
+      "meanDistractorLen": 76,
+      "ratio": 2.04
+    },
+    {
+      "id": "pp-2027-c5-r015-a-hard",
+      "keyLen": 186,
+      "meanDistractorLen": 69.5,
+      "ratio": 2.68
+    },
+    {
+      "id": "pp-2027-c5-r015-b-hard",
+      "keyLen": 153,
+      "meanDistractorLen": 66.5,
+      "ratio": 2.3
+    },
+    {
+      "id": "pp-2027-c5-r015-c-easy",
+      "keyLen": 152,
+      "meanDistractorLen": 67.5,
+      "ratio": 2.25
+    },
+    {
+      "id": "pp-mock1-r015-d-hard-1",
+      "keyLen": 188,
+      "meanDistractorLen": 70.5,
+      "ratio": 2.67
+    },
+    {
+      "id": "pp-2027-c5-r016-b-easy",
+      "keyLen": 113,
+      "meanDistractorLen": 53.5,
+      "ratio": 2.11
+    }
+  ],
+  "adjudications": [
+    {
+      "id": "pp-mock1-r003-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r005-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r005-c-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r007-b-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r007-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r007-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r009-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r009-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r010-a-easy-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r010-a-medium",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r010-b-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r010-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r010-d-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r012-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r012-e-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r014-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r015-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r015-d-hard-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r016-d-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r016-f-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r018-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r018-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r019-a-medium-1",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r022-a-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r022-b-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r023-b-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r023-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r024-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r025-a-medium-1",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r025-b-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r025-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r025-c-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r029-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r029-c-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r034-b-easy-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r038-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r040-a-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r040-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r041-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r041-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r042-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r042-a-medium-1",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r043-a-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r043-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r044-c-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r044-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r044-d-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r045-a-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r045-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r045-c-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r045-d-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r045-d-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r046-b-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r046-c-medium-1",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r048-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r048-c-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r049-a-medium",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r049-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r050-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r051-a-easy-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r051-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r052-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r053-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r053-a-medium",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r054-a-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r054-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r054-b-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r056-b-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r056-b-medium",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r056-c-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r057-b-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r057-b-medium-1",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r058-b-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r058-b-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r059-b-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r059-c-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r060-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r060-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r060-c-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r061-b-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r061-b-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r062-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r063-a-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r063-c-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r063-c-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r064-a-easy-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r064-a-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r064-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r065-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r066-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r067-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r068-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r068-b-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r068-b-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r068-c-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r068-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r069-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r069-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r069-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r069-d-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r071-b-medium-1",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r071-c-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r073-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r074-b-easy",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r076-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r076-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r076-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r077-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r078-a-hard-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r078-b-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r078-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r080-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r080-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r080-c-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r080-c-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r082-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r082-b-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r083-a-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r083-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r085-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r086-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r086-d-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r086-d-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r087-c-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r087-f-medium",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r087-g-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r087-g-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r088-a-medium",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r088-d-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r088-e-easy-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r088-h-hard",
+      "rawCodes": [
+        "FORMAT_NUMERIC_ORDER"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r089-a-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r089-b-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r089-c-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r089-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r089-c-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r089-d-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r090-a-medium",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r090-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r090-d-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r090-d-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r090-e-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r090-f-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r090-g-easy",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r091-c-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r092-e-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-2027-c5-r092-g-hard",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r092-g-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r096-a-hard-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r097-c-hard-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r100-c-easy-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    },
+    {
+      "id": "pp-mock1-r102-a-medium-1",
+      "rawCodes": [
+        "FORMAT_MIXED_OPTION_TYPES"
+      ],
+      "adjudication": "false_positive_digits_in_prose",
+      "detail": "Shared formatRules.ts orderingValue strips non-digits from prose options mentioning numbers, years, or standards."
+    }
+  ]
+}

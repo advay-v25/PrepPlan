@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { parseTheme, THEME_COOKIE } from '../lib/theme/theme'
 import '../styles.css'
 import '../overhaul.css'
+import '../flow.css'
 
 const geist = Geist({ subsets: ['latin'], display: 'swap', variable: '--font-geist' })
 const geistMono = Geist_Mono({ subsets: ['latin'], display: 'swap', variable: '--font-geist-mono' })

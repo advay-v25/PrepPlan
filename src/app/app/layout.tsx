@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '../../lib/supabase/server'
 import { isAdmitted } from '../../lib/beta/admission'
 import { AppShell } from '../../components/AppShell'
-import { needsPassword } from '../../lib/auth/passwordState'
+import { profileRow } from '../../lib/ops/sharedReads'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,13 +20,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!user.email_confirmed_at) redirect('/check-email')
   if (!(await isAdmitted(user.id))) redirect('/not-invited')
-  if (needsPassword(user)) redirect('/set-password?next=/app')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('onboarding_status,display_name')
-    .eq('id', user.id)
-    .maybeSingle().throwOnError()
+  const profile = await profileRow(user.id)   // the same per-request snapshot the page's loaders share
 
   if (profile?.onboarding_status !== 'complete') redirect('/onboarding')
 

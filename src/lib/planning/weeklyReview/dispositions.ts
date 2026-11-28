@@ -12,7 +12,12 @@ export const NEXT: Next[] = ['continue', 'later', 'remove']
 
 /** `placeDate` is the student's own choice of day for a continuing task: a date, or 'none' to place it themselves. */
 export type Choice = { happened: Happened; next?: Next; estimateMinutes?: number | null; placeDate?: string }
-export type DispositionTask = { id: string; title: string; taskType: string; execution: string; durationMinutes: number; isProtected: boolean; lmId?: string | null; outcomeId?: string | null; repairThreadId?: string | null }
+/** What is still owed on a task: the planned time less what was actually logged. Never negative, never a percentage; a task logged past its plan keeps a short remainder. */
+export function remainingMinutes(planned: number, logged: number): number {
+  return logged <= 0 ? planned : logged < planned ? Math.max(5, planned - logged) : 15
+}
+
+export type DispositionTask = { /** Minutes actually logged on this task. */ loggedMinutes?: number; id: string; title: string; taskType: string; execution: string; durationMinutes: number; isProtected: boolean; lmId?: string | null; outcomeId?: string | null; repairThreadId?: string | null }
 
 export type Action = {
   taskId: string
@@ -65,10 +70,11 @@ export function resolveDispositions(tasks: DispositionTask[], choices: Record<st
     actions.push({
       taskId: task.id, setExecution, cancel, unknown: happened === 'unknown',
       continuation: carries ? {
-        minutes: estimate ?? task.durationMinutes,
+        // The student's own remaining estimate wins; otherwise the planner's: planned time less logged time, labelled as its estimate.
+        minutes: estimate ?? remainingMinutes(task.durationMinutes, task.loggedMinutes ?? 0),
         intent: next as 'continue' | 'later',
         // A reused estimate is a guess when work was started or its state is unknown; a stated one is not.
-        provisional: estimate == null && (happened === 'partial' || happened === 'unknown'),
+        provisional: estimate == null && (happened === 'partial' || happened === 'unknown' || (task.loggedMinutes ?? 0) > 0),
       } : null,
     })
   }

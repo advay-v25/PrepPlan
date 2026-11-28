@@ -66,3 +66,22 @@ test('the student can choose the day, but never a check before the required gap'
 test('a repeat miss earns a longer session than a first miss', () => {
   assert.ok(run([th('a', { occurrence: 3 })], { maxSittingMinutes: null }).tasks[0].duration_minutes > run([th('a')], { maxSittingMinutes: null }).tasks[0].duration_minutes)
 })
+
+test('fit is decided by whole gaps, not the day total: 45 minutes does not fit two 30-minute gaps; the 30-minute re-check does', () => {
+  const g = (...r: [number, number][]) => r.map(([start, end]) => ({ start, end }))
+  const two = g([540, 570], [660, 690])                                    // 09:00-09:30 and 11:00-11:30
+  const gapsByDate = Object.fromEntries(week.map(d => [d, two]))
+  const r = run([th('a', { occurrence: 2 })], { capacity: cap(60), gapsByDate, maxSittingMinutes: 45 })  // one 45-minute sitting; the totals alone would accept it
+  assert.equal(r.tasks.length, 0); assert.equal(r.unplaced.length, 1); assert.equal(r.check, null)
+  const ok = run([th('a', { occurrence: 3 })], { capacity: cap(60), gapsByDate, maxSittingMinutes: 30 })   // 60 minutes as 30 + 30: one sitting per gap
+  assert.equal(ok.tasks.length, 2); assert.ok(ok.check)
+  const perDay: Record<string, number> = {}; for (const t of ok.tasks) perDay[t.local_date] = (perDay[t.local_date] ?? 0) + 1
+  assert.ok(Object.values(perDay).every(n => n <= 2))                      // never more sittings on a day than it has gaps
+})
+test('a student can deliberately put a repair on a day outside the usual study days; it still has to fit a whole gap', () => {
+  const gapsByDate = Object.fromEntries(week.map(d => [d, [{ start: 540, end: 600 }]]))
+  const r = run([th('a')], { capacity: cap(60), gapsByDate, overrides: { 'a:0': week[6] } })   // week[6] is the Sunday, not in studyDates
+  assert.equal(r.tasks[0]?.local_date, week[6])
+  const none = run([th('a')], { capacity: cap(60), gapsByDate: { ...gapsByDate, [week[6]]: [{ start: 540, end: 550 }] }, overrides: { 'a:0': week[6] } })  // 10-minute gap holds no 30-minute repair
+  assert.equal(none.tasks.length, 0); assert.equal(none.unplaced.length, 1)
+})

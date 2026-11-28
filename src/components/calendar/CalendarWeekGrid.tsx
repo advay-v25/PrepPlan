@@ -13,6 +13,7 @@ import { useTaskMutation } from './useTaskMutation'
 import { ConflictDialog } from './ConflictDialog'
 import { UndoToast } from './UndoToast'
 import { NewTaskDialog } from './NewTaskDialog'
+import { useHydrated } from '../ui/WhenReady'
 import { CommitmentDialog } from './CommitmentDialog'
 import { NextClassDialog } from './NextClassDialog'
 import { calendarClassSelectionHref, calendarSelectionHref, findCalendarTask } from '../../lib/routing/calendar'
@@ -73,6 +74,7 @@ export function CalendarWeekGrid({
   const [creatingOn, setCreatingOn] = useState<{ date: string; startMinutes: number; untimed?: boolean } | null>(null)
   const [addingCommitment, setAddingCommitment] = useState(false)
   const [addingNextClass, setAddingNextClass] = useState(openNextClass)
+  const ready = useHydrated()   // a press before then would be dropped
 
   // Seven 128px columns do not fit a phone; it opens on the agenda unless a view was asked for.
   useEffect(() => {
@@ -235,7 +237,7 @@ export function CalendarWeekGrid({
 
   return (
     <div className="calendar">
-      {!readOnly && <p className="muted">Open a task to change its day or time.</p>}
+      {!readOnly && <p className="muted cal-hint">Open a task to change its day or time.</p>}
       <div className="calendar-toolbar">
         <div className="calendar-viewswitch" role="tablist" aria-label="Calendar view" onKeyDown={event => {
           if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return
@@ -257,16 +259,16 @@ export function CalendarWeekGrid({
             </div>
           )}
           {!readOnly && allowTaskCreation && days.some(d => d >= today) && (
-            <button type="button" className="secondary-button is-sm" onClick={() => setCreatingOn({ date: days.includes(today) ? today : days[0], startMinutes: 9 * 60, untimed: true })}>
+            <button type="button" className="secondary-button is-sm" disabled={!ready} onClick={() => setCreatingOn({ date: days.includes(today) ? today : days[0], startMinutes: 9 * 60, untimed: true })}>
               Add study task
             </button>
           )}
           {!readOnly && classPattern === 'variable' && (
-            <button type="button" className="secondary-button is-sm" onClick={() => setAddingNextClass(true)}>
+            <button type="button" className="secondary-button is-sm" disabled={!ready} onClick={() => setAddingNextClass(true)}>
               Add next class
             </button>
           )}
-          {!readOnly && <button type="button" className="secondary-button is-sm" onClick={() => setAddingCommitment(true)}>
+          {!readOnly && <button type="button" className="secondary-button is-sm" disabled={!ready} onClick={() => setAddingCommitment(true)}>
             <Plus size={14} aria-hidden /> Add commitment
           </button>}
         </div>

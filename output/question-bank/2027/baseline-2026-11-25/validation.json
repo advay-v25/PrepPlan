@@ -1,0 +1,68 @@
+{
+  "date": "2026-11-25",
+  "sourceFingerprint": "2ed49edff3ec79be",
+  "bankFingerprint": "599a2594d55c990f",
+  "orderedContentHash": "721526d5ea2208470b81dba9e21fbc556dd1beaf282c05760e0a551840667726",
+  "checks": {
+    "verify": "PASS: 62 constituent commands",
+    "canonicalTypes": "PASS",
+    "optimizedProductionBuild": "PASS: isolated build; app source unchanged by authoring",
+    "referenceIntakeSelfCheck": "PASS",
+    "rebuildDeterminism": "PASS",
+    "numericFormulasExecuted": 99,
+    "formatOrInputDefects": 0,
+    "localDraftImport": {
+      "inserted": 536,
+      "preserved": 0,
+      "bankHash": "c6196d23975b5db04cf0d28324448090cf057d793cb746553ed60090eb0b86be",
+      "localRehearsal": "PASS",
+      "idempotent": true,
+      "changedContentRefused": true,
+      "atomicRollback": true,
+      "learnerEligible": 0,
+      "heldOutEligible": 0,
+      "humanApprovals": 0
+    },
+    "offlineBrowser": {
+      "browser": "Chromium",
+      "fallback": "Browser plugin not available",
+      "results": [
+        {
+          "width": 1280,
+          "title": true,
+          "search": true,
+          "filters": true,
+          "blindAndAnswer": true,
+          "pagination": true,
+          "noOverflow": true,
+          "consoleErrors": []
+        },
+        {
+          "width": 390,
+          "title": true,
+          "search": true,
+          "filters": true,
+          "blindAndAnswer": true,
+          "pagination": true,
+          "noOverflow": true,
+          "consoleErrors": []
+        }
+      ]
+    },
+    "privateProxy": "PASS: real loopback identity, injected status and wrong-target startup refusal; no upstream calls",
+    "targetGuard": "PASS: direct and explicit loopback binding; invalid targets refused",
+    "disposableEnvironmentIsolation": "PASS",
+    "gitDiffCheck": "PASS"
+  },
+  "unexecuted": [
+    "Authenticated desktop/390px Phase 0\u20135 acceptance",
+    "Hosted draft import and disposable installation",
+    "Independent verifier/model solves for the new drafts",
+    "Human source/scope/difficulty/family/editorial reviews",
+    "Commercial input/distribution decision",
+    "Live Google consent, received email and real Turnstile checks"
+  ],
+  "releaseEligible": false,
+  "hostedWrites": false,
+  "modelCalls": false
+}

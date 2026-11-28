@@ -1,4 +1,5 @@
 import { createAdminClient } from '../supabase/admin'
+import { STUDY_TYPES } from '../curriculum/studyActivity'
 import { calendarTaskHref } from '../routing/calendar'
 import { getReport } from '../mocks/reportService'
 import { describeScore } from '../mocks/report'
@@ -29,12 +30,35 @@ export type SelectedObject =
   | { kind: 'unavailable'; what: 'proposal' | 'repair' | 'attempt' | 'task' | 'reading' | 'report'; message: string }
   | { kind: 'report'; id: string; status: 'active' | 'withdrawn'; title: string; summary: string; href: string }
   | { kind: 'reading'; id: string; title: string; href: string }
-  | { kind: 'task'; id: string; title: string; date: string; minutes: number; movable: boolean; href: string }
+  | { kind: 'task'; id: string; title: string; date: string; minutes: number; movable: boolean; href: string; logSummary: string | null }
   | { kind: 'attempt'; id: string; title: string; summary: string; resultHref: string }
   | { kind: 'proposal'; id: string; status: 'pending' | 'executed' | 'rejected' | 'stale' | 'expired'; title: string; reasoning: string; moves: { id: string; title: string; minutes: number; date: string }[]; staysDue: { title: string; reason: string }[]; taskLinks: TaskLink[]; message: string }
   | { kind: 'repair'; id: string; attemptId: string | null; status: string; conceptName: string; message: string; taskLinks: { label: string; href: string }[]; checkLink: { label: string; href: string } | null }
 
 const GONE = (what: 'proposal' | 'repair' | 'attempt' | 'task' | 'reading' | 'report'): SelectedObject => ({ kind: 'unavailable', what, message: `That ${what === 'proposal' ? 'suggestion' : what === 'attempt' ? 'paper' : what === 'task' ? 'task' : what === 'reading' ? 'reading' : what === 'report' ? 'mock report' : 'weak area'} is not available. It may have been removed, or it is not yours to open.` })
+
+type SelectedStudyLog = { status: 'partial' | 'completed'; minutes: number | null; confirmed: number; separate: boolean }
+
+async function readSelectedStudyLog(
+  admin: ReturnType<typeof createAdminClient>, userId: string,
+  task: { id: string; execution: string; learning_activity_id: unknown; task_type: string },
+): Promise<SelectedStudyLog | null> {
+  if (!STUDY_TYPES.has(task.task_type) || (task.execution !== 'partial' && task.execution !== 'completed')) return null
+  const [{ data: event }, { count }] = await Promise.all([
+    admin.from('task_events').select('actual_duration_minutes').eq('user_id', userId).eq('task_id', task.id)
+      .eq('event_type', task.execution).order('created_at', { ascending: false }).order('id', { ascending: false }).limit(1).maybeSingle().throwOnError(),
+    admin.from('block_scope_confirmations').select('outcome_id', { count: 'exact', head: true })
+      .eq('user_id', userId).eq('block_id', task.id).throwOnError(),
+  ])
+  return { status: task.execution, minutes: event?.actual_duration_minutes ?? null, confirmed: count ?? 0, separate: Boolean(task.learning_activity_id) }
+}
+
+function describeSelectedStudyLog(log: SelectedStudyLog) {
+  const status = log.separate ? 'Separate session logged.' : log.status === 'partial' ? 'Partly done.' : 'Block finished.'
+  const time = log.minutes === null ? 'No minutes were reported.' : `Latest report: ${log.minutes} minutes studied.`
+  const scope = log.confirmed === 0 ? 'Coverage is still unconfirmed.' : `${log.confirmed} outcome${log.confirmed === 1 ? '' : 's'} confirmed as covered.`
+  return `${status} ${time} ${scope}`
+}
 
 export async function loadSelectedObject(userId: string, sel: Selection): Promise<SelectedObject | null> {
   const admin = createAdminClient()
@@ -51,10 +75,12 @@ export async function loadSelectedObject(userId: string, sel: Selection): Promis
     return { kind: 'reading', id: r.id as string, title: `Reading ${r.reading_no}: ${r.title}`, href: `/app/curriculum/${r.topic_id}/${r.id}` }
   }
   if (sel.task) {
-    const { data: t } = await admin.from('plan_blocks').select('id, title, local_date, duration_minutes, execution, is_protected_commitment, cancelled_at, learning_activity_id').eq('id', sel.task).eq('user_id', userId).maybeSingle()
+    const { data: t } = await admin.from('plan_blocks').select('id, title, local_date, duration_minutes, execution, is_protected_commitment, cancelled_at, learning_activity_id, task_type').eq('id', sel.task).eq('user_id', userId).maybeSingle().throwOnError()
     if (!t || t.cancelled_at || !t.local_date) return GONE('task')
+    const log = await readSelectedStudyLog(admin, userId, t)
     return { kind: 'task', id: t.id as string, title: t.title as string, date: t.local_date as string, minutes: Number(t.duration_minutes ?? 0),
-      movable: t.execution === 'not_started' && !t.is_protected_commitment && !t.learning_activity_id, href: calendarTaskHref(t.id as string, t.local_date as string) }
+      movable: t.execution === 'not_started' && !t.is_protected_commitment && !t.learning_activity_id, href: calendarTaskHref(t.id as string, t.local_date as string),
+      logSummary: log ? describeSelectedStudyLog(log) : null }
   }
   if (sel.attempt) {
     // Owned and scored only. Another student's id and a missing one look the same.
